@@ -769,6 +769,78 @@ h1 {
 .btn-horloge.bonne {
   animation: horloge-bonne 0.45s ease-in-out;
 }
+
+/* ── Durées ──────────────────────────────────────────────────────────────── */
+
+.duree-question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Problème du jour ────────────────────────────────────────────────────── */
+
+.probleme-question {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  text-align: center;
+}
+
+/* ── Masse ───────────────────────────────────────────────────────────────── */
+
+.masse-question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.masse-objets {
+  display: flex;
+  gap: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0.35rem 0;
+}
+
+.masse-objet {
+  text-align: center;
+  font-size: clamp(2rem, 10vw, 3rem);
+  line-height: 1.3;
+}
+
+.masse-val {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primaire);
+  display: block;
+}
+
+.masse-vs {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.55;
+}
+
+/* ── Périmètre ───────────────────────────────────────────────────────────── */
+
+.perimetre-question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Angles ──────────────────────────────────────────────────────────────── */
+
+.angle-question {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: apparition-horloge 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
   </style>
 </head>
 <body>
@@ -831,6 +903,11 @@ h1 {
         <button type="button" class="carte-jeu" data-jeu="lecture"><span class="emoji-jeu">📚</span><span class="nom-jeu">Lecture</span><span class="desc-jeu">Image et mot qui va avec</span></button>
         <button type="button" class="carte-jeu" data-jeu="anglais"><span class="emoji-jeu">🇬🇧</span><span class="nom-jeu">English</span><span class="desc-jeu">What is this?</span></button>
         <button type="button" class="carte-jeu" data-jeu="traduction"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction</span><span class="desc-jeu">Français → Anglais</span></button>
+        <button type="button" class="carte-jeu" data-jeu="durees"><span class="emoji-jeu">⏱️</span><span class="nom-jeu">Durées</span><span class="desc-jeu">Calcule l'heure de fin</span></button>
+        <button type="button" class="carte-jeu" data-jeu="probleme"><span class="emoji-jeu">📖</span><span class="nom-jeu">Problème du jour</span><span class="desc-jeu">Résous le problème</span></button>
+        <button type="button" class="carte-jeu" data-jeu="masse"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">La masse</span><span class="desc-jeu">Poids et pesées</span></button>
+        <button type="button" class="carte-jeu" data-jeu="perimetre"><span class="emoji-jeu">🔲</span><span class="nom-jeu">Périmètre</span><span class="desc-jeu">Tour de la figure</span></button>
+        <button type="button" class="carte-jeu" data-jeu="angles"><span class="emoji-jeu">📐</span><span class="nom-jeu">Les angles</span><span class="desc-jeu">Droit, aigu, obtus</span></button>
       </div>
       <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
         <span id="icone-genre-actuel">👧</span>
@@ -2114,6 +2191,329 @@ h1 {
     });
   }
 
+  // ── Durées ───────────────────────────────────────────────────────────────
+
+  function lancerDurees() {
+    elTitre.textContent = "⏱️";
+    let debutH, debutM, dureeMin, texteduree;
+
+    if (!estCE1()) {
+      debutH = 8 + Math.floor(Math.random() * 9);
+      debutM = 0;
+      dureeMin = [30, 60][Math.floor(Math.random() * 2)];
+      texteduree = dureeMin === 60 ? "1 heure" : "30 minutes";
+    } else {
+      debutH = 8 + Math.floor(Math.random() * 9);
+      debutM = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
+      const durees = [15, 30, 45, 60, 90, 120];
+      dureeMin = durees[Math.floor(Math.random() * durees.length)];
+      if (dureeMin < 60) texteduree = dureeMin + " minutes";
+      else if (dureeMin === 60) texteduree = "1 heure";
+      else if (dureeMin === 90) texteduree = "1h30";
+      else texteduree = "2 heures";
+    }
+
+    const debutMin = debutH * 60 + debutM;
+    const finMin = debutMin + dureeMin;
+    bonneReponse = finMin;
+
+    const activites = ["Tu joues", "Tu lis", "Tu dessines", "Tu danses", "Tu fais du vélo"];
+    const acti = activites[Math.floor(Math.random() * activites.length)];
+    const affH = debutH + "h" + String(debutM).padStart(2, "0");
+
+    elQuestion.innerHTML = `<div class="duree-question">
+      <div class="grande-horloge">${svgHorloge(debutH || 12, debutM, 120)}</div>
+      <p>Il est <strong>${affH}</strong>.</p>
+      <p>${acti} pendant <strong>${texteduree}</strong>.</p>
+      <p>À quelle heure tu t'arrêtes ?</p>
+    </div>`;
+
+    const fausses = [-60, -45, -30, -15, 15, 30, 45, 60, 90]
+      .map(d => finMin + d)
+      .filter(t => t > 0 && t !== finMin && Math.floor(t / 60) < 24);
+    afficherChoixHorloge(melanger([finMin, ...melanger(fausses).slice(0, 3)]));
+  }
+
+  // ── Problème du jour ─────────────────────────────────────────────────────
+
+  const PROBLEMES = {
+    cp: [
+      { generer() {
+        const a = 4 + Math.floor(Math.random() * 5);
+        const b = 1 + Math.floor(Math.random() * (a - 1));
+        return { texte: `Léa a <strong>${a}</strong> 🍎. Elle en mange <strong>${b}</strong>. Combien en reste-t-il ?`, rep: a - b, min: 0, max: a + 2 };
+      } },
+      { generer() {
+        const a = 2 + Math.floor(Math.random() * 5);
+        const b = 1 + Math.floor(Math.random() * 4);
+        return { texte: `Tom a <strong>${a}</strong> billes 🔵. Son ami lui en donne <strong>${b}</strong>. Combien en a-t-il maintenant ?`, rep: a + b, min: a, max: a + b + 4 };
+      } },
+      { generer() {
+        const a = 2 + Math.floor(Math.random() * 5);
+        const b = 2 + Math.floor(Math.random() * 5);
+        return { texte: `Il y a <strong>${a}</strong> 🐱 dans le jardin et <strong>${b}</strong> dans la maison. Combien de chats en tout ?`, rep: a + b, min: Math.max(2, a + b - 4), max: a + b + 4 };
+      } },
+      { generer() {
+        const a = 5 + Math.floor(Math.random() * 5);
+        const b = 1 + Math.floor(Math.random() * (a - 1));
+        return { texte: `On avait <strong>${a}</strong> 🎈 ballons. <strong>${b}</strong> se sont envolés. Combien en reste-t-il ?`, rep: a - b, min: 0, max: a };
+      } },
+      { generer() {
+        const g = 3 + Math.floor(Math.random() * 5);
+        const f = 3 + Math.floor(Math.random() * 5);
+        return { texte: `Dans la classe, <strong>${g}</strong> 👦 garçons et <strong>${f}</strong> 👧 filles. Combien d'élèves en tout ?`, rep: g + f, min: g + f - 4, max: g + f + 4 };
+      } },
+    ],
+    ce1: [
+      { generer() {
+        const a = 20 + Math.floor(Math.random() * 40);
+        const b = 10 + Math.floor(Math.random() * 20);
+        return { texte: `Une bibliothèque a <strong>${a}</strong> livres de BD et <strong>${b}</strong> livres de contes. Combien de livres au total ?`, rep: a + b, min: a + b - 15, max: a + b + 15 };
+      } },
+      { generer() {
+        const tot = 30 + Math.floor(Math.random() * 40);
+        const p = 5 + Math.floor(Math.random() * 20);
+        return { texte: `Le bus a <strong>${tot}</strong> passagers 🚌. À l'arrêt, <strong>${p}</strong> descendent. Combien reste-t-il ?`, rep: tot - p, min: Math.max(0, tot - p - 12), max: tot - p + 12 };
+      } },
+      { generer() {
+        const t = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+        const n = 3 + Math.floor(Math.random() * 7);
+        return { texte: `Il y a <strong>${n}</strong> boîtes avec <strong>${t}</strong> 🍪 biscuits chacune. Combien de biscuits en tout ?`, rep: n * t, min: Math.max(2, n * t - 10), max: n * t + 10 };
+      } },
+      { generer() {
+        const t = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+        const q = 2 + Math.floor(Math.random() * 8);
+        return { texte: `On partage <strong>${t * q}</strong> 🍬 bonbons entre <strong>${t}</strong> enfants. Combien pour chacun ?`, rep: q, min: Math.max(1, q - 4), max: q + 4 };
+      } },
+      { generer() {
+        const a = 20 + Math.floor(Math.random() * 30);
+        const b = 5 + Math.floor(Math.random() * (a - 5));
+        return { texte: `Lucie a économisé <strong>${a}</strong> € 💰. Elle dépense <strong>${b}</strong> €. Combien lui reste-t-il ?`, rep: a - b, min: Math.max(0, a - b - 10), max: a - b + 10 };
+      } },
+    ],
+  };
+
+  function lancerProbleme() {
+    elTitre.textContent = "📖";
+    const pool = estCE1() ? PROBLEMES.ce1 : PROBLEMES.cp;
+    const tmpl = pool[Math.floor(Math.random() * pool.length)];
+    const { texte, rep, min, max } = tmpl.generer();
+    bonneReponse = rep;
+    elQuestion.innerHTML = `<div class="probleme-question"><p>${texte}</p></div>`;
+    const props = propositionsAvecBonne(rep, Math.max(0, min), Math.max(max, min + 5), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+  }
+
+  // ── Masse ────────────────────────────────────────────────────────────────
+
+  const OBJETS_MASSE = [
+    { emoji: "🍎", nom: "une pomme",    masse: 200 },
+    { emoji: "📚", nom: "un livre",     masse: 500 },
+    { emoji: "🧸", nom: "un doudou",    masse: 300 },
+    { emoji: "⚽", nom: "un ballon",    masse: 400 },
+    { emoji: "🍌", nom: "une banane",   masse: 150 },
+    { emoji: "🥛", nom: "1 L de lait", masse: 1000 },
+    { emoji: "🍫", nom: "un chocolat", masse: 100 },
+    { emoji: "🎒", nom: "un cartable",  masse: 2000 },
+    { emoji: "🐱", nom: "un chat",      masse: 4000 },
+    { emoji: "🐶", nom: "un chien",     masse: 6000 },
+  ];
+
+  function formatMasse(g) {
+    if (g >= 1000 && g % 1000 === 0) return (g / 1000) + " kg";
+    if (g >= 1000) return Math.floor(g / 1000) + " kg " + (g % 1000) + " g";
+    return g + " g";
+  }
+
+  function lancerMasse() {
+    elTitre.textContent = "⚖️";
+    const deux = melanger(OBJETS_MASSE).slice(0, 2);
+    const [objA, objB] = deux;
+
+    if (!estCE1()) {
+      if (objA.masse === objB.masse) { lancerMasse(); return; }
+      bonneReponse = objA.masse > objB.masse ? 0 : 1;
+      elQuestion.innerHTML = `<div class="masse-question">
+        <p>Lequel est le plus <strong>lourd</strong> ?</p>
+        <div class="masse-objets">
+          <div class="masse-objet">${objA.emoji}<br><span class="masse-val">${formatMasse(objA.masse)}</span></div>
+          <div class="masse-vs">ou</div>
+          <div class="masse-objet">${objB.emoji}<br><span class="masse-val">${formatMasse(objB.masse)}</span></div>
+        </div>
+      </div>`;
+      elChoix.innerHTML = "";
+      [{ val: 0, obj: objA }, { val: 1, obj: objB }].forEach(({ val, obj }) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix";
+        b.textContent = obj.emoji + " " + formatMasse(obj.masse);
+        b.dataset.valeur = String(val);
+        b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+    } else {
+      const total = objA.masse + objB.masse;
+      bonneReponse = total;
+      elQuestion.innerHTML = `<div class="masse-question">
+        <p>${objA.emoji} ${objA.nom} pèse <strong>${formatMasse(objA.masse)}</strong>.</p>
+        <p>${objB.emoji} ${objB.nom} pèse <strong>${formatMasse(objB.masse)}</strong>.</p>
+        <p>Combien pèsent-ils <strong>ensemble</strong> ?</p>
+      </div>`;
+      const step = total >= 1000 ? 500 : 50;
+      const fausses = [-3, -2, -1, 1, 2, 3]
+        .map(d => total + d * step)
+        .filter(v => v > 0 && v !== total);
+      const opts = melanger([total, ...melanger(fausses).slice(0, 3)]);
+      elChoix.innerHTML = "";
+      opts.forEach(v => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix";
+        b.textContent = formatMasse(v);
+        b.dataset.valeur = String(v);
+        b.addEventListener("click", () => apresReponse(v, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+    }
+  }
+
+  // ── Périmètre ────────────────────────────────────────────────────────────
+
+  function svgPerimetre(type, a, b) {
+    const W = 260, H = 190;
+    let shape = "", labels = "";
+    const fs = 15, fw = 700, fc = "#5344c7";
+
+    if (type === "carre") {
+      const s = 100, x0 = (W - s) / 2, y0 = (H - s) / 2;
+      shape = `<rect x="${x0}" y="${y0}" width="${s}" height="${s}" fill="#f0eeff" stroke="#6c5ce7" stroke-width="3" rx="3"/>`;
+      labels += `<text x="${W/2}" y="${y0-10}" text-anchor="middle" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+      labels += `<text x="${W/2}" y="${y0+s+20}" text-anchor="middle" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+      labels += `<text x="${x0-10}" y="${H/2+5}" text-anchor="end" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+      labels += `<text x="${x0+s+10}" y="${H/2+5}" text-anchor="start" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+    } else if (type === "rectangle") {
+      const rw = 150, rh = 80, x0 = (W - rw) / 2, y0 = (H - rh) / 2;
+      shape = `<rect x="${x0}" y="${y0}" width="${rw}" height="${rh}" fill="#f0eeff" stroke="#6c5ce7" stroke-width="3" rx="3"/>`;
+      labels += `<text x="${W/2}" y="${y0-10}" text-anchor="middle" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+      labels += `<text x="${W/2}" y="${y0+rh+20}" text-anchor="middle" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+      labels += `<text x="${x0-10}" y="${H/2+5}" text-anchor="end" font-size="${fs}" font-weight="${fw}" fill="${fc}">${b} cm</text>`;
+      labels += `<text x="${x0+rw+10}" y="${H/2+5}" text-anchor="start" font-size="${fs}" font-weight="${fw}" fill="${fc}">${b} cm</text>`;
+    } else {
+      const side = 110, cx = W / 2, cy = H / 2 + 10;
+      const th = side * Math.sqrt(3) / 2;
+      const p1 = `${cx.toFixed(1)},${(cy - th * 0.65).toFixed(1)}`;
+      const p2 = `${(cx - side / 2).toFixed(1)},${(cy + th * 0.35).toFixed(1)}`;
+      const p3 = `${(cx + side / 2).toFixed(1)},${(cy + th * 0.35).toFixed(1)}`;
+      shape = `<polygon points="${p1} ${p2} ${p3}" fill="#f0eeff" stroke="#6c5ce7" stroke-width="3"/>`;
+      labels += `<text x="${cx}" y="${(cy + th * 0.35 + 18).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+      labels += `<text x="${(cx - side / 4 - 14).toFixed(1)}" y="${(cy - th * 0.15).toFixed(1)}" text-anchor="end" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+      labels += `<text x="${(cx + side / 4 + 14).toFixed(1)}" y="${(cy - th * 0.15).toFixed(1)}" text-anchor="start" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>`;
+    }
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:Fredoka,sans-serif">${shape}${labels}</svg>`;
+  }
+
+  function lancerPerimetre() {
+    elTitre.textContent = "🔲";
+    const maxC = estCE1() ? 15 : 8;
+    const types = estCE1() ? ["carre", "rectangle", "triangle"] : ["carre", "rectangle"];
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    let a, b, perimetre;
+    if (type === "carre") {
+      a = 2 + Math.floor(Math.random() * (maxC - 1)); b = a;
+      perimetre = 4 * a;
+    } else if (type === "rectangle") {
+      a = 2 + Math.floor(Math.random() * (maxC - 1));
+      do { b = 2 + Math.floor(Math.random() * (maxC - 1)); } while (b === a);
+      perimetre = 2 * (a + b);
+    } else {
+      a = 2 + Math.floor(Math.random() * (maxC - 1)); b = a;
+      perimetre = 3 * a;
+    }
+    bonneReponse = perimetre;
+
+    const noms = { carre: "carré", rectangle: "rectangle", triangle: "triangle équilatéral" };
+    elQuestion.innerHTML = `<div class="perimetre-question">
+      <p>Calcule le <strong>périmètre</strong> de ce ${noms[type]} (en cm).</p>
+      ${svgPerimetre(type, a, b)}
+    </div>`;
+
+    const props = propositionsAvecBonne(perimetre, Math.max(4, perimetre - 12), perimetre + 14, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+  }
+
+  // ── Angles ───────────────────────────────────────────────────────────────
+
+  function svgAngle(degres, taille) {
+    const cx = taille * 0.22, cy = taille * 0.74;
+    const lon = taille * 0.6;
+    const rad = degres * Math.PI / 180;
+    const x1 = cx + lon, y1 = cy;
+    const x2 = (cx + lon * Math.cos(rad)).toFixed(2);
+    const y2 = (cy - lon * Math.sin(rad)).toFixed(2);
+
+    let mark = "";
+    if (degres === 90) {
+      const sq = taille * 0.13;
+      mark = `<path d="M${(cx + sq).toFixed(1)},${cy} L${(cx + sq).toFixed(1)},${(cy - sq).toFixed(1)} L${cx},${(cy - sq).toFixed(1)}" fill="none" stroke="#6c5ce7" stroke-width="2"/>`;
+    } else {
+      const r = taille * 0.2;
+      const ax = (cx + r * Math.cos(rad)).toFixed(2);
+      const ay = (cy - r * Math.sin(rad)).toFixed(2);
+      mark = `<path d="M${(cx + r).toFixed(1)},${cy} A${r},${r} 0 0 0 ${ax},${ay}" fill="#c4b5f9" opacity="0.55" stroke="#6c5ce7" stroke-width="1.5"/>`;
+    }
+    return `<svg width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}" xmlns="http://www.w3.org/2000/svg">
+      <line x1="${cx}" y1="${cy}" x2="${x1}" y2="${y1}" stroke="#5344c7" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#5344c7" stroke-width="3.5" stroke-linecap="round"/>
+      ${mark}
+      <circle cx="${cx}" cy="${cy}" r="5" fill="#5344c7"/>
+    </svg>`;
+  }
+
+  function lancerAngles() {
+    elTitre.textContent = "📐";
+    let degres, bonneVal;
+
+    if (!estCE1()) {
+      if (Math.random() < 0.5) {
+        degres = 90; bonneVal = 0;
+      } else {
+        degres = Math.random() < 0.5
+          ? 15 + Math.floor(Math.random() * 55)
+          : 110 + Math.floor(Math.random() * 55);
+        bonneVal = 1;
+      }
+      bonneReponse = bonneVal;
+      elQuestion.innerHTML = `<div class="angle-question">${svgAngle(degres, 160)}</div>`;
+      elChoix.innerHTML = "";
+      [{ val: 0, label: "Angle droit" }, { val: 1, label: "Pas droit" }].forEach(({ val, label }) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix";
+        b.textContent = label; b.dataset.valeur = String(val);
+        b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+    } else {
+      const idx = Math.floor(Math.random() * 3);
+      if (idx === 0) { degres = 90; bonneVal = 0; }
+      else if (idx === 1) { degres = 15 + Math.floor(Math.random() * 60); bonneVal = 1; }
+      else { degres = 110 + Math.floor(Math.random() * 55); bonneVal = 2; }
+      bonneReponse = bonneVal;
+      elQuestion.innerHTML = `<div class="angle-question">${svgAngle(degres, 160)}</div>`;
+      elChoix.innerHTML = "";
+      [
+        { val: 0, label: "Droit (90°)" },
+        { val: 1, label: "Aigu (< 90°)" },
+        { val: 2, label: "Obtus (> 90°)" },
+      ].forEach(({ val, label }, i) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix";
+        b.textContent = label; b.dataset.valeur = String(val);
+        if (i === 2) b.style.gridColumn = "1 / -1";
+        b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+    }
+  }
+
   const lanceurs = {
     compte: lancerCompte,
     addition: lancerAddition,
@@ -2137,6 +2537,11 @@ h1 {
     lecture: lancerLecture,
     anglais: lancerAnglaisMots,
     traduction: lancerTraduction,
+    durees: lancerDurees,
+    probleme: lancerProbleme,
+    masse: lancerMasse,
+    perimetre: lancerPerimetre,
+    angles: lancerAngles,
   };
 
   function montrerMenu() {
