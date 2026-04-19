@@ -827,6 +827,8 @@ h1 {
         <button type="button" class="carte-jeu" data-jeu="mesures"><span class="emoji-jeu">📏</span><span class="nom-jeu">Mesures</span><span class="desc-jeu">Longueurs et masses</span></button>
         <button type="button" class="carte-jeu" data-jeu="monnaiece1"><span class="emoji-jeu">💶</span><span class="nom-jeu">Monnaie CE1</span><span class="desc-jeu">Totaux &amp; monnaie rendue</span></button>
         <button type="button" class="carte-jeu" data-jeu="symetrie"><span class="emoji-jeu">🪞</span><span class="nom-jeu">Symétrie</span><span class="desc-jeu">Trouve le miroir</span></button>
+        <button type="button" class="carte-jeu" data-jeu="syllabes"><span class="emoji-jeu">📖</span><span class="nom-jeu">Syllabes</span><span class="desc-jeu">Complète le mot !</span></button>
+        <button type="button" class="carte-jeu" data-jeu="lecture"><span class="emoji-jeu">📚</span><span class="nom-jeu">Lecture</span><span class="desc-jeu">Image et mot qui va avec</span></button>
       </div>
       <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
         <span id="icone-genre-actuel">👧</span>
@@ -1850,6 +1852,139 @@ h1 {
     });
   }
 
+  // ── Jeux de lecture ──────────────────────────────────────────────────────
+
+  const MOTS_SYLLABES_CP = [
+    { mot: "maison",  parties: ["mai", "son"] },
+    { mot: "lapin",   parties: ["la", "pin"] },
+    { mot: "chapeau", parties: ["cha", "peau"] },
+    { mot: "robot",   parties: ["ro", "bot"] },
+    { mot: "vélo",    parties: ["vé", "lo"] },
+    { mot: "ballon",  parties: ["bal", "lon"] },
+    { mot: "sapin",   parties: ["sa", "pin"] },
+    { mot: "bateau",  parties: ["ba", "teau"] },
+    { mot: "soleil",  parties: ["so", "leil"] },
+    { mot: "chaton",  parties: ["cha", "ton"] },
+    { mot: "mouton",  parties: ["mou", "ton"] },
+    { mot: "matin",   parties: ["ma", "tin"] },
+    { mot: "pomme",   parties: ["pom", "me"] },
+    { mot: "nuage",   parties: ["nu", "age"] },
+    { mot: "tigre",   parties: ["ti", "gre"] },
+  ];
+
+  const MOTS_SYLLABES_CE1 = [
+    { mot: "papillon",   parties: ["pa", "pil", "lon"] },
+    { mot: "chocolat",   parties: ["cho", "co", "lat"] },
+    { mot: "tomate",     parties: ["to", "ma", "te"] },
+    { mot: "biberon",    parties: ["bi", "be", "ron"] },
+    { mot: "camion",     parties: ["ca", "mi", "on"] },
+    { mot: "princesse",  parties: ["prin", "ces", "se"] },
+    { mot: "dinosaure",  parties: ["di", "no", "saure"] },
+    { mot: "araignée",   parties: ["a", "rai", "gnée"] },
+    { mot: "éléphant",   parties: ["é", "lé", "phant"] },
+    { mot: "domino",     parties: ["do", "mi", "no"] },
+    { mot: "girafe",     parties: ["gi", "ra", "fe"] },
+    { mot: "tortue",     parties: ["tor", "tue"] },
+    { mot: "ananas",     parties: ["a", "na", "nas"] },
+    { mot: "carotte",    parties: ["ca", "rot", "te"] },
+    { mot: "licorne",    parties: ["li", "cor", "ne"] },
+  ];
+
+  function lancerSyllabes() {
+    elTitre.textContent = "📖 Syllabes";
+    const liste = estCE1() ? MOTS_SYLLABES_CE1 : MOTS_SYLLABES_CP;
+    const item = liste[Math.floor(Math.random() * liste.length)];
+    const parties = item.parties;
+    const indexCache = Math.floor(Math.random() * parties.length);
+    const syllabeCachee = parties[indexCache];
+
+    const affiche = parties.map((s, i) =>
+      i === indexCache
+        ? `<span style="color:var(--rose);border-bottom:3px solid var(--rose);padding:0 2px;min-width:2ch;display:inline-block">___</span>`
+        : `<span>${s}</span>`
+    ).join('<span style="opacity:0.4;margin:0 1px">·</span>');
+
+    elQuestion.innerHTML =
+      "<p>Quelle syllabe manque ?</p>" +
+      `<p style="font-size:1.7rem;font-weight:700;color:var(--primaire);letter-spacing:0.04em;margin-top:0.5rem">${affiche}</p>`;
+
+    const toutesListes = [...MOTS_SYLLABES_CP, ...MOTS_SYLLABES_CE1];
+    const piscine = toutesListes.flatMap((m) => m.parties).filter((s) => s !== syllabeCachee);
+    const distracteurs = melanger(piscine).slice(0, 3);
+    const options = melanger([syllabeCachee, ...distracteurs]);
+    bonneReponse = options.indexOf(syllabeCachee);
+
+    elChoix.innerHTML = "";
+    options.forEach((syl, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-choix";
+      b.textContent = syl;
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, bonneReponse));
+      elChoix.appendChild(b);
+    });
+  }
+
+  const MOTS_IMAGES_CP = [
+    { emoji: "🐱", mot: "chat",      fausses: ["chien", "lapin", "ours"] },
+    { emoji: "🐶", mot: "chien",     fausses: ["chat", "loup", "renard"] },
+    { emoji: "🐰", mot: "lapin",     fausses: ["souris", "chat", "lièvre"] },
+    { emoji: "🍎", mot: "pomme",     fausses: ["poire", "cerise", "orange"] },
+    { emoji: "🌸", mot: "fleur",     fausses: ["arbre", "feuille", "fruit"] },
+    { emoji: "🏠", mot: "maison",    fausses: ["château", "école", "garage"] },
+    { emoji: "⭐", mot: "étoile",    fausses: ["lune", "soleil", "nuage"] },
+    { emoji: "🌙", mot: "lune",      fausses: ["soleil", "étoile", "nuage"] },
+    { emoji: "🐟", mot: "poisson",   fausses: ["requin", "crabe", "baleine"] },
+    { emoji: "🚂", mot: "train",     fausses: ["bus", "avion", "bateau"] },
+    { emoji: "🦁", mot: "lion",      fausses: ["tigre", "ours", "loup"] },
+    { emoji: "🐸", mot: "grenouille",fausses: ["crapaud", "lézard", "serpent"] },
+    { emoji: "🌈", mot: "arc-en-ciel",fausses: ["nuage", "soleil", "pluie"] },
+    { emoji: "🎈", mot: "ballon",    fausses: ["bulle", "boule", "balle"] },
+    { emoji: "🍓", mot: "fraise",    fausses: ["cerise", "tomate", "pomme"] },
+  ];
+
+  const MOTS_IMAGES_CE1 = [
+    { emoji: "🦋", mot: "papillon",  fausses: ["libellule", "coccinelle", "abeille"] },
+    { emoji: "🐘", mot: "éléphant",  fausses: ["hippopotame", "rhinocéros", "girafe"] },
+    { emoji: "🚀", mot: "fusée",     fausses: ["avion", "hélicoptère", "satellite"] },
+    { emoji: "🦊", mot: "renard",    fausses: ["loup", "chacal", "coyote"] },
+    { emoji: "🐊", mot: "crocodile", fausses: ["alligator", "lézard", "iguane"] },
+    { emoji: "🌋", mot: "volcan",    fausses: ["montagne", "colline", "falaise"] },
+    { emoji: "🐙", mot: "pieuvre",   fausses: ["méduse", "calmar", "crabe"] },
+    { emoji: "🦒", mot: "girafe",    fausses: ["zèbre", "éléphant", "chameau"] },
+    { emoji: "🌵", mot: "cactus",    fausses: ["palmier", "bambou", "arbuste"] },
+    { emoji: "🦜", mot: "perroquet", fausses: ["toucan", "flamant", "pélican"] },
+    { emoji: "🐉", mot: "dragon",    fausses: ["dinosaure", "monstre", "serpent"] },
+    { emoji: "🏔️", mot: "montagne",  fausses: ["colline", "falaise", "volcan"] },
+  ];
+
+  function lancerLecture() {
+    elTitre.textContent = "📚 Lecture";
+    const liste = estCE1() ? MOTS_IMAGES_CE1 : MOTS_IMAGES_CP;
+    const item = liste[Math.floor(Math.random() * liste.length)];
+
+    elQuestion.innerHTML =
+      "<p style='font-size:0.95rem;margin-bottom:0.25rem'>Quel mot correspond à cette image ?</p>" +
+      `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+    const fausses = melanger(item.fausses).slice(0, 3);
+    const options = melanger([item.mot, ...fausses]);
+    bonneReponse = options.indexOf(item.mot);
+
+    elChoix.innerHTML = "";
+    options.forEach((mot, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-choix";
+      b.style.fontSize = "1rem";
+      b.textContent = mot;
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, bonneReponse));
+      elChoix.appendChild(b);
+    });
+  }
+
   const lanceurs = {
     compte: lancerCompte,
     addition: lancerAddition,
@@ -1869,6 +2004,8 @@ h1 {
     mesures: lancerMesures,
     monnaiece1: lancerMonnaieCe1,
     symetrie: lancerSymetrie,
+    syllabes: lancerSyllabes,
+    lecture: lancerLecture,
   };
 
   function montrerMenu() {
