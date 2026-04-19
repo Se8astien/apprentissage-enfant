@@ -11,6 +11,7 @@
   const RENARD_BONHEUR_KEY = "renard-bonheur";
   const RENARD_BONHEUR_TS_KEY = "renard-bonheur-ts";
   const RENARD_CALIN_DATE_KEY = "renard-calin-date";
+  const RENARD_STREAK_KEY = "renard-streak";
   const NIVEAU = { CP: "cp", CE1: "ce1" };
   const GENRE = { FILLE: "fille", GARCON: "garcon" };
 
@@ -263,11 +264,66 @@
     return d !== new Date().toISOString().slice(0, 10);
   }
 
+  function lireStreak() {
+    try { return JSON.parse(localStorage.getItem(RENARD_STREAK_KEY)) || { count: 0, lastVisit: "" }; }
+    catch { return { count: 0, lastVisit: "" }; }
+  }
+  function sauverStreak(s) { localStorage.setItem(RENARD_STREAK_KEY, JSON.stringify(s)); }
+
+  function mettreAJourStreak() {
+    const today = new Date().toISOString().slice(0, 10);
+    const s = lireStreak();
+    if (s.lastVisit === today) return s;
+
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const newCount = s.lastVisit === yesterday ? s.count + 1 : 1;
+    const streakData = { count: newCount, lastVisit: today };
+    sauverStreak(streakData);
+
+    // Paliers de récompense
+    const paliers = { 3: "chapeau-base", 7: "lunettes-base", 30: "echarpe-rare" };
+    if (paliers[newCount]) debloquerAccessoire(paliers[newCount]);
+
+    // Message si streak brisé (lastVisit existe mais n'est pas hier)
+    if (s.lastVisit && s.lastVisit !== yesterday && s.count > 0) {
+      if (elSousTitre) {
+        elSousTitre.textContent = "Le renard t'a attendu, mais il est content que tu sois là ! 🦊";
+        setTimeout(() => majGenre(), 4000);
+      }
+    }
+    return streakData;
+  }
+
+  function afficherStreakHeader(count) {
+    let el = document.getElementById("streak-header");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "streak-header";
+      el.className = "streak-header";
+      const scoreEl = document.querySelector(".score-global");
+      if (scoreEl) scoreEl.parentNode.insertBefore(el, scoreEl);
+    }
+    el.textContent = count >= 2 ? `🔥 ${count}` : "";
+    el.title = `${count} jour${count > 1 ? "s" : ""} d'affilée !`;
+  }
+
   elTotal.textContent = lireEtoiles();
   syncNiveauButtons();
   majLabelsMenu();
   mettreAJourJauges();
   mettreAJourRenardHeader();
+  const streakInit = mettreAJourStreak();
+  afficherStreakHeader(streakInit.count);
+
+  function debloquerAccessoire(id) {
+    try {
+      const liste = JSON.parse(localStorage.getItem("renard-accessoires") || "[]");
+      if (!liste.includes(id)) {
+        liste.push(id);
+        localStorage.setItem("renard-accessoires", JSON.stringify(liste));
+      }
+    } catch { /* ignore */ }
+  }
 
   function declencherEvolution(stade) {
     confetti();

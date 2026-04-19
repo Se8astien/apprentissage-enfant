@@ -99,6 +99,20 @@ h1 {
   font-size: 1.2rem;
 }
 
+.streak-header {
+  background: linear-gradient(135deg, #ff7675, #d63031);
+  color: white;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 3px 10px rgba(214, 48, 49, 0.35);
+  min-width: 2.2rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.streak-header:empty { display: none; }
+
 .ecran {
   display: none;
 }
