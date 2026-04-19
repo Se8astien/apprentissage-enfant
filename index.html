@@ -1039,6 +1039,73 @@ h1 {
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
+/* ── Jauges ──────────────────────────────────────────────────── */
+.maison-jauges {
+  width: 100%;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.jauge-ligne {
+  display: grid;
+  grid-template-columns: 80px 1fr 36px;
+  align-items: center;
+  gap: 0.5rem;
+}
+.jauge-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.jauge-barre-fond {
+  background: #eee;
+  border-radius: 10px;
+  height: 12px;
+  overflow: hidden;
+}
+.jauge-barre-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+.jauge-faim    { background: linear-gradient(90deg, #f39c12, #e74c3c); }
+.jauge-bonheur { background: linear-gradient(90deg, #e84393, #c0392b); }
+.jauge-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666;
+  text-align: right;
+}
+.maison-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-action-renard {
+  background: white;
+  border: 2.5px solid var(--primaire);
+  color: var(--primaire);
+  border-radius: 16px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.4;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-action-renard:hover:not(:disabled) {
+  background: var(--primaire);
+  color: white;
+}
+.btn-action-renard:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* ── Bouton Ma Maison ────────────────────────────────────────── */
 .btn-maison {
   display: block;
@@ -1302,6 +1369,30 @@ h1 {
             <div class="maison-barre-remplie" id="maison-barre-remplie"></div>
           </div>
         </div>
+        <div class="maison-jauges">
+          <div class="jauge-ligne">
+            <span class="jauge-label">🍎 Faim</span>
+            <div class="jauge-barre-fond">
+              <div class="jauge-barre-fill jauge-faim" id="jauge-faim-barre"></div>
+            </div>
+            <span class="jauge-val" id="jauge-faim-val"></span>
+          </div>
+          <div class="jauge-ligne">
+            <span class="jauge-label">❤️ Bonheur</span>
+            <div class="jauge-barre-fond">
+              <div class="jauge-barre-fill jauge-bonheur" id="jauge-bonheur-barre"></div>
+            </div>
+            <span class="jauge-val" id="jauge-bonheur-val"></span>
+          </div>
+        </div>
+        <div class="maison-actions">
+          <button type="button" class="btn-action-renard" id="btn-nourrir">
+            🍎 Nourrir<br><small>−2 ⭐</small>
+          </button>
+          <button type="button" class="btn-action-renard" id="btn-calin">
+            ❤️ Câlin<br><small id="calin-dispo-label">1× par jour</small>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -1327,6 +1418,11 @@ h1 {
   const STORAGE_GENRE = "maths-cp-genre";
   const RENARD_NOM_KEY = "renard-nom";
   const RENARD_NAISSANCE_KEY = "renard-naissance";
+  const RENARD_FAIM_KEY = "renard-faim";
+  const RENARD_FAIM_TS_KEY = "renard-faim-ts";
+  const RENARD_BONHEUR_KEY = "renard-bonheur";
+  const RENARD_BONHEUR_TS_KEY = "renard-bonheur-ts";
+  const RENARD_CALIN_DATE_KEY = "renard-calin-date";
   const NIVEAU = { CP: "cp", CE1: "ce1" };
   const GENRE = { FILLE: "fille", GARCON: "garcon" };
 
@@ -1442,15 +1538,23 @@ h1 {
     return 4;
   }
 
-  function svgRenard(stade, taille) {
+  function svgRenard(stade, taille, opts) {
+    const triste = opts && opts.triste;
     const s = RENARD_STADES[Math.max(0, Math.min(4, stade))];
     const t = taille || 80;
     const h = Math.round(t * 1.1);
 
-    const sourcils = stade >= 2
-      ? `<path d="M29,54 Q37,50 44,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-         <path d="M56,54 Q63,50 71,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
-      : "";
+    const sourcils = triste
+      ? `<path d="M29,62 Q37,57 44,63" stroke="${s.yeux}" stroke-width="2" fill="none" stroke-linecap="round"/>
+         <path d="M56,63 Q63,57 71,62" stroke="${s.yeux}" stroke-width="2" fill="none" stroke-linecap="round"/>`
+      : (stade >= 2
+        ? `<path d="M29,54 Q37,50 44,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+           <path d="M56,54 Q63,50 71,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+        : "");
+
+    const bouche = triste
+      ? `<path d="M44,80 Q50,74 56,80" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
+      : `<path d="M44,77 Q50,83 56,77" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
 
     function etoileSvg(cx, cy, r, couleur, op) {
       const r2 = r * 0.38;
@@ -1493,18 +1597,20 @@ h1 {
   <circle cx="41" cy="62" r="1.8" fill="white"/>
   <circle cx="67" cy="62" r="1.8" fill="white"/>
   <ellipse cx="50" cy="73" rx="3.5" ry="2.5" fill="#8B4513"/>
-  <path d="M44,77 Q50,83 56,77" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  ${bouche}
   <circle cx="27" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
   <circle cx="73" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
 </svg>`;
   }
 
   function mettreAJourRenardHeader() {
-    const stade = getStade(lireEtoiles());
+    const stade  = getStade(lireEtoiles());
+    const triste = lireFaim() < 20 || lireBonheur() < 20;
+    const opts   = { triste };
     const header = document.getElementById("mascotte-header");
     const genre  = document.getElementById("mascotte-genre");
-    if (header) header.innerHTML = svgRenard(stade, 44);
-    if (genre)  genre.innerHTML  = svgRenard(stade, 72);
+    if (header) header.innerHTML = svgRenard(stade, 44, opts);
+    if (genre)  genre.innerHTML  = svgRenard(stade, 72, opts);
   }
 
   function lireNomRenard() {
@@ -1532,9 +1638,47 @@ h1 {
     }, 350);
   }
 
+  function lireFaim() {
+    const v = parseFloat(localStorage.getItem(RENARD_FAIM_KEY));
+    return Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 80;
+  }
+  function sauverFaim(v) {
+    localStorage.setItem(RENARD_FAIM_KEY, String(Math.max(0, Math.min(100, v))));
+    localStorage.setItem(RENARD_FAIM_TS_KEY, String(Date.now()));
+  }
+  function lireBonheur() {
+    const v = parseFloat(localStorage.getItem(RENARD_BONHEUR_KEY));
+    return Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 80;
+  }
+  function sauverBonheur(v) {
+    localStorage.setItem(RENARD_BONHEUR_KEY, String(Math.max(0, Math.min(100, v))));
+    localStorage.setItem(RENARD_BONHEUR_TS_KEY, String(Date.now()));
+  }
+  function appliquerDecay(valKey, tsKey, tauxParHeure) {
+    const ts = parseInt(localStorage.getItem(tsKey) || "0", 10);
+    if (!ts) return;
+    const heures = (Date.now() - ts) / 3600000;
+    const val = parseFloat(localStorage.getItem(valKey) || "80");
+    const nvVal = Math.max(0, val - tauxParHeure * heures);
+    localStorage.setItem(valKey, String(nvVal));
+    localStorage.setItem(tsKey, String(Date.now()));
+  }
+  function mettreAJourJauges() {
+    appliquerDecay(RENARD_FAIM_KEY, RENARD_FAIM_TS_KEY, 20 / 24);
+    appliquerDecay(RENARD_BONHEUR_KEY, RENARD_BONHEUR_TS_KEY, 15 / 24);
+    // Initialiser les timestamps si première visite
+    if (!localStorage.getItem(RENARD_FAIM_TS_KEY)) sauverFaim(lireFaim());
+    if (!localStorage.getItem(RENARD_BONHEUR_TS_KEY)) sauverBonheur(lireBonheur());
+  }
+  function peutFaireCalin() {
+    const d = localStorage.getItem(RENARD_CALIN_DATE_KEY);
+    return d !== new Date().toISOString().slice(0, 10);
+  }
+
   elTotal.textContent = lireEtoiles();
   syncNiveauButtons();
   majLabelsMenu();
+  mettreAJourJauges();
   mettreAJourRenardHeader();
 
   function declencherEvolution(stade) {
@@ -1722,6 +1866,7 @@ h1 {
       elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
       elFeedback.className = "feedback ok";
       ajouterEtoiles(1);
+      sauverFaim(lireFaim() + 5);
       confetti();
       declencherReactionRenard(true);
     } else {
@@ -3213,7 +3358,8 @@ h1 {
     const s       = RENARD_STADES[stade];
     const nom     = lireNomRenard() || "Foxy";
 
-    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160);
+    const triste = lireFaim() < 20 || lireBonheur() < 20;
+    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160, { triste });
     document.getElementById("maison-nom").textContent  = nom;
     document.getElementById("maison-stade").textContent = "✦ " + s.nom;
     document.getElementById("maison-etoiles-total").textContent = etoiles;
@@ -3240,6 +3386,41 @@ h1 {
       document.getElementById("maison-prog-label").textContent = "🏆 Stade maximum atteint !";
       document.getElementById("maison-barre-remplie").style.width = "100%";
     }
+
+    // Jauges faim / bonheur
+    function majJaugeEl(id, barreId, valId, val) {
+      document.getElementById(barreId).style.width = val + "%";
+      document.getElementById(valId).textContent = Math.round(val) + "%";
+    }
+    majJaugeEl("faim",    "jauge-faim-barre",    "jauge-faim-val",    lireFaim());
+    majJaugeEl("bonheur", "jauge-bonheur-barre",  "jauge-bonheur-val", lireBonheur());
+
+    // Bouton Nourrir
+    const btnNourrir = document.getElementById("btn-nourrir");
+    btnNourrir.disabled = etoiles < 2 || lireFaim() >= 95;
+    btnNourrir.onclick = () => {
+      if (lireEtoiles() < 2) return;
+      const t = lireEtoiles() - 2;
+      localStorage.setItem(STORAGE_KEY, String(t));
+      elTotal.textContent = t;
+      sauverFaim(lireFaim() + 30);
+      mettreAJourRenardHeader();
+      montrerMaison();
+    };
+
+    // Bouton Câlin
+    const btnCalin = document.getElementById("btn-calin");
+    const peutCalin = peutFaireCalin();
+    btnCalin.disabled = !peutCalin;
+    document.getElementById("calin-dispo-label").textContent =
+      peutCalin ? "1× par jour" : "✓ Déjà fait !";
+    btnCalin.onclick = () => {
+      if (!peutFaireCalin()) return;
+      localStorage.setItem(RENARD_CALIN_DATE_KEY, new Date().toISOString().slice(0, 10));
+      sauverBonheur(lireBonheur() + 20);
+      mettreAJourRenardHeader();
+      montrerMaison();
+    };
   }
 
   function montrerJeu(nom) {
