@@ -4,6 +4,8 @@
   const STORAGE_KEY = "maths-cp-etoiles";
   const STORAGE_NIVEAU = "maths-cp-niveau";
   const STORAGE_GENRE = "maths-cp-genre";
+  const RENARD_NOM_KEY = "renard-nom";
+  const RENARD_NAISSANCE_KEY = "renard-naissance";
   const NIVEAU = { CP: "cp", CE1: "ce1" };
   const GENRE = { FILLE: "fille", GARCON: "garcon" };
 
@@ -184,6 +186,31 @@
     if (genre)  genre.innerHTML  = svgRenard(stade, 72);
   }
 
+  function lireNomRenard() {
+    return localStorage.getItem(RENARD_NOM_KEY) || null;
+  }
+
+  function sauverNomRenard(nom) {
+    localStorage.setItem(RENARD_NOM_KEY, nom);
+    if (!localStorage.getItem(RENARD_NAISSANCE_KEY)) {
+      localStorage.setItem(RENARD_NAISSANCE_KEY, new Date().toISOString().slice(0, 10));
+    }
+  }
+
+  function montrerNommage() {
+    const elNommage = document.getElementById("ecran-nommage");
+    elGenre.hidden = true;
+    elGenre.classList.remove("actif");
+    elNommage.hidden = false;
+    elNommage.classList.add("actif");
+    const foxDiv = document.getElementById("nommage-fox");
+    if (foxDiv) foxDiv.innerHTML = svgRenard(0, 110);
+    setTimeout(() => {
+      const inp = document.getElementById("input-nom-renard");
+      if (inp) inp.focus();
+    }, 350);
+  }
+
   elTotal.textContent = lireEtoiles();
   syncNiveauButtons();
   majLabelsMenu();
@@ -196,12 +223,34 @@
     mettreAJourRenardHeader();
   };
 
-  // ── Démarrage : genre screen ou menu direct ───────────────────────────────
-  if (localStorage.getItem(STORAGE_GENRE)) {
+  // ── Démarrage ─────────────────────────────────────────────────────────────
+  if (!lireNomRenard()) {
+    montrerNommage();
+  } else if (localStorage.getItem(STORAGE_GENRE)) {
     majGenre();
     montrerMenu();
-  } else {
-    // Écran genre déjà actif dans le HTML, rien à faire
+    const nom = lireNomRenard();
+    if (elSousTitre) {
+      elSousTitre.textContent = `${nom} t'attendait ! 🦊`;
+      setTimeout(() => majGenre(), 3500);
+    }
+  }
+
+  // ── Formulaire de nommage ─────────────────────────────────────────────────
+  const formNommage = document.getElementById("nommage-form");
+  if (formNommage) {
+    formNommage.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const inp = document.getElementById("input-nom-renard");
+      const nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
+      sauverNomRenard(nom);
+      const elNommage = document.getElementById("ecran-nommage");
+      elNommage.classList.remove("actif");
+      elNommage.hidden = true;
+      elGenre.hidden = false;
+      elGenre.classList.add("actif");
+      mettreAJourRenardHeader();
+    });
   }
 
   document.querySelectorAll(".niveau-btn").forEach((btn) => {
