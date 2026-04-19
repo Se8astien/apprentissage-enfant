@@ -495,6 +495,68 @@
     return h + "h" + String(m).padStart(2, "0");
   }
 
+  function svgHorlogeAnnotee(heure, minute, taille) {
+    const cx = taille / 2, cy = taille / 2;
+    const r = taille / 2 - 3;
+    const rad = (d) => (d * Math.PI) / 180;
+    const angleM = rad((minute / 60) * 360 - 90);
+    const angleH = rad((((heure % 12) + minute / 60) / 12) * 360 - 90);
+    const lonM = r * 0.68, lonH = r * 0.46;
+    const mX = (cx + lonM * Math.cos(angleM)).toFixed(2);
+    const mY = (cy + lonM * Math.sin(angleM)).toFixed(2);
+    const hX = (cx + lonH * Math.cos(angleH)).toFixed(2);
+    const hY = (cy + lonH * Math.sin(angleH)).toFixed(2);
+    let ticks = "";
+    for (let i = 0; i < 12; i++) {
+      const a = rad(i * 30 - 90);
+      const r1 = r - Math.round(taille * 0.07);
+      const r2 = r - 2;
+      ticks += `<line x1="${(cx + r1 * Math.cos(a)).toFixed(2)}" y1="${(cy + r1 * Math.sin(a)).toFixed(2)}" x2="${(cx + r2 * Math.cos(a)).toFixed(2)}" y2="${(cy + r2 * Math.sin(a)).toFixed(2)}" stroke="#c4b5f9" stroke-width="1.5" stroke-linecap="round"/>`;
+    }
+    let nums = "";
+    for (let n = 1; n <= 12; n++) {
+      const a = rad(n * 30 - 90);
+      const nr = r * 0.74;
+      nums += `<text x="${(cx + nr * Math.cos(a)).toFixed(2)}" y="${(cy + nr * Math.sin(a)).toFixed(2)}" text-anchor="middle" dominant-baseline="central" font-size="${Math.round(taille * 0.10)}" fill="#4a4068" font-weight="700" font-family="inherit">${n}</text>`;
+    }
+    return `<svg width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="${cx}" cy="${cy}" r="${r}" fill="white" stroke="#6c5ce7" stroke-width="2"/>
+  ${ticks}${nums}
+  <line x1="${cx}" y1="${cy}" x2="${mX}" y2="${mY}" stroke="#00cec9" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="${cx}" y1="${cy}" x2="${hX}" y2="${hY}" stroke="#5344c7" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="${cx}" cy="${cy}" r="3.5" fill="#5344c7"/>
+</svg>`;
+  }
+
+  function montrerAideHeure() {
+    resetFeedback();
+    elChoix.innerHTML = "";
+    const exemples = [
+      { h: 3, m: 0,  label: "3h00", sub: "grande sur le 12" },
+      { h: 3, m: 15, label: "3h15", sub: "grande sur le 3" },
+      { h: 3, m: 30, label: "3h30", sub: "grande sur le 6" },
+      { h: 3, m: 45, label: "3h45", sub: "grande sur le 9" },
+    ];
+    const exHTML = exemples.map((e) =>
+      `<div class="aide-ex">
+        <div class="grande-horloge">${svgHorlogeAnnotee(e.h, e.m, 90)}</div>
+        <p class="aide-ex-label">${e.label}</p>
+        <p class="aide-ex-sub">${e.sub}</p>
+      </div>`
+    ).join("");
+    elQuestion.innerHTML = `
+      <div class="aide-heure">
+        <p class="aide-heure-titre">🕐 Comment lire l'heure ?</p>
+        <div class="aide-heure-legende">
+          <div class="aide-legende-item heures">🟣 Petite aiguille épaisse → les <strong>HEURES</strong></div>
+          <div class="aide-legende-item minutes">🔵 Grande aiguille fine → les <strong>MINUTES</strong></div>
+        </div>
+        <div class="aide-heure-exemples">${exHTML}</div>
+        <button type="button" class="btn-retour-aide" id="btn-retour-aide">← Nouvelle question</button>
+      </div>`;
+    document.getElementById("btn-retour-aide").addEventListener("click", lancerHeure);
+  }
+
   function lancerHeure() {
     elTitre.textContent = "🕐";
 
@@ -523,7 +585,10 @@
 
     bonneReponse = bonne;
 
-    elQuestion.innerHTML = `<div class="grande-horloge">${svgHorloge(bonneH || 12, bonneM, 160)}</div>`;
+    elQuestion.innerHTML = `
+      <div class="grande-horloge">${svgHorloge(bonneH || 12, bonneM, 160)}</div>
+      <button type="button" class="btn-aide-heure" id="btn-aide-heure">💡 Comment lire l'heure ?</button>`;
+    document.getElementById("btn-aide-heure").addEventListener("click", montrerAideHeure);
     afficherChoixHorloge(options);
   }
 
