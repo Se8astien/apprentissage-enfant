@@ -6,6 +6,11 @@
   const STORAGE_GENRE = "maths-cp-genre";
   const RENARD_NOM_KEY = "renard-nom";
   const RENARD_NAISSANCE_KEY = "renard-naissance";
+  const RENARD_FAIM_KEY = "renard-faim";
+  const RENARD_FAIM_TS_KEY = "renard-faim-ts";
+  const RENARD_BONHEUR_KEY = "renard-bonheur";
+  const RENARD_BONHEUR_TS_KEY = "renard-bonheur-ts";
+  const RENARD_CALIN_DATE_KEY = "renard-calin-date";
   const NIVEAU = { CP: "cp", CE1: "ce1" };
   const GENRE = { FILLE: "fille", GARCON: "garcon" };
 
@@ -121,15 +126,23 @@
     return 4;
   }
 
-  function svgRenard(stade, taille) {
+  function svgRenard(stade, taille, opts) {
+    const triste = opts && opts.triste;
     const s = RENARD_STADES[Math.max(0, Math.min(4, stade))];
     const t = taille || 80;
     const h = Math.round(t * 1.1);
 
-    const sourcils = stade >= 2
-      ? `<path d="M29,54 Q37,50 44,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-         <path d="M56,54 Q63,50 71,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
-      : "";
+    const sourcils = triste
+      ? `<path d="M29,62 Q37,57 44,63" stroke="${s.yeux}" stroke-width="2" fill="none" stroke-linecap="round"/>
+         <path d="M56,63 Q63,57 71,62" stroke="${s.yeux}" stroke-width="2" fill="none" stroke-linecap="round"/>`
+      : (stade >= 2
+        ? `<path d="M29,54 Q37,50 44,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+           <path d="M56,54 Q63,50 71,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+        : "");
+
+    const bouche = triste
+      ? `<path d="M44,80 Q50,74 56,80" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
+      : `<path d="M44,77 Q50,83 56,77" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
 
     function etoileSvg(cx, cy, r, couleur, op) {
       const r2 = r * 0.38;
@@ -172,18 +185,20 @@
   <circle cx="41" cy="62" r="1.8" fill="white"/>
   <circle cx="67" cy="62" r="1.8" fill="white"/>
   <ellipse cx="50" cy="73" rx="3.5" ry="2.5" fill="#8B4513"/>
-  <path d="M44,77 Q50,83 56,77" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  ${bouche}
   <circle cx="27" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
   <circle cx="73" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
 </svg>`;
   }
 
   function mettreAJourRenardHeader() {
-    const stade = getStade(lireEtoiles());
+    const stade  = getStade(lireEtoiles());
+    const triste = lireFaim() < 20 || lireBonheur() < 20;
+    const opts   = { triste };
     const header = document.getElementById("mascotte-header");
     const genre  = document.getElementById("mascotte-genre");
-    if (header) header.innerHTML = svgRenard(stade, 44);
-    if (genre)  genre.innerHTML  = svgRenard(stade, 72);
+    if (header) header.innerHTML = svgRenard(stade, 44, opts);
+    if (genre)  genre.innerHTML  = svgRenard(stade, 72, opts);
   }
 
   function lireNomRenard() {
@@ -211,9 +226,47 @@
     }, 350);
   }
 
+  function lireFaim() {
+    const v = parseFloat(localStorage.getItem(RENARD_FAIM_KEY));
+    return Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 80;
+  }
+  function sauverFaim(v) {
+    localStorage.setItem(RENARD_FAIM_KEY, String(Math.max(0, Math.min(100, v))));
+    localStorage.setItem(RENARD_FAIM_TS_KEY, String(Date.now()));
+  }
+  function lireBonheur() {
+    const v = parseFloat(localStorage.getItem(RENARD_BONHEUR_KEY));
+    return Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 80;
+  }
+  function sauverBonheur(v) {
+    localStorage.setItem(RENARD_BONHEUR_KEY, String(Math.max(0, Math.min(100, v))));
+    localStorage.setItem(RENARD_BONHEUR_TS_KEY, String(Date.now()));
+  }
+  function appliquerDecay(valKey, tsKey, tauxParHeure) {
+    const ts = parseInt(localStorage.getItem(tsKey) || "0", 10);
+    if (!ts) return;
+    const heures = (Date.now() - ts) / 3600000;
+    const val = parseFloat(localStorage.getItem(valKey) || "80");
+    const nvVal = Math.max(0, val - tauxParHeure * heures);
+    localStorage.setItem(valKey, String(nvVal));
+    localStorage.setItem(tsKey, String(Date.now()));
+  }
+  function mettreAJourJauges() {
+    appliquerDecay(RENARD_FAIM_KEY, RENARD_FAIM_TS_KEY, 20 / 24);
+    appliquerDecay(RENARD_BONHEUR_KEY, RENARD_BONHEUR_TS_KEY, 15 / 24);
+    // Initialiser les timestamps si première visite
+    if (!localStorage.getItem(RENARD_FAIM_TS_KEY)) sauverFaim(lireFaim());
+    if (!localStorage.getItem(RENARD_BONHEUR_TS_KEY)) sauverBonheur(lireBonheur());
+  }
+  function peutFaireCalin() {
+    const d = localStorage.getItem(RENARD_CALIN_DATE_KEY);
+    return d !== new Date().toISOString().slice(0, 10);
+  }
+
   elTotal.textContent = lireEtoiles();
   syncNiveauButtons();
   majLabelsMenu();
+  mettreAJourJauges();
   mettreAJourRenardHeader();
 
   function declencherEvolution(stade) {
@@ -257,12 +310,14 @@
   } else if (localStorage.getItem(STORAGE_GENRE)) {
     majGenre();
     montrerMenu();
+    // Message de bienvenue personnalisé
     const nom = lireNomRenard();
     if (elSousTitre) {
       elSousTitre.textContent = `${nom} t'attendait ! 🦊`;
       setTimeout(() => majGenre(), 3500);
     }
   }
+  // Sinon : #ecran-genre déjà actif dans le HTML
 
   // ── Formulaire de nommage ─────────────────────────────────────────────────
   const formNommage = document.getElementById("nommage-form");
@@ -399,6 +454,7 @@
       elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
       elFeedback.className = "feedback ok";
       ajouterEtoiles(1);
+      sauverFaim(lireFaim() + 5);
       confetti();
       declencherReactionRenard(true);
     } else {
@@ -715,10 +771,10 @@
     resetFeedback();
     elChoix.innerHTML = "";
     const exemples = [
-      { h: 3, m: 0,  label: "3h00", sub: "grande sur le 12" },
-      { h: 3, m: 15, label: "3h15", sub: "grande sur le 3" },
-      { h: 3, m: 30, label: "3h30", sub: "grande sur le 6" },
-      { h: 3, m: 45, label: "3h45", sub: "grande sur le 9" },
+      { h: 3, m: 0,  label: "3h00",  sub: "grande sur le 12" },
+      { h: 3, m: 15, label: "3h15",  sub: "grande sur le 3" },
+      { h: 3, m: 30, label: "3h30",  sub: "grande sur le 6" },
+      { h: 3, m: 45, label: "3h45",  sub: "grande sur le 9" },
     ];
     const exHTML = exemples.map((e) =>
       `<div class="aide-ex">
@@ -885,14 +941,6 @@
     }
   }
 
-  const LABELS_FORMES = {
-    cercle: "Cercle",
-    carré: "Carré",
-    rectangle: "Rectangle",
-    triangle: "Triangle",
-    losange: "Losange",
-  };
-
   function lancerFormes() {
     elTitre.textContent = "🔷";
     const idx = Math.floor(Math.random() * FORMES.length);
@@ -900,20 +948,18 @@
     const couleurQ = COULEURS_FORMES[Math.floor(Math.random() * COULEURS_FORMES.length)];
     bonneReponse = idx;
 
-    elQuestion.innerHTML = `<div class="forme-question">
-      <p>Comment s'appelle cette forme ?</p>
-      ${svgForme(forme, 150, couleurQ)}
-    </div>`;
+    elQuestion.innerHTML = `<div class="forme-question">${svgForme(forme, 130, couleurQ)}</div>`;
 
     const autresIdx = melanger(FORMES.map((_, i) => i).filter((i) => i !== idx)).slice(0, 3);
     const optionsIdx = melanger([idx, ...autresIdx]);
 
     elChoix.innerHTML = "";
     optionsIdx.forEach((i) => {
+      const ci = (COULEURS_FORMES.indexOf(couleurQ) + i + 1) % COULEURS_FORMES.length;
       const b = document.createElement("button");
       b.type = "button";
-      b.className = "btn-choix";
-      b.textContent = LABELS_FORMES[FORMES[i]];
+      b.className = "btn-choix btn-forme";
+      b.innerHTML = svgForme(FORMES[i], 75, COULEURS_FORMES[ci]);
       b.dataset.valeur = String(i);
       b.addEventListener("click", () => apresReponse(i, b, bonneReponse));
       elChoix.appendChild(b);
@@ -946,6 +992,17 @@
     return euros > 0 ? `${euros},${cents}€` : `0,${cents}€`;
   }
 
+  const ARTICLES_BOUTIQUE = [
+    { nom: "un livre", emoji: "📚" },
+    { nom: "un jouet", emoji: "🧸" },
+    { nom: "une glace", emoji: "🍦" },
+    { nom: "un cahier", emoji: "📓" },
+    { nom: "des crayons", emoji: "✏️" },
+    { nom: "un ballon", emoji: "⚽" },
+    { nom: "une gomme", emoji: "🖊️" },
+    { nom: "un gâteau", emoji: "🍰" },
+  ];
+
   function svgPiecesLigne(pieces) {
     let x = 0;
     let circles = "";
@@ -974,7 +1031,7 @@
     if (total === 0 || chosenPieces.length < 2) { lancerMonnaieCp(); return; }
     bonneReponse = total;
 
-    elQuestion.innerHTML = `<p>Combien valent ces pièces en tout ?</p>${svgPiecesLigne(chosenPieces)}`;
+    elQuestion.innerHTML = svgPiecesLigne(chosenPieces);
 
     const dist = entiersDistincts(Math.max(1, total - 20), total + 20, 3, total);
     const opts = melanger([total, ...dist]);
@@ -1163,17 +1220,6 @@
 
   // ── Monnaie CE1 ──────────────────────────────────────────────────────────
 
-  const ARTICLES_BOUTIQUE = [
-    { nom: "un livre", emoji: "📚" },
-    { nom: "un jouet", emoji: "🧸" },
-    { nom: "une glace", emoji: "🍦" },
-    { nom: "un cahier", emoji: "📓" },
-    { nom: "des crayons", emoji: "✏️" },
-    { nom: "un ballon", emoji: "⚽" },
-    { nom: "une gomme", emoji: "🖊️" },
-    { nom: "un gâteau", emoji: "🍰" },
-  ];
-
   function lancerMonnaieCe1() {
     elTitre.textContent = "🛍️";
     const prixOptions = [100, 150, 200, 250, 300, 400, 500, 750, 1000];
@@ -1263,6 +1309,259 @@
       b.innerHTML = svg;
       b.dataset.valeur = String(val);
       b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
+      elChoix.appendChild(b);
+    });
+  }
+
+  // ── Jeux de lecture ──────────────────────────────────────────────────────
+
+  const MOTS_SYLLABES_CP = [
+    { mot: "maison",  parties: ["mai", "son"] },
+    { mot: "lapin",   parties: ["la", "pin"] },
+    { mot: "chapeau", parties: ["cha", "peau"] },
+    { mot: "robot",   parties: ["ro", "bot"] },
+    { mot: "vélo",    parties: ["vé", "lo"] },
+    { mot: "ballon",  parties: ["bal", "lon"] },
+    { mot: "sapin",   parties: ["sa", "pin"] },
+    { mot: "bateau",  parties: ["ba", "teau"] },
+    { mot: "soleil",  parties: ["so", "leil"] },
+    { mot: "chaton",  parties: ["cha", "ton"] },
+    { mot: "mouton",  parties: ["mou", "ton"] },
+    { mot: "matin",   parties: ["ma", "tin"] },
+    { mot: "pomme",   parties: ["pom", "me"] },
+    { mot: "nuage",   parties: ["nu", "age"] },
+    { mot: "tigre",   parties: ["ti", "gre"] },
+  ];
+
+  const MOTS_SYLLABES_CE1 = [
+    { mot: "papillon",   parties: ["pa", "pil", "lon"] },
+    { mot: "chocolat",   parties: ["cho", "co", "lat"] },
+    { mot: "tomate",     parties: ["to", "ma", "te"] },
+    { mot: "biberon",    parties: ["bi", "be", "ron"] },
+    { mot: "camion",     parties: ["ca", "mi", "on"] },
+    { mot: "princesse",  parties: ["prin", "ces", "se"] },
+    { mot: "dinosaure",  parties: ["di", "no", "saure"] },
+    { mot: "araignée",   parties: ["a", "rai", "gnée"] },
+    { mot: "éléphant",   parties: ["é", "lé", "phant"] },
+    { mot: "domino",     parties: ["do", "mi", "no"] },
+    { mot: "girafe",     parties: ["gi", "ra", "fe"] },
+    { mot: "tortue",     parties: ["tor", "tue"] },
+    { mot: "ananas",     parties: ["a", "na", "nas"] },
+    { mot: "carotte",    parties: ["ca", "rot", "te"] },
+    { mot: "licorne",    parties: ["li", "cor", "ne"] },
+  ];
+
+  function lancerSyllabes() {
+    elTitre.textContent = "📖 Syllabes";
+    const liste = estCE1() ? MOTS_SYLLABES_CE1 : MOTS_SYLLABES_CP;
+    const item = liste[Math.floor(Math.random() * liste.length)];
+    const parties = item.parties;
+    const indexCache = Math.floor(Math.random() * parties.length);
+    const syllabeCachee = parties[indexCache];
+
+    const affiche = parties.map((s, i) =>
+      i === indexCache
+        ? `<span style="color:var(--rose);border-bottom:3px solid var(--rose);padding:0 2px;min-width:2ch;display:inline-block">___</span>`
+        : `<span>${s}</span>`
+    ).join('<span style="opacity:0.4;margin:0 1px">·</span>');
+
+    elQuestion.innerHTML =
+      "<p>Quelle syllabe manque ?</p>" +
+      `<p style="font-size:1.7rem;font-weight:700;color:var(--primaire);letter-spacing:0.04em;margin-top:0.5rem">${affiche}</p>`;
+
+    const toutesListes = [...MOTS_SYLLABES_CP, ...MOTS_SYLLABES_CE1];
+    const piscine = toutesListes.flatMap((m) => m.parties).filter((s) => s !== syllabeCachee);
+    const distracteurs = melanger(piscine).slice(0, 3);
+    const options = melanger([syllabeCachee, ...distracteurs]);
+    bonneReponse = options.indexOf(syllabeCachee);
+
+    elChoix.innerHTML = "";
+    options.forEach((syl, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-choix";
+      b.textContent = syl;
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, bonneReponse));
+      elChoix.appendChild(b);
+    });
+  }
+
+  const MOTS_IMAGES_CP = [
+    { emoji: "🐱", mot: "chat",      fausses: ["chien", "lapin", "ours"] },
+    { emoji: "🐶", mot: "chien",     fausses: ["chat", "loup", "renard"] },
+    { emoji: "🐰", mot: "lapin",     fausses: ["souris", "chat", "lièvre"] },
+    { emoji: "🍎", mot: "pomme",     fausses: ["poire", "cerise", "orange"] },
+    { emoji: "🌸", mot: "fleur",     fausses: ["arbre", "feuille", "fruit"] },
+    { emoji: "🏠", mot: "maison",    fausses: ["château", "école", "garage"] },
+    { emoji: "⭐", mot: "étoile",    fausses: ["lune", "soleil", "nuage"] },
+    { emoji: "🌙", mot: "lune",      fausses: ["soleil", "étoile", "nuage"] },
+    { emoji: "🐟", mot: "poisson",   fausses: ["requin", "crabe", "baleine"] },
+    { emoji: "🚂", mot: "train",     fausses: ["bus", "avion", "bateau"] },
+    { emoji: "🦁", mot: "lion",      fausses: ["tigre", "ours", "loup"] },
+    { emoji: "🐸", mot: "grenouille",fausses: ["crapaud", "lézard", "serpent"] },
+    { emoji: "🌈", mot: "arc-en-ciel",fausses: ["nuage", "soleil", "pluie"] },
+    { emoji: "🎈", mot: "ballon",    fausses: ["bulle", "boule", "balle"] },
+    { emoji: "🍓", mot: "fraise",    fausses: ["cerise", "tomate", "pomme"] },
+  ];
+
+  const MOTS_IMAGES_CE1 = [
+    { emoji: "🦋", mot: "papillon",  fausses: ["libellule", "coccinelle", "abeille"] },
+    { emoji: "🐘", mot: "éléphant",  fausses: ["hippopotame", "rhinocéros", "girafe"] },
+    { emoji: "🚀", mot: "fusée",     fausses: ["avion", "hélicoptère", "satellite"] },
+    { emoji: "🦊", mot: "renard",    fausses: ["loup", "chacal", "coyote"] },
+    { emoji: "🐊", mot: "crocodile", fausses: ["alligator", "lézard", "iguane"] },
+    { emoji: "🌋", mot: "volcan",    fausses: ["montagne", "colline", "falaise"] },
+    { emoji: "🐙", mot: "pieuvre",   fausses: ["méduse", "calmar", "crabe"] },
+    { emoji: "🦒", mot: "girafe",    fausses: ["zèbre", "éléphant", "chameau"] },
+    { emoji: "🌵", mot: "cactus",    fausses: ["palmier", "bambou", "arbuste"] },
+    { emoji: "🦜", mot: "perroquet", fausses: ["toucan", "flamant", "pélican"] },
+    { emoji: "🐉", mot: "dragon",    fausses: ["dinosaure", "monstre", "serpent"] },
+    { emoji: "🏔️", mot: "montagne",  fausses: ["colline", "falaise", "volcan"] },
+  ];
+
+  function lancerLecture() {
+    elTitre.textContent = "📚 Lecture";
+    const liste = estCE1() ? MOTS_IMAGES_CE1 : MOTS_IMAGES_CP;
+    const item = liste[Math.floor(Math.random() * liste.length)];
+
+    elQuestion.innerHTML =
+      "<p style='font-size:0.95rem;margin-bottom:0.25rem'>Quel mot correspond à cette image ?</p>" +
+      `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+    const fausses = melanger(item.fausses).slice(0, 3);
+    const options = melanger([item.mot, ...fausses]);
+    bonneReponse = options.indexOf(item.mot);
+
+    elChoix.innerHTML = "";
+    options.forEach((mot, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-choix";
+      b.style.fontSize = "1rem";
+      b.textContent = mot;
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, bonneReponse));
+      elChoix.appendChild(b);
+    });
+  }
+
+  // ── Jeux d'anglais ───────────────────────────────────────────────────────
+
+  const ANGLAIS_IMAGES_CP = [
+    { emoji: "🐱", mot: "cat",     fausses: ["dog", "bird", "fish"] },
+    { emoji: "🐶", mot: "dog",     fausses: ["cat", "cow", "pig"] },
+    { emoji: "🏠", mot: "house",   fausses: ["school", "car", "tree"] },
+    { emoji: "🌳", mot: "tree",    fausses: ["flower", "grass", "leaf"] },
+    { emoji: "⭐", mot: "star",    fausses: ["moon", "sun", "cloud"] },
+    { emoji: "🌙", mot: "moon",    fausses: ["star", "sun", "sky"] },
+    { emoji: "🍎", mot: "apple",   fausses: ["orange", "banana", "pear"] },
+    { emoji: "🎈", mot: "balloon", fausses: ["ball", "bubble", "kite"] },
+    { emoji: "📚", mot: "book",    fausses: ["pen", "bag", "desk"] },
+    { emoji: "🚗", mot: "car",     fausses: ["bus", "bike", "boat"] },
+    { emoji: "🌸", mot: "flower",  fausses: ["tree", "leaf", "plant"] },
+    { emoji: "🐟", mot: "fish",    fausses: ["bird", "frog", "crab"] },
+    { emoji: "☀️", mot: "sun",     fausses: ["moon", "star", "cloud"] },
+    { emoji: "🍰", mot: "cake",    fausses: ["pie", "bread", "sweet"] },
+    { emoji: "🐸", mot: "frog",    fausses: ["fish", "snake", "duck"] },
+  ];
+
+  const ANGLAIS_IMAGES_CE1 = [
+    { emoji: "🦋", mot: "butterfly", fausses: ["dragonfly", "ladybug", "bee"] },
+    { emoji: "🐘", mot: "elephant",  fausses: ["hippo", "rhino", "giraffe"] },
+    { emoji: "🚀", mot: "rocket",    fausses: ["plane", "ship", "balloon"] },
+    { emoji: "🌋", mot: "volcano",   fausses: ["mountain", "hill", "island"] },
+    { emoji: "🦊", mot: "fox",       fausses: ["wolf", "bear", "deer"] },
+    { emoji: "🌵", mot: "cactus",    fausses: ["palm", "bamboo", "bush"] },
+    { emoji: "🦜", mot: "parrot",    fausses: ["eagle", "owl", "swan"] },
+    { emoji: "🍕", mot: "pizza",     fausses: ["pasta", "burger", "salad"] },
+    { emoji: "🌈", mot: "rainbow",   fausses: ["thunder", "storm", "cloud"] },
+    { emoji: "🎸", mot: "guitar",    fausses: ["piano", "violin", "drum"] },
+    { emoji: "🐙", mot: "octopus",   fausses: ["jellyfish", "squid", "crab"] },
+    { emoji: "🦒", mot: "giraffe",   fausses: ["zebra", "elephant", "camel"] },
+  ];
+
+  function lancerAnglaisMots() {
+    elTitre.textContent = "🇬🇧 English";
+    const liste = estCE1() ? ANGLAIS_IMAGES_CE1 : ANGLAIS_IMAGES_CP;
+    const item = liste[Math.floor(Math.random() * liste.length)];
+
+    elQuestion.innerHTML =
+      "<p style='font-size:0.95rem;margin-bottom:0.25rem'>What is this in English?</p>" +
+      `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+    const fausses = melanger(item.fausses).slice(0, 3);
+    const options = melanger([item.mot, ...fausses]);
+    bonneReponse = options.indexOf(item.mot);
+
+    elChoix.innerHTML = "";
+    options.forEach((mot, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-choix";
+      b.style.fontSize = "1rem";
+      b.textContent = mot;
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, bonneReponse));
+      elChoix.appendChild(b);
+    });
+  }
+
+  const TRAD_CP = [
+    { fr: "chat",   en: "cat",    fausses: ["dog", "bird", "fish"] },
+    { fr: "chien",  en: "dog",    fausses: ["cat", "cow", "pig"] },
+    { fr: "rouge",  en: "red",    fausses: ["blue", "green", "yellow"] },
+    { fr: "bleu",   en: "blue",   fausses: ["red", "green", "pink"] },
+    { fr: "un",     en: "one",    fausses: ["two", "three", "four"] },
+    { fr: "deux",   en: "two",    fausses: ["one", "three", "five"] },
+    { fr: "grand",  en: "big",    fausses: ["small", "tall", "old"] },
+    { fr: "petit",  en: "small",  fausses: ["big", "tall", "young"] },
+    { fr: "maison", en: "house",  fausses: ["school", "park", "shop"] },
+    { fr: "livre",  en: "book",   fausses: ["pen", "bag", "desk"] },
+    { fr: "ami",    en: "friend", fausses: ["family", "teacher", "baby"] },
+    { fr: "eau",    en: "water",  fausses: ["milk", "juice", "tea"] },
+    { fr: "chat",   en: "cat",    fausses: ["fox", "bear", "wolf"] },
+    { fr: "soleil", en: "sun",    fausses: ["moon", "star", "cloud"] },
+    { fr: "pomme",  en: "apple",  fausses: ["pear", "orange", "grape"] },
+  ];
+
+  const TRAD_CE1 = [
+    { fr: "école",    en: "school",     fausses: ["house", "park", "church"] },
+    { fr: "famille",  en: "family",     fausses: ["friend", "teacher", "team"] },
+    { fr: "heureux",  en: "happy",      fausses: ["sad", "angry", "tired"] },
+    { fr: "rapide",   en: "fast",       fausses: ["slow", "big", "loud"] },
+    { fr: "beau",     en: "beautiful",  fausses: ["ugly", "strange", "plain"] },
+    { fr: "manger",   en: "to eat",     fausses: ["to drink", "to sleep", "to run"] },
+    { fr: "jouer",    en: "to play",    fausses: ["to eat", "to sleep", "to read"] },
+    { fr: "courir",   en: "to run",     fausses: ["to jump", "to walk", "to swim"] },
+    { fr: "dormir",   en: "to sleep",   fausses: ["to eat", "to run", "to dream"] },
+    { fr: "pays",     en: "country",    fausses: ["city", "town", "village"] },
+    { fr: "mer",      en: "sea",        fausses: ["lake", "river", "pond"] },
+    { fr: "fleur",    en: "flower",     fausses: ["tree", "leaf", "grass"] },
+  ];
+
+  function lancerTraduction() {
+    elTitre.textContent = "🇬🇧 Traduction";
+    const liste = estCE1() ? TRAD_CE1 : TRAD_CP;
+    const item = liste[Math.floor(Math.random() * liste.length)];
+
+    elQuestion.innerHTML =
+      "<p style='font-size:0.9rem;margin-bottom:0.4rem'>Comment dit-on en anglais ?</p>" +
+      `<p style="font-size:2.2rem;font-weight:700;color:var(--primaire);margin:0">${item.fr}</p>`;
+
+    const fausses = melanger(item.fausses).slice(0, 3);
+    const options = melanger([item.en, ...fausses]);
+    bonneReponse = options.indexOf(item.en);
+
+    elChoix.innerHTML = "";
+    options.forEach((mot, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-choix";
+      b.style.fontSize = "1rem";
+      b.textContent = mot;
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, bonneReponse));
       elChoix.appendChild(b);
     });
   }
@@ -1420,8 +1719,7 @@
       elChoix.innerHTML = "";
       [{ val: 0, obj: objA }, { val: 1, obj: objB }].forEach(({ val, obj }) => {
         const b = document.createElement("button");
-        b.type = "button";
-        b.className = "btn-choix";
+        b.type = "button"; b.className = "btn-choix";
         b.textContent = obj.emoji + " " + formatMasse(obj.masse);
         b.dataset.valeur = String(val);
         b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
@@ -1443,8 +1741,7 @@
       elChoix.innerHTML = "";
       opts.forEach(v => {
         const b = document.createElement("button");
-        b.type = "button";
-        b.className = "btn-choix";
+        b.type = "button"; b.className = "btn-choix";
         b.textContent = formatMasse(v);
         b.dataset.valeur = String(v);
         b.addEventListener("click", () => apresReponse(v, b, bonneReponse));
@@ -1611,6 +1908,10 @@
     mesures: lancerMesures,
     monnaiece1: lancerMonnaieCe1,
     symetrie: lancerSymetrie,
+    syllabes: lancerSyllabes,
+    lecture: lancerLecture,
+    anglais: lancerAnglaisMots,
+    traduction: lancerTraduction,
     durees: lancerDurees,
     probleme: lancerProbleme,
     masse: lancerMasse,
@@ -1645,11 +1946,13 @@
     const s       = RENARD_STADES[stade];
     const nom     = lireNomRenard() || "Foxy";
 
-    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160);
+    const triste = lireFaim() < 20 || lireBonheur() < 20;
+    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160, { triste });
     document.getElementById("maison-nom").textContent  = nom;
     document.getElementById("maison-stade").textContent = "✦ " + s.nom;
     document.getElementById("maison-etoiles-total").textContent = etoiles;
 
+    // Jours depuis naissance
     const naissance = localStorage.getItem(RENARD_NAISSANCE_KEY);
     if (naissance) {
       const jours = Math.max(0, Math.floor((Date.now() - new Date(naissance).getTime()) / 86400000));
@@ -1658,6 +1961,7 @@
                     : `Tu as ${nom} depuis ${jours} jour${jours > 1 ? "s" : ""} !`;
     }
 
+    // Barre de progression vers prochain stade
     const seuils = [0, 21, 61, 151, 301];
     if (stade < 4) {
       const min = seuils[stade], max = seuils[stade + 1];
@@ -1670,6 +1974,41 @@
       document.getElementById("maison-prog-label").textContent = "🏆 Stade maximum atteint !";
       document.getElementById("maison-barre-remplie").style.width = "100%";
     }
+
+    // Jauges faim / bonheur
+    function majJaugeEl(id, barreId, valId, val) {
+      document.getElementById(barreId).style.width = val + "%";
+      document.getElementById(valId).textContent = Math.round(val) + "%";
+    }
+    majJaugeEl("faim",    "jauge-faim-barre",    "jauge-faim-val",    lireFaim());
+    majJaugeEl("bonheur", "jauge-bonheur-barre",  "jauge-bonheur-val", lireBonheur());
+
+    // Bouton Nourrir
+    const btnNourrir = document.getElementById("btn-nourrir");
+    btnNourrir.disabled = etoiles < 2 || lireFaim() >= 95;
+    btnNourrir.onclick = () => {
+      if (lireEtoiles() < 2) return;
+      const t = lireEtoiles() - 2;
+      localStorage.setItem(STORAGE_KEY, String(t));
+      elTotal.textContent = t;
+      sauverFaim(lireFaim() + 30);
+      mettreAJourRenardHeader();
+      montrerMaison();
+    };
+
+    // Bouton Câlin
+    const btnCalin = document.getElementById("btn-calin");
+    const peutCalin = peutFaireCalin();
+    btnCalin.disabled = !peutCalin;
+    document.getElementById("calin-dispo-label").textContent =
+      peutCalin ? "1× par jour" : "✓ Déjà fait !";
+    btnCalin.onclick = () => {
+      if (!peutFaireCalin()) return;
+      localStorage.setItem(RENARD_CALIN_DATE_KEY, new Date().toISOString().slice(0, 10));
+      sauverBonheur(lireBonheur() + 20);
+      mettreAJourRenardHeader();
+      montrerMaison();
+    };
   }
 
   function montrerJeu(nom) {
