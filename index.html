@@ -990,6 +990,70 @@ h1 {
   justify-content: center;
   animation: apparition-horloge 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* ── Évolution renard ─────────────────────────────────────────── */
+.evolution-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.evolution-carte {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  animation: evolutionZoom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes evolutionZoom {
+  0%   { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+  70%  { transform: scale(1.06) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1)    rotate(0deg); opacity: 1; }
+}
+.evolution-renard {
+  line-height: 0;
+  animation: flotte 2.5s ease-in-out infinite;
+}
+.evolution-titre {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primaire);
+  margin: 0;
+}
+.evolution-nom-stade {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0;
+}
+.evolution-msg {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0;
+}
+.btn-evolution-fermer {
+  background: var(--primaire);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.65rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 0.3rem;
+}
   </style>
 </head>
 <body>
@@ -1308,11 +1372,39 @@ h1 {
   majLabelsMenu();
   mettreAJourRenardHeader();
 
-  // Wrapper : mise à jour du renard à chaque étoile gagnée
+  function declencherEvolution(stade) {
+    confetti();
+    const s = RENARD_STADES[stade];
+    const overlay = document.createElement("div");
+    overlay.className = "evolution-overlay";
+    overlay.innerHTML = `
+      <div class="evolution-carte">
+        <div class="evolution-renard">${svgRenard(stade, 130)}</div>
+        <p class="evolution-titre">✨ Ton renard évolue !</p>
+        <p class="evolution-nom-stade">Il devient : ${s.nom}</p>
+        <p class="evolution-msg">Continue comme ça, tu es incroyable !</p>
+        <button type="button" class="btn-evolution-fermer">Super ! 🎉</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => confetti(), 400);
+    overlay.querySelector(".btn-evolution-fermer").addEventListener("click", () => {
+      overlay.style.opacity = "0";
+      overlay.style.transition = "opacity 0.3s";
+      setTimeout(() => overlay.remove(), 300);
+    });
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.querySelector(".btn-evolution-fermer").click();
+    });
+  }
+
+  // Wrapper : mise à jour du renard + détection d'évolution à chaque étoile
   const _ajouterEtoilesBase = ajouterEtoiles;
   ajouterEtoiles = function(n) {
+    const stadeBefore = getStade(lireEtoiles());
     _ajouterEtoilesBase(n);
+    const stadeAfter = getStade(lireEtoiles());
     mettreAJourRenardHeader();
+    if (stadeAfter > stadeBefore) declencherEvolution(stadeAfter);
   };
 
   // ── Démarrage ─────────────────────────────────────────────────────────────

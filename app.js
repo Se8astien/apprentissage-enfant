@@ -216,11 +216,39 @@
   majLabelsMenu();
   mettreAJourRenardHeader();
 
-  // Wrapper : mise à jour du renard à chaque étoile gagnée
+  function declencherEvolution(stade) {
+    confetti();
+    const s = RENARD_STADES[stade];
+    const overlay = document.createElement("div");
+    overlay.className = "evolution-overlay";
+    overlay.innerHTML = `
+      <div class="evolution-carte">
+        <div class="evolution-renard">${svgRenard(stade, 130)}</div>
+        <p class="evolution-titre">✨ Ton renard évolue !</p>
+        <p class="evolution-nom-stade">Il devient : ${s.nom}</p>
+        <p class="evolution-msg">Continue comme ça, tu es incroyable !</p>
+        <button type="button" class="btn-evolution-fermer">Super ! 🎉</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => confetti(), 400);
+    overlay.querySelector(".btn-evolution-fermer").addEventListener("click", () => {
+      overlay.style.opacity = "0";
+      overlay.style.transition = "opacity 0.3s";
+      setTimeout(() => overlay.remove(), 300);
+    });
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.querySelector(".btn-evolution-fermer").click();
+    });
+  }
+
+  // Wrapper : mise à jour du renard + détection d'évolution à chaque étoile
   const _ajouterEtoilesBase = ajouterEtoiles;
   ajouterEtoiles = function(n) {
+    const stadeBefore = getStade(lireEtoiles());
     _ajouterEtoilesBase(n);
+    const stadeAfter = getStade(lireEtoiles());
     mettreAJourRenardHeader();
+    if (stadeAfter > stadeBefore) declencherEvolution(stadeAfter);
   };
 
   // ── Démarrage ─────────────────────────────────────────────────────────────
