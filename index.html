@@ -991,6 +991,99 @@ h1 {
   animation: apparition-horloge 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ── Bouton Ma Maison ────────────────────────────────────────── */
+.btn-maison {
+  display: block;
+  margin: 1rem auto 0.25rem;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.6rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 3px 0 #4834d4, 0 5px 15px rgba(108,92,231,0.3);
+  transition: transform 0.1s;
+}
+.btn-maison:active { transform: scale(0.97); }
+
+/* ── Écran Ma Maison ─────────────────────────────────────────── */
+.maison-conteneur {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.5rem 1rem 1.5rem;
+}
+.maison-renard {
+  line-height: 0;
+  animation: renard-respire 3s ease-in-out infinite;
+}
+@keyframes renard-respire {
+  0%, 100% { transform: scaleY(1);   }
+  50%       { transform: scaleY(1.03); }
+}
+.maison-infos {
+  text-align: center;
+}
+.maison-nom {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primaire);
+  margin: 0 0 0.15rem;
+}
+.maison-stade {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 0.15rem;
+}
+.maison-jours {
+  font-size: 0.82rem;
+  color: #888;
+  margin: 0;
+}
+.maison-etoiles {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fff9e6;
+  border: 2px solid #fdcb6e;
+  border-radius: 20px;
+  padding: 0.4rem 1.1rem;
+}
+.maison-etoiles-icone { font-size: 1.4rem; }
+.maison-etoiles-total {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #e17055;
+}
+.maison-progression {
+  width: 100%;
+  max-width: 280px;
+}
+.maison-prog-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  margin: 0 0 0.35rem;
+  text-align: center;
+}
+.maison-barre-fond {
+  background: #eee;
+  border-radius: 10px;
+  height: 12px;
+  overflow: hidden;
+}
+.maison-barre-remplie {
+  height: 100%;
+  background: linear-gradient(90deg, #6c5ce7, #fd79a8);
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+
 /* ── Évolution renard ─────────────────────────────────────────── */
 .evolution-overlay {
   position: fixed;
@@ -1136,10 +1229,33 @@ h1 {
         <button type="button" class="carte-jeu" data-jeu="perimetre"><span class="emoji-jeu">🔲</span><span class="nom-jeu">Périmètre</span><span class="desc-jeu">Tour de la figure</span></button>
         <button type="button" class="carte-jeu" data-jeu="angles"><span class="emoji-jeu">📐</span><span class="nom-jeu">Les angles</span><span class="desc-jeu">Droit, aigu, obtus</span></button>
       </div>
+      <button type="button" class="btn-maison" id="btn-maison" aria-label="Ma Maison">🏠 Ma Maison</button>
       <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
         <span id="icone-genre-actuel">👧</span>
       </button>
     </main>
+
+    <section id="ecran-maison" class="ecran" hidden aria-label="Ma Maison">
+      <button type="button" class="btn-retour" id="btn-retour-maison">← Menu</button>
+      <div class="maison-conteneur">
+        <div class="maison-renard" id="maison-renard" aria-hidden="true"></div>
+        <div class="maison-infos">
+          <p class="maison-nom" id="maison-nom"></p>
+          <p class="maison-stade" id="maison-stade"></p>
+          <p class="maison-jours" id="maison-jours"></p>
+        </div>
+        <div class="maison-etoiles">
+          <span class="maison-etoiles-icone">⭐</span>
+          <span class="maison-etoiles-total" id="maison-etoiles-total"></span>
+        </div>
+        <div class="maison-progression">
+          <p class="maison-prog-label" id="maison-prog-label"></p>
+          <div class="maison-barre-fond">
+            <div class="maison-barre-remplie" id="maison-barre-remplie"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section id="ecran-jeu" class="ecran" hidden>
       <button type="button" class="btn-retour" id="btn-retour">← Menu</button>
@@ -3013,9 +3129,53 @@ h1 {
     elGenre.classList.remove("actif");
     elJeu.hidden = true;
     elJeu.classList.remove("actif");
+    const elMaison = document.getElementById("ecran-maison");
+    if (elMaison) { elMaison.hidden = true; elMaison.classList.remove("actif"); }
     elMenu.hidden = false;
     elMenu.classList.add("actif");
     majGenre();
+  }
+
+  function montrerMaison() {
+    const elMaison = document.getElementById("ecran-maison");
+    if (!elMaison) return;
+    elMenu.hidden = true;
+    elMenu.classList.remove("actif");
+    elMaison.hidden = false;
+    elMaison.classList.add("actif");
+
+    const etoiles = lireEtoiles();
+    const stade   = getStade(etoiles);
+    const s       = RENARD_STADES[stade];
+    const nom     = lireNomRenard() || "Foxy";
+
+    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160);
+    document.getElementById("maison-nom").textContent  = nom;
+    document.getElementById("maison-stade").textContent = "✦ " + s.nom;
+    document.getElementById("maison-etoiles-total").textContent = etoiles;
+
+    // Jours depuis naissance
+    const naissance = localStorage.getItem(RENARD_NAISSANCE_KEY);
+    if (naissance) {
+      const jours = Math.max(0, Math.floor((Date.now() - new Date(naissance).getTime()) / 86400000));
+      document.getElementById("maison-jours").textContent =
+        jours === 0 ? `Tu as ${nom} depuis aujourd'hui !`
+                    : `Tu as ${nom} depuis ${jours} jour${jours > 1 ? "s" : ""} !`;
+    }
+
+    // Barre de progression vers prochain stade
+    const seuils = [0, 21, 61, 151, 301];
+    if (stade < 4) {
+      const min = seuils[stade], max = seuils[stade + 1];
+      const pct  = Math.min(100, Math.round(((etoiles - min) / (max - min)) * 100));
+      const reste = max - etoiles;
+      document.getElementById("maison-prog-label").textContent =
+        `${reste} ⭐ pour devenir ${RENARD_STADES[stade + 1].nom}`;
+      document.getElementById("maison-barre-remplie").style.width = pct + "%";
+    } else {
+      document.getElementById("maison-prog-label").textContent = "🏆 Stade maximum atteint !";
+      document.getElementById("maison-barre-remplie").style.width = "100%";
+    }
   }
 
   function montrerJeu(nom) {
@@ -3059,6 +3219,14 @@ h1 {
       elGenre.classList.add("actif");
     });
   }
+
+  // Bouton Ma Maison
+  const btnMaison = document.getElementById("btn-maison");
+  if (btnMaison) btnMaison.addEventListener("click", montrerMaison);
+
+  // Retour depuis Ma Maison
+  const btnRetourMaison = document.getElementById("btn-retour-maison");
+  if (btnRetourMaison) btnRetourMaison.addEventListener("click", montrerMenu);
 })();
   </script>
 </body>

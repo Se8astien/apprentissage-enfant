@@ -1610,9 +1610,51 @@
     elGenre.classList.remove("actif");
     elJeu.hidden = true;
     elJeu.classList.remove("actif");
+    const elMaison = document.getElementById("ecran-maison");
+    if (elMaison) { elMaison.hidden = true; elMaison.classList.remove("actif"); }
     elMenu.hidden = false;
     elMenu.classList.add("actif");
     majGenre();
+  }
+
+  function montrerMaison() {
+    const elMaison = document.getElementById("ecran-maison");
+    if (!elMaison) return;
+    elMenu.hidden = true;
+    elMenu.classList.remove("actif");
+    elMaison.hidden = false;
+    elMaison.classList.add("actif");
+
+    const etoiles = lireEtoiles();
+    const stade   = getStade(etoiles);
+    const s       = RENARD_STADES[stade];
+    const nom     = lireNomRenard() || "Foxy";
+
+    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160);
+    document.getElementById("maison-nom").textContent  = nom;
+    document.getElementById("maison-stade").textContent = "✦ " + s.nom;
+    document.getElementById("maison-etoiles-total").textContent = etoiles;
+
+    const naissance = localStorage.getItem(RENARD_NAISSANCE_KEY);
+    if (naissance) {
+      const jours = Math.max(0, Math.floor((Date.now() - new Date(naissance).getTime()) / 86400000));
+      document.getElementById("maison-jours").textContent =
+        jours === 0 ? `Tu as ${nom} depuis aujourd'hui !`
+                    : `Tu as ${nom} depuis ${jours} jour${jours > 1 ? "s" : ""} !`;
+    }
+
+    const seuils = [0, 21, 61, 151, 301];
+    if (stade < 4) {
+      const min = seuils[stade], max = seuils[stade + 1];
+      const pct  = Math.min(100, Math.round(((etoiles - min) / (max - min)) * 100));
+      const reste = max - etoiles;
+      document.getElementById("maison-prog-label").textContent =
+        `${reste} ⭐ pour devenir ${RENARD_STADES[stade + 1].nom}`;
+      document.getElementById("maison-barre-remplie").style.width = pct + "%";
+    } else {
+      document.getElementById("maison-prog-label").textContent = "🏆 Stade maximum atteint !";
+      document.getElementById("maison-barre-remplie").style.width = "100%";
+    }
   }
 
   function montrerJeu(nom) {
@@ -1656,4 +1698,12 @@
       elGenre.classList.add("actif");
     });
   }
+
+  // Bouton Ma Maison
+  const btnMaison = document.getElementById("btn-maison");
+  if (btnMaison) btnMaison.addEventListener("click", montrerMaison);
+
+  // Retour depuis Ma Maison
+  const btnRetourMaison = document.getElementById("btn-retour-maison");
+  if (btnRetourMaison) btnRetourMaison.addEventListener("click", montrerMenu);
 })();
