@@ -77,14 +77,14 @@
 
   function majLabelsMenu() {
     const desc = document.getElementById("desc-addition");
-    if (desc) desc.textContent = estCE1() ? "Jusqu'à 20" : "Jusqu'à 10";
+    if (desc) desc.textContent = estCE1() ? "Jusqu'à 79" : "Jusqu'à 10";
   }
 
   function setBadgeVisible(visible) {
     if (!elBadge) return;
     if (visible) {
       elBadge.hidden = false;
-      elBadge.textContent = estCE1() ? "Niveau : fin CP — début CE1" : "Niveau : CP";
+      elBadge.textContent = estCE1() ? "Niveau : CE1" : "Niveau : CP";
     } else {
       elBadge.hidden = true;
     }
@@ -301,40 +301,22 @@
       return;
     }
 
-    total = 11 + Math.floor(Math.random() * 10);
+    total = 21 + Math.floor(Math.random() * 59);
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
 
-    if (total <= 12) {
-      const e1 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-      let e2 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-      if (e2 === e1) e2 = ANIMAUX[(ANIMAUX.indexOf(e1) + 1) % ANIMAUX.length];
-      html =
-        "<p>Combien en tout ?</p>" +
-        '<p class="ligne-emojis petit">' +
-        Array(a).fill(e1).join(" ") +
-        " <span style='opacity:.5'>+</span> " +
-        Array(b).fill(e2).join(" ") +
-        "</p>" +
-        '<p class="equation">' +
-        a +
-        " + " +
-        b +
-        " = ?</p>";
-    } else {
-      html =
-        "<p>Calcul mental — combien font :</p>" +
-        '<p class="equation" style="font-size:2rem;margin-top:.75rem">' +
-        a +
-        " + " +
-        b +
-        " = ?</p>";
-    }
+    html =
+      "<p>Calcul mental — combien font :</p>" +
+      '<p class="equation" style="font-size:2rem;margin-top:.75rem">' +
+      a +
+      " + " +
+      b +
+      " = ?</p>";
 
     elQuestion.innerHTML = html;
     bonneReponse = total;
-    const pmin = Math.max(2, total - 8);
-    const pmax = Math.min(20, total + 8);
+    const pmin = Math.max(2, total - 15);
+    const pmax = Math.min(95, total + 15);
     const props = propositionsAvecBonne(total, pmin, pmax, 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
@@ -348,7 +330,7 @@
     if (!estCE1()) {
       total = 4 + Math.floor(Math.random() * 7);
     } else {
-      total = 10 + Math.floor(Math.random() * 11);
+      total = 21 + Math.floor(Math.random() * 69);
     }
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
@@ -367,7 +349,7 @@
       " = ?</p>";
     bonneReponse = reste;
     const props = estCE1()
-      ? propositionsAvecBonne(reste, Math.max(0, reste - 7), Math.min(20, reste + 7), 3)
+      ? propositionsAvecBonne(reste, Math.max(0, reste - 15), Math.min(89, reste + 15), 3)
       : propositionsAvecBonne(reste, 0, 10, 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
@@ -381,10 +363,10 @@
       a = 1 + Math.floor(Math.random() * 20);
       b = 1 + Math.floor(Math.random() * 20);
     } else {
-      a = 10 + Math.floor(Math.random() * 90);
-      b = 10 + Math.floor(Math.random() * 90);
+      a = 100 + Math.floor(Math.random() * 900);
+      b = 100 + Math.floor(Math.random() * 900);
     }
-    if (a === b) b = b < 99 ? b + 1 : b - 1;
+    if (a === b) b = b < 999 ? b + 1 : b - 1;
     bonneReponse = Math.max(a, b);
     elQuestion.innerHTML =
       "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
@@ -398,30 +380,32 @@
 
   function lancerSuite() {
     elTitre.textContent = "Numéro manquant";
-    let debut;
+    let debut, step;
     if (!estCE1()) {
       debut = 1 + Math.floor(Math.random() * 12);
+      step = 1;
     } else {
-      debut = 15 + Math.floor(Math.random() * 46);
+      step = [1, 2, 5, 10][Math.floor(Math.random() * 4)];
+      debut = 1 + Math.floor(Math.random() * Math.max(1, 95 - step * 4));
     }
-    const suite = [debut, debut + 1, debut + 2, debut + 3, debut + 4];
+    const suite = [debut, debut + step, debut + step * 2, debut + step * 3, debut + step * 4];
     const indexCache = 1 + Math.floor(Math.random() * 3);
     bonneReponse = suite[indexCache];
     const affiche = suite.map((n, i) => (i === indexCache ? "?" : String(n)));
     elQuestion.innerHTML =
-      "<p>Quel chiffre manque dans la suite ?</p>" +
+      "<p>Quel nombre manque dans la suite ?</p>" +
       '<p class="suite">' +
       affiche.join(" — ") +
       "</p>";
-    const min = Math.max(1, debut - 2);
-    const max = debut + 6;
+    const min = Math.max(1, bonneReponse - step * 3);
+    const max = bonneReponse + step * 3;
     const props = propositionsAvecBonne(bonneReponse, min, max, 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
 
   function lancerDoubles() {
     elTitre.textContent = "Doubles";
-    const n = estCE1() ? 5 + Math.floor(Math.random() * 6) : 1 + Math.floor(Math.random() * 5);
+    const n = estCE1() ? 10 + Math.floor(Math.random() * 16) : 1 + Math.floor(Math.random() * 5);
     const d = n + n;
     elQuestion.innerHTML =
       "<p>Le double de <strong>" +
@@ -434,7 +418,7 @@
       " = ?</p>";
     bonneReponse = d;
     const props = estCE1()
-      ? propositionsAvecBonne(d, Math.max(8, d - 6), Math.min(24, d + 6), 3)
+      ? propositionsAvecBonne(d, Math.max(10, d - 12), Math.min(60, d + 12), 3)
       : propositionsAvecBonne(d, 2, 12, 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
@@ -560,7 +544,7 @@
 
   function lancerPairImpair() {
     elTitre.textContent = "🟣 🔵";
-    const max = estCE1() ? 40 : 20;
+    const max = estCE1() ? 100 : 20;
     const n = 2 + Math.floor(Math.random() * (max - 1));
     const estPair = n % 2 === 0;
     bonneReponse = estPair ? 0 : 1;
@@ -762,7 +746,7 @@
 
   function lancerMoitie() {
     elTitre.textContent = "✂️";
-    const maxMoitie = estCE1() ? 20 : 10;
+    const maxMoitie = estCE1() ? 30 : 10;
     const moitie = 1 + Math.floor(Math.random() * maxMoitie);
     const n = moitie * 2;
     bonneReponse = moitie;
@@ -821,9 +805,9 @@
 
   function lancerDivision() {
     elTitre.textContent = "➗";
-    const diviseurs = estCE1() ? [2, 3, 4, 5] : [2, 3];
+    const diviseurs = estCE1() ? [2, 3, 4, 5, 10] : [2, 3];
     const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
-    const maxQuot = estCE1() ? 8 : 5;
+    const maxQuot = estCE1() ? 10 : 5;
     const quotient = 1 + Math.floor(Math.random() * maxQuot);
     const total = diviseur * quotient;
     bonneReponse = quotient;
@@ -944,9 +928,9 @@
 
   function lancerMonnaieCe1() {
     elTitre.textContent = "🛍️";
-    const prixOptions = [50, 100, 150, 200, 250, 300];
+    const prixOptions = [100, 150, 200, 250, 300, 400, 500, 750, 1000];
     const prix = prixOptions[Math.floor(Math.random() * prixOptions.length)];
-    const billets = [100, 200, 500].filter((b) => b > prix);
+    const billets = [200, 500, 1000, 2000].filter((b) => b > prix);
     if (!billets.length) { lancerMonnaieCe1(); return; }
     const paye = billets[Math.floor(Math.random() * billets.length)];
     const monnaie = paye - prix;
@@ -961,7 +945,7 @@
       <div class="monnaie-ligne">💰 On te rend <strong>?</strong></div>
     </div>`;
 
-    const dist = entiersDistincts(Math.max(1, monnaie - 100), Math.min(500, monnaie + 150), 3, monnaie);
+    const dist = entiersDistincts(Math.max(1, monnaie - 200), Math.min(2000, monnaie + 300), 3, monnaie);
     const opts = melanger([monnaie, ...dist]);
     elChoix.innerHTML = "";
     opts.forEach((v) => {
