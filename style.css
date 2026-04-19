@@ -48,8 +48,7 @@ body {
 }
 
 .mascotte {
-  font-size: 2.75rem;
-  line-height: 1;
+  line-height: 0;
   animation: flotte 2.5s ease-in-out infinite;
 }
 
@@ -549,7 +548,7 @@ h1 {
 }
 
 .genre-mascotte {
-  font-size: 3.5rem;
+  line-height: 0;
   animation: flotte 2.5s ease-in-out infinite;
 }
 

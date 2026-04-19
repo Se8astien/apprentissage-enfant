@@ -101,9 +101,100 @@
     elTotal.textContent = t;
   }
 
+  // ── Compagnon renard ─────────────────────────────────────────────────────
+
+  const RENARD_STADES = [
+    { nom: "Bébé renard",      corps: "#f5b97e", interne: "#fde7c8", yeux: "#3d2b1f" },
+    { nom: "Jeune renard",     corps: "#e8872a", interne: "#f5c07a", yeux: "#1a1a1a" },
+    { nom: "Renard malin",     corps: "#c96416", interne: "#e89050", yeux: "#0d0d0d" },
+    { nom: "Renard magique",   corps: "#9c59d1", interne: "#c99ef0", yeux: "#4b0082" },
+    { nom: "Renard légendaire",corps: "#ffd700", interne: "#ffe999", yeux: "#c8860a" },
+  ];
+
+  function getStade(etoiles) {
+    if (etoiles < 21)  return 0;
+    if (etoiles < 61)  return 1;
+    if (etoiles < 151) return 2;
+    if (etoiles < 301) return 3;
+    return 4;
+  }
+
+  function svgRenard(stade, taille) {
+    const s = RENARD_STADES[Math.max(0, Math.min(4, stade))];
+    const t = taille || 80;
+    const h = Math.round(t * 1.1);
+
+    const sourcils = stade >= 2
+      ? `<path d="M29,54 Q37,50 44,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+         <path d="M56,54 Q63,50 71,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+      : "";
+
+    function etoileSvg(cx, cy, r, couleur, op) {
+      const r2 = r * 0.38;
+      const pts = [];
+      for (let i = 0; i < 8; i++) {
+        const a = (i * Math.PI) / 4 - Math.PI / 2;
+        const rr = i % 2 === 0 ? r : r2;
+        pts.push(`${(cx + Math.cos(a) * rr).toFixed(1)},${(cy + Math.sin(a) * rr).toFixed(1)}`);
+      }
+      return `<polygon points="${pts.join(" ")}" fill="${couleur}" opacity="${op}"/>`;
+    }
+
+    const particules = stade === 3
+      ? etoileSvg(10, 28, 6, "#e056fd", 0.75) +
+        etoileSvg(84, 22, 5, "#fdcb6e", 0.80) +
+        etoileSvg(87, 73, 4, "#a29bfe", 0.70) +
+        etoileSvg(8,  78, 5, "#74b9ff", 0.70)
+      : "";
+
+    const couronne = stade === 4
+      ? `<polygon points="33,26 39,8 50,20 61,8 67,26" fill="#ffd700" stroke="#b8860b" stroke-width="1.5" stroke-linejoin="round"/>
+         <circle cx="39" cy="9"  r="4" fill="#ff6b00"/>
+         <circle cx="50" cy="21" r="4" fill="#ff0080"/>
+         <circle cx="61" cy="9"  r="4" fill="#ff6b00"/>`
+      : "";
+
+    return `<svg width="${t}" height="${h}" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+  ${couronne}${particules}
+  <polygon points="16,66 28,22 45,60" fill="${s.corps}"/>
+  <polygon points="84,66 72,22 55,60" fill="${s.corps}"/>
+  <polygon points="22,62 28,28 42,57" fill="${s.interne}"/>
+  <polygon points="78,62 72,28 58,57" fill="${s.interne}"/>
+  <ellipse cx="50" cy="70" rx="33" ry="30" fill="${s.corps}"/>
+  <ellipse cx="50" cy="79" rx="23" ry="21" fill="white" opacity="0.88"/>
+  ${sourcils}
+  <circle cx="37" cy="63" r="7.5" fill="white"/>
+  <circle cx="63" cy="63" r="7.5" fill="white"/>
+  <circle cx="39" cy="64" r="4.5" fill="${s.yeux}"/>
+  <circle cx="65" cy="64" r="4.5" fill="${s.yeux}"/>
+  <circle cx="41" cy="62" r="1.8" fill="white"/>
+  <circle cx="67" cy="62" r="1.8" fill="white"/>
+  <ellipse cx="50" cy="73" rx="3.5" ry="2.5" fill="#8B4513"/>
+  <path d="M44,77 Q50,83 56,77" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <circle cx="27" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
+  <circle cx="73" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
+</svg>`;
+  }
+
+  function mettreAJourRenardHeader() {
+    const stade = getStade(lireEtoiles());
+    const header = document.getElementById("mascotte-header");
+    const genre  = document.getElementById("mascotte-genre");
+    if (header) header.innerHTML = svgRenard(stade, 44);
+    if (genre)  genre.innerHTML  = svgRenard(stade, 72);
+  }
+
   elTotal.textContent = lireEtoiles();
   syncNiveauButtons();
   majLabelsMenu();
+  mettreAJourRenardHeader();
+
+  // Wrapper : mise à jour du renard à chaque étoile gagnée
+  const _ajouterEtoilesBase = ajouterEtoiles;
+  ajouterEtoiles = function(n) {
+    _ajouterEtoilesBase(n);
+    mettreAJourRenardHeader();
+  };
 
   // ── Démarrage : genre screen ou menu direct ───────────────────────────────
   if (localStorage.getItem(STORAGE_GENRE)) {
