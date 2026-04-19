@@ -400,12 +400,27 @@
       elFeedback.className = "feedback ok";
       ajouterEtoiles(1);
       confetti();
+      declencherReactionRenard(true);
     } else {
       const ko = messagesKo();
       elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
       elFeedback.className = "feedback non";
+      declencherReactionRenard(false);
     }
     elSuivant.hidden = false;
+  }
+
+  function declencherReactionRenard(correct) {
+    const el = document.getElementById("renard-reaction");
+    if (!el) return;
+    el.hidden = false;
+    el.className = "renard-reaction";
+    const stade = getStade(lireEtoiles());
+    const bulle = correct ? "Ouais ! 🎉" : "Tu y es presque !";
+    el.innerHTML = `<div class="renard-bulle">${bulle}</div>${svgRenard(stade, 72)}`;
+    void el.offsetWidth;
+    el.classList.add(correct ? "visible" : "encourage");
+    setTimeout(() => { el.hidden = true; el.className = "renard-reaction"; }, 2000);
   }
 
   function resetFeedback() {

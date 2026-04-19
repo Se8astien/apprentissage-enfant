@@ -991,6 +991,54 @@ h1 {
   animation: apparition-horloge 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ── Réaction renard en jeu ──────────────────────────────────── */
+.renard-reaction {
+  position: fixed;
+  bottom: 80px;
+  right: -120px;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  pointer-events: none;
+  transition: right 0s;
+}
+.renard-reaction.visible {
+  animation: renard-slide-in 1.8s ease forwards;
+}
+.renard-reaction.encourage {
+  animation: renard-encourage 2s ease forwards;
+}
+@keyframes renard-slide-in {
+  0%   { right: -120px; transform: translateY(0); }
+  20%  { right: 12px;   transform: translateY(0); }
+  35%  { right: 12px;   transform: translateY(-18px); }
+  50%  { right: 12px;   transform: translateY(0); }
+  65%  { right: 12px;   transform: translateY(-10px); }
+  80%  { right: 12px;   transform: translateY(0); }
+  100% { right: -120px; transform: translateY(0); }
+}
+@keyframes renard-encourage {
+  0%   { right: -120px; transform: rotate(0deg); }
+  20%  { right: 12px;   transform: rotate(0deg); }
+  40%  { right: 12px;   transform: rotate(-12deg); }
+  60%  { right: 12px;   transform: rotate(8deg); }
+  80%  { right: 12px;   transform: rotate(0deg); }
+  100% { right: -120px; transform: rotate(0deg); }
+}
+.renard-bulle {
+  background: white;
+  border: 2px solid var(--primaire);
+  border-radius: 14px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primaire);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
 /* ── Bouton Ma Maison ────────────────────────────────────────── */
 .btn-maison {
   display: block;
@@ -1267,6 +1315,7 @@ h1 {
       <button type="button" class="btn-suivant" id="btn-suivant" hidden>Question suivante →</button>
     </section>
 
+    <div id="renard-reaction" class="renard-reaction" aria-hidden="true" hidden></div>
     <div id="confetti" class="confetti" aria-hidden="true"></div>
   </div>
   <script>
@@ -1674,12 +1723,27 @@ h1 {
       elFeedback.className = "feedback ok";
       ajouterEtoiles(1);
       confetti();
+      declencherReactionRenard(true);
     } else {
       const ko = messagesKo();
       elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
       elFeedback.className = "feedback non";
+      declencherReactionRenard(false);
     }
     elSuivant.hidden = false;
+  }
+
+  function declencherReactionRenard(correct) {
+    const el = document.getElementById("renard-reaction");
+    if (!el) return;
+    el.hidden = false;
+    el.className = "renard-reaction";
+    const stade = getStade(lireEtoiles());
+    const bulle = correct ? "Ouais ! 🎉" : "Tu y es presque !";
+    el.innerHTML = `<div class="renard-bulle">${bulle}</div>${svgRenard(stade, 72)}`;
+    void el.offsetWidth;
+    el.classList.add(correct ? "visible" : "encourage");
+    setTimeout(() => { el.hidden = true; el.className = "renard-reaction"; }, 2000);
   }
 
   function resetFeedback() {
