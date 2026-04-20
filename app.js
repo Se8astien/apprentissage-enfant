@@ -610,7 +610,7 @@
     elTitre.textContent = "Compte-moi ça !";
     const n = estCE1()
       ? 10 + Math.floor(Math.random() * 9)
-      : 3 + Math.floor(Math.random() * 8);
+      : 3 + Math.floor(Math.random() * 13);
     const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
     const ligne = Array(n).fill(emoji).join(" ");
     elQuestion.innerHTML =
@@ -623,7 +623,7 @@
     bonneReponse = n;
     const props = estCE1()
       ? propositionsAvecBonne(n, Math.max(6, n - 4), Math.min(22, n + 4), 3)
-      : propositionsAvecBonne(n, 1, 12, 3);
+      : propositionsAvecBonne(n, Math.max(1, n - 4), Math.min(18, n + 4), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
 
@@ -636,24 +636,27 @@
 
     if (!estCE1()) {
       a = 1 + Math.floor(Math.random() * 9);
-      b = 1 + Math.floor(Math.random() * (10 - a));
+      b = 1 + Math.floor(Math.random() * 9);
       total = a + b;
-      const e1 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-      let e2 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-      if (e2 === e1) e2 = ANIMAUX[(ANIMAUX.indexOf(e1) + 1) % ANIMAUX.length];
-      html =
-        "<p>Combien en tout ?</p>" +
-        '<p class="ligne-emojis">' +
-        Array(a).fill(e1).join(" ") +
-        " <span style='opacity:.5'>+</span> " +
-        Array(b).fill(e2).join(" ") +
-        "</p>" +
-        '<p class="equation">' +
-        a +
-        " + " +
-        b +
-        " = ?</p>";
-      const props = propositionsAvecBonne(total, 2, 10, 3);
+      if (total <= 10) {
+        const e1 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
+        let e2 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
+        if (e2 === e1) e2 = ANIMAUX[(ANIMAUX.indexOf(e1) + 1) % ANIMAUX.length];
+        html =
+          "<p>Combien en tout ?</p>" +
+          '<p class="ligne-emojis">' +
+          Array(a).fill(e1).join(" ") +
+          " <span style='opacity:.5'>+</span> " +
+          Array(b).fill(e2).join(" ") +
+          "</p>" +
+          '<p class="equation">' + a + " + " + b + " = ?</p>";
+      } else {
+        html =
+          "<p>Calcule :</p>" +
+          '<p class="equation" style="font-size:2rem;margin-top:.75rem">' +
+          a + " + " + b + " = ?</p>";
+      }
+      const props = propositionsAvecBonne(total, Math.max(2, total - 6), Math.min(20, total + 6), 3);
       elQuestion.innerHTML = html;
       bonneReponse = total;
       afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
@@ -687,29 +690,30 @@
     let reste;
 
     if (!estCE1()) {
-      total = 4 + Math.floor(Math.random() * 7);
+      total = 4 + Math.floor(Math.random() * 17);
     } else {
       total = 21 + Math.floor(Math.random() * 69);
     }
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
 
-    elQuestion.innerHTML =
-      "<p>Il y a <strong>" +
-      total +
-      "</strong> pommes 🍎</p>" +
-      "<p>On en mange <strong>" +
-      enleve +
-      "</strong>. Combien il en reste ?</p>" +
-      '<p class="equation">' +
-      total +
-      " − " +
-      enleve +
-      " = ?</p>";
+    if (!estCE1() && total <= 10) {
+      const biffees = Array(enleve).fill('<span style="opacity:0.25;text-decoration:line-through">🍎</span>');
+      const restantes = Array(reste).fill("🍎");
+      elQuestion.innerHTML =
+        "<p>On mange <strong>" + enleve + "</strong> pommes sur <strong>" + total + "</strong>. Combien reste-t-il ?</p>" +
+        '<p class="ligne-emojis">' + [...biffees, ...restantes].join(" ") + "</p>" +
+        '<p class="equation">' + total + " − " + enleve + " = ?</p>";
+    } else {
+      elQuestion.innerHTML =
+        "<p>Il y a <strong>" + total + "</strong> pommes 🍎</p>" +
+        "<p>On en mange <strong>" + enleve + "</strong>. Combien il en reste ?</p>" +
+        '<p class="equation">' + total + " − " + enleve + " = ?</p>";
+    }
     bonneReponse = reste;
     const props = estCE1()
       ? propositionsAvecBonne(reste, Math.max(0, reste - 15), Math.min(89, reste + 15), 3)
-      : propositionsAvecBonne(reste, 0, 10, 3);
+      : propositionsAvecBonne(reste, 0, Math.min(20, total), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
 
@@ -741,8 +745,8 @@
     elTitre.textContent = "Numéro manquant";
     let debut, step;
     if (!estCE1()) {
-      debut = 1 + Math.floor(Math.random() * 12);
-      step = 1;
+      step = Math.random() < 0.35 ? 2 : 1;
+      debut = 1 + Math.floor(Math.random() * Math.max(1, 20 - step * 4));
     } else {
       step = [1, 2, 5, 10][Math.floor(Math.random() * 4)];
       debut = 1 + Math.floor(Math.random() * Math.max(1, 95 - step * 4));
@@ -764,7 +768,7 @@
 
   function lancerDoubles() {
     elTitre.textContent = "Doubles";
-    const n = estCE1() ? 10 + Math.floor(Math.random() * 16) : 1 + Math.floor(Math.random() * 5);
+    const n = estCE1() ? 10 + Math.floor(Math.random() * 16) : 1 + Math.floor(Math.random() * 10);
     const d = n + n;
     elQuestion.innerHTML =
       "<p>Le double de <strong>" +
@@ -778,7 +782,7 @@
     bonneReponse = d;
     const props = estCE1()
       ? propositionsAvecBonne(d, Math.max(10, d - 12), Math.min(60, d + 12), 3)
-      : propositionsAvecBonne(d, 2, 12, 3);
+      : propositionsAvecBonne(d, Math.max(2, d - 6), Math.min(22, d + 6), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
 
@@ -917,7 +921,7 @@
   }
 
   function lancerHeure() {
-    elTitre.textContent = "🕐";
+    elTitre.textContent = "🕐 L'heure";
 
     // CP : multiples de 5 min ; CE1 : n'importe quelle minute
     const pas = estCE1() ? 1 : 5;
@@ -967,7 +971,7 @@
   }
 
   function lancerPairImpair() {
-    elTitre.textContent = "🟣 🔵";
+    elTitre.textContent = "Pair ou Impair ?";
     const max = estCE1() ? 100 : 20;
     const n = 2 + Math.floor(Math.random() * (max - 1));
     const estPair = n % 2 === 0;
@@ -983,16 +987,20 @@
     const svgH = 20 + Math.ceil(n / 2) * 30;
 
     elQuestion.innerHTML = `<div class="pair-question">
+      <p style="font-size:0.85rem;margin:0 0 0.4rem;color:#555">Peut-on ranger ces objets <strong>en 2 groupes égaux</strong> ?</p>
       <span class="pair-nombre">${n}</span>
       <svg width="74" height="${svgH}" viewBox="0 0 74 ${svgH}">${dots}</svg>
     </div>`;
 
     elChoix.innerHTML = "";
-    [{ val: 0, icon: svgPairesIcon(true) }, { val: 1, icon: svgPairesIcon(false) }].forEach(({ val, icon }) => {
+    [
+      { val: 0, icon: svgPairesIcon(true),  label: "Pair 🟰" },
+      { val: 1, icon: svgPairesIcon(false), label: "Impair ≠" },
+    ].forEach(({ val, icon, label }) => {
       const b = document.createElement("button");
       b.type = "button";
       b.className = "btn-choix btn-visuel2";
-      b.innerHTML = icon;
+      b.innerHTML = icon + `<div style="font-size:0.9rem;font-weight:700;margin-top:0.25rem;color:var(--primaire)">${label}</div>`;
       b.dataset.valeur = String(val);
       b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
       elChoix.appendChild(b);
@@ -1019,14 +1027,22 @@
   }
 
   function lancerDizaines() {
-    elTitre.textContent = "📊";
+    elTitre.textContent = "📊 Dizaines & Unités";
     const max = estCE1() ? 99 : 69;
     const n = 11 + Math.floor(Math.random() * (max - 10));
     const diz = Math.floor(n / 10);
     const un = n % 10;
     bonneReponse = n;
 
-    elQuestion.innerHTML = `<div class="diz-question">${svgDizUn(diz, un)}</div>`;
+    elQuestion.innerHTML = `<div class="diz-question">
+      <p style="font-size:0.82rem;margin:0 0 0.55rem">
+        <span style="color:#6c5ce7;font-weight:700">▮ barre = 10 (dizaine)</span>
+        &nbsp;·&nbsp;
+        <span style="color:#d4a017;font-weight:700">● point = 1 (unité)</span>
+      </p>
+      ${svgDizUn(diz, un)}
+      <p style="font-size:0.9rem;margin:0.5rem 0 0;font-weight:600">Quel nombre est représenté ?</p>
+    </div>`;
     const props = propositionsAvecBonne(n, Math.max(10, n - 22), Math.min(max, n + 22), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
@@ -1062,7 +1078,7 @@
   }
 
   function lancerFormes() {
-    elTitre.textContent = "🔷";
+    elTitre.textContent = "🔷 Les formes";
     const idx = Math.floor(Math.random() * FORMES.length);
     const forme = FORMES[idx];
     const couleurQ = COULEURS_FORMES[Math.floor(Math.random() * COULEURS_FORMES.length)];
@@ -1136,7 +1152,7 @@
   }
 
   function lancerMonnaieCp() {
-    elTitre.textContent = "🪙";
+    elTitre.textContent = "🪙 La monnaie";
     const pool = estCE1() ? PIECES_DEF : PIECES_DEF.slice(0, 6);
     const nbPieces = 2 + Math.floor(Math.random() * 2);
     const chosenPieces = [];
@@ -1151,7 +1167,10 @@
     if (total === 0 || chosenPieces.length < 2) { lancerMonnaieCp(); return; }
     bonneReponse = total;
 
-    elQuestion.innerHTML = svgPiecesLigne(chosenPieces);
+    elQuestion.innerHTML = `<div class="monnaie-question">
+      <p>Quelle est la valeur <strong>totale</strong> de ces pièces ?</p>
+      <div style="overflow-x:auto;text-align:center;margin-top:0.4rem">${svgPiecesLigne(chosenPieces)}</div>
+    </div>`;
 
     const dist = entiersDistincts(Math.max(1, total - 20), total + 20, 3, total);
     const opts = melanger([total, ...dist]);
@@ -1170,7 +1189,7 @@
   // ── Moitié ──────────────────────────────────────────────────────────────
 
   function lancerMoitie() {
-    elTitre.textContent = "✂️";
+    elTitre.textContent = "✂️ La moitié";
     const maxMoitie = estCE1() ? 30 : 10;
     const moitie = 1 + Math.floor(Math.random() * maxMoitie);
     const n = moitie * 2;
@@ -1180,6 +1199,7 @@
     const row1 = Array(moitie).fill(emoji).join(" ");
     const row2 = Array(moitie).fill("❓").join(" ");
     elQuestion.innerHTML = `<div class="moitie-question">
+      <p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Partage-les en <strong>2 parts égales</strong>. Combien dans chaque moitié ?</p>
       <div class="moitie-row">${row1}</div>
       <div class="moitie-sep">— — —</div>
       <div class="moitie-row moitie-cache">${row2}</div>
@@ -1206,7 +1226,7 @@
       for (let g = 0; g < fact; g++) {
         groupsHtml += `<div class="mult-groupe">${Array(mult).fill(emoji).join("")}</div>`;
       }
-      elQuestion.innerHTML = `<div class="mult-grille">${groupsHtml}</div>`;
+      elQuestion.innerHTML = `<p style="font-size:0.9rem;font-weight:700;margin:0 0 0.5rem;color:var(--primaire)">${fact} groupe${fact > 1 ? "s" : ""} de ${mult} = combien en tout ?</p><div class="mult-grille">${groupsHtml}</div>`;
     } else {
       // Dots grid for larger products
       for (let g = 0; g < fact; g++) {
@@ -1218,7 +1238,7 @@
         const dh = Math.ceil(mult / 5) * 18 + 6;
         groupsHtml += `<svg class="mult-dots" width="${dw}" height="${dh}" viewBox="0 0 ${dw} ${dh}">${dotsSvg}</svg>`;
       }
-      elQuestion.innerHTML = `<div class="mult-grille-dots">${groupsHtml}</div>`;
+      elQuestion.innerHTML = `<p style="font-size:0.9rem;font-weight:700;margin:0 0 0.5rem;color:var(--primaire)">${fact} × ${mult} = ?</p><div class="mult-grille-dots">${groupsHtml}</div>`;
     }
 
     const pmin = Math.max(2, produit - 18), pmax = Math.min(110, produit + 18);
@@ -1244,6 +1264,7 @@
       groupsHtml += `<div class="div-groupe">${g === 0 ? Array(quotient).fill(emoji).join("") : "❓"}</div>`;
     }
     elQuestion.innerHTML = `<div class="div-question">
+      <p style="font-size:0.88rem;margin:0 0 0.5rem">On partage <strong>${total}</strong> ${emoji} en <strong>${diviseur}</strong> groupes égaux. Combien dans chaque groupe ?</p>
       <div class="div-total">${totalLine}</div>
       <div class="div-arrow">▼</div>
       <div class="div-groupes">${groupsHtml}</div>
@@ -1284,7 +1305,9 @@
     const bonne = pool[Math.floor(Math.random() * pool.length)];
     bonneReponse = bonne.n * 10 + bonne.d;
 
-    elQuestion.innerHTML = `<div class="fraction-question">${svgFraction(bonne.n, bonne.d, 140)}</div>`;
+    elQuestion.innerHTML =
+      `<p style="font-size:0.88rem;margin:0 0 0.5rem">Quelle <strong>fraction</strong> est coloriée en violet ?</p>` +
+      `<div class="fraction-question">${svgFraction(bonne.n, bonne.d, 130)}</div>`;
 
     const fausses = melanger(pool.filter((f) => f.n !== bonne.n || f.d !== bonne.d)).slice(0, 3);
     // Pad with extra if not enough distinct options
@@ -1311,7 +1334,7 @@
   // ── Mesures ──────────────────────────────────────────────────────────────
 
   function lancerMesures() {
-    elTitre.textContent = "📏";
+    elTitre.textContent = "📏 Mesures";
     const maxLen = estCE1() ? 18 : 12;
     const lenA = 3 + Math.floor(Math.random() * (maxLen - 2));
     let lenB;
@@ -1321,17 +1344,26 @@
     const scale = 18;
     const wA = lenA * scale, wB = lenB * scale;
     const maxW = Math.max(wA, wB) + 20;
-    elQuestion.innerHTML = `<svg width="${maxW}" height="80" viewBox="0 0 ${maxW} 80">
-      <rect x="10" y="10" width="${wA}" height="24" rx="6" fill="#6c5ce7" opacity="0.85"/>
-      <rect x="10" y="46" width="${wB}" height="24" rx="6" fill="#fd79a8" opacity="0.85"/>
-    </svg>`;
+    const labelA = lenA + " cm", labelB = lenB + " cm";
+    elQuestion.innerHTML = `
+      <p style="font-size:0.88rem;margin:0 0 0.5rem">Quelle barre est la plus <strong>longue</strong> ?</p>
+      <svg width="${maxW + 60}" height="90" viewBox="0 0 ${maxW + 60} 90">
+        <rect x="10" y="10" width="${wA}" height="26" rx="6" fill="#6c5ce7" opacity="0.85"/>
+        <text x="${10 + wA + 6}" y="28" fill="#5344c7" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelA}</text>
+        <rect x="10" y="50" width="${wB}" height="26" rx="6" fill="#fd79a8" opacity="0.85"/>
+        <text x="${10 + wB + 6}" y="68" fill="#c0226a" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelB}</text>
+      </svg>`;
 
     elChoix.innerHTML = "";
-    [{ val: 0, col: "#6c5ce7" }, { val: 1, col: "#fd79a8" }].forEach(({ val, col }) => {
+    [
+      { val: 0, col: "#6c5ce7", label: labelA },
+      { val: 1, col: "#fd79a8", label: labelB },
+    ].forEach(({ val, col, label }) => {
       const b = document.createElement("button");
       b.type = "button";
-      b.className = "btn-choix btn-visuel2";
-      b.innerHTML = `<svg width="60" height="28" viewBox="0 0 60 28"><rect x="4" y="4" width="52" height="20" rx="5" fill="${col}"/></svg>`;
+      b.className = "btn-choix";
+      b.style.fontSize = "1.1rem";
+      b.innerHTML = `<span style="color:${col};font-weight:800">${label}</span>`;
       b.dataset.valeur = String(val);
       b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
       elChoix.appendChild(b);
@@ -1408,11 +1440,13 @@
   }
 
   function lancerSymetrie() {
-    elTitre.textContent = "🪞";
+    elTitre.textContent = "🪞 Symétrie";
     const type = Math.floor(Math.random() * 3);
     bonneReponse = 1; // correct = miroir (gauche=true)
 
-    elQuestion.innerHTML = `<div class="symetrie-question">${svgDemiFigure(type, 130, false)}</div>`;
+    elQuestion.innerHTML =
+      `<p style="font-size:0.88rem;margin:0 0 0.4rem">Quelle est l'image <strong>miroir</strong> de cette figure (dans le 🪞) ?</p>` +
+      `<div class="symetrie-question">${svgDemiFigure(type, 130, false)}</div>`;
 
     const options = melanger([
       { val: 1, svg: svgDemiFigure(type, 78, true) },
@@ -1640,9 +1674,15 @@
     { fr: "livre",  en: "book",   fausses: ["pen", "bag", "desk"] },
     { fr: "ami",    en: "friend", fausses: ["family", "teacher", "baby"] },
     { fr: "eau",    en: "water",  fausses: ["milk", "juice", "tea"] },
-    { fr: "chat",   en: "cat",    fausses: ["fox", "bear", "wolf"] },
     { fr: "soleil", en: "sun",    fausses: ["moon", "star", "cloud"] },
     { fr: "pomme",  en: "apple",  fausses: ["pear", "orange", "grape"] },
+    { fr: "trois",  en: "three",  fausses: ["one", "two", "four"] },
+    { fr: "quatre", en: "four",   fausses: ["two", "three", "five"] },
+    { fr: "cinq",   en: "five",   fausses: ["four", "six", "seven"] },
+    { fr: "jaune",  en: "yellow", fausses: ["red", "blue", "green"] },
+    { fr: "vert",   en: "green",  fausses: ["yellow", "blue", "red"] },
+    { fr: "table",  en: "table",  fausses: ["chair", "bed", "desk"] },
+    { fr: "voiture",en: "car",    fausses: ["bus", "bike", "boat"] },
   ];
 
   const TRAD_CE1 = [
@@ -1689,7 +1729,7 @@
   // ── Durées ───────────────────────────────────────────────────────────────
 
   function lancerDurees() {
-    elTitre.textContent = "⏱️";
+    elTitre.textContent = "⏱️ Durées";
     let debutH, debutM, dureeMin, texteduree;
 
     if (!estCE1()) {
@@ -1758,6 +1798,31 @@
         const f = 3 + Math.floor(Math.random() * 5);
         return { texte: `Dans la classe, <strong>${g}</strong> 👦 garçons et <strong>${f}</strong> 👧 filles. Combien d'élèves en tout ?`, rep: g + f, min: g + f - 4, max: g + f + 4 };
       } },
+      { generer() {
+        const n = 2 + Math.floor(Math.random() * 4);
+        const k = 1 + Math.floor(Math.random() * 4);
+        return { texte: `Il y a <strong>${n}</strong> 🐦 oiseaux sur un arbre. <strong>${k}</strong> autres arrivent. Combien y a-t-il d'oiseaux en tout ?`, rep: n + k, min: Math.max(2, n + k - 3), max: n + k + 3 };
+      } },
+      { generer() {
+        const t = 4 + Math.floor(Math.random() * 6);
+        const m = 1 + Math.floor(Math.random() * (t - 1));
+        return { texte: `Dans un panier, il y a <strong>${t}</strong> 🍊. On en mange <strong>${m}</strong>. Combien reste-t-il ?`, rep: t - m, min: 0, max: t };
+      } },
+      { generer() {
+        const a = 2 + Math.floor(Math.random() * 4);
+        const b = 2 + Math.floor(Math.random() * 4);
+        return { texte: `Camille a <strong>${a}</strong> 🖍️ crayons rouges et <strong>${b}</strong> bleus. Combien de crayons en tout ?`, rep: a + b, min: Math.max(2, a + b - 3), max: a + b + 3 };
+      } },
+      { generer() {
+        const n = 5 + Math.floor(Math.random() * 5);
+        const s = 1 + Math.floor(Math.random() * (n - 2));
+        return { texte: `Il y a <strong>${n}</strong> 🌟 étoiles. <strong>${s}</strong> disparaissent. Combien reste-t-il d'étoiles ?`, rep: n - s, min: 0, max: n };
+      } },
+      { generer() {
+        const p = 3 + Math.floor(Math.random() * 4);
+        const e = 1 + Math.floor(Math.random() * 4);
+        return { texte: `Noah a <strong>${p}</strong> 🍪 biscuits. Sa sœur lui en donne <strong>${e}</strong>. Combien Noah a-t-il de biscuits maintenant ?`, rep: p + e, min: Math.max(2, p + e - 3), max: p + e + 3 };
+      } },
     ],
     ce1: [
       { generer() {
@@ -1789,7 +1854,7 @@
   };
 
   function lancerProbleme() {
-    elTitre.textContent = "📖";
+    elTitre.textContent = "📖 Problème du jour";
     const pool = estCE1() ? PROBLEMES.ce1 : PROBLEMES.cp;
     const tmpl = pool[Math.floor(Math.random() * pool.length)];
     const { texte, rep, min, max } = tmpl.generer();
@@ -1821,7 +1886,7 @@
   }
 
   function lancerMasse() {
-    elTitre.textContent = "⚖️";
+    elTitre.textContent = "⚖️ La masse";
     const deux = melanger(OBJETS_MASSE).slice(0, 2);
     const [objA, objB] = deux;
 
@@ -1906,7 +1971,7 @@
   }
 
   function lancerPerimetre() {
-    elTitre.textContent = "🔲";
+    elTitre.textContent = "🔲 Périmètre";
     const maxC = estCE1() ? 15 : 8;
     const types = estCE1() ? ["carre", "rectangle", "triangle"] : ["carre", "rectangle"];
     const type = types[Math.floor(Math.random() * types.length)];
@@ -1964,7 +2029,7 @@
   }
 
   function lancerAngles() {
-    elTitre.textContent = "📐";
+    elTitre.textContent = "📐 Les angles";
     let degres, bonneVal;
 
     if (!estCE1()) {
@@ -1977,9 +2042,11 @@
         bonneVal = 1;
       }
       bonneReponse = bonneVal;
-      elQuestion.innerHTML = `<div class="angle-question">${svgAngle(degres, 160)}</div>`;
+      elQuestion.innerHTML =
+        `<p style="font-size:0.8rem;color:#777;margin:0 0 0.35rem">📐 Un angle <strong>droit</strong> forme un coin parfait, comme le coin d'une feuille.</p>` +
+        `<div class="angle-question">${svgAngle(degres, 150)}</div>`;
       elChoix.innerHTML = "";
-      [{ val: 0, label: "Angle droit" }, { val: 1, label: "Pas droit" }].forEach(({ val, label }) => {
+      [{ val: 0, label: "✅ Angle droit" }, { val: 1, label: "❌ Pas droit" }].forEach(({ val, label }) => {
         const b = document.createElement("button");
         b.type = "button"; b.className = "btn-choix";
         b.textContent = label; b.dataset.valeur = String(val);
