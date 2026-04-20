@@ -127,6 +127,23 @@
     return 4;
   }
 
+  const ACCESSOIRES_DEF = {
+    "chapeau-base":  { nom: "🎩 Chapeau",    svg: (t) => `<rect x="30" y="8" width="40" height="6" rx="3" fill="#2d3436"/><rect x="22" y="13" width="56" height="5" rx="2.5" fill="#2d3436"/>` },
+    "lunettes-base": { nom: "👓 Lunettes",   svg: (t) => `<circle cx="37" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><circle cx="63" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><line x1="45.5" y1="63" x2="54.5" y2="63" stroke="#2d3436" stroke-width="2"/><line x1="28.5" y1="63" x2="22" y2="60" stroke="#2d3436" stroke-width="2"/><line x1="71.5" y1="63" x2="78" y2="60" stroke="#2d3436" stroke-width="2"/>` },
+    "echarpe-rare":  { nom: "🧣 Écharpe",    svg: (t) => `<path d="M20,88 Q35,82 50,84 Q65,82 80,88" stroke="#e74c3c" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50,84 L54,97" stroke="#e74c3c" stroke-width="6" stroke-linecap="round"/>` },
+    "couronne-legendaire": { nom: "👑 Couronne légendaire", svg: (t) => `<polygon points="28,26 34,8 50,18 66,8 72,26" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/><circle cx="34" cy="9" r="4.5" fill="#e74c3c"/><circle cx="50" cy="19" r="4.5" fill="#9b59b6"/><circle cx="66" cy="9" r="4.5" fill="#e74c3c"/>` },
+  };
+
+  function lireAccessoires() {
+    try { return JSON.parse(localStorage.getItem("renard-accessoires") || "[]"); }
+    catch { return []; }
+  }
+  function lireTenue() {
+    try { return JSON.parse(localStorage.getItem("renard-tenue") || "{}"); }
+    catch { return {}; }
+  }
+  function sauverTenue(t) { localStorage.setItem("renard-tenue", JSON.stringify(t)); }
+
   function svgRenard(stade, taille, opts) {
     const triste = opts && opts.triste;
     const s = RENARD_STADES[Math.max(0, Math.min(4, stade))];
@@ -170,6 +187,9 @@
          <circle cx="61" cy="9"  r="4" fill="#ff6b00"/>`
       : "";
 
+    const tenue = (opts && opts.accessoires != null) ? opts.accessoires : Object.keys(lireTenue());
+    const accSvg = tenue.map(id => ACCESSOIRES_DEF[id] ? ACCESSOIRES_DEF[id].svg(t) : "").join("");
+
     return `<svg width="${t}" height="${h}" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
   ${couronne}${particules}
   <polygon points="16,66 28,22 45,60" fill="${s.corps}"/>
@@ -189,13 +209,15 @@
   ${bouche}
   <circle cx="27" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
   <circle cx="73" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
+  ${accSvg}
 </svg>`;
   }
 
   function mettreAJourRenardHeader() {
     const stade  = getStade(lireEtoiles());
     const triste = lireFaim() < 20 || lireBonheur() < 20;
-    const opts   = { triste };
+    const accessoires = Object.keys(lireTenue());
+    const opts   = { triste, accessoires };
     const header = document.getElementById("mascotte-header");
     const genre  = document.getElementById("mascotte-genre");
     if (header) header.innerHTML = svgRenard(stade, 44, opts);
@@ -2003,7 +2025,7 @@
     const nom     = lireNomRenard() || "Foxy";
 
     const triste = lireFaim() < 20 || lireBonheur() < 20;
-    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160, { triste });
+    document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160, { triste, accessoires: Object.keys(lireTenue()) });
     document.getElementById("maison-nom").textContent  = nom;
     document.getElementById("maison-stade").textContent = "✦ " + s.nom;
     document.getElementById("maison-etoiles-total").textContent = etoiles;
@@ -2067,6 +2089,53 @@
     };
   }
 
+  function montrerDressing() {
+    const elDressing = document.getElementById("ecran-dressing");
+    const elMaison   = document.getElementById("ecran-maison");
+    if (!elDressing) return;
+    elMaison.hidden = true;
+    elMaison.classList.remove("actif");
+    elDressing.hidden = false;
+    elDressing.classList.add("actif");
+
+    const stade    = getStade(lireEtoiles());
+    const nom      = lireNomRenard() || "Foxy";
+    const debloques = lireAccessoires();
+    const tenue    = lireTenue();
+
+    document.getElementById("dressing-sous-titre").textContent =
+      `${nom} peut porter ${debloques.length} accessoire${debloques.length !== 1 ? "s" : ""} !`;
+
+    // Aperçu du renard avec la tenue actuelle
+    document.getElementById("dressing-preview").innerHTML =
+      svgRenard(stade, 120, { accessoires: Object.keys(tenue) });
+
+    // Grille de tous les accessoires connus
+    const grille = document.getElementById("dressing-grille");
+    grille.innerHTML = "";
+    Object.entries(ACCESSOIRES_DEF).forEach(([id, def]) => {
+      const debloque = debloques.includes(id);
+      const equipe   = id in tenue;
+      const carte = document.createElement("button");
+      carte.type = "button";
+      carte.className = "dressing-carte" + (equipe ? " equipe" : "") + (debloque ? "" : " verrouille");
+      carte.innerHTML = `
+        <div style="line-height:0">${svgRenard(stade, 80, { accessoires: [id] })}</div>
+        <span class="dressing-carte-nom">${def.nom}</span>
+        <span class="dressing-carte-badge">${equipe ? "✓ Équipé" : (debloque ? "Disponible" : "🔒 Verrouillé")}</span>`;
+      if (debloque) {
+        carte.addEventListener("click", () => {
+          const t = lireTenue();
+          if (id in t) { delete t[id]; } else { t[id] = true; }
+          sauverTenue(t);
+          mettreAJourRenardHeader();
+          montrerDressing();
+        });
+      }
+      grille.appendChild(carte);
+    });
+  }
+
   function montrerJeu(nom) {
     jeuCourant = nom;
     elMenu.hidden = true;
@@ -2116,4 +2185,16 @@
   // Retour depuis Ma Maison
   const btnRetourMaison = document.getElementById("btn-retour-maison");
   if (btnRetourMaison) btnRetourMaison.addEventListener("click", montrerMenu);
+
+  // Dressing
+  const btnDressing = document.getElementById("btn-dressing");
+  if (btnDressing) btnDressing.addEventListener("click", montrerDressing);
+  const btnRetourDressing = document.getElementById("btn-retour-dressing");
+  if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => {
+    const elDressing = document.getElementById("ecran-dressing");
+    const elMaison   = document.getElementById("ecran-maison");
+    elDressing.hidden = true;
+    elDressing.classList.remove("actif");
+    montrerMaison();
+  });
 })();
