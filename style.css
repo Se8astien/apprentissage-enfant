@@ -1347,3 +1347,15 @@ h1 {
   background: var(--primaire);
   color: white;
 }
+
+/* ── Combo ── */
+.combo-carte {
+  gap: 0.5rem;
+}
+.combo-flamme {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #e17055;
+  margin: 0;
+  animation: flotte 1s ease-in-out infinite;
+}

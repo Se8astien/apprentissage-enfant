@@ -34,6 +34,7 @@
   let jeuCourant = null;
   let bonneReponse = null;
   let repondu = false;
+  let comboActuel = 0;
   let niveauCourant = lireNiveau();
   let genreCourant = lireGenre();
 
@@ -528,6 +529,7 @@
     if (choix !== correct) bouton.classList.add("mauvaise");
 
     if (choix === correct) {
+      comboActuel++;
       const ok = messagesOk();
       elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
       elFeedback.className = "feedback ok";
@@ -535,7 +537,10 @@
       sauverFaim(lireFaim() + 5);
       confetti();
       declencherReactionRenard(true);
+      if (comboActuel === 10) declencherCombo(10);
+      else if (comboActuel === 5) declencherCombo(5);
     } else {
+      comboActuel = 0;
       const ko = messagesKo();
       elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
       elFeedback.className = "feedback non";
@@ -555,6 +560,27 @@
     void el.offsetWidth;
     el.classList.add(correct ? "visible" : "encourage");
     setTimeout(() => { el.hidden = true; el.className = "renard-reaction"; }, 2000);
+  }
+
+  function declencherCombo(nb) {
+    const bonus = nb >= 10 ? 3 : 1;
+    ajouterEtoiles(bonus);
+    const nom  = lireNomRenard() || "Foxy";
+    const stade = getStade(lireEtoiles());
+    const overlay = document.createElement("div");
+    overlay.className = "evolution-overlay";
+    overlay.innerHTML = `
+      <div class="evolution-carte combo-carte">
+        <div class="evolution-renard">${svgRenard(stade, 100)}</div>
+        <p class="combo-flamme">${nb >= 10 ? "🔥🔥 COMBO ×10 ! 🔥🔥" : "🔥 COMBO ×5 !"}</p>
+        <p class="evolution-titre">${nom} est fier de toi !</p>
+        <p class="evolution-msg">+${bonus} ⭐ bonus !</p>
+        <button type="button" class="btn-evolution-fermer">Super !</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    confetti();
+    overlay.querySelector(".btn-evolution-fermer").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
   }
 
   function resetFeedback() {
@@ -2138,6 +2164,7 @@
 
   function montrerJeu(nom) {
     jeuCourant = nom;
+    comboActuel = 0;
     elMenu.hidden = true;
     elMenu.classList.remove("actif");
     elJeu.hidden = false;
