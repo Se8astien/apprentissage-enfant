@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Maths Magiques — CP</title>
+  <title>Maths Magiques — CP &amp; CE1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -15,11 +15,14 @@
       <div class="mascotte" id="mascotte-header" aria-hidden="true"></div>
       <div class="titre-bloc">
         <h1>Maths magiques</h1>
-        <p class="sous-titre" id="sous-titre">Des jeux pour devenir championne en maths !</p>
+        <p class="sous-titre" id="sous-titre">Des jeux pour devenir champion·ne !</p>
       </div>
-      <div class="score-global" title="Étoiles gagnées">
-        <span class="score-icone">⭐</span>
-        <span id="total-etoiles">0</span>
+      <div class="header-droite">
+        <div class="streak-header" id="streak-header"></div>
+        <div class="score-global" title="Étoiles gagnées">
+          <span class="score-icone">⭐</span>
+          <span id="total-etoiles">0</span>
+        </div>
       </div>
     </header>
 
@@ -52,44 +55,61 @@
     </section>
 
     <main id="ecran-menu" class="ecran" hidden>
+
+      <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
+      <button type="button" class="maison-banner" id="btn-maison" aria-label="Ma Maison">
+        <div class="maison-banner-fox" id="maison-banner-fox" aria-hidden="true"></div>
+        <div class="maison-banner-infos">
+          <span class="maison-banner-nom" id="maison-banner-nom"></span>
+          <span class="maison-banner-sub" id="maison-banner-sub"></span>
+        </div>
+        <div class="maison-banner-droite">
+          <span class="maison-banner-stars" id="maison-banner-stars"></span>
+          <span class="maison-banner-fleche" aria-hidden="true">›</span>
+        </div>
+      </button>
+
+      <!-- ── Sélecteur de niveau ──────────────────────────────── -->
       <div class="niveau-barre" role="group" aria-label="Niveau de difficulté">
-        <span class="niveau-label">Niveau</span>
         <div class="niveau-switch">
-          <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">CP</button>
-          <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">CE1</button>
+          <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
+          <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>
         </div>
       </div>
-      <p class="accueil">Choisis un jeu, c'est parti !</p>
+
+      <p class="accueil">Choisis ton jeu !</p>
+
+      <!-- ── Grille des jeux ─────────────────────────────────── -->
       <div class="grille-jeux">
-        <button type="button" class="carte-jeu" data-jeu="compte"><span class="emoji-jeu">🐱</span><span class="nom-jeu">Compte-moi ça !</span><span class="desc-jeu">Combien d'animaux ?</span></button>
-        <button type="button" class="carte-jeu" data-jeu="addition"><span class="emoji-jeu">🎈</span><span class="nom-jeu">Addition magique</span><span class="desc-jeu" id="desc-addition">Jusqu'à 10</span></button>
-        <button type="button" class="carte-jeu" data-jeu="soustraction"><span class="emoji-jeu">🍎</span><span class="nom-jeu">Les pommes</span><span class="desc-jeu">On enlève, combien il reste ?</span></button>
-        <button type="button" class="carte-jeu" data-jeu="compare"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">Le plus grand</span><span class="desc-jeu">Qui gagne ?</span></button>
-        <button type="button" class="carte-jeu" data-jeu="suite"><span class="emoji-jeu">🔢</span><span class="nom-jeu">Numéro manquant</span><span class="desc-jeu">Trouve le chiffre caché</span></button>
-        <button type="button" class="carte-jeu" data-jeu="doubles"><span class="emoji-jeu">👯</span><span class="nom-jeu">Doubles</span><span class="desc-jeu">2 + 2, 3 + 3…</span></button>
-        <button type="button" class="carte-jeu" data-jeu="heure"><span class="emoji-jeu">🕐</span><span class="nom-jeu">L'heure</span><span class="desc-jeu">Lis l'horloge !</span></button>
-        <button type="button" class="carte-jeu" data-jeu="pairimpair"><span class="emoji-jeu">🟣</span><span class="nom-jeu">Pair ou Impair ?</span><span class="desc-jeu">Range les objets en 2</span></button>
-        <button type="button" class="carte-jeu" data-jeu="dizaines"><span class="emoji-jeu">📊</span><span class="nom-jeu">Dizaines &amp; Unités</span><span class="desc-jeu">Barres et points</span></button>
-        <button type="button" class="carte-jeu" data-jeu="formes"><span class="emoji-jeu">🔷</span><span class="nom-jeu">Les formes</span><span class="desc-jeu">Cercle, carré, triangle…</span></button>
-        <button type="button" class="carte-jeu" data-jeu="monnaiecp"><span class="emoji-jeu">🪙</span><span class="nom-jeu">La monnaie</span><span class="desc-jeu">Pièces et petites sommes</span></button>
-        <button type="button" class="carte-jeu" data-jeu="moitie"><span class="emoji-jeu">✂️</span><span class="nom-jeu">La moitié</span><span class="desc-jeu">Partage en 2 parts égales</span></button>
-        <button type="button" class="carte-jeu" data-jeu="multiplication"><span class="emoji-jeu">✖️</span><span class="nom-jeu">Tables ×</span><span class="desc-jeu">×2 ×3 ×4 ×5 ×10</span></button>
-        <button type="button" class="carte-jeu" data-jeu="division"><span class="emoji-jeu">➗</span><span class="nom-jeu">Partage</span><span class="desc-jeu">En groupes égaux</span></button>
-        <button type="button" class="carte-jeu" data-jeu="fractions"><span class="emoji-jeu">🍕</span><span class="nom-jeu">Fractions</span><span class="desc-jeu">½ ¼ ¾ de formes</span></button>
-        <button type="button" class="carte-jeu" data-jeu="mesures"><span class="emoji-jeu">📏</span><span class="nom-jeu">Mesures</span><span class="desc-jeu">Longueurs et masses</span></button>
-        <button type="button" class="carte-jeu" data-jeu="monnaiece1"><span class="emoji-jeu">💶</span><span class="nom-jeu">Monnaie CE1</span><span class="desc-jeu">Totaux &amp; monnaie rendue</span></button>
-        <button type="button" class="carte-jeu" data-jeu="symetrie"><span class="emoji-jeu">🪞</span><span class="nom-jeu">Symétrie</span><span class="desc-jeu">Trouve le miroir</span></button>
-        <button type="button" class="carte-jeu" data-jeu="syllabes"><span class="emoji-jeu">📖</span><span class="nom-jeu">Syllabes</span><span class="desc-jeu">Complète le mot !</span></button>
-        <button type="button" class="carte-jeu" data-jeu="lecture"><span class="emoji-jeu">📚</span><span class="nom-jeu">Lecture</span><span class="desc-jeu">Image et mot qui va avec</span></button>
-        <button type="button" class="carte-jeu" data-jeu="anglais"><span class="emoji-jeu">🇬🇧</span><span class="nom-jeu">English</span><span class="desc-jeu">What is this?</span></button>
-        <button type="button" class="carte-jeu" data-jeu="traduction"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction</span><span class="desc-jeu">Français → Anglais</span></button>
-        <button type="button" class="carte-jeu" data-jeu="durees"><span class="emoji-jeu">⏱️</span><span class="nom-jeu">Durées</span><span class="desc-jeu">Calcule l'heure de fin</span></button>
-        <button type="button" class="carte-jeu" data-jeu="probleme"><span class="emoji-jeu">📖</span><span class="nom-jeu">Problème du jour</span><span class="desc-jeu">Résous le problème</span></button>
-        <button type="button" class="carte-jeu" data-jeu="masse"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">La masse</span><span class="desc-jeu">Poids et pesées</span></button>
-        <button type="button" class="carte-jeu" data-jeu="perimetre"><span class="emoji-jeu">🔲</span><span class="nom-jeu">Périmètre</span><span class="desc-jeu">Tour de la figure</span></button>
-        <button type="button" class="carte-jeu" data-jeu="angles"><span class="emoji-jeu">📐</span><span class="nom-jeu">Les angles</span><span class="desc-jeu">Droit, aigu, obtus</span></button>
+        <button type="button" class="carte-jeu" data-jeu="compte"        data-cat="maths">  <span class="emoji-jeu">🐱</span><span class="nom-jeu">Compte-moi ça !</span><span class="desc-jeu">Combien d'animaux ?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="addition"      data-cat="maths">  <span class="emoji-jeu">🎈</span><span class="nom-jeu">Addition magique</span><span class="desc-jeu" id="desc-addition">Jusqu'à 10</span></button>
+        <button type="button" class="carte-jeu" data-jeu="soustraction"  data-cat="maths">  <span class="emoji-jeu">🍎</span><span class="nom-jeu">Les pommes</span><span class="desc-jeu">On enlève, combien reste-t-il ?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="compare"       data-cat="maths">  <span class="emoji-jeu">⚖️</span><span class="nom-jeu">Le plus grand</span><span class="desc-jeu">Qui gagne ?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="suite"         data-cat="maths">  <span class="emoji-jeu">🔢</span><span class="nom-jeu">Numéro manquant</span><span class="desc-jeu">Trouve le chiffre caché</span></button>
+        <button type="button" class="carte-jeu" data-jeu="doubles"       data-cat="maths">  <span class="emoji-jeu">👯</span><span class="nom-jeu">Doubles</span><span class="desc-jeu">2+2, 3+3…</span></button>
+        <button type="button" class="carte-jeu" data-jeu="moitie"        data-cat="maths">  <span class="emoji-jeu">✂️</span><span class="nom-jeu">La moitié</span><span class="desc-jeu">Partage en 2 parts égales</span></button>
+        <button type="button" class="carte-jeu" data-jeu="dizaines"      data-cat="maths">  <span class="emoji-jeu">📊</span><span class="nom-jeu">Dizaines &amp; Unités</span><span class="desc-jeu">Barres et points</span></button>
+        <button type="button" class="carte-jeu" data-jeu="pairimpair"    data-cat="formes"> <span class="emoji-jeu">🟣</span><span class="nom-jeu">Pair ou Impair ?</span><span class="desc-jeu">Range les objets en 2</span></button>
+        <button type="button" class="carte-jeu" data-jeu="formes"        data-cat="formes"> <span class="emoji-jeu">🔷</span><span class="nom-jeu">Les formes</span><span class="desc-jeu">Cercle, carré, triangle…</span></button>
+        <button type="button" class="carte-jeu" data-jeu="fractions"     data-cat="formes"> <span class="emoji-jeu">🍕</span><span class="nom-jeu">Fractions</span><span class="desc-jeu">½ ¼ ¾ de formes</span></button>
+        <button type="button" class="carte-jeu" data-jeu="symetrie"      data-cat="formes"> <span class="emoji-jeu">🪞</span><span class="nom-jeu">Symétrie</span><span class="desc-jeu">Trouve le miroir</span></button>
+        <button type="button" class="carte-jeu" data-jeu="perimetre"     data-cat="formes"> <span class="emoji-jeu">🔲</span><span class="nom-jeu">Périmètre</span><span class="desc-jeu">Tour de la figure</span></button>
+        <button type="button" class="carte-jeu" data-jeu="angles"        data-cat="formes"> <span class="emoji-jeu">📐</span><span class="nom-jeu">Les angles</span><span class="desc-jeu">Droit, aigu, obtus</span></button>
+        <button type="button" class="carte-jeu" data-jeu="heure"         data-cat="temps">  <span class="emoji-jeu">🕐</span><span class="nom-jeu">L'heure</span><span class="desc-jeu">Lis l'horloge !</span></button>
+        <button type="button" class="carte-jeu" data-jeu="durees"        data-cat="temps">  <span class="emoji-jeu">⏱️</span><span class="nom-jeu">Durées</span><span class="desc-jeu">Calcule l'heure de fin</span></button>
+        <button type="button" class="carte-jeu" data-jeu="mesures"       data-cat="temps">  <span class="emoji-jeu">📏</span><span class="nom-jeu">Mesures</span><span class="desc-jeu">Longueurs et masses</span></button>
+        <button type="button" class="carte-jeu" data-jeu="masse"         data-cat="temps">  <span class="emoji-jeu">⚖️</span><span class="nom-jeu">La masse</span><span class="desc-jeu">Poids et pesées</span></button>
+        <button type="button" class="carte-jeu" data-jeu="monnaiecp"     data-cat="argent"> <span class="emoji-jeu">🪙</span><span class="nom-jeu">La monnaie</span><span class="desc-jeu">Pièces et petites sommes</span></button>
+        <button type="button" class="carte-jeu" data-jeu="monnaiece1"    data-cat="argent"> <span class="emoji-jeu">💶</span><span class="nom-jeu">Monnaie CE1</span><span class="desc-jeu">Totaux &amp; rendu</span></button>
+        <button type="button" class="carte-jeu" data-jeu="multiplication" data-cat="avance"><span class="emoji-jeu">✖️</span><span class="nom-jeu">Tables ×</span><span class="desc-jeu">×2 ×3 ×4 ×5 ×10</span></button>
+        <button type="button" class="carte-jeu" data-jeu="division"      data-cat="avance"> <span class="emoji-jeu">➗</span><span class="nom-jeu">Partage</span><span class="desc-jeu">En groupes égaux</span></button>
+        <button type="button" class="carte-jeu" data-jeu="probleme"      data-cat="avance"> <span class="emoji-jeu">📖</span><span class="nom-jeu">Problème du jour</span><span class="desc-jeu">Résous le problème</span></button>
+        <button type="button" class="carte-jeu" data-jeu="syllabes"      data-cat="langage"><span class="emoji-jeu">📖</span><span class="nom-jeu">Syllabes</span><span class="desc-jeu">Complète le mot !</span></button>
+        <button type="button" class="carte-jeu" data-jeu="lecture"       data-cat="langage"><span class="emoji-jeu">📚</span><span class="nom-jeu">Lecture</span><span class="desc-jeu">Image et mot qui va avec</span></button>
+        <button type="button" class="carte-jeu" data-jeu="anglais"       data-cat="langage"><span class="emoji-jeu">🇬🇧</span><span class="nom-jeu">English</span><span class="desc-jeu">What is this?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="traduction"    data-cat="langage"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction</span><span class="desc-jeu">Français → Anglais</span></button>
       </div>
-      <button type="button" class="btn-maison" id="btn-maison" aria-label="Ma Maison">🏠 Ma Maison</button>
+
       <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
         <span id="icone-genre-actuel">👧</span>
       </button>
@@ -97,6 +117,7 @@
 
     <section id="ecran-maison" class="ecran" hidden aria-label="Ma Maison">
       <button type="button" class="btn-retour" id="btn-retour-maison">← Menu</button>
+      <h2 class="maison-titre">🏠 Ma Maison</h2>
       <div class="maison-conteneur">
         <div class="maison-renard" id="maison-renard" aria-hidden="true"></div>
         <div class="maison-infos">

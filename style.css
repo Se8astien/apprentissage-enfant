@@ -43,12 +43,24 @@ body {
 .top {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  background: white;
+  border-radius: 1.2rem;
+  padding: 0.6rem 0.85rem;
+  box-shadow: 0 4px 18px var(--ombre);
+}
+
+.header-droite {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .mascotte {
   line-height: 0;
+  flex-shrink: 0;
   animation: flotte 2.5s ease-in-out infinite;
 }
 .genre-mascotte {
@@ -71,43 +83,44 @@ body {
 
 h1 {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--primaire);
   letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .sous-titre {
-  margin: 0.15rem 0 0;
-  font-size: 0.8rem;
-  opacity: 0.85;
+  margin: 0.1rem 0 0;
+  font-size: 0.73rem;
+  opacity: 0.75;
+  line-height: 1.3;
 }
 
 .score-global {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  background: var(--carte);
-  padding: 0.4rem 0.65rem;
+  gap: 0.2rem;
+  background: #fff9e6;
+  border: 2px solid #fdcb6e;
+  padding: 0.35rem 0.6rem;
   border-radius: 999px;
-  font-weight: 700;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 14px var(--ombre);
+  font-weight: 800;
+  font-size: 1rem;
 }
 
 .score-icone {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .streak-header {
   background: linear-gradient(135deg, #ff7675, #d63031);
   color: white;
   border-radius: 999px;
-  padding: 0.35rem 0.65rem;
+  padding: 0.3rem 0.55rem;
   font-weight: 800;
-  font-size: 0.95rem;
-  box-shadow: 0 3px 10px rgba(214, 48, 49, 0.35);
-  min-width: 2.2rem;
+  font-size: 0.85rem;
+  min-width: 2rem;
   text-align: center;
   transition: transform 0.2s;
 }
@@ -134,135 +147,159 @@ h1 {
 }
 
 .niveau-barre {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.niveau-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--primaire-fonce);
-  opacity: 0.85;
+  margin-bottom: 0.85rem;
 }
 
 .niveau-switch {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  background: var(--carte);
-  padding: 0.35rem;
+  gap: 0.45rem;
+  background: white;
+  padding: 0.4rem;
   border-radius: 999px;
   box-shadow: 0 4px 16px var(--ombre);
 }
 
 .niveau-btn {
   flex: 1;
-  min-width: 6rem;
   border: none;
   border-radius: 999px;
-  padding: 0.55rem 0.65rem;
+  padding: 0.7rem 0.5rem;
   font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
   background: transparent;
   color: var(--texte);
-  opacity: 0.75;
-  transition: background 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  opacity: 0.6;
+  transition: background 0.18s ease, opacity 0.18s ease, transform 0.1s;
+  letter-spacing: -0.01em;
 }
+
+.niveau-btn:active { transform: scale(0.97); }
 
 .niveau-btn:hover,
 .niveau-btn:focus-visible {
   opacity: 1;
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .niveau-btn.actif {
   background: linear-gradient(135deg, var(--primaire), #a29bfe);
   color: #fff;
   opacity: 1;
-  box-shadow: 0 2px 10px rgba(108, 92, 231, 0.35);
+  box-shadow: 0 3px 12px rgba(108, 92, 231, 0.4);
 }
 
 .accueil {
   text-align: center;
-  font-size: 1rem;
-  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #888;
+  margin: 0 0 0.75rem;
+  letter-spacing: 0.02em;
 }
 
 .grille-jeux {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .carte-jeu {
   border: none;
-  border-radius: 1.1rem;
-  padding: 1rem 0.75rem;
+  border-radius: 1.2rem;
+  padding: 1.1rem 0.7rem 0.9rem;
   background: var(--carte);
-  box-shadow: 0 6px 20px var(--ombre);
+  box-shadow: 0 4px 16px var(--ombre);
   cursor: pointer;
   font-family: inherit;
   text-align: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.carte-jeu::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  border-radius: 1.2rem 1.2rem 0 0;
 }
 
 .carte-jeu:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .carte-jeu:hover,
 .carte-jeu:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(108, 92, 231, 0.2);
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(108, 92, 231, 0.18);
+  outline: none;
 }
 
+/* ── Couleurs par catégorie ── */
+.carte-jeu[data-cat="maths"]::before   { background: #6c5ce7; }
+.carte-jeu[data-cat="formes"]::before  { background: #00b894; }
+.carte-jeu[data-cat="temps"]::before   { background: #0984e3; }
+.carte-jeu[data-cat="argent"]::before  { background: #f9ca24; }
+.carte-jeu[data-cat="avance"]::before  { background: #e17055; }
+.carte-jeu[data-cat="langage"]::before { background: #e84393; }
+
+.carte-jeu[data-cat="maths"]   { background: #f9f7ff; }
+.carte-jeu[data-cat="formes"]  { background: #f2fdf8; }
+.carte-jeu[data-cat="temps"]   { background: #f0f8ff; }
+.carte-jeu[data-cat="argent"]  { background: #fffef0; }
+.carte-jeu[data-cat="avance"]  { background: #fff5f2; }
+.carte-jeu[data-cat="langage"] { background: #fff0f9; }
+
 .emoji-jeu {
-  font-size: 2rem;
+  font-size: 2.4rem;
   line-height: 1;
 }
 
 .nom-jeu {
   font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--primaire);
+  font-size: 0.88rem;
+  color: var(--texte);
+  line-height: 1.25;
 }
 
 .desc-jeu {
-  font-size: 0.72rem;
-  opacity: 0.8;
+  font-size: 0.68rem;
+  opacity: 0.65;
   line-height: 1.25;
 }
 
 .btn-retour {
-  border: none;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 2.5px solid var(--primaire);
+  background: white;
   color: var(--primaire);
   font-family: inherit;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   cursor: pointer;
-  padding: 0.4rem 0;
-  margin-bottom: 0.5rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 2px 8px var(--ombre);
+  transition: background 0.14s, color 0.14s;
 }
 
 .btn-retour:hover,
 .btn-retour:focus-visible {
-  text-decoration: underline;
+  background: var(--primaire);
+  color: white;
   outline: none;
 }
+.btn-retour:active { transform: scale(0.97); }
 
 .jeu-niveau {
   text-align: center;
@@ -1073,8 +1110,8 @@ h1 {
   border-radius: 10px;
   transition: width 0.5s ease;
 }
-.jauge-faim    { background: linear-gradient(90deg, #f39c12, #e74c3c); }
-.jauge-bonheur { background: linear-gradient(90deg, #e84393, #c0392b); }
+.jauge-faim    { background: linear-gradient(90deg, #fdcb6e, #e17055); }
+.jauge-bonheur { background: linear-gradient(90deg, #fd79a8, #e84393); }
 .jauge-val {
   font-size: 0.75rem;
   font-weight: 700;
@@ -1110,31 +1147,86 @@ h1 {
   cursor: not-allowed;
 }
 
-/* ── Bouton Ma Maison ────────────────────────────────────────── */
-.btn-maison {
-  display: block;
-  margin: 1rem auto 0.25rem;
-  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-  color: white;
+/* ── Bannière Ma Maison (haut du menu) ──────────────────────── */
+.maison-banner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: linear-gradient(135deg, #5f50e0 0%, #9b8ff8 60%, #c084fc 100%);
   border: none;
-  border-radius: 20px;
-  padding: 0.6rem 1.6rem;
-  font-size: 1rem;
-  font-weight: 700;
+  border-radius: 1.4rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.85rem;
   cursor: pointer;
   font-family: inherit;
-  box-shadow: 0 3px 0 #4834d4, 0 5px 15px rgba(108,92,231,0.3);
-  transition: transform 0.1s;
+  gap: 0.75rem;
+  box-shadow: 0 5px 0 #3d2fc0, 0 8px 24px rgba(108,92,231,0.35);
+  transition: transform 0.12s, box-shadow 0.12s;
+  text-align: left;
 }
-.btn-maison:active { transform: scale(0.97); }
+.maison-banner:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #3d2fc0, 0 4px 12px rgba(108,92,231,0.25);
+}
+.maison-banner-fox {
+  line-height: 0;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+.maison-banner-infos {
+  flex: 1;
+  min-width: 0;
+}
+.maison-banner-nom {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.maison-banner-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.78);
+  margin-top: 0.1rem;
+}
+.maison-banner-droite {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+  flex-shrink: 0;
+}
+.maison-banner-stars {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #fdcb6e;
+  letter-spacing: 0.02em;
+}
+.maison-banner-fleche {
+  font-size: 1.8rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1;
+  margin-top: -0.1rem;
+}
 
 /* ── Écran Ma Maison ─────────────────────────────────────────── */
+.maison-titre {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primaire);
+  margin: 0 0 0.75rem;
+}
+
 .maison-conteneur {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.5rem 1rem 1.5rem;
+  gap: 0.9rem;
+  padding: 0 0 1.5rem;
 }
 .maison-renard {
   line-height: 0;

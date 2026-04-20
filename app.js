@@ -223,6 +223,22 @@
     const genre  = document.getElementById("mascotte-genre");
     if (header) header.innerHTML = svgRenard(stade, 44, opts);
     if (genre)  genre.innerHTML  = svgRenard(stade, 72, opts);
+    mettreAJourMaisonBanner();
+  }
+
+  function mettreAJourMaisonBanner() {
+    const foxEl   = document.getElementById("maison-banner-fox");
+    const nomEl   = document.getElementById("maison-banner-nom");
+    const subEl   = document.getElementById("maison-banner-sub");
+    const starsEl = document.getElementById("maison-banner-stars");
+    if (!foxEl) return;
+    const stade  = getStade(lireEtoiles());
+    const triste = lireFaim() < 20 || lireBonheur() < 20;
+    const accessoires = Object.keys(lireTenue());
+    foxEl.innerHTML = svgRenard(stade, 46, { triste, accessoires });
+    if (nomEl)   nomEl.textContent   = (lireNomRenard() || "Foxy") + " 🏠";
+    if (subEl)   subEl.textContent   = RENARD_STADES[stade].nom;
+    if (starsEl) starsEl.textContent = "⭐ " + lireEtoiles();
   }
 
   function lireNomRenard() {
@@ -2035,6 +2051,7 @@
     elMenu.hidden = false;
     elMenu.classList.add("actif");
     majGenre();
+    mettreAJourMaisonBanner();
   }
 
   function montrerMaison() {
