@@ -608,23 +608,53 @@
 
   function lancerCompte() {
     elTitre.textContent = "Compte-moi ça !";
-    const n = estCE1()
-      ? 10 + Math.floor(Math.random() * 9)
-      : 3 + Math.floor(Math.random() * 13);
-    const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-    const ligne = Array(n).fill(emoji).join(" ");
-    elQuestion.innerHTML =
-      "<p>Combien d'animaux tu vois ?</p>" +
-      '<p class="ligne-emojis' +
-      (n > 8 ? " petit" : "") +
-      '">' +
-      ligne +
-      "</p>";
-    bonneReponse = n;
-    const props = estCE1()
-      ? propositionsAvecBonne(n, Math.max(6, n - 4), Math.min(22, n + 4), 3)
-      : propositionsAvecBonne(n, Math.max(1, n - 4), Math.min(18, n + 4), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+
+    if (!estCE1()) {
+      const n = 3 + Math.floor(Math.random() * 13);
+      const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
+      const ligne = Array(n).fill(emoji).join(" ");
+      elQuestion.innerHTML =
+        "<p>Combien d'animaux tu vois ?</p>" +
+        '<p class="ligne-emojis' + (n > 8 ? " petit" : "") + '">' + ligne + "</p>";
+      bonneReponse = n;
+      const props = propositionsAvecBonne(n, Math.max(1, n - 4), Math.min(18, n + 4), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+      return;
+    }
+
+    // CE1 : deux types d'animaux, total ou différence
+    const idxA = Math.floor(Math.random() * ANIMAUX.length);
+    let idxB = Math.floor(Math.random() * ANIMAUX.length);
+    if (idxB === idxA) idxB = (idxA + 1) % ANIMAUX.length;
+    const emojiA = ANIMAUX[idxA];
+    const emojiB = ANIMAUX[idxB];
+    const nA = 3 + Math.floor(Math.random() * 9);   // 3–11
+    const nB = 3 + Math.floor(Math.random() * 9);   // 3–11
+    const ligneA = Array(nA).fill(emojiA).join(" ");
+    const ligneB = Array(nB).fill(emojiB).join(" ");
+
+    const typeDiff = Math.random() < 0.4 && nA !== nB;
+    if (typeDiff) {
+      const diff = Math.abs(nA - nB);
+      const plusGrand = nA > nB ? emojiA : emojiB;
+      const plusPetit = nA > nB ? emojiB : emojiA;
+      bonneReponse = diff;
+      elQuestion.innerHTML =
+        `<p>Combien de ${plusGrand} <strong>de plus</strong> que de ${plusPetit} ?</p>` +
+        `<p class="ligne-emojis petit">${ligneA}</p>` +
+        `<p class="ligne-emojis petit">${ligneB}</p>`;
+      const props = propositionsAvecBonne(diff, Math.max(0, diff - 4), Math.min(12, diff + 4), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+    } else {
+      const total = nA + nB;
+      bonneReponse = total;
+      elQuestion.innerHTML =
+        `<p>Combien d'animaux <strong>en tout</strong> ?</p>` +
+        `<p class="ligne-emojis petit">${ligneA}</p>` +
+        `<p class="ligne-emojis petit">${ligneB}</p>`;
+      const props = propositionsAvecBonne(total, Math.max(4, total - 5), Math.min(24, total + 5), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+    }
   }
 
   function lancerAddition() {
@@ -663,17 +693,23 @@
       return;
     }
 
-    total = 21 + Math.floor(Math.random() * 59);
-    a = 1 + Math.floor(Math.random() * (total - 1));
-    b = total - a;
+    // CE1 : addition jusqu'à 79, parfois avec un multiple de 10 (20%)
+    const useDizaine = Math.random() < 0.20;
+    if (useDizaine) {
+      const dizaines = [10, 20, 30, 40, 50];
+      a = dizaines[Math.floor(Math.random() * dizaines.length)];
+      b = 5 + Math.floor(Math.random() * 30);
+    } else {
+      total = 21 + Math.floor(Math.random() * 59);
+      a = 1 + Math.floor(Math.random() * (total - 1));
+      b = total - a;
+    }
+    total = a + b;
 
     html =
-      "<p>Calcul mental — combien font :</p>" +
-      '<p class="equation" style="font-size:2rem;margin-top:.75rem">' +
-      a +
-      " + " +
-      b +
-      " = ?</p>";
+      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette addition :</p>" +
+      '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.75rem">' +
+      a + " + " + b + " = ?</p>";
 
     elQuestion.innerHTML = html;
     bonneReponse = total;
@@ -704,11 +740,17 @@
         "<p>On mange <strong>" + enleve + "</strong> pommes sur <strong>" + total + "</strong>. Combien reste-t-il ?</p>" +
         '<p class="ligne-emojis">' + [...biffees, ...restantes].join(" ") + "</p>" +
         '<p class="equation">' + total + " − " + enleve + " = ?</p>";
-    } else {
+    } else if (!estCE1()) {
       elQuestion.innerHTML =
         "<p>Il y a <strong>" + total + "</strong> pommes 🍎</p>" +
         "<p>On en mange <strong>" + enleve + "</strong>. Combien il en reste ?</p>" +
         '<p class="equation">' + total + " − " + enleve + " = ?</p>";
+    } else {
+      // CE1 : soustraction 10–89, avec conseil soustraction posée
+      elQuestion.innerHTML =
+        "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
+        '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.4rem">' + total + " − " + enleve + " = ?</p>" +
+        "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pour les grands nombres, pense à la soustraction posée !</p>";
     }
     bonneReponse = reste;
     const props = estCE1()
@@ -726,18 +768,21 @@
       a = 1 + Math.floor(Math.random() * 20);
       b = 1 + Math.floor(Math.random() * 20);
     } else {
-      a = 100 + Math.floor(Math.random() * 900);
-      b = 100 + Math.floor(Math.random() * 900);
+      // 30% chance d'utiliser des nombres à 3 chiffres (100–999)
+      if (Math.random() < 0.30) {
+        a = 100 + Math.floor(Math.random() * 900);
+        b = 100 + Math.floor(Math.random() * 900);
+      } else {
+        a = 10 + Math.floor(Math.random() * 90);
+        b = 10 + Math.floor(Math.random() * 90);
+      }
     }
     if (a === b) b = b < 999 ? b + 1 : b - 1;
     bonneReponse = Math.max(a, b);
     elQuestion.innerHTML =
       "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
-      '<p class="equation" style="font-size:clamp(1.35rem,6vw,1.85rem)">' +
-      a +
-      " &nbsp; ou &nbsp; " +
-      b +
-      "</p>";
+      '<p class="equation" style="font-size:clamp(1.6rem,7vw,2.4rem);text-align:center;margin-top:0.5rem">' +
+      a + " &nbsp; ou &nbsp; " + b + "</p>";
     afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, bonneReponse));
   }
 
@@ -748,18 +793,21 @@
       step = Math.random() < 0.35 ? 2 : 1;
       debut = 1 + Math.floor(Math.random() * Math.max(1, 20 - step * 4));
     } else {
-      step = [1, 2, 5, 10][Math.floor(Math.random() * 4)];
+      // Pas 1, 2, 5, 10 + pas 3 (20%) et pas 4 (20%)
+      const r = Math.random();
+      if (r < 0.20) step = 3;
+      else if (r < 0.40) step = 4;
+      else step = [1, 2, 5, 10][Math.floor(Math.random() * 4)];
       debut = 1 + Math.floor(Math.random() * Math.max(1, 95 - step * 4));
     }
     const suite = [debut, debut + step, debut + step * 2, debut + step * 3, debut + step * 4];
     const indexCache = 1 + Math.floor(Math.random() * 3);
     bonneReponse = suite[indexCache];
     const affiche = suite.map((n, i) => (i === indexCache ? "?" : String(n)));
+    const regleTexte = estCE1() ? ` (on avance de ${step} en ${step})` : "";
     elQuestion.innerHTML =
-      "<p>Quel nombre manque dans la suite ?</p>" +
-      '<p class="suite">' +
-      affiche.join(" — ") +
-      "</p>";
+      `<p>Continue la suite${regleTexte} — quel nombre manque ?</p>` +
+      '<p class="suite">' + affiche.join(" — ") + "</p>";
     const min = Math.max(1, bonneReponse - step * 3);
     const max = bonneReponse + step * 3;
     const props = propositionsAvecBonne(bonneReponse, min, max, 3);
@@ -768,22 +816,42 @@
 
   function lancerDoubles() {
     elTitre.textContent = "Doubles";
-    const n = estCE1() ? 10 + Math.floor(Math.random() * 16) : 1 + Math.floor(Math.random() * 10);
-    const d = n + n;
-    elQuestion.innerHTML =
-      "<p>Le double de <strong>" +
-      n +
-      "</strong>, c'est combien ?</p>" +
-      '<p class="equation">' +
-      n +
-      " + " +
-      n +
-      " = ?</p>";
-    bonneReponse = d;
-    const props = estCE1()
-      ? propositionsAvecBonne(d, Math.max(10, d - 12), Math.min(60, d + 12), 3)
-      : propositionsAvecBonne(d, Math.max(2, d - 6), Math.min(22, d + 6), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+
+    if (!estCE1()) {
+      const n = 1 + Math.floor(Math.random() * 10);
+      const d = n + n;
+      elQuestion.innerHTML =
+        "<p>Le double de <strong>" + n + "</strong>, c'est combien ?</p>" +
+        '<p class="equation">' + n + " + " + n + " = ?</p>";
+      bonneReponse = d;
+      const props = propositionsAvecBonne(d, Math.max(2, d - 6), Math.min(22, d + 6), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+      return;
+    }
+
+    // CE1 : doubles 1–20, ou moitiés de nombres pairs 2–40
+    const useDouble = Math.random() < 0.55;
+    if (useDouble) {
+      const n = 1 + Math.floor(Math.random() * 20);
+      const d = n * 2;
+      bonneReponse = d;
+      elQuestion.innerHTML =
+        `<p style='font-size:0.9rem;margin:0 0 0.3rem'>Quel est le double de ce nombre ?</p>` +
+        `<p class="equation" style="font-size:2.2rem;font-weight:700">Le double de <strong>${n}</strong> = ?</p>` +
+        `<p style='font-size:0.82rem;color:#888'>(double = le nombre + lui-même : ${n} + ${n})</p>`;
+      const props = propositionsAvecBonne(d, Math.max(2, d - 10), Math.min(42, d + 10), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+    } else {
+      const moitie = 1 + Math.floor(Math.random() * 20);
+      const n = moitie * 2;
+      bonneReponse = moitie;
+      elQuestion.innerHTML =
+        `<p style='font-size:0.9rem;margin:0 0 0.3rem'>Quelle est la moitié de ce nombre ?</p>` +
+        `<p class="equation" style="font-size:2.2rem;font-weight:700">La moitié de <strong>${n}</strong> = ?</p>` +
+        `<p style='font-size:0.82rem;color:#888'>(moitié = partager en 2 groupes égaux)</p>`;
+      const props = propositionsAvecBonne(moitie, Math.max(1, moitie - 6), Math.min(22, moitie + 6), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+    }
   }
 
   // ── Horloge analogique SVG ────────────────────────────────────────────────
@@ -923,11 +991,11 @@
   function lancerHeure() {
     elTitre.textContent = "🕐 L'heure";
 
-    // CP : multiples de 5 min ; CE1 : n'importe quelle minute
-    const pas = estCE1() ? 1 : 5;
+    // CP : multiples de 5 min ; CE1 : quarts d'heure (0, 15, 30, 45 min)
+    const minutesPool = estCE1() ? [0, 15, 30, 45] : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
     const pool = [];
     for (let h = 1; h <= 12; h++) {
-      for (let m = 0; m < 60; m += pas) {
+      for (const m of minutesPool) {
         pool.push(h * 60 + m);
       }
     }
@@ -937,7 +1005,6 @@
     const bonneM = bonne % 60;
 
     // Distracteurs : même heure avec minutes différentes OU heures différentes
-    // Pour rendre intéressant : 2 distracteurs même heure (minutes diff), 1 heure diff
     const memHeure = pool.filter((t) => Math.floor(t / 60) === bonneH && t !== bonne);
     const autreHeure = pool.filter((t) => Math.floor(t / 60) !== bonneH);
 
@@ -948,9 +1015,12 @@
 
     bonneReponse = bonne;
 
-    elQuestion.innerHTML = `
-      <div class="grande-horloge">${svgHorloge(bonneH || 12, bonneM, 160)}</div>
-      <button type="button" class="btn-aide-heure" id="btn-aide-heure">💡 Comment lire l'heure ?</button>`;
+    const questionTexte = estCE1()
+      ? `<p style="font-size:0.88rem;font-weight:700;margin:0 0 0.3rem;color:var(--primaire)">Quelle heure est-il ?</p>`
+      : "";
+    elQuestion.innerHTML = questionTexte +
+      `<div class="grande-horloge">${svgHorloge(bonneH || 12, bonneM, 160)}</div>` +
+      `<button type="button" class="btn-aide-heure" id="btn-aide-heure">💡 Comment lire l'heure ?</button>`;
     document.getElementById("btn-aide-heure").addEventListener("click", montrerAideHeure);
     afficherChoixHorloge(options);
   }
@@ -972,25 +1042,39 @@
 
   function lancerPairImpair() {
     elTitre.textContent = "Pair ou Impair ?";
-    const max = estCE1() ? 100 : 20;
+    const max = estCE1() ? 99 : 20;
     const n = 2 + Math.floor(Math.random() * (max - 1));
     const estPair = n % 2 === 0;
     bonneReponse = estPair ? 0 : 1;
 
-    let dots = "";
-    for (let i = 0; i < n; i++) {
-      const col = i % 2;
-      const row = Math.floor(i / 2);
-      const color = col === 0 ? "#6c5ce7" : "#fd79a8";
-      dots += `<circle cx="${22 + col * 30}" cy="${20 + row * 30}" r="12" fill="${color}" opacity="0.85"/>`;
+    let questionHtml;
+    if (!estCE1() || n <= 20) {
+      let dots = "";
+      for (let i = 0; i < n; i++) {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const color = col === 0 ? "#6c5ce7" : "#fd79a8";
+        dots += `<circle cx="${22 + col * 30}" cy="${20 + row * 30}" r="12" fill="${color}" opacity="0.85"/>`;
+      }
+      const svgH = 20 + Math.ceil(n / 2) * 30;
+      questionHtml = `<div class="pair-question">
+        <p style="font-size:0.85rem;margin:0 0 0.4rem;color:#555">Peut-on ranger ces objets <strong>en 2 groupes égaux</strong> ?</p>
+        <span class="pair-nombre">${n}</span>
+        <svg width="74" height="${svgH}" viewBox="0 0 74 ${svgH}">${dots}</svg>
+      </div>`;
+    } else {
+      // CE1 grands nombres : explication chiffre des unités
+      questionHtml = `<div class="pair-question">
+        <p style="font-size:0.85rem;margin:0 0 0.35rem;color:#555">
+          Un nombre est <strong>pair</strong> si son dernier chiffre est 0, 2, 4, 6 ou 8.<br>
+          Un nombre est <strong>impair</strong> si son dernier chiffre est 1, 3, 5, 7 ou 9.
+        </p>
+        <span class="pair-nombre" style="font-size:3rem">${n}</span>
+        <p style="font-size:0.82rem;margin:0.35rem 0 0;color:#888">Ce nombre est-il pair ou impair ?</p>
+      </div>`;
     }
-    const svgH = 20 + Math.ceil(n / 2) * 30;
 
-    elQuestion.innerHTML = `<div class="pair-question">
-      <p style="font-size:0.85rem;margin:0 0 0.4rem;color:#555">Peut-on ranger ces objets <strong>en 2 groupes égaux</strong> ?</p>
-      <span class="pair-nombre">${n}</span>
-      <svg width="74" height="${svgH}" viewBox="0 0 74 ${svgH}">${dots}</svg>
-    </div>`;
+    elQuestion.innerHTML = questionHtml;
 
     elChoix.innerHTML = "";
     [
@@ -1026,31 +1110,98 @@
     return `<svg width="${w}" height="60" viewBox="0 0 ${w} 60">${items}</svg>`;
   }
 
+  function svgDizUnCent(cent, diz, un) {
+    const bigW = 20, bigH = 60, barW = 12, barH = 44, gap = 4, dotR = 7, dotGap = 18;
+    let items = "";
+    let x = 8;
+    for (let i = 0; i < cent; i++) {
+      items += `<rect x="${x}" y="4" width="${bigW}" height="${bigH}" rx="4" fill="#e17055" opacity="0.85"/>`;
+      x += bigW + gap + 2;
+    }
+    if (cent > 0 && (diz > 0 || un > 0)) x += 8;
+    for (let i = 0; i < diz; i++) {
+      items += `<rect x="${x}" y="12" width="${barW}" height="${barH}" rx="3" fill="#6c5ce7" opacity="0.85"/>`;
+      x += barW + gap;
+    }
+    if (diz > 0 && un > 0) x += 8;
+    for (let i = 0; i < un; i++) {
+      items += `<circle cx="${x + dotR}" cy="34" r="${dotR}" fill="#fdcb6e" opacity="0.9"/>`;
+      x += dotGap;
+    }
+    const w = Math.max(x + 12, 60);
+    return `<svg width="${w}" height="70" viewBox="0 0 ${w} 70">${items}</svg>`;
+  }
+
   function lancerDizaines() {
     elTitre.textContent = "📊 Dizaines & Unités";
-    const max = estCE1() ? 99 : 69;
-    const n = 11 + Math.floor(Math.random() * (max - 10));
-    const diz = Math.floor(n / 10);
-    const un = n % 10;
-    bonneReponse = n;
 
-    elQuestion.innerHTML = `<div class="diz-question">
-      <p style="font-size:0.82rem;margin:0 0 0.55rem">
-        <span style="color:#6c5ce7;font-weight:700">▮ barre = 10 (dizaine)</span>
+    if (!estCE1()) {
+      const max = 69;
+      const n = 11 + Math.floor(Math.random() * (max - 10));
+      const diz = Math.floor(n / 10);
+      const un = n % 10;
+      bonneReponse = n;
+      elQuestion.innerHTML = `<div class="diz-question">
+        <p style="font-size:0.82rem;margin:0 0 0.55rem">
+          <span style="color:#6c5ce7;font-weight:700">▮ barre = 10 (dizaine)</span>
+          &nbsp;·&nbsp;
+          <span style="color:#d4a017;font-weight:700">● point = 1 (unité)</span>
+        </p>
+        ${svgDizUn(diz, un)}
+        <p style="font-size:0.9rem;margin:0.5rem 0 0;font-weight:600">Quel nombre est représenté ?</p>
+      </div>`;
+      const props = propositionsAvecBonne(n, Math.max(10, n - 22), Math.min(max, n + 22), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+      return;
+    }
+
+    // CE1 : 50% chance d'utiliser les centaines (nombres jusqu'à 999)
+    const useCent = Math.random() < 0.50;
+    let n, cent, diz, un, legende, svgEl, maxProp;
+    if (useCent) {
+      cent = 1 + Math.floor(Math.random() * 9);
+      diz  = Math.floor(Math.random() * 10);
+      un   = Math.floor(Math.random() * 10);
+      n = cent * 100 + diz * 10 + un;
+      if (n < 100) n = cent * 100;
+      svgEl = svgDizUnCent(cent, diz, un);
+      legende = `<span style="color:#e17055;font-weight:700">▮ grande barre = 100 (centaine)</span>
         &nbsp;·&nbsp;
-        <span style="color:#d4a017;font-weight:700">● point = 1 (unité)</span>
-      </p>
-      ${svgDizUn(diz, un)}
+        <span style="color:#6c5ce7;font-weight:700">▪ barre = 10 (dizaine)</span>
+        &nbsp;·&nbsp;
+        <span style="color:#d4a017;font-weight:700">● point = 1 (unité)</span>`;
+      maxProp = 999;
+    } else {
+      n = 11 + Math.floor(Math.random() * 88);
+      diz = Math.floor(n / 10);
+      un = n % 10;
+      svgEl = svgDizUn(diz, un);
+      legende = `<span style="color:#6c5ce7;font-weight:700">▮ barre = 10 (dizaine)</span>
+        &nbsp;·&nbsp;
+        <span style="color:#d4a017;font-weight:700">● point = 1 (unité)</span>`;
+      maxProp = 99;
+    }
+    bonneReponse = n;
+    elQuestion.innerHTML = `<div class="diz-question">
+      <p style="font-size:0.78rem;margin:0 0 0.55rem">${legende}</p>
+      ${svgEl}
       <p style="font-size:0.9rem;margin:0.5rem 0 0;font-weight:600">Quel nombre est représenté ?</p>
     </div>`;
-    const props = propositionsAvecBonne(n, Math.max(10, n - 22), Math.min(max, n + 22), 3);
+    const props = propositionsAvecBonne(n, Math.max(10, n - 30), Math.min(maxProp, n + 30), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
 
   // ── Formes géométriques ──────────────────────────────────────────────────
 
-  const FORMES = ["cercle", "carré", "rectangle", "triangle", "losange"];
+  const FORMES_CP = ["cercle", "carré", "rectangle", "triangle", "losange"];
+  const FORMES_CE1 = ["cercle", "carré", "rectangle", "triangle", "losange", "pentagone", "hexagone"];
+  const FORMES = FORMES_CP; // alias pour compatibilité
   const COULEURS_FORMES = ["#6c5ce7", "#00cec9", "#fd79a8", "#fdcb6e", "#00b894", "#e17055"];
+
+  const FORMES_COTES = {
+    "cercle": 0, "carré": 4, "rectangle": 4, "triangle": 3,
+    "losange": 4, "pentagone": 5, "hexagone": 6,
+  };
 
   function svgForme(type, taille, couleur) {
     const cx = taille / 2, cy = taille / 2, r = taille * 0.38;
@@ -1073,33 +1224,67 @@
         const pts = `${cx},${cy - r} ${cx + r * 0.72},${cy} ${cx},${cy + r} ${cx - r * 0.72},${cy}`;
         return `<svg width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}"><polygon points="${pts}" fill="${couleur}"/></svg>`;
       }
+      case "pentagone": {
+        const pts = [];
+        for (let i = 0; i < 5; i++) {
+          const a = (i / 5) * 2 * Math.PI - Math.PI / 2;
+          pts.push(`${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`);
+        }
+        return `<svg width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}"><polygon points="${pts.join(" ")}" fill="${couleur}"/></svg>`;
+      }
+      case "hexagone": {
+        const pts = [];
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * 2 * Math.PI - Math.PI / 2;
+          pts.push(`${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`);
+        }
+        return `<svg width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}"><polygon points="${pts.join(" ")}" fill="${couleur}"/></svg>`;
+      }
       default: return "";
     }
   }
 
   function lancerFormes() {
     elTitre.textContent = "🔷 Les formes";
-    const idx = Math.floor(Math.random() * FORMES.length);
-    const forme = FORMES[idx];
+
+    const liste = estCE1() ? FORMES_CE1 : FORMES_CP;
+    const idx = Math.floor(Math.random() * liste.length);
+    const forme = liste[idx];
     const couleurQ = COULEURS_FORMES[Math.floor(Math.random() * COULEURS_FORMES.length)];
     bonneReponse = idx;
 
-    elQuestion.innerHTML = `<div class="forme-question">${svgForme(forme, 130, couleurQ)}</div>`;
+    // CE1 : 40% demande le nom par nombre de côtés (sauf cercle)
+    const demandeCotes = estCE1() && Math.random() < 0.40 && forme !== "cercle";
+    const cotes = FORMES_COTES[forme];
 
-    const autresIdx = melanger(FORMES.map((_, i) => i).filter((i) => i !== idx)).slice(0, 3);
-    const optionsIdx = melanger([idx, ...autresIdx]);
-
-    elChoix.innerHTML = "";
-    optionsIdx.forEach((i) => {
-      const ci = (COULEURS_FORMES.indexOf(couleurQ) + i + 1) % COULEURS_FORMES.length;
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "btn-choix btn-forme";
-      b.innerHTML = svgForme(FORMES[i], 75, COULEURS_FORMES[ci]);
-      b.dataset.valeur = String(i);
-      b.addEventListener("click", () => apresReponse(i, b, bonneReponse));
-      elChoix.appendChild(b);
-    });
+    if (demandeCotes) {
+      elQuestion.innerHTML = `<p style="font-size:0.9rem;margin:0 0 0.4rem">Comment s'appelle une figure à <strong>${cotes} côtés</strong> ?</p>`;
+      const autresIdx = melanger(liste.map((_, i) => i).filter((i) => i !== idx && FORMES_COTES[liste[i]] !== cotes)).slice(0, 3);
+      const optionsIdx = melanger([idx, ...autresIdx]);
+      elChoix.innerHTML = "";
+      optionsIdx.forEach((i) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "1rem";
+        b.textContent = liste[i]; b.dataset.valeur = String(i);
+        b.addEventListener("click", () => apresReponse(i, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+    } else {
+      elQuestion.innerHTML = `<div class="forme-question">${svgForme(forme, 130, couleurQ)}</div>` +
+        (estCE1() ? `<p style="font-size:0.82rem;margin:0.3rem 0 0;color:#888">Comment s'appelle cette figure ?</p>` : "");
+      const autresIdx = melanger(liste.map((_, i) => i).filter((i) => i !== idx)).slice(0, 3);
+      const optionsIdx = melanger([idx, ...autresIdx]);
+      elChoix.innerHTML = "";
+      optionsIdx.forEach((i) => {
+        const ci = (COULEURS_FORMES.indexOf(couleurQ) + i + 1) % COULEURS_FORMES.length;
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix btn-forme";
+        b.innerHTML = svgForme(liste[i], 75, COULEURS_FORMES[ci]);
+        b.dataset.valeur = String(i);
+        b.addEventListener("click", () => apresReponse(i, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+    }
   }
 
   // ── Monnaie CP ──────────────────────────────────────────────────────────
@@ -1190,7 +1375,7 @@
 
   function lancerMoitie() {
     elTitre.textContent = "✂️ La moitié";
-    const maxMoitie = estCE1() ? 30 : 10;
+    const maxMoitie = estCE1() ? 12 : 10;  // CE1 : moitiés jusqu'à 24 (moitie max=12)
     const moitie = 1 + Math.floor(Math.random() * maxMoitie);
     const n = moitie * 2;
     bonneReponse = moitie;
@@ -1198,8 +1383,11 @@
 
     const row1 = Array(moitie).fill(emoji).join(" ");
     const row2 = Array(moitie).fill("❓").join(" ");
+    const questionTexte = estCE1()
+      ? `<p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Quelle est la moitié ?</p>`
+      : `<p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Partage-les en <strong>2 parts égales</strong>. Combien dans chaque moitié ?</p>`;
     elQuestion.innerHTML = `<div class="moitie-question">
-      <p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Partage-les en <strong>2 parts égales</strong>. Combien dans chaque moitié ?</p>
+      ${questionTexte}
       <div class="moitie-row">${row1}</div>
       <div class="moitie-sep">— — —</div>
       <div class="moitie-row moitie-cache">${row2}</div>
@@ -1212,7 +1400,7 @@
   // ── Tables de multiplication ────────────────────────────────────────────
 
   function lancerMultiplication() {
-    elTitre.textContent = "✖️";
+    elTitre.textContent = "✖️ Multiplication";
     const tables = estCE1() ? [2, 3, 4, 5, 10] : [2, 3, 5];
     const mult = tables[Math.floor(Math.random() * tables.length)];
     const maxFact = estCE1() ? 10 : 5;
@@ -1222,13 +1410,19 @@
 
     const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
     let groupsHtml = "";
-    if (produit <= 30) {
+    if (!estCE1() && produit <= 30) {
       for (let g = 0; g < fact; g++) {
         groupsHtml += `<div class="mult-groupe">${Array(mult).fill(emoji).join("")}</div>`;
       }
       elQuestion.innerHTML = `<p style="font-size:0.9rem;font-weight:700;margin:0 0 0.5rem;color:var(--primaire)">${fact} groupe${fact > 1 ? "s" : ""} de ${mult} = combien en tout ?</p><div class="mult-grille">${groupsHtml}</div>`;
+    } else if (estCE1()) {
+      // CE1 : équation claire X × Y = ?
+      elQuestion.innerHTML =
+        `<p style="font-size:0.85rem;margin:0 0 0.3rem">Calcule ce produit :</p>` +
+        `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${fact} × ${mult} = ?</p>` +
+        `<p style="font-size:0.78rem;color:#888">(tables × ${mult})</p>`;
     } else {
-      // Dots grid for larger products
+      // Dots grid for larger products (CP)
       for (let g = 0; g < fact; g++) {
         let dotsSvg = "";
         for (let d = 0; d < mult; d++) {
@@ -1249,7 +1443,7 @@
   // ── Division / Partage ──────────────────────────────────────────────────
 
   function lancerDivision() {
-    elTitre.textContent = "➗";
+    elTitre.textContent = "➗ Division";
     const diviseurs = estCE1() ? [2, 3, 4, 5, 10] : [2, 3];
     const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
     const maxQuot = estCE1() ? 10 : 5;
@@ -1300,13 +1494,13 @@
   function lancerFractions() {
     elTitre.textContent = "🍕";
     const pool = estCE1()
-      ? [{ n: 1, d: 2 }, { n: 1, d: 4 }, { n: 3, d: 4 }, { n: 1, d: 3 }, { n: 2, d: 3 }]
+      ? [{ n: 1, d: 2 }, { n: 1, d: 4 }, { n: 3, d: 4 }, { n: 1, d: 3 }, { n: 2, d: 3 }, { n: 2, d: 4 }]
       : [{ n: 1, d: 2 }, { n: 1, d: 4 }, { n: 3, d: 4 }];
     const bonne = pool[Math.floor(Math.random() * pool.length)];
     bonneReponse = bonne.n * 10 + bonne.d;
 
     elQuestion.innerHTML =
-      `<p style="font-size:0.88rem;margin:0 0 0.5rem">Quelle <strong>fraction</strong> est coloriée en violet ?</p>` +
+      `<p style="font-size:0.88rem;margin:0 0 0.3rem">Quelle <strong>fraction</strong> de la figure est coloriée en violet ?</p>` +
       `<div class="fraction-question">${svgFraction(bonne.n, bonne.d, 130)}</div>`;
 
     const fausses = melanger(pool.filter((f) => f.n !== bonne.n || f.d !== bonne.d)).slice(0, 3);
@@ -1335,45 +1529,130 @@
 
   function lancerMesures() {
     elTitre.textContent = "📏 Mesures";
-    const maxLen = estCE1() ? 18 : 12;
-    const lenA = 3 + Math.floor(Math.random() * (maxLen - 2));
-    let lenB;
-    do { lenB = 3 + Math.floor(Math.random() * (maxLen - 2)); } while (lenB === lenA);
-    bonneReponse = lenA > lenB ? 0 : 1;
 
-    const scale = 18;
-    const wA = lenA * scale, wB = lenB * scale;
-    const maxW = Math.max(wA, wB) + 20;
-    const labelA = lenA + " cm", labelB = lenB + " cm";
-    elQuestion.innerHTML = `
-      <p style="font-size:0.88rem;margin:0 0 0.5rem">Quelle barre est la plus <strong>longue</strong> ?</p>
-      <svg width="${maxW + 60}" height="90" viewBox="0 0 ${maxW + 60} 90">
-        <rect x="10" y="10" width="${wA}" height="26" rx="6" fill="#6c5ce7" opacity="0.85"/>
-        <text x="${10 + wA + 6}" y="28" fill="#5344c7" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelA}</text>
-        <rect x="10" y="50" width="${wB}" height="26" rx="6" fill="#fd79a8" opacity="0.85"/>
-        <text x="${10 + wB + 6}" y="68" fill="#c0226a" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelB}</text>
-      </svg>`;
+    if (!estCE1()) {
+      const maxLen = 12;
+      const lenA = 3 + Math.floor(Math.random() * (maxLen - 2));
+      let lenB;
+      do { lenB = 3 + Math.floor(Math.random() * (maxLen - 2)); } while (lenB === lenA);
+      bonneReponse = lenA > lenB ? 0 : 1;
+      const scale = 18;
+      const wA = lenA * scale, wB = lenB * scale;
+      const maxW = Math.max(wA, wB) + 20;
+      const labelA = lenA + " cm", labelB = lenB + " cm";
+      elQuestion.innerHTML = `
+        <p style="font-size:0.88rem;margin:0 0 0.5rem">Quelle barre est la plus <strong>longue</strong> ?</p>
+        <svg width="${maxW + 60}" height="90" viewBox="0 0 ${maxW + 60} 90">
+          <rect x="10" y="10" width="${wA}" height="26" rx="6" fill="#6c5ce7" opacity="0.85"/>
+          <text x="${10 + wA + 6}" y="28" fill="#5344c7" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelA}</text>
+          <rect x="10" y="50" width="${wB}" height="26" rx="6" fill="#fd79a8" opacity="0.85"/>
+          <text x="${10 + wB + 6}" y="68" fill="#c0226a" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelB}</text>
+        </svg>`;
+      elChoix.innerHTML = "";
+      [
+        { val: 0, col: "#6c5ce7", label: labelA },
+        { val: 1, col: "#fd79a8", label: labelB },
+      ].forEach(({ val, col, label }) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "1.1rem";
+        b.innerHTML = `<span style="color:${col};font-weight:800">${label}</span>`;
+        b.dataset.valeur = String(val);
+        b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+      return;
+    }
 
-    elChoix.innerHTML = "";
-    [
-      { val: 0, col: "#6c5ce7", label: labelA },
-      { val: 1, col: "#fd79a8", label: labelB },
-    ].forEach(({ val, col, label }) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "btn-choix";
-      b.style.fontSize = "1.1rem";
-      b.innerHTML = `<span style="color:${col};font-weight:800">${label}</span>`;
-      b.dataset.valeur = String(val);
-      b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
-      elChoix.appendChild(b);
-    });
+    // CE1 : 40% conversion cm↔mm, 60% comparaison de barres jusqu'à 30 cm
+    const useConversion = Math.random() < 0.40;
+    if (useConversion) {
+      const typeConv = Math.random() < 0.5 ? "cm_vers_mm" : "mm_vers_cm";
+      if (typeConv === "cm_vers_mm") {
+        const cm = 1 + Math.floor(Math.random() * 20);
+        const mm = cm * 10;
+        bonneReponse = mm;
+        elQuestion.innerHTML =
+          `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>1 cm = 10 mm</strong></p>` +
+          `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">` +
+          `Combien de mm dans <strong>${cm} cm</strong> ?</p>`;
+        const props = propositionsAvecBonne(mm, Math.max(5, mm - 30), Math.min(220, mm + 30), 3);
+        afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+      } else {
+        const cm = 1 + Math.floor(Math.random() * 20);
+        const mm = cm * 10;
+        bonneReponse = cm;
+        elQuestion.innerHTML =
+          `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>10 mm = 1 cm</strong></p>` +
+          `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">` +
+          `Combien de cm dans <strong>${mm} mm</strong> ?</p>`;
+        const props = propositionsAvecBonne(cm, Math.max(1, cm - 5), Math.min(22, cm + 5), 3);
+        afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+      }
+    } else {
+      const maxLen = 30;
+      const lenA = 3 + Math.floor(Math.random() * (maxLen - 2));
+      let lenB;
+      do { lenB = 3 + Math.floor(Math.random() * (maxLen - 2)); } while (lenB === lenA);
+      bonneReponse = lenA > lenB ? 0 : 1;
+      const scale = Math.min(18, 260 / maxLen);
+      const wA = Math.round(lenA * scale), wB = Math.round(lenB * scale);
+      const maxW = Math.max(wA, wB) + 20;
+      const labelA = lenA + " cm", labelB = lenB + " cm";
+      elQuestion.innerHTML = `
+        <p style="font-size:0.88rem;margin:0 0 0.5rem">Quelle barre est la plus <strong>longue</strong> ?</p>
+        <svg width="${maxW + 60}" height="90" viewBox="0 0 ${maxW + 60} 90">
+          <rect x="10" y="10" width="${wA}" height="26" rx="6" fill="#6c5ce7" opacity="0.85"/>
+          <text x="${10 + wA + 6}" y="28" fill="#5344c7" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelA}</text>
+          <rect x="10" y="50" width="${wB}" height="26" rx="6" fill="#fd79a8" opacity="0.85"/>
+          <text x="${10 + wB + 6}" y="68" fill="#c0226a" font-size="13" font-weight="700" font-family="Fredoka,sans-serif">${labelB}</text>
+        </svg>`;
+      elChoix.innerHTML = "";
+      [
+        { val: 0, col: "#6c5ce7", label: labelA },
+        { val: 1, col: "#fd79a8", label: labelB },
+      ].forEach(({ val, col, label }) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "1.1rem";
+        b.innerHTML = `<span style="color:${col};font-weight:800">${label}</span>`;
+        b.dataset.valeur = String(val);
+        b.addEventListener("click", () => apresReponse(val, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+    }
   }
 
   // ── Monnaie CE1 ──────────────────────────────────────────────────────────
 
   function lancerMonnaieCe1() {
-    elTitre.textContent = "🛍️";
+    elTitre.textContent = "🛍️ La monnaie";
+
+    // 35% : question total de 2 articles ; 65% : rendu de monnaie
+    const typeTotal = Math.random() < 0.35;
+    if (typeTotal) {
+      const pool2 = melanger(ARTICLES_BOUTIQUE).slice(0, 2);
+      const prixA = [100, 150, 200, 250, 300][Math.floor(Math.random() * 5)];
+      const prixB = [100, 150, 200, 250, 300][Math.floor(Math.random() * 5)];
+      const total = prixA + prixB;
+      bonneReponse = total;
+      elQuestion.innerHTML = `<div class="monnaie-question">
+        <p style="font-size:0.85rem;margin:0 0 0.35rem">Combien coûtent ces articles <strong>en tout</strong> ?</p>
+        <div class="monnaie-ligne">${pool2[0].emoji} ${pool2[0].nom} → <strong>${labelEuros(prixA)}</strong></div>
+        <div class="monnaie-ligne">${pool2[1].emoji} ${pool2[1].nom} → <strong>${labelEuros(prixB)}</strong></div>
+        <div class="monnaie-ligne">💰 Total = <strong>?</strong></div>
+      </div>`;
+      const dist = entiersDistincts(Math.max(100, total - 300), Math.min(700, total + 300), 3, total);
+      const opts = melanger([total, ...dist]);
+      elChoix.innerHTML = "";
+      opts.forEach((v) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix";
+        b.textContent = labelEuros(v); b.dataset.valeur = String(v);
+        b.addEventListener("click", () => apresReponse(v, b, bonneReponse));
+        elChoix.appendChild(b);
+      });
+      return;
+    }
+
     const prixOptions = [100, 150, 200, 250, 300, 400, 500, 750, 1000];
     const prix = prixOptions[Math.floor(Math.random() * prixOptions.length)];
     const billets = [200, 500, 1000, 2000].filter((b) => b > prix);
@@ -1385,6 +1664,7 @@
     const article = ARTICLES_BOUTIQUE[Math.floor(Math.random() * ARTICLES_BOUTIQUE.length)];
 
     elQuestion.innerHTML = `<div class="monnaie-question">
+      <p style="font-size:0.85rem;margin:0 0 0.35rem">Tu paies <strong>${labelEuros(paye)}</strong>. Tu reçois du rendu. Quel est le rendu ?</p>
       <div class="monnaie-ligne">${article.emoji} Tu achètes ${article.nom}</div>
       <div class="monnaie-ligne">🏷️ Ça coûte <strong>${labelEuros(prix)}</strong></div>
       <div class="monnaie-ligne">💵 Tu donnes <strong>${labelEuros(paye)}</strong></div>
@@ -1444,9 +1724,12 @@
     const type = Math.floor(Math.random() * 3);
     bonneReponse = 1; // correct = miroir (gauche=true)
 
+    const hint = estCE1()
+      ? `<p style="font-size:0.78rem;color:#888;margin:0.2rem 0 0">💡 L'image miroir est le reflet exact, retourné de gauche à droite.</p>`
+      : "";
     elQuestion.innerHTML =
       `<p style="font-size:0.88rem;margin:0 0 0.4rem">Quelle est l'image <strong>miroir</strong> de cette figure (dans le 🪞) ?</p>` +
-      `<div class="symetrie-question">${svgDemiFigure(type, 130, false)}</div>`;
+      `<div class="symetrie-question">${svgDemiFigure(type, 130, false)}</div>` + hint;
 
     const options = melanger([
       { val: 1, svg: svgDemiFigure(type, 78, true) },
@@ -1633,6 +1916,13 @@
     { emoji: "🎸", mot: "guitar",    fausses: ["piano", "violin", "drum"] },
     { emoji: "🐙", mot: "octopus",   fausses: ["jellyfish", "squid", "crab"] },
     { emoji: "🦒", mot: "giraffe",   fausses: ["zebra", "elephant", "camel"] },
+    // Parties du corps / fournitures scolaires
+    { emoji: "👁️", mot: "eye",       fausses: ["ear", "nose", "mouth"] },
+    { emoji: "👂", mot: "ear",       fausses: ["eye", "nose", "hand"] },
+    { emoji: "✏️", mot: "pencil",    fausses: ["pen", "ruler", "eraser"] },
+    { emoji: "📐", mot: "ruler",     fausses: ["pencil", "scissors", "book"] },
+    { emoji: "🎒", mot: "backpack",  fausses: ["bag", "suitcase", "purse"] },
+    { emoji: "🖍️", mot: "crayon",    fausses: ["pen", "pencil", "marker"] },
   ];
 
   function lancerAnglaisMots() {
@@ -1698,6 +1988,20 @@
     { fr: "pays",     en: "country",    fausses: ["city", "town", "village"] },
     { fr: "mer",      en: "sea",        fausses: ["lake", "river", "pond"] },
     { fr: "fleur",    en: "flower",     fausses: ["tree", "leaf", "grass"] },
+    // Corps humain
+    { fr: "tête",     en: "head",       fausses: ["hand", "foot", "arm"] },
+    { fr: "main",     en: "hand",       fausses: ["foot", "arm", "finger"] },
+    { fr: "pied",     en: "foot",       fausses: ["leg", "hand", "knee"] },
+    { fr: "nez",      en: "nose",       fausses: ["mouth", "ear", "eye"] },
+    // Fournitures scolaires
+    { fr: "règle",    en: "ruler",      fausses: ["pencil", "eraser", "book"] },
+    { fr: "crayon",   en: "pencil",     fausses: ["pen", "ruler", "crayon"] },
+    { fr: "gomme",    en: "eraser",     fausses: ["pencil", "ruler", "pen"] },
+    // Couleurs + adjectifs
+    { fr: "orange",   en: "orange",     fausses: ["red", "purple", "pink"] },
+    { fr: "violet",   en: "purple",     fausses: ["pink", "blue", "grey"] },
+    { fr: "long",     en: "long",       fausses: ["short", "wide", "tall"] },
+    { fr: "chaud",    en: "hot",        fausses: ["cold", "warm", "cool"] },
   ];
 
   function lancerTraduction() {
@@ -1849,6 +2153,27 @@
         const a = 20 + Math.floor(Math.random() * 30);
         const b = 5 + Math.floor(Math.random() * (a - 5));
         return { texte: `Lucie a économisé <strong>${a}</strong> € 💰. Elle dépense <strong>${b}</strong> €. Combien lui reste-t-il ?`, rep: a - b, min: Math.max(0, a - b - 10), max: a - b + 10 };
+      } },
+      // 3 nouveaux templates CE1 : multiplication, problème en 2 étapes, monnaie
+      { generer() {
+        const t = [2, 3, 4, 5, 10][Math.floor(Math.random() * 5)];
+        const n = 2 + Math.floor(Math.random() * 9);
+        return { texte: `Une ferme a <strong>${n}</strong> enclos 🐄. Chaque enclos contient <strong>${t}</strong> vaches. Combien de vaches en tout ? (<em>${n} × ${t}</em>)`, rep: n * t, min: Math.max(2, n * t - 12), max: n * t + 12 };
+      } },
+      { generer() {
+        const a = 15 + Math.floor(Math.random() * 20);
+        const b = 5 + Math.floor(Math.random() * 10);
+        const c = 3 + Math.floor(Math.random() * 8);
+        const rep = a + b - c;
+        return { texte: `Il y a <strong>${a}</strong> élèves dans la classe 🏫. <strong>${b}</strong> autres arrivent puis <strong>${c}</strong> partent. Combien d'élèves y a-t-il maintenant ?`, rep, min: Math.max(0, rep - 12), max: rep + 12 };
+      } },
+      { generer() {
+        const prixU = [50, 100, 150, 200][Math.floor(Math.random() * 4)];
+        const qte = 2 + Math.floor(Math.random() * 4);
+        const total = prixU * qte;
+        const paye = Math.ceil(total / 100) * 100 + [0, 100, 200][Math.floor(Math.random() * 3)];
+        const rendu = paye - total;
+        return { texte: `Hugo achète <strong>${qte}</strong> autocollants 🏷️ à <strong>${prixU} centimes</strong> chacun. Il paie avec <strong>${(paye / 100).toFixed(0)}€</strong>. Combien lui rend-on ?`, rep: rendu, min: Math.max(0, rendu - 100), max: rendu + 200 };
       } },
     ],
   };
@@ -2059,12 +2384,14 @@
       else if (idx === 1) { degres = 15 + Math.floor(Math.random() * 60); bonneVal = 1; }
       else { degres = 110 + Math.floor(Math.random() * 55); bonneVal = 2; }
       bonneReponse = bonneVal;
-      elQuestion.innerHTML = `<div class="angle-question">${svgAngle(degres, 160)}</div>`;
+      elQuestion.innerHTML =
+        `<p style="font-size:0.78rem;color:#888;margin:0 0 0.3rem">📐 Quel type d'angle vois-tu ?</p>` +
+        `<div class="angle-question">${svgAngle(degres, 160)}</div>`;
       elChoix.innerHTML = "";
       [
-        { val: 0, label: "Droit (90°)" },
-        { val: 1, label: "Aigu (< 90°)" },
-        { val: 2, label: "Obtus (> 90°)" },
+        { val: 0, label: "Angle droit (90°)" },
+        { val: 1, label: "Angle aigu (< 90°)" },
+        { val: 2, label: "Angle obtus (> 90°)" },
       ].forEach(({ val, label }, i) => {
         const b = document.createElement("button");
         b.type = "button"; b.className = "btn-choix";
