@@ -1,0 +1,359 @@
+// app-renard.js — fox companion: SVG, accessories, dressing, streak, evolution
+
+import {
+  STORAGE_KEY,
+  RENARD_NAISSANCE_KEY,
+  RENARD_CALIN_DATE_KEY,
+  elTotal,
+  elSousTitre,
+  elMenu,
+  elGenre,
+  lireEtoiles,
+  _ajouterEtoilesBase,
+  lireFaim,
+  lireBonheur,
+  sauverFaim,
+  sauverBonheur,
+  lireNomRenard,
+  lireAccessoires,
+  lireTenue,
+  sauverTenue,
+  debloquerAccessoire,
+  lireStreak,
+  sauverStreak,
+  peutFaireCalin,
+  majGenre,
+  confetti,
+} from "./app-state.js";
+
+// Re-export peutFaireCalin so other modules don't need to import app-state directly
+export { peutFaireCalin } from "./app-state.js";
+
+// ── Stades d'évolution ────────────────────────────────────────────────────────
+export const RENARD_STADES = [
+  { nom: "Bébé renard",       corps: "#f5b97e", interne: "#fde7c8", yeux: "#3d2b1f" },
+  { nom: "Jeune renard",      corps: "#e8872a", interne: "#f5c07a", yeux: "#1a1a1a" },
+  { nom: "Renard malin",      corps: "#c96416", interne: "#e89050", yeux: "#0d0d0d" },
+  { nom: "Renard magique",    corps: "#9c59d1", interne: "#c99ef0", yeux: "#4b0082" },
+  { nom: "Renard légendaire", corps: "#ffd700", interne: "#ffe999", yeux: "#c8860a" },
+];
+
+export function getStade(etoiles) {
+  if (etoiles < 21)  return 0;
+  if (etoiles < 61)  return 1;
+  if (etoiles < 151) return 2;
+  if (etoiles < 301) return 3;
+  return 4;
+}
+
+// ── Accessoires ───────────────────────────────────────────────────────────────
+export const ACCESSOIRES_DEF = {
+  "chapeau-base":  { nom: "🎩 Chapeau",    svg: (t) => `<rect x="30" y="8" width="40" height="6" rx="3" fill="#2d3436"/><rect x="22" y="13" width="56" height="5" rx="2.5" fill="#2d3436"/>` },
+  "lunettes-base": { nom: "👓 Lunettes",   svg: (t) => `<circle cx="37" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><circle cx="63" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><line x1="45.5" y1="63" x2="54.5" y2="63" stroke="#2d3436" stroke-width="2"/><line x1="28.5" y1="63" x2="22" y2="60" stroke="#2d3436" stroke-width="2"/><line x1="71.5" y1="63" x2="78" y2="60" stroke="#2d3436" stroke-width="2"/>` },
+  "echarpe-rare":  { nom: "🧣 Écharpe",    svg: (t) => `<path d="M20,88 Q35,82 50,84 Q65,82 80,88" stroke="#e74c3c" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50,84 L54,97" stroke="#e74c3c" stroke-width="6" stroke-linecap="round"/>` },
+  "couronne-legendaire": { nom: "👑 Couronne légendaire", svg: (t) => `<polygon points="28,26 34,8 50,18 66,8 72,26" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/><circle cx="34" cy="9" r="4.5" fill="#e74c3c"/><circle cx="50" cy="19" r="4.5" fill="#9b59b6"/><circle cx="66" cy="9" r="4.5" fill="#e74c3c"/>` },
+};
+
+// ── SVG renard ────────────────────────────────────────────────────────────────
+export function svgRenard(stade, taille, opts) {
+  const triste = opts && opts.triste;
+  const s = RENARD_STADES[Math.max(0, Math.min(4, stade))];
+  const t = taille || 80;
+  const h = Math.round(t * 1.1);
+
+  const sourcils = triste
+    ? `<path d="M29,62 Q37,57 44,63" stroke="${s.yeux}" stroke-width="2" fill="none" stroke-linecap="round"/>
+       <path d="M56,63 Q63,57 71,62" stroke="${s.yeux}" stroke-width="2" fill="none" stroke-linecap="round"/>`
+    : (stade >= 2
+      ? `<path d="M29,54 Q37,50 44,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+         <path d="M56,54 Q63,50 71,54" stroke="${s.yeux}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+      : "");
+
+  const bouche = triste
+    ? `<path d="M44,80 Q50,74 56,80" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
+    : `<path d="M44,77 Q50,83 56,77" stroke="#8B4513" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+
+  function etoileSvg(cx, cy, r, couleur, op) {
+    const r2 = r * 0.38;
+    const pts = [];
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI) / 4 - Math.PI / 2;
+      const rr = i % 2 === 0 ? r : r2;
+      pts.push(`${(cx + Math.cos(a) * rr).toFixed(1)},${(cy + Math.sin(a) * rr).toFixed(1)}`);
+    }
+    return `<polygon points="${pts.join(" ")}" fill="${couleur}" opacity="${op}"/>`;
+  }
+
+  const particules = stade === 3
+    ? etoileSvg(10, 28, 6, "#e056fd", 0.75) +
+      etoileSvg(84, 22, 5, "#fdcb6e", 0.80) +
+      etoileSvg(87, 73, 4, "#a29bfe", 0.70) +
+      etoileSvg(8,  78, 5, "#74b9ff", 0.70)
+    : "";
+
+  const couronne = stade === 4
+    ? `<polygon points="33,26 39,8 50,20 61,8 67,26" fill="#ffd700" stroke="#b8860b" stroke-width="1.5" stroke-linejoin="round"/>
+       <circle cx="39" cy="9"  r="4" fill="#ff6b00"/>
+       <circle cx="50" cy="21" r="4" fill="#ff0080"/>
+       <circle cx="61" cy="9"  r="4" fill="#ff6b00"/>`
+    : "";
+
+  const tenue = (opts && opts.accessoires != null) ? opts.accessoires : Object.keys(lireTenue());
+  const accSvg = tenue.map(id => ACCESSOIRES_DEF[id] ? ACCESSOIRES_DEF[id].svg(t) : "").join("");
+
+  return `<svg width="${t}" height="${h}" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+  ${couronne}${particules}
+  <polygon points="16,66 28,22 45,60" fill="${s.corps}"/>
+  <polygon points="84,66 72,22 55,60" fill="${s.corps}"/>
+  <polygon points="22,62 28,28 42,57" fill="${s.interne}"/>
+  <polygon points="78,62 72,28 58,57" fill="${s.interne}"/>
+  <ellipse cx="50" cy="70" rx="33" ry="30" fill="${s.corps}"/>
+  <ellipse cx="50" cy="79" rx="23" ry="21" fill="white" opacity="0.88"/>
+  ${sourcils}
+  <circle cx="37" cy="63" r="7.5" fill="white"/>
+  <circle cx="63" cy="63" r="7.5" fill="white"/>
+  <circle cx="39" cy="64" r="4.5" fill="${s.yeux}"/>
+  <circle cx="65" cy="64" r="4.5" fill="${s.yeux}"/>
+  <circle cx="41" cy="62" r="1.8" fill="white"/>
+  <circle cx="67" cy="62" r="1.8" fill="white"/>
+  <ellipse cx="50" cy="73" rx="3.5" ry="2.5" fill="#8B4513"/>
+  ${bouche}
+  <circle cx="27" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
+  <circle cx="73" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
+  ${accSvg}
+</svg>`;
+}
+
+// ── Header / banner update ────────────────────────────────────────────────────
+export function mettreAJourRenardHeader() {
+  const stade  = getStade(lireEtoiles());
+  const triste = lireFaim() < 20 || lireBonheur() < 20;
+  const accessoires = Object.keys(lireTenue());
+  const opts   = { triste, accessoires };
+  const header = document.getElementById("mascotte-header");
+  const genre  = document.getElementById("mascotte-genre");
+  if (header) header.innerHTML = svgRenard(stade, 44, opts);
+  if (genre)  genre.innerHTML  = svgRenard(stade, 72, opts);
+  mettreAJourMaisonBanner();
+}
+
+export function mettreAJourMaisonBanner() {
+  const foxEl   = document.getElementById("maison-banner-fox");
+  const nomEl   = document.getElementById("maison-banner-nom");
+  const subEl   = document.getElementById("maison-banner-sub");
+  const starsEl = document.getElementById("maison-banner-stars");
+  if (!foxEl) return;
+  const stade  = getStade(lireEtoiles());
+  const triste = lireFaim() < 20 || lireBonheur() < 20;
+  const accessoires = Object.keys(lireTenue());
+  foxEl.innerHTML = svgRenard(stade, 46, { triste, accessoires });
+  if (nomEl)   nomEl.textContent   = (lireNomRenard() || "Foxy") + " 🏠";
+  if (subEl)   subEl.textContent   = RENARD_STADES[stade].nom;
+  if (starsEl) starsEl.textContent = "⭐ " + lireEtoiles();
+}
+
+// ── Nommage screen ────────────────────────────────────────────────────────────
+export function montrerNommage() {
+  const elNommage = document.getElementById("ecran-nommage");
+  elGenre.hidden = true;
+  elGenre.classList.remove("actif");
+  elNommage.hidden = false;
+  elNommage.classList.add("actif");
+  const foxDiv = document.getElementById("nommage-fox");
+  if (foxDiv) foxDiv.innerHTML = svgRenard(0, 110);
+  setTimeout(() => {
+    const inp = document.getElementById("input-nom-renard");
+    if (inp) inp.focus();
+  }, 350);
+}
+
+// ── Evolution overlay ─────────────────────────────────────────────────────────
+function declencherEvolution(stade) {
+  confetti();
+  const s = RENARD_STADES[stade];
+  const overlay = document.createElement("div");
+  overlay.className = "evolution-overlay";
+  overlay.innerHTML = `
+    <div class="evolution-carte">
+      <div class="evolution-renard">${svgRenard(stade, 130)}</div>
+      <p class="evolution-titre">✨ Ton renard évolue !</p>
+      <p class="evolution-nom-stade">Il devient : ${s.nom}</p>
+      <p class="evolution-msg">Continue comme ça, tu es incroyable !</p>
+      <button type="button" class="btn-evolution-fermer">Super ! 🎉</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => confetti(), 400);
+  overlay.querySelector(".btn-evolution-fermer").addEventListener("click", () => {
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 0.3s";
+    setTimeout(() => overlay.remove(), 300);
+  });
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.querySelector(".btn-evolution-fermer").click();
+  });
+}
+
+// ── ajouterEtoiles (wrapped — detects evolution) ──────────────────────────────
+export function ajouterEtoiles(n) {
+  const stadeBefore = getStade(lireEtoiles());
+  _ajouterEtoilesBase(n);
+  const stadeAfter = getStade(lireEtoiles());
+  mettreAJourRenardHeader();
+  if (stadeAfter > stadeBefore) declencherEvolution(stadeAfter);
+}
+
+// ── Streak ────────────────────────────────────────────────────────────────────
+export function mettreAJourStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  const s = lireStreak();
+  if (s.lastVisit === today) return s;
+
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const newCount = s.lastVisit === yesterday ? s.count + 1 : 1;
+  const streakData = { count: newCount, lastVisit: today };
+  sauverStreak(streakData);
+
+  const paliers = { 3: "chapeau-base", 7: "lunettes-base", 30: "echarpe-rare" };
+  if (paliers[newCount]) debloquerAccessoire(paliers[newCount]);
+
+  if (s.lastVisit && s.lastVisit !== yesterday && s.count > 0) {
+    if (elSousTitre) {
+      elSousTitre.textContent = "Le renard t'a attendu, mais il est content que tu sois là ! 🦊";
+      setTimeout(() => majGenre(), 4000);
+    }
+  }
+  return streakData;
+}
+
+export function afficherStreakHeader(count) {
+  let el = document.getElementById("streak-header");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "streak-header";
+    el.className = "streak-header";
+    const scoreEl = document.querySelector(".score-global");
+    if (scoreEl) scoreEl.parentNode.insertBefore(el, scoreEl);
+  }
+  el.textContent = count >= 2 ? `🔥 ${count}` : "";
+  el.title = `${count} jour${count > 1 ? "s" : ""} d'affilée !`;
+}
+
+// ── Maison screen ─────────────────────────────────────────────────────────────
+export function montrerMaison(montrerMenuFn) {
+  const elMaison = document.getElementById("ecran-maison");
+  if (!elMaison) return;
+  elMenu.hidden = true;
+  elMenu.classList.remove("actif");
+  elMaison.hidden = false;
+  elMaison.classList.add("actif");
+
+  const etoiles = lireEtoiles();
+  const stade   = getStade(etoiles);
+  const s       = RENARD_STADES[stade];
+  const nom     = lireNomRenard() || "Foxy";
+
+  const triste = lireFaim() < 20 || lireBonheur() < 20;
+  document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160, { triste, accessoires: Object.keys(lireTenue()) });
+  document.getElementById("maison-nom").textContent  = nom;
+  document.getElementById("maison-stade").textContent = "✦ " + s.nom;
+  document.getElementById("maison-etoiles-total").textContent = etoiles;
+
+  const naissance = localStorage.getItem(RENARD_NAISSANCE_KEY);
+  if (naissance) {
+    const jours = Math.max(0, Math.floor((Date.now() - new Date(naissance).getTime()) / 86400000));
+    document.getElementById("maison-jours").textContent =
+      jours === 0 ? `Tu as ${nom} depuis aujourd'hui !`
+                  : `Tu as ${nom} depuis ${jours} jour${jours > 1 ? "s" : ""} !`;
+  }
+
+  const seuils = [0, 21, 61, 151, 301];
+  if (stade < 4) {
+    const min = seuils[stade], max = seuils[stade + 1];
+    const pct  = Math.min(100, Math.round(((etoiles - min) / (max - min)) * 100));
+    const reste = max - etoiles;
+    document.getElementById("maison-prog-label").textContent =
+      `${reste} ⭐ pour devenir ${RENARD_STADES[stade + 1].nom}`;
+    document.getElementById("maison-barre-remplie").style.width = pct + "%";
+  } else {
+    document.getElementById("maison-prog-label").textContent = "🏆 Stade maximum atteint !";
+    document.getElementById("maison-barre-remplie").style.width = "100%";
+  }
+
+  function majJaugeEl(id, barreId, valId, val) {
+    document.getElementById(barreId).style.width = val + "%";
+    document.getElementById(valId).textContent = Math.round(val) + "%";
+  }
+  majJaugeEl("faim",    "jauge-faim-barre",    "jauge-faim-val",    lireFaim());
+  majJaugeEl("bonheur", "jauge-bonheur-barre",  "jauge-bonheur-val", lireBonheur());
+
+  const btnNourrir = document.getElementById("btn-nourrir");
+  btnNourrir.disabled = etoiles < 2 || lireFaim() >= 95;
+  btnNourrir.onclick = () => {
+    if (lireEtoiles() < 2) return;
+    const t = lireEtoiles() - 2;
+    localStorage.setItem(STORAGE_KEY, String(t));
+    elTotal.textContent = t;
+    sauverFaim(lireFaim() + 30);
+    mettreAJourRenardHeader();
+    montrerMaison(montrerMenuFn);
+  };
+
+  const btnCalin = document.getElementById("btn-calin");
+  const peutCalin = peutFaireCalin();
+  btnCalin.disabled = !peutCalin;
+  document.getElementById("calin-dispo-label").textContent =
+    peutCalin ? "1× par jour" : "✓ Déjà fait !";
+  btnCalin.onclick = () => {
+    if (!peutFaireCalin()) return;
+    localStorage.setItem(RENARD_CALIN_DATE_KEY, new Date().toISOString().slice(0, 10));
+    sauverBonheur(lireBonheur() + 20);
+    mettreAJourRenardHeader();
+    montrerMaison(montrerMenuFn);
+  };
+}
+
+// ── Dressing screen ───────────────────────────────────────────────────────────
+export function montrerDressing() {
+  const elDressing = document.getElementById("ecran-dressing");
+  const elMaison   = document.getElementById("ecran-maison");
+  if (!elDressing) return;
+  elMaison.hidden = true;
+  elMaison.classList.remove("actif");
+  elDressing.hidden = false;
+  elDressing.classList.add("actif");
+
+  const stade    = getStade(lireEtoiles());
+  const nom      = lireNomRenard() || "Foxy";
+  const debloques = lireAccessoires();
+  const tenue    = lireTenue();
+
+  document.getElementById("dressing-sous-titre").textContent =
+    `${nom} peut porter ${debloques.length} accessoire${debloques.length !== 1 ? "s" : ""} !`;
+
+  document.getElementById("dressing-preview").innerHTML =
+    svgRenard(stade, 120, { accessoires: Object.keys(tenue) });
+
+  const grille = document.getElementById("dressing-grille");
+  grille.innerHTML = "";
+  Object.entries(ACCESSOIRES_DEF).forEach(([id, def]) => {
+    const debloque = debloques.includes(id);
+    const equipe   = id in tenue;
+    const carte = document.createElement("button");
+    carte.type = "button";
+    carte.className = "dressing-carte" + (equipe ? " equipe" : "") + (debloque ? "" : " verrouille");
+    carte.innerHTML = `
+      <div style="line-height:0">${svgRenard(stade, 80, { accessoires: [id] })}</div>
+      <span class="dressing-carte-nom">${def.nom}</span>
+      <span class="dressing-carte-badge">${equipe ? "✓ Équipé" : (debloque ? "Disponible" : "🔒 Verrouillé")}</span>`;
+    if (debloque) {
+      carte.addEventListener("click", () => {
+        const t = lireTenue();
+        if (id in t) { delete t[id]; } else { t[id] = true; }
+        sauverTenue(t);
+        mettreAJourRenardHeader();
+        montrerDressing();
+      });
+    }
+    grille.appendChild(carte);
+  });
+}
