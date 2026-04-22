@@ -778,6 +778,28 @@
       }
     }
     if (a === b) b = b < 999 ? b + 1 : b - 1;
+
+    // CE1 : 40% chance de demander le symbole < > =
+    if (estCE1() && Math.random() < 0.40) {
+      const symbole = a < b ? "<" : ">";
+      bonneReponse = symbole;
+      elQuestion.innerHTML =
+        "<p>Quel signe faut-il mettre entre ces deux nombres ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.6rem,7vw,2.4rem);text-align:center;margin-top:0.5rem">' +
+        a + " &nbsp; <span style='color:#fd79a8'>?</span> &nbsp; " + b + "</p>" +
+        "<p style='font-size:0.78rem;color:#888;margin-top:0.3rem'>💡 Le signe \"ouvre la bouche\" vers le plus grand</p>";
+      elChoix.innerHTML = "";
+      ["<", ">"].forEach(sym => {
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "btn-choix";
+        btn.style.fontSize = "2rem"; btn.style.fontWeight = "700";
+        btn.textContent = sym; btn.dataset.valeur = sym;
+        btn.addEventListener("click", () => apresReponse(sym, btn, bonneReponse));
+        elChoix.appendChild(btn);
+      });
+      return;
+    }
+
     bonneReponse = Math.max(a, b);
     elQuestion.innerHTML =
       "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
@@ -991,8 +1013,10 @@
   function lancerHeure() {
     elTitre.textContent = "🕐 L'heure";
 
-    // CP : multiples de 5 min ; CE1 : quarts d'heure (0, 15, 30, 45 min)
-    const minutesPool = estCE1() ? [0, 15, 30, 45] : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+    // CP : quarts d'heure ; CE1 : tous les multiples de 5 min (plus dur)
+    const minutesPool = estCE1()
+      ? [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+      : [0, 15, 30, 45];
     const pool = [];
     for (let h = 1; h <= 12; h++) {
       for (const m of minutesPool) {
@@ -1375,25 +1399,44 @@
 
   function lancerMoitie() {
     elTitre.textContent = "✂️ La moitié";
-    const maxMoitie = estCE1() ? 12 : 10;  // CE1 : moitiés jusqu'à 24 (moitie max=12)
-    const moitie = 1 + Math.floor(Math.random() * maxMoitie);
-    const n = moitie * 2;
-    bonneReponse = moitie;
     const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
 
-    const row1 = Array(moitie).fill(emoji).join(" ");
-    const row2 = Array(moitie).fill("❓").join(" ");
-    const questionTexte = estCE1()
-      ? `<p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Quelle est la moitié ?</p>`
-      : `<p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Partage-les en <strong>2 parts égales</strong>. Combien dans chaque moitié ?</p>`;
-    elQuestion.innerHTML = `<div class="moitie-question">
-      ${questionTexte}
-      <div class="moitie-row">${row1}</div>
-      <div class="moitie-sep">— — —</div>
-      <div class="moitie-row moitie-cache">${row2}</div>
-    </div>`;
+    if (!estCE1()) {
+      const moitie = 1 + Math.floor(Math.random() * 10);
+      const n = moitie * 2;
+      bonneReponse = moitie;
+      const row1 = Array(moitie).fill(emoji).join(" ");
+      const row2 = Array(moitie).fill("❓").join(" ");
+      elQuestion.innerHTML = `<div class="moitie-question">
+        <p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Partage-les en <strong>2 parts égales</strong>. Combien dans chaque moitié ?</p>
+        <div class="moitie-row">${row1}</div>
+        <div class="moitie-sep">— — —</div>
+        <div class="moitie-row moitie-cache">${row2}</div>
+      </div>`;
+      const props = propositionsAvecBonne(moitie, Math.max(1, moitie - 5), Math.min(12, moitie + 5), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
+      return;
+    }
 
-    const props = propositionsAvecBonne(moitie, Math.max(1, moitie - 5), Math.min(maxMoitie + 2, moitie + 5), 3);
+    // CE1 : moitiés jusqu'à 50 (n jusqu'à 100), sans visuel pour les grands nombres
+    const moitie = 1 + Math.floor(Math.random() * 25);
+    const n = moitie * 2;
+    bonneReponse = moitie;
+    let contenuVisuel;
+    if (n <= 20) {
+      const row1 = Array(moitie).fill(emoji).join(" ");
+      const row2 = Array(moitie).fill("❓").join(" ");
+      contenuVisuel = `<div class="moitie-row">${row1}</div>
+        <div class="moitie-sep">— — —</div>
+        <div class="moitie-row moitie-cache">${row2}</div>`;
+    } else {
+      contenuVisuel = `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:.4rem 0">${n} ÷ 2 = ?</p>`;
+    }
+    elQuestion.innerHTML = `<div class="moitie-question">
+      <p style="font-size:0.9rem;margin:0 0 0.5rem">Il y a <strong>${n}</strong> ${emoji}. Quelle est la <strong>moitié</strong> ?</p>
+      ${contenuVisuel}
+    </div>`;
+    const props = propositionsAvecBonne(moitie, Math.max(1, moitie - 8), Math.min(27, moitie + 8), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
   }
 
@@ -1452,17 +1495,22 @@
     bonneReponse = quotient;
 
     const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-    const totalLine = Array(total).fill(emoji).join(" ");
-    let groupsHtml = "";
-    for (let g = 0; g < diviseur; g++) {
-      groupsHtml += `<div class="div-groupe">${g === 0 ? Array(quotient).fill(emoji).join("") : "❓"}</div>`;
+    let questionHtml;
+    if (total <= 20) {
+      const totalLine = Array(total).fill(emoji).join(" ");
+      let groupsHtml = "";
+      for (let g = 0; g < diviseur; g++) {
+        groupsHtml += `<div class="div-groupe">${g === 0 ? Array(quotient).fill(emoji).join("") : "❓"}</div>`;
+      }
+      questionHtml = `<p style="font-size:0.88rem;margin:0 0 0.5rem">On partage <strong>${total}</strong> ${emoji} en <strong>${diviseur}</strong> groupes égaux. Combien dans chaque groupe ?</p>
+        <div class="div-total">${totalLine}</div>
+        <div class="div-arrow">▼</div>
+        <div class="div-groupes">${groupsHtml}</div>`;
+    } else {
+      questionHtml = `<p style="font-size:0.88rem;margin:0 0 0.5rem">On partage <strong>${total}</strong> ${emoji} en <strong>${diviseur}</strong> groupes égaux. Combien dans chaque groupe ?</p>
+        <p class="equation" style="font-size:2.2rem;font-weight:700;margin:.4rem 0">${total} ÷ ${diviseur} = ?</p>`;
     }
-    elQuestion.innerHTML = `<div class="div-question">
-      <p style="font-size:0.88rem;margin:0 0 0.5rem">On partage <strong>${total}</strong> ${emoji} en <strong>${diviseur}</strong> groupes égaux. Combien dans chaque groupe ?</p>
-      <div class="div-total">${totalLine}</div>
-      <div class="div-arrow">▼</div>
-      <div class="div-groupes">${groupsHtml}</div>
-    </div>`;
+    elQuestion.innerHTML = `<div class="div-question">${questionHtml}</div>`;
 
     const props = propositionsAvecBonne(quotient, Math.max(1, quotient - 4), quotient + 4, 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, bonneReponse));
@@ -1687,6 +1735,7 @@
 
   // ── Symétrie ────────────────────────────────────────────────────────────
 
+  // types 0-2 : CP et CE1 ; types 3-4 : CE1 uniquement (plus complexes)
   function svgDemiFigure(type, taille, gauche) {
     const cx = taille / 2, cy = taille / 2, r = taille * 0.38;
     const g = gauche ? -1 : 1;
@@ -1703,15 +1752,23 @@
       shape = `<polygon points="${pts.join(" ")}" fill="#fdcb6e"/>`;
     } else if (type === 1) {
       // Demi-maison
-      const bx = cx - r * 0.7 * g, bw = r * 1.4;
+      const bw = r * 1.4;
       shape = `<rect x="${Math.min(cx, cx - r * 0.7 * g)}" y="${cy}" width="${bw}" height="${r * 0.85}" fill="#00cec9"/>
         <polygon points="${cx},${cy - r * 0.6} ${cx - r * 0.8 * g},${cy} ${cx + r * 0.8 * g},${cy}" fill="#fd79a8"/>`;
-    } else {
+    } else if (type === 2) {
       // Demi-papillon
       const pts1 = `${cx},${cy} ${cx + r * 0.85 * g},${cy - r * 0.65} ${cx + r * 0.4 * g},${cy + r * 0.3}`;
       const pts2 = `${cx},${cy} ${cx + r * 0.85 * g},${cy + r * 0.65} ${cx + r * 0.4 * g},${cy - r * 0.3}`;
       shape = `<polygon points="${pts1}" fill="#6c5ce7" opacity="0.85"/>
         <polygon points="${pts2}" fill="#fd79a8" opacity="0.85"/>`;
+    } else if (type === 3) {
+      // Demi-flèche (CE1)
+      const pts = `${cx},${cy - r * 0.8} ${cx + r * 0.9 * g},${cy} ${cx},${cy + r * 0.25} ${cx + r * 0.5 * g},${cy + r * 0.9}`;
+      shape = `<polygon points="${pts}" fill="#00b894"/>`;
+    } else {
+      // Demi-éclair (CE1)
+      const pts = `${cx},${cy - r} ${cx - r * 0.55 * g},${cy - r * 0.05} ${cx},${cy + r * 0.1} ${cx - r * 0.7 * g},${cy + r}`;
+      shape = `<polygon points="${pts}" fill="#e17055"/>`;
     }
     return `<svg width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}">
       <line x1="${cx}" y1="4" x2="${cx}" y2="${taille - 4}" stroke="#c4b5f9" stroke-width="2" stroke-dasharray="5,3"/>
@@ -1721,21 +1778,22 @@
 
   function lancerSymetrie() {
     elTitre.textContent = "🪞 Symétrie";
-    const type = Math.floor(Math.random() * 3);
+    const nbTypes = estCE1() ? 5 : 3;
+    const type = Math.floor(Math.random() * nbTypes);
     bonneReponse = 1; // correct = miroir (gauche=true)
 
-    const hint = estCE1()
-      ? `<p style="font-size:0.78rem;color:#888;margin:0.2rem 0 0">💡 L'image miroir est le reflet exact, retourné de gauche à droite.</p>`
-      : "";
     elQuestion.innerHTML =
       `<p style="font-size:0.88rem;margin:0 0 0.4rem">Quelle est l'image <strong>miroir</strong> de cette figure (dans le 🪞) ?</p>` +
-      `<div class="symetrie-question">${svgDemiFigure(type, 130, false)}</div>` + hint;
+      `<div class="symetrie-question">${svgDemiFigure(type, 130, false)}</div>`;
 
+    const autreCE1 = [3, 4];
+    const autresTypes = [0, 1, 2, 3, 4].filter(t => t !== type && (estCE1() || t < 3));
+    const [t1, t2] = melanger(autresTypes);
     const options = melanger([
       { val: 1, svg: svgDemiFigure(type, 78, true) },
       { val: 0, svg: svgDemiFigure(type, 78, false) },
-      { val: 2, svg: svgDemiFigure((type + 1) % 3, 78, true) },
-      { val: 3, svg: svgDemiFigure((type + 2) % 3, 78, false) },
+      { val: 2, svg: svgDemiFigure(t1, 78, true) },
+      { val: 3, svg: svgDemiFigure(t2, 78, false) },
     ]);
 
     elChoix.innerHTML = "";
