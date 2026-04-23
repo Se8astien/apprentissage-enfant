@@ -90,8 +90,8 @@ export function majGenre() {
   const f = estFille();
   if (elSousTitre) {
     elSousTitre.textContent = f
-      ? "Des jeux pour devenir championne en maths !"
-      : "Des jeux pour devenir champion en maths !";
+      ? "Des jeux pour devenir championne !"
+      : "Des jeux pour devenir champion !";
   }
   if (elIconeGenre) elIconeGenre.textContent = f ? "👧" : "👦";
 }
