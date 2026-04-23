@@ -564,6 +564,49 @@ function svgMilliers(mil, cent, diz, un) {
 export function lancerDizaines() {
   elTitre.textContent = "📊 Dizaines & Unités";
 
+  if (estCE2()) {
+    const useMilliers = Math.random() < 0.50;
+    let n2, mil, cent2, diz2, un2, legende2, svgEl2;
+    if (useMilliers) {
+      mil  = 1 + Math.floor(Math.random() * 9);
+      cent2 = Math.floor(Math.random() * 10);
+      diz2  = Math.floor(Math.random() * 10);
+      un2   = Math.floor(Math.random() * 10);
+      n2 = mil * 1000 + cent2 * 100 + diz2 * 10 + un2;
+      if (n2 < 1000) n2 = mil * 1000;
+      svgEl2 = svgMilliers(mil, cent2, diz2, un2);
+      legende2 = `<span style="color:#d63031;font-weight:700">▮ grande plaque rouge = 1000</span>
+        &nbsp;·&nbsp;
+        <span style="color:#e17055;font-weight:700">▮ orange = 100</span>
+        &nbsp;·&nbsp;
+        <span style="color:#6c5ce7;font-weight:700">▪ barre = 10</span>
+        &nbsp;·&nbsp;
+        <span style="color:#d4a017;font-weight:700">● point = 1</span>`;
+    } else {
+      // fall back to CE1 behaviour (centaines)
+      const cent3 = 1 + Math.floor(Math.random() * 9);
+      const diz3  = Math.floor(Math.random() * 10);
+      const un3   = Math.floor(Math.random() * 10);
+      n2 = cent3 * 100 + diz3 * 10 + un3;
+      if (n2 < 100) n2 = cent3 * 100;
+      svgEl2 = svgDizUnCent(cent3, diz3, un3);
+      legende2 = `<span style="color:#e17055;font-weight:700">▮ grande barre = 100</span>
+        &nbsp;·&nbsp;
+        <span style="color:#6c5ce7;font-weight:700">▪ barre = 10</span>
+        &nbsp;·&nbsp;
+        <span style="color:#d4a017;font-weight:700">● point = 1</span>`;
+    }
+    setBonneReponse(n2);
+    elQuestion.innerHTML = `<div class="diz-question">
+      <p style="font-size:0.75rem;margin:0 0 0.55rem">${legende2}</p>
+      ${svgEl2}
+      <p style="font-size:0.9rem;margin:0.5rem 0 0;font-weight:600">Quel nombre est représenté ?</p>
+    </div>`;
+    const props = propositionsAvecBonne(n2, Math.max(100, n2 - 300), Math.min(9999, n2 + 300), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
   if (!estCE1()) {
     const max = 69;
     const n = 11 + Math.floor(Math.random() * (max - 10));
@@ -636,13 +679,13 @@ function svgPairesIcon(pair) {
 
 export function lancerPairImpair() {
   elTitre.textContent = "Pair ou Impair ?";
-  const max = estCE1() ? 99 : 20;
+  const max = estCE2() ? 9999 : (estCE1() ? 99 : 20);
   const n = 2 + Math.floor(Math.random() * (max - 1));
   const estPair = n % 2 === 0;
   setBonneReponse(estPair ? 0 : 1);
 
   let questionHtml;
-  if (!estCE1() || n <= 20) {
+  if ((!estCE1() && !estCE2()) || n <= 20) {
     let dots = "";
     for (let i = 0; i < n; i++) {
       const col = i % 2;
