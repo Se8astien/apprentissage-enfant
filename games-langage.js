@@ -311,9 +311,32 @@ const TRAD_CE1 = [
   { fr: "chaud",    en: "hot",       fausses: ["cold", "warm", "cool"] },
 ];
 
+const TRAD_CE2 = [
+  { fr: "courir",        en: "to run",      fausses: ["to jump","to walk","to swim"] },
+  { fr: "nager",         en: "to swim",     fausses: ["to run","to fly","to dive"] },
+  { fr: "chanter",       en: "to sing",     fausses: ["to dance","to play","to listen"] },
+  { fr: "écrire",        en: "to write",    fausses: ["to read","to draw","to copy"] },
+  { fr: "lire",          en: "to read",     fausses: ["to write","to study","to learn"] },
+  { fr: "difficile",     en: "difficult",   fausses: ["easy","simple","hard"] },
+  { fr: "facile",        en: "easy",        fausses: ["difficult","hard","simple"] },
+  { fr: "important",     en: "important",   fausses: ["useful","necessary","serious"] },
+  { fr: "différent",     en: "different",   fausses: ["similar","same","equal"] },
+  { fr: "mathématiques", en: "maths",       fausses: ["science","history","art"] },
+  { fr: "histoire",      en: "history",     fausses: ["geography","science","language"] },
+  { fr: "géographie",    en: "geography",   fausses: ["history","science","maths"] },
+  { fr: "musique",       en: "music",       fausses: ["art","dance","drama"] },
+  { fr: "dessin",        en: "art",         fausses: ["music","drama","craft"] },
+  { fr: "sciences",      en: "science",     fausses: ["maths","history","geography"] },
+  { fr: "pays",          en: "country",     fausses: ["city","town","region"] },
+  { fr: "montagne",      en: "mountain",    fausses: ["hill","volcano","cliff"] },
+  { fr: "forêt",         en: "forest",      fausses: ["jungle","park","garden"] },
+  { fr: "rivière",       en: "river",       fausses: ["lake","sea","stream"] },
+  { fr: "magnifique",    en: "magnificent", fausses: ["beautiful","wonderful","great"] },
+];
+
 export function lancerTraduction() {
   elTitre.textContent = "🇬🇧 Traduction";
-  const liste = estCE1() ? TRAD_CE1 : TRAD_CP;
+  const liste = estCE2() ? TRAD_CE2 : estCE1() ? TRAD_CE1 : TRAD_CP;
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   elQuestion.innerHTML =
