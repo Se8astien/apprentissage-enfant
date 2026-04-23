@@ -19,6 +19,7 @@ import {
   setBadgeVisible,
   getNiveauCourant,
   getJeuCourant,
+  estCE2,
 } from "./app-state.js";
 
 import {

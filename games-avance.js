@@ -8,6 +8,7 @@ import {
   setBonneReponse,
   getBonneReponse,
   estCE1,
+  estCE2,
   propositionsAvecBonne,
   afficherChoix,
 } from "./app-state.js";
@@ -17,6 +18,36 @@ import { apresReponse } from "./app-nav.js";
 // ── lancerMultiplication ──────────────────────────────────────────────────────
 export function lancerMultiplication() {
   elTitre.textContent = "✖️ Multiplication";
+
+  if (estCE2()) {
+    const tables = [2, 3, 4, 5, 6, 7, 8, 9, 11, 12];
+    const mult = tables[Math.floor(Math.random() * tables.length)];
+    const maxFact = 12;
+    const fact = 1 + Math.floor(Math.random() * maxFact);
+    const produit = mult * fact;
+
+    // 30% chance: ask for missing factor "A × ? = C"
+    if (Math.random() < 0.30) {
+      setBonneReponse(fact);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.85rem;margin:0 0 0.3rem">Trouve le facteur manquant :</p>` +
+        `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${mult} × ? = ${produit}</p>`;
+      const pmin = Math.max(1, fact - 4), pmax = fact + 4;
+      const props = propositionsAvecBonne(fact, pmin, pmax, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      setBonneReponse(produit);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.85rem;margin:0 0 0.3rem">Calcule ce produit :</p>` +
+        `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${fact} × ${mult} = ?</p>` +
+        `<p style="font-size:0.78rem;color:#888">(tables × ${mult})</p>`;
+      const pmin = Math.max(2, produit - 18), pmax = Math.min(150, produit + 18);
+      const props = propositionsAvecBonne(produit, pmin, pmax, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
+
   const tables = estCE1() ? [2, 3, 4, 5, 10] : [2, 3, 5];
   const mult = tables[Math.floor(Math.random() * tables.length)];
   const maxFact = estCE1() ? 10 : 5;
@@ -57,6 +88,35 @@ export function lancerMultiplication() {
 // ── lancerDivision ────────────────────────────────────────────────────────────
 export function lancerDivision() {
   elTitre.textContent = "➗ Division";
+
+  if (estCE2()) {
+    const diviseurs = [2, 3, 4, 5, 6, 7, 8, 9];
+    const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
+    const quotient = 1 + Math.floor(Math.random() * 12);
+
+    // 25% chance: add remainder context
+    if (Math.random() < 0.25) {
+      const reste = Math.floor(Math.random() * (diviseur - 1));
+      const total = diviseur * quotient + reste;
+      setBonneReponse(quotient);
+      elQuestion.innerHTML = `<div class="div-question">
+        <p style="font-size:0.88rem;margin:0 0 0.5rem">Combien de groupes entiers de <strong>${diviseur}</strong> dans <strong>${total}</strong> ?</p>
+        <p class="equation" style="font-size:2.2rem;font-weight:700;margin:.4rem 0">${total} ÷ ${diviseur} = ?</p>
+        <p style="font-size:0.78rem;color:#888">(groupes entiers, sans le reste)</p>
+      </div>`;
+    } else {
+      const total = diviseur * quotient;
+      setBonneReponse(quotient);
+      elQuestion.innerHTML = `<div class="div-question">
+        <p style="font-size:0.88rem;margin:0 0 0.5rem">Calcule cette division :</p>
+        <p class="equation" style="font-size:2.2rem;font-weight:700;margin:.4rem 0">${total} ÷ ${diviseur} = ?</p>
+      </div>`;
+    }
+    const props = propositionsAvecBonne(quotient, Math.max(1, quotient - 4), quotient + 4, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
   const diviseurs = estCE1() ? [2, 3, 4, 5, 10] : [2, 3];
   const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
   const maxQuot = estCE1() ? 10 : 5;
@@ -187,11 +247,49 @@ const PROBLEMES = {
       return { texte: `Hugo achète <strong>${qte}</strong> autocollants 🏷️ à <strong>${prixU} centimes</strong> chacun. Il paie avec <strong>${(paye / 100).toFixed(0)}€</strong>. Combien lui rend-on ?`, rep: rendu, min: Math.max(0, rendu - 100), max: rendu + 200 };
     } },
   ],
+  ce2: [
+    { generer() {
+      const etageres = 3 + Math.floor(Math.random()*8);
+      const parEtagere = 4 + Math.floor(Math.random()*8);
+      const vendus = Math.floor(Math.random()*(etageres*parEtagere - 5)) + 1;
+      const rep = etageres * parEtagere - vendus;
+      return { texte: `Une boulangerie prépare <strong>${etageres}</strong> étagères de <strong>${parEtagere}</strong> pains 🍞. Elle en vend <strong>${vendus}</strong>. Combien reste-t-il de pains ?`, rep, min: Math.max(0, rep-20), max: rep+20 };
+    } },
+    { generer() {
+      const mat = 1 + Math.floor(Math.random()*8);
+      const apr = 1 + Math.floor(Math.random()*8);
+      const jours = 2 + Math.floor(Math.random()*5);
+      const rep = (mat + apr) * jours;
+      return { texte: `Lola roule <strong>${mat} km</strong> le matin et <strong>${apr} km</strong> l'après-midi, pendant <strong>${jours} jours</strong>. Combien de km en tout ?`, rep, min: Math.max(0, rep-20), max: rep+20 };
+    } },
+    { generer() {
+      const nb = 2 + Math.floor(Math.random()*4);
+      const prixU = 1 + Math.floor(Math.random()*5);
+      const gomme = 1 + Math.floor(Math.random()*3);
+      const budget = 10;
+      const depense = nb * prixU + gomme;
+      const rep = budget - depense;
+      if (rep < 0) return PROBLEMES.ce2[2].generer();
+      return { texte: `<strong>${nb}</strong> stylos coûtent <strong>${prixU}€</strong> chacun. Une gomme coûte <strong>${gomme}€</strong>. Julie paie avec <strong>${budget}€</strong>. Combien reçoit-elle ?`, rep, min: Math.max(0, rep-5), max: rep+5 };
+    } },
+    { generer() {
+      const groupes = 3 + Math.floor(Math.random()*10);
+      const parGroupe = 3 + Math.floor(Math.random()*7);
+      const total = groupes * parGroupe;
+      return { texte: `<strong>${total}</strong> élèves 🏫 sont répartis en groupes de <strong>${parGroupe}</strong>. Combien de groupes y a-t-il ?`, rep: groupes, min: Math.max(1, groupes-6), max: groupes+6 };
+    } },
+    { generer() {
+      const departH = 8 + Math.floor(Math.random()*5);
+      const dureeH = 1 + Math.floor(Math.random()*4);
+      const arH = departH + dureeH;
+      return { texte: `Un train part à <strong>${departH}h00</strong> 🚂. Le trajet dure <strong>${dureeH} heure${dureeH>1?"s":""}</strong>. À quelle heure arrive-t-il ?`, rep: arH, min: arH-3, max: arH+3 };
+    } },
+  ],
 };
 
 export function lancerProbleme() {
   elTitre.textContent = "📖 Problème du jour";
-  const pool = estCE1() ? PROBLEMES.ce1 : PROBLEMES.cp;
+  const pool = estCE2() ? PROBLEMES.ce2 : estCE1() ? PROBLEMES.ce1 : PROBLEMES.cp;
   const tmpl = pool[Math.floor(Math.random() * pool.length)];
   const { texte, rep, min, max } = tmpl.generer();
   setBonneReponse(rep);

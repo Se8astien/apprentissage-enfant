@@ -7,6 +7,7 @@ import {
   setBonneReponse,
   getBonneReponse,
   estCE1,
+  estCE2,
   melanger,
   propositionsAvecBonne,
   afficherChoix,
@@ -147,13 +148,21 @@ function montrerAideHeure() {
 export function lancerHeure() {
   elTitre.textContent = "🕐 L'heure";
 
-  const minutesPool = estCE1()
-    ? [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
-    : [0, 15, 30, 45];
-  const pool = [];
-  for (let h = 1; h <= 12; h++) {
-    for (const m of minutesPool) {
-      pool.push(h * 60 + m);
+  let pool = [];
+  if (estCE2()) {
+    for (let h = 1; h <= 12; h++) {
+      for (let m = 0; m < 60; m++) {
+        pool.push(h * 60 + m);
+      }
+    }
+  } else {
+    const minutesPool = estCE1()
+      ? [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+      : [0, 15, 30, 45];
+    for (let h = 1; h <= 12; h++) {
+      for (const m of minutesPool) {
+        pool.push(h * 60 + m);
+      }
     }
   }
 
@@ -161,12 +170,27 @@ export function lancerHeure() {
   const bonneH = Math.floor(bonne / 60);
   const bonneM = bonne % 60;
 
-  const memHeure = pool.filter((t) => Math.floor(t / 60) === bonneH && t !== bonne);
-  const autreHeure = pool.filter((t) => Math.floor(t / 60) !== bonneH);
-
-  const distMemH = melanger(memHeure).slice(0, 2);
-  const distAutreH = melanger(autreHeure).slice(0, 1);
-  const fausses = melanger([...distMemH, ...distAutreH]).slice(0, 3);
+  let fausses;
+  if (estCE2()) {
+    // Distractors: ±1, ±2, ±5 minutes from correct answer
+    const offsets = [-5, -2, -1, 1, 2, 5];
+    const candidats = offsets
+      .map(d => bonne + d)
+      .filter(t => t > 0 && t !== bonne && Math.floor(t / 60) >= 1 && Math.floor(t / 60) <= 12);
+    fausses = melanger(candidats).slice(0, 3);
+    // pad if needed
+    while (fausses.length < 3) {
+      const extra = bonne + (fausses.length % 2 === 0 ? 3 : -3);
+      if (extra > 0 && extra !== bonne && !fausses.includes(extra)) fausses.push(extra);
+      else break;
+    }
+  } else {
+    const memHeure = pool.filter((t) => Math.floor(t / 60) === bonneH && t !== bonne);
+    const autreHeure = pool.filter((t) => Math.floor(t / 60) !== bonneH);
+    const distMemH = melanger(memHeure).slice(0, 2);
+    const distAutreH = melanger(autreHeure).slice(0, 1);
+    fausses = melanger([...distMemH, ...distAutreH]).slice(0, 3);
+  }
   const options = melanger([bonne, ...fausses]);
 
   setBonneReponse(bonne);
@@ -181,9 +205,40 @@ export function lancerHeure() {
   afficherChoixHorloge(options);
 }
 
+function texteMinutes(min) {
+  if (min < 60) return min + " minutes";
+  if (min === 60) return "1 heure";
+  if (min === 90) return "1h30";
+  if (min === 120) return "2 heures";
+  return min + " minutes";
+}
+
 // ── lancerDurees ──────────────────────────────────────────────────────────────
 export function lancerDurees() {
   elTitre.textContent = "⏱️ Durées";
+
+  if (estCE2()) {
+    const debutH = 8 + Math.floor(Math.random() * 10);
+    const debutM = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
+    const duree1 = [30, 45, 60, 90][Math.floor(Math.random() * 4)];
+    const duree2 = [15, 30, 45, 60][Math.floor(Math.random() * 4)];
+    const finMin = debutH * 60 + debutM + duree1 + duree2;
+    setBonneReponse(finMin);
+
+    const affH = debutH + "h" + String(debutM).padStart(2, "0");
+    elQuestion.innerHTML = `<div class="duree-question">
+      <div class="grande-horloge">${svgHorloge(debutH || 12, debutM, 120)}</div>
+      <p>Il est <strong>${affH}</strong>. Tu regardes un film de <strong>${texteMinutes(duree1)}</strong> puis tu fais <strong>${texteMinutes(duree2)}</strong> de vélo.</p>
+      <p>À quelle heure tu finis ?</p>
+    </div>`;
+
+    const fausses = [-60, -45, -30, -15, 15, 30, 45, 60]
+      .map(d => finMin + d)
+      .filter(t => t > 0 && t !== finMin && Math.floor(t / 60) < 24);
+    afficherChoixHorloge(melanger([finMin, ...melanger(fausses).slice(0, 3)]));
+    return;
+  }
+
   let debutH, debutM, dureeMin, texteduree;
 
   if (!estCE1()) {
@@ -226,6 +281,41 @@ export function lancerDurees() {
 // ── lancerMesures ─────────────────────────────────────────────────────────────
 export function lancerMesures() {
   elTitre.textContent = "📏 Mesures";
+
+  if (estCE2()) {
+    const type = Math.floor(Math.random() * 4);
+    let question, answer, rappel;
+    if (type === 0) {
+      const km = 1 + Math.floor(Math.random() * 20);
+      answer = km * 1000;
+      question = `Combien de mètres dans <strong>${km} km</strong> ?`;
+      rappel = "1 km = 1 000 m";
+    } else if (type === 1) {
+      const m = 1 + Math.floor(Math.random() * 20);
+      answer = m * 100;
+      question = `Combien de cm dans <strong>${m} m</strong> ?`;
+      rappel = "1 m = 100 cm";
+    } else if (type === 2) {
+      const kg = 1 + Math.floor(Math.random() * 20);
+      answer = kg * 1000;
+      question = `Combien de grammes dans <strong>${kg} kg</strong> ?`;
+      rappel = "1 kg = 1 000 g";
+    } else {
+      const l = 1 + Math.floor(Math.random() * 20);
+      answer = l * 100;
+      question = `Combien de cL dans <strong>${l} L</strong> ?`;
+      rappel = "1 L = 100 cL";
+    }
+    setBonneReponse(answer);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>${rappel}</strong></p>` +
+      `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">${question}</p>`;
+    const minVal = Math.max(1, Math.round(answer * 0.6));
+    const maxVal = Math.round(answer * 1.4);
+    const props = propositionsAvecBonne(answer, minVal, maxVal, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
 
   if (!estCE1()) {
     const maxLen = 12;
@@ -340,6 +430,51 @@ function formatMasse(g) {
 
 export function lancerMasse() {
   elTitre.textContent = "⚖️ La masse";
+
+  if (estCE2()) {
+    // 30% chance: conversion question kg→g
+    if (Math.random() < 0.30) {
+      const kg = 1 + Math.floor(Math.random() * 20);
+      const answer = kg * 1000;
+      setBonneReponse(answer);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>1 kg = 1 000 g</strong></p>` +
+        `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">` +
+        `<strong>${kg} kg</strong> = ? g</p>`;
+      const minVal = Math.max(1, Math.round(answer * 0.6));
+      const maxVal = Math.round(answer * 1.4);
+      const props = propositionsAvecBonne(answer, minVal, maxVal, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+      return;
+    }
+    // 3-object total mass
+    const trois = melanger(OBJETS_MASSE).slice(0, 3);
+    const [objA, objB, objC] = trois;
+    const total = objA.masse + objB.masse + objC.masse;
+    setBonneReponse(total);
+    elQuestion.innerHTML = `<div class="masse-question">
+      <p>${objA.emoji} ${objA.nom} pèse <strong>${formatMasse(objA.masse)}</strong>.</p>
+      <p>${objB.emoji} ${objB.nom} pèse <strong>${formatMasse(objB.masse)}</strong>.</p>
+      <p>${objC.emoji} ${objC.nom} pèse <strong>${formatMasse(objC.masse)}</strong>.</p>
+      <p>Combien pèsent-ils <strong>ensemble</strong> ?</p>
+    </div>`;
+    const step = total >= 1000 ? 500 : 50;
+    const fausses = [-3, -2, -1, 1, 2, 3]
+      .map(d => total + d * step)
+      .filter(v => v > 0 && v !== total);
+    const opts = melanger([total, ...melanger(fausses).slice(0, 3)]);
+    elChoix.innerHTML = "";
+    opts.forEach(v => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.textContent = formatMasse(v);
+      b.dataset.valeur = String(v);
+      b.addEventListener("click", () => apresReponse(v, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
   const deux = melanger(OBJETS_MASSE).slice(0, 2);
   const [objA, objB] = deux;
 

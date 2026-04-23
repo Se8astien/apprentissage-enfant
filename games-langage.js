@@ -7,6 +7,7 @@ import {
   setBonneReponse,
   getBonneReponse,
   estCE1,
+  estCE2,
   melanger,
 } from "./app-state.js";
 
@@ -49,9 +50,27 @@ const MOTS_SYLLABES_CE1 = [
   { mot: "licorne",    parties: ["li", "cor", "ne"] },
 ];
 
+const MOTS_SYLLABES_CE2 = [
+  { mot: "bibliothèque",   parties: ["bi","blio","thèque"] },
+  { mot: "anniversaire",   parties: ["an","ni","ver","saire"] },
+  { mot: "médicament",     parties: ["mé","di","ca","ment"] },
+  { mot: "hippopotame",    parties: ["hip","po","po","tame"] },
+  { mot: "calculatrice",   parties: ["cal","cu","la","trice"] },
+  { mot: "extraordinaire", parties: ["ex","tra","or","di","naire"] },
+  { mot: "aquarium",       parties: ["a","qua","ri","um"] },
+  { mot: "photographie",   parties: ["pho","to","gra","phie"] },
+  { mot: "thermomètre",    parties: ["ther","mo","mètre"] },
+  { mot: "gymnaste",       parties: ["gym","naste"] },
+  { mot: "végétarien",     parties: ["vé","gé","ta","rien"] },
+  { mot: "dictionnaire",   parties: ["dic","tion","naire"] },
+  { mot: "élémentaire",    parties: ["é","lé","men","taire"] },
+  { mot: "capitalisme",    parties: ["ca","pi","ta","lis","me"] },
+  { mot: "archéologie",    parties: ["ar","ché","o","lo","gie"] },
+];
+
 export function lancerSyllabes() {
   elTitre.textContent = "📖 Syllabes";
-  const liste = estCE1() ? MOTS_SYLLABES_CE1 : MOTS_SYLLABES_CP;
+  const liste = estCE2() ? MOTS_SYLLABES_CE2 : estCE1() ? MOTS_SYLLABES_CE1 : MOTS_SYLLABES_CP;
   const item = liste[Math.floor(Math.random() * liste.length)];
   const parties = item.parties;
   const indexCache = Math.floor(Math.random() * parties.length);
@@ -67,7 +86,7 @@ export function lancerSyllabes() {
     "<p>Quelle syllabe manque ?</p>" +
     `<p style="font-size:1.7rem;font-weight:700;color:var(--primaire);letter-spacing:0.04em;margin-top:0.5rem">${affiche}</p>`;
 
-  const toutesListes = [...MOTS_SYLLABES_CP, ...MOTS_SYLLABES_CE1];
+  const toutesListes = [...MOTS_SYLLABES_CP, ...MOTS_SYLLABES_CE1, ...MOTS_SYLLABES_CE2];
   const piscine = toutesListes.flatMap((m) => m.parties).filter((s) => s !== syllabeCachee);
   const distracteurs = melanger(piscine).slice(0, 3);
   const options = melanger([syllabeCachee, ...distracteurs]);
@@ -119,9 +138,24 @@ const MOTS_IMAGES_CE1 = [
   { emoji: "🏔️", mot: "montagne",  fausses: ["colline", "falaise", "volcan"] },
 ];
 
+const MOTS_IMAGES_CE2 = [
+  { emoji: "🗺️", mot: "carte",        fausses: ["boussole","atlas","globe"] },
+  { emoji: "🏛️", mot: "monument",     fausses: ["château","temple","musée"] },
+  { emoji: "🔭", mot: "télescope",    fausses: ["microscope","lunette","jumelle"] },
+  { emoji: "🧬", mot: "biologie",     fausses: ["chimie","physique","médecine"] },
+  { emoji: "⚗️", mot: "expérience",   fausses: ["mélange","réaction","chimie"] },
+  { emoji: "🎭", mot: "théâtre",      fausses: ["cinéma","cirque","spectacle"] },
+  { emoji: "📰", mot: "journal",      fausses: ["magazine","livre","affiche"] },
+  { emoji: "🧭", mot: "boussole",     fausses: ["carte","compas","montre"] },
+  { emoji: "🏗️", mot: "construction", fausses: ["bâtiment","usine","chantier"] },
+  { emoji: "🎨", mot: "peinture",     fausses: ["dessin","sculpture","photographie"] },
+  { emoji: "🌡️", mot: "température",  fausses: ["météo","chaleur","mesure"] },
+  { emoji: "💻", mot: "ordinateur",   fausses: ["tablette","téléphone","écran"] },
+];
+
 export function lancerLecture() {
   elTitre.textContent = "📚 Lecture";
-  const liste = estCE1() ? MOTS_IMAGES_CE1 : MOTS_IMAGES_CP;
+  const liste = estCE2() ? MOTS_IMAGES_CE2 : estCE1() ? MOTS_IMAGES_CE1 : MOTS_IMAGES_CP;
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   elQuestion.innerHTML =
@@ -185,9 +219,24 @@ const ANGLAIS_IMAGES_CE1 = [
   { emoji: "🖍️", mot: "crayon",    fausses: ["pen", "pencil", "marker"] },
 ];
 
+const ANGLAIS_IMAGES_CE2 = [
+  { emoji: "🌍", mot: "world",       fausses: ["country","earth","globe"] },
+  { emoji: "🏔️", mot: "mountain",    fausses: ["hill","volcano","cliff"] },
+  { emoji: "🌊", mot: "ocean",       fausses: ["sea","lake","river"] },
+  { emoji: "🏙️", mot: "city",        fausses: ["town","village","capital"] },
+  { emoji: "✈️", mot: "airplane",    fausses: ["helicopter","rocket","balloon"] },
+  { emoji: "🌿", mot: "plant",       fausses: ["tree","flower","grass"] },
+  { emoji: "🔬", mot: "microscope",  fausses: ["telescope","binoculars","camera"] },
+  { emoji: "📱", mot: "phone",       fausses: ["computer","tablet","screen"] },
+  { emoji: "💡", mot: "light",       fausses: ["lamp","candle","fire"] },
+  { emoji: "🌡️", mot: "temperature", fausses: ["weather","heat","cold"] },
+  { emoji: "🚂", mot: "train",       fausses: ["metro","tram","cable car"] },
+  { emoji: "🎭", mot: "theatre",     fausses: ["cinema","concert","show"] },
+];
+
 export function lancerAnglaisMots() {
   elTitre.textContent = "🇬🇧 English";
-  const liste = estCE1() ? ANGLAIS_IMAGES_CE1 : ANGLAIS_IMAGES_CP;
+  const liste = estCE2() ? ANGLAIS_IMAGES_CE2 : estCE1() ? ANGLAIS_IMAGES_CE1 : ANGLAIS_IMAGES_CP;
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   elQuestion.innerHTML =
@@ -262,9 +311,32 @@ const TRAD_CE1 = [
   { fr: "chaud",    en: "hot",       fausses: ["cold", "warm", "cool"] },
 ];
 
+const TRAD_CE2 = [
+  { fr: "courir",        en: "to run",      fausses: ["to jump","to walk","to swim"] },
+  { fr: "nager",         en: "to swim",     fausses: ["to run","to fly","to dive"] },
+  { fr: "chanter",       en: "to sing",     fausses: ["to dance","to play","to listen"] },
+  { fr: "écrire",        en: "to write",    fausses: ["to read","to draw","to copy"] },
+  { fr: "lire",          en: "to read",     fausses: ["to write","to study","to learn"] },
+  { fr: "difficile",     en: "difficult",   fausses: ["easy","simple","hard"] },
+  { fr: "facile",        en: "easy",        fausses: ["difficult","hard","simple"] },
+  { fr: "important",     en: "important",   fausses: ["useful","necessary","serious"] },
+  { fr: "différent",     en: "different",   fausses: ["similar","same","equal"] },
+  { fr: "mathématiques", en: "maths",       fausses: ["science","history","art"] },
+  { fr: "histoire",      en: "history",     fausses: ["geography","science","language"] },
+  { fr: "géographie",    en: "geography",   fausses: ["history","science","maths"] },
+  { fr: "musique",       en: "music",       fausses: ["art","dance","drama"] },
+  { fr: "dessin",        en: "art",         fausses: ["music","drama","craft"] },
+  { fr: "sciences",      en: "science",     fausses: ["maths","history","geography"] },
+  { fr: "pays",          en: "country",     fausses: ["city","town","region"] },
+  { fr: "montagne",      en: "mountain",    fausses: ["hill","volcano","cliff"] },
+  { fr: "forêt",         en: "forest",      fausses: ["jungle","park","garden"] },
+  { fr: "rivière",       en: "river",       fausses: ["lake","sea","stream"] },
+  { fr: "magnifique",    en: "magnificent", fausses: ["beautiful","wonderful","great"] },
+];
+
 export function lancerTraduction() {
   elTitre.textContent = "🇬🇧 Traduction";
-  const liste = estCE1() ? TRAD_CE1 : TRAD_CP;
+  const liste = estCE2() ? TRAD_CE2 : estCE1() ? TRAD_CE1 : TRAD_CP;
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   elQuestion.innerHTML =

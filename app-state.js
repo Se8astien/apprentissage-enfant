@@ -14,7 +14,7 @@ export const RENARD_CALIN_DATE_KEY = "renard-calin-date";
 export const RENARD_STREAK_KEY  = "renard-streak";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-export const NIVEAU = { CP: "cp", CE1: "ce1" };
+export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2" };
 export const GENRE  = { FILLE: "fille", GARCON: "garcon" };
 
 export const ANIMAUX = ["🐱", "🐶", "🐰", "🐻", "🦊", "🐸", "🐥", "🐧", "🦋", "🐝"];
@@ -53,7 +53,9 @@ export function getGenreCourant()       { return genreCourant; }
 // ── Niveau ────────────────────────────────────────────────────────────────────
 export function lireNiveau() {
   const v = localStorage.getItem(STORAGE_NIVEAU);
-  return v === NIVEAU.CE1 ? NIVEAU.CE1 : NIVEAU.CP;
+  if (v === NIVEAU.CE1) return NIVEAU.CE1;
+  if (v === NIVEAU.CE2) return NIVEAU.CE2;
+  return NIVEAU.CP;
 }
 
 export function sauverNiveau(n) {
@@ -63,6 +65,10 @@ export function sauverNiveau(n) {
 
 export function estCE1() {
   return niveauCourant === NIVEAU.CE1;
+}
+
+export function estCE2() {
+  return niveauCourant === NIVEAU.CE2;
 }
 
 // ── Genre ─────────────────────────────────────────────────────────────────────
@@ -98,14 +104,21 @@ export function syncNiveauButtons() {
 
 export function majLabelsMenu() {
   const desc = document.getElementById("desc-addition");
-  if (desc) desc.textContent = estCE1() ? "Jusqu'à 79" : "Jusqu'à 10";
+  if (desc) {
+    if (estCE2()) desc.textContent = "Jusqu'à 999";
+    else if (estCE1()) desc.textContent = "Jusqu'à 79";
+    else desc.textContent = "Jusqu'à 10";
+  }
 }
 
 export function setBadgeVisible(visible) {
   if (!elBadge) return;
   if (visible) {
     elBadge.hidden = false;
-    elBadge.textContent = estCE1() ? "Niveau : CE1" : "Niveau : CP";
+    let label = "Niveau : CP";
+    if (estCE1()) label = "Niveau : CE1";
+    if (estCE2()) label = "Niveau : CE2";
+    elBadge.textContent = label;
   } else {
     elBadge.hidden = true;
   }

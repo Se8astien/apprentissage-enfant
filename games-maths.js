@@ -9,6 +9,7 @@ import {
   setBonneReponse,
   getBonneReponse,
   estCE1,
+  estCE2,
   melanger,
   propositionsAvecBonne,
   afficherChoix,
@@ -19,6 +20,50 @@ import { apresReponse, apresReponseTexte } from "./app-nav.js";
 // ── lancerCompte ──────────────────────────────────────────────────────────────
 export function lancerCompte() {
   elTitre.textContent = "Compte-moi ça !";
+
+  if (estCE2()) {
+    // CE2 : trois types d'animaux, 3–10 chacun, 40% différence, 60% total
+    const idxs = [];
+    while (idxs.length < 3) {
+      const i = Math.floor(Math.random() * ANIMAUX.length);
+      if (!idxs.includes(i)) idxs.push(i);
+    }
+    const [eA, eB, eC] = idxs.map(i => ANIMAUX[i]);
+    const nA = 3 + Math.floor(Math.random() * 8);
+    const nB = 3 + Math.floor(Math.random() * 8);
+    const nC = 3 + Math.floor(Math.random() * 8);
+    // cap total at ~30
+    const total3 = nA + nB + nC;
+    const lA = Array(nA).fill(eA).join(" ");
+    const lB = Array(nB).fill(eB).join(" ");
+    const lC = Array(nC).fill(eC).join(" ");
+    const typeDiff3 = Math.random() < 0.40;
+    if (typeDiff3) {
+      const maxN = Math.max(nA, nB, nC);
+      const minN = Math.min(nA, nB, nC);
+      const diff3 = maxN - minN;
+      const emGrand = nA === maxN ? eA : (nB === maxN ? eB : eC);
+      const emPetit = nA === minN ? eA : (nB === minN ? eB : eC);
+      setBonneReponse(diff3);
+      elQuestion.innerHTML =
+        `<p>Combien de ${emGrand} <strong>de plus</strong> que de ${emPetit} ?</p>` +
+        `<p class="ligne-emojis petit">${lA}</p>` +
+        `<p class="ligne-emojis petit">${lB}</p>` +
+        `<p class="ligne-emojis petit">${lC}</p>`;
+      const props = propositionsAvecBonne(diff3, Math.max(0, diff3 - 5), Math.min(10, diff3 + 5), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      setBonneReponse(total3);
+      elQuestion.innerHTML =
+        `<p>Combien d'animaux <strong>en tout</strong> ?</p>` +
+        `<p class="ligne-emojis petit">${lA}</p>` +
+        `<p class="ligne-emojis petit">${lB}</p>` +
+        `<p class="ligne-emojis petit">${lC}</p>`;
+      const props = propositionsAvecBonne(total3, Math.max(9, total3 - 8), Math.min(30, total3 + 8), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
 
   if (!estCE1()) {
     const n = 3 + Math.floor(Math.random() * 13);
@@ -75,6 +120,21 @@ export function lancerAddition() {
   let b;
   let total;
   let html;
+
+  if (estCE2()) {
+    total = 100 + Math.floor(Math.random() * 900);
+    a = 1 + Math.floor(Math.random() * (total - 1));
+    b = total - a;
+    html =
+      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette addition :</p>" +
+      '<p class="equation" style="font-size:2.2rem;font-weight:700">' + a + " + " + b + " = ?</p>" +
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à l'addition posée pour les grands nombres</p>";
+    elQuestion.innerHTML = html;
+    setBonneReponse(total);
+    const props = propositionsAvecBonne(total, Math.max(100, total - 80), Math.min(999, total + 80), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
 
   if (!estCE1()) {
     a = 1 + Math.floor(Math.random() * 9);
@@ -138,6 +198,20 @@ export function lancerSoustraction() {
   let enleve;
   let reste;
 
+  if (estCE2()) {
+    total = 100 + Math.floor(Math.random() * 900);
+    enleve = 1 + Math.floor(Math.random() * (total - 1));
+    reste = total - enleve;
+    elQuestion.innerHTML =
+      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
+      '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
+    setBonneReponse(reste);
+    const props = propositionsAvecBonne(reste, Math.max(0, reste - 80), Math.min(998, reste + 80), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
   if (!estCE1()) {
     total = 4 + Math.floor(Math.random() * 17);
   } else {
@@ -176,6 +250,35 @@ export function lancerCompare() {
   elTitre.textContent = "Le plus grand";
   let a;
   let b;
+
+  if (estCE2()) {
+    if (Math.random() < 0.50) {
+      // 50% : deux nombres à 4 chiffres → plus grand
+      a = 1000 + Math.floor(Math.random() * 9000);
+      b = 1000 + Math.floor(Math.random() * 9000);
+      if (a === b) b = b < 9999 ? b + 1 : b - 1;
+      setBonneReponse(Math.max(a, b));
+      elQuestion.innerHTML =
+        "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.4rem,6vw,2.2rem);text-align:center;margin-top:0.5rem">' +
+        a + " &nbsp; ou &nbsp; " + b + "</p>";
+      afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      // 50% : trois nombres à 2 chiffres → plus petit
+      a = 10 + Math.floor(Math.random() * 90);
+      b = 10 + Math.floor(Math.random() * 90);
+      let c = 10 + Math.floor(Math.random() * 90);
+      while (c === a || c === b) c = 10 + Math.floor(Math.random() * 90);
+      if (a === b) b = b < 99 ? b + 1 : b - 1;
+      setBonneReponse(Math.min(a, b, c));
+      elQuestion.innerHTML =
+        "<p>Quel est le <strong>plus petit</strong> de ces trois nombres ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.4rem,6vw,2.2rem);text-align:center;margin-top:0.5rem">' +
+        a + " &nbsp; " + b + " &nbsp; " + c + "</p>";
+      afficherChoix(melanger([a, b, c]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
 
   if (!estCE1()) {
     a = 1 + Math.floor(Math.random() * 20);
@@ -224,7 +327,11 @@ export function lancerCompare() {
 export function lancerSuite() {
   elTitre.textContent = "Numéro manquant";
   let debut, step;
-  if (!estCE1()) {
+  if (estCE2()) {
+    const stepsCE2 = [3, 4, 6, 7, 8, 9, 25, 50, 100];
+    step = stepsCE2[Math.floor(Math.random() * stepsCE2.length)];
+    debut = 1 + Math.floor(Math.random() * 200);
+  } else if (!estCE1()) {
     step = Math.random() < 0.35 ? 2 : 1;
     debut = 1 + Math.floor(Math.random() * Math.max(1, 20 - step * 4));
   } else {
@@ -238,7 +345,7 @@ export function lancerSuite() {
   const indexCache = 1 + Math.floor(Math.random() * 3);
   setBonneReponse(suite[indexCache]);
   const affiche = suite.map((n, i) => (i === indexCache ? "?" : String(n)));
-  const regleTexte = estCE1() ? ` (on avance de ${step} en ${step})` : "";
+  const regleTexte = (estCE1() || estCE2()) ? ` (on avance de ${step} en ${step})` : "";
   elQuestion.innerHTML =
     `<p>Continue la suite${regleTexte} — quel nombre manque ?</p>` +
     '<p class="suite">' + affiche.join(" — ") + "</p>";
@@ -251,6 +358,45 @@ export function lancerSuite() {
 // ── lancerDoubles ─────────────────────────────────────────────────────────────
 export function lancerDoubles() {
   elTitre.textContent = "Doubles";
+
+  if (estCE2()) {
+    const typeD = Math.random();
+    if (typeD < 0.33) {
+      // Double d'un multiple de 5 jusqu'à 200
+      const n = 5 * (1 + Math.floor(Math.random() * 40));
+      const rep = 2 * n;
+      setBonneReponse(rep);
+      elQuestion.innerHTML =
+        `<p style='font-size:0.9rem;margin:0 0 0.3rem'>Quel est le double de ce nombre ?</p>` +
+        `<p class="equation" style="font-size:2.2rem;font-weight:700">Le double de <strong>${n}</strong> = ?</p>` +
+        `<p style='font-size:0.82rem;color:#888'>(double = ${n} + ${n})</p>`;
+      const props = propositionsAvecBonne(rep, Math.max(10, rep - 40), Math.min(410, rep + 40), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else if (typeD < 0.67) {
+      // Moitié d'un multiple pair de 5 jusqu'à 400
+      const n = 10 * (1 + Math.floor(Math.random() * 40));
+      const rep = n / 2;
+      setBonneReponse(rep);
+      elQuestion.innerHTML =
+        `<p style='font-size:0.9rem;margin:0 0 0.3rem'>Quelle est la moitié de ce nombre ?</p>` +
+        `<p class="equation" style="font-size:2.2rem;font-weight:700">La moitié de <strong>${n}</strong> = ?</p>` +
+        `<p style='font-size:0.82rem;color:#888'>(moitié = ${n} ÷ 2)</p>`;
+      const props = propositionsAvecBonne(rep, Math.max(5, rep - 30), Math.min(205, rep + 30), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      // Quart d'un multiple de 4 jusqu'à 100
+      const n = 4 * (1 + Math.floor(Math.random() * 25));
+      const rep = n / 4;
+      setBonneReponse(rep);
+      elQuestion.innerHTML =
+        `<p style='font-size:0.9rem;margin:0 0 0.3rem'>Quel est le quart de ce nombre ?</p>` +
+        `<p class="equation" style="font-size:2.2rem;font-weight:700">Le quart de <strong>${n}</strong> = ?</p>` +
+        `<p style='font-size:0.82rem;color:#888'>(quart = ${n} ÷ 4)</p>`;
+      const props = propositionsAvecBonne(rep, Math.max(1, rep - 8), Math.min(26, rep + 8), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
 
   if (!estCE1()) {
     const n = 1 + Math.floor(Math.random() * 10);
@@ -293,6 +439,20 @@ export function lancerDoubles() {
 export function lancerMoitie() {
   elTitre.textContent = "✂️ La moitié";
   const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
+
+  if (estCE2()) {
+    // CE2 : quart de multiples de 4 jusqu'à 100
+    const n = 4 * (2 + Math.floor(Math.random() * 24));
+    const quart = n / 4;
+    setBonneReponse(quart);
+    elQuestion.innerHTML = `<div class="moitie-question">
+      <p style="font-size:0.9rem;margin:0 0 0.5rem">Quel est le <strong>quart</strong> de <strong>${n}</strong> ?</p>
+      <p class="equation" style="font-size:2.4rem;font-weight:700;margin:.4rem 0">${n} ÷ 4 = ?</p>
+    </div>`;
+    const props = propositionsAvecBonne(quart, Math.max(1, quart - 10), Math.min(26, quart + 10), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
 
   if (!estCE1()) {
     const moitie = 1 + Math.floor(Math.random() * 10);
@@ -373,9 +533,79 @@ function svgDizUnCent(cent, diz, un) {
   return `<svg width="${w}" height="70" viewBox="0 0 ${w} 70">${items}</svg>`;
 }
 
+function svgMilliers(mil, cent, diz, un) {
+  const milW = 28, milH = 72, bigW = 20, bigH = 60, barW = 12, barH = 44, gap = 4, dotR = 7, dotGap = 18;
+  let items = "";
+  let x = 8;
+  for (let i = 0; i < mil; i++) {
+    items += `<rect x="${x}" y="2" width="${milW}" height="${milH}" rx="5" fill="#d63031" opacity="0.85"/>`;
+    x += milW + gap + 2;
+  }
+  if (mil > 0 && (cent > 0 || diz > 0 || un > 0)) x += 10;
+  for (let i = 0; i < cent; i++) {
+    items += `<rect x="${x}" y="8" width="${bigW}" height="${bigH}" rx="4" fill="#e17055" opacity="0.85"/>`;
+    x += bigW + gap + 2;
+  }
+  if (cent > 0 && (diz > 0 || un > 0)) x += 8;
+  for (let i = 0; i < diz; i++) {
+    items += `<rect x="${x}" y="18" width="${barW}" height="${barH}" rx="3" fill="#6c5ce7" opacity="0.85"/>`;
+    x += barW + gap;
+  }
+  if (diz > 0 && un > 0) x += 8;
+  for (let i = 0; i < un; i++) {
+    items += `<circle cx="${x + dotR}" cy="40" r="${dotR}" fill="#fdcb6e" opacity="0.9"/>`;
+    x += dotGap;
+  }
+  const w = Math.max(x + 12, 80);
+  return `<svg width="${w}" height="80" viewBox="0 0 ${w} 80">${items}</svg>`;
+}
+
 // ── lancerDizaines ────────────────────────────────────────────────────────────
 export function lancerDizaines() {
   elTitre.textContent = "📊 Dizaines & Unités";
+
+  if (estCE2()) {
+    const useMilliers = Math.random() < 0.50;
+    let n2, mil, cent2, diz2, un2, legende2, svgEl2;
+    if (useMilliers) {
+      mil  = 1 + Math.floor(Math.random() * 9);
+      cent2 = Math.floor(Math.random() * 10);
+      diz2  = Math.floor(Math.random() * 10);
+      un2   = Math.floor(Math.random() * 10);
+      n2 = mil * 1000 + cent2 * 100 + diz2 * 10 + un2;
+      if (n2 < 1000) n2 = mil * 1000;
+      svgEl2 = svgMilliers(mil, cent2, diz2, un2);
+      legende2 = `<span style="color:#d63031;font-weight:700">▮ grande plaque rouge = 1000</span>
+        &nbsp;·&nbsp;
+        <span style="color:#e17055;font-weight:700">▮ orange = 100</span>
+        &nbsp;·&nbsp;
+        <span style="color:#6c5ce7;font-weight:700">▪ barre = 10</span>
+        &nbsp;·&nbsp;
+        <span style="color:#d4a017;font-weight:700">● point = 1</span>`;
+    } else {
+      // fall back to CE1 behaviour (centaines)
+      const cent3 = 1 + Math.floor(Math.random() * 9);
+      const diz3  = Math.floor(Math.random() * 10);
+      const un3   = Math.floor(Math.random() * 10);
+      n2 = cent3 * 100 + diz3 * 10 + un3;
+      if (n2 < 100) n2 = cent3 * 100;
+      svgEl2 = svgDizUnCent(cent3, diz3, un3);
+      legende2 = `<span style="color:#e17055;font-weight:700">▮ grande barre = 100</span>
+        &nbsp;·&nbsp;
+        <span style="color:#6c5ce7;font-weight:700">▪ barre = 10</span>
+        &nbsp;·&nbsp;
+        <span style="color:#d4a017;font-weight:700">● point = 1</span>`;
+    }
+    setBonneReponse(n2);
+    elQuestion.innerHTML = `<div class="diz-question">
+      <p style="font-size:0.75rem;margin:0 0 0.55rem">${legende2}</p>
+      ${svgEl2}
+      <p style="font-size:0.9rem;margin:0.5rem 0 0;font-weight:600">Quel nombre est représenté ?</p>
+    </div>`;
+    const props = propositionsAvecBonne(n2, Math.max(100, n2 - 300), Math.min(9999, n2 + 300), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
 
   if (!estCE1()) {
     const max = 69;
@@ -449,13 +679,13 @@ function svgPairesIcon(pair) {
 
 export function lancerPairImpair() {
   elTitre.textContent = "Pair ou Impair ?";
-  const max = estCE1() ? 99 : 20;
+  const max = estCE2() ? 9999 : (estCE1() ? 99 : 20);
   const n = 2 + Math.floor(Math.random() * (max - 1));
   const estPair = n % 2 === 0;
   setBonneReponse(estPair ? 0 : 1);
 
   let questionHtml;
-  if (!estCE1() || n <= 20) {
+  if ((!estCE1() && !estCE2()) || n <= 20) {
     let dots = "";
     for (let i = 0; i < n; i++) {
       const col = i % 2;

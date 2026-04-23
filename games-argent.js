@@ -7,6 +7,7 @@ import {
   setBonneReponse,
   getBonneReponse,
   estCE1,
+  estCE2,
   melanger,
   entiersDistincts,
 } from "./app-state.js";
@@ -61,9 +62,54 @@ function svgPiecesLigne(pieces) {
   return `<svg width="${x}" height="64" viewBox="0 0 ${x} 64">${circles}</svg>`;
 }
 
+// ── Billets ───────────────────────────────────────────────────────────────────
+const BILLETS_DEF = [
+  { val: 500,  label: "5€",  color: "#2ecc71" },
+  { val: 1000, label: "10€", color: "#3498db" },
+  { val: 2000, label: "20€", color: "#9b59b6" },
+  { val: 5000, label: "50€", color: "#e67e22" },
+];
+
+function svgBillet(val, label, color) {
+  return `<svg width="72" height="36" viewBox="0 0 72 36">
+    <rect x="1" y="1" width="70" height="34" rx="4" fill="${color}" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+    <text x="36" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="white" font-family="Fredoka,sans-serif">${label}</text>
+  </svg>`;
+}
+
 // ── lancerMonnaieCp ───────────────────────────────────────────────────────────
 export function lancerMonnaieCp() {
   elTitre.textContent = "🪙 La monnaie";
+
+  if (estCE2()) {
+    // Pick 2 notes randomly
+    const noteA = BILLETS_DEF[Math.floor(Math.random() * BILLETS_DEF.length)];
+    const noteB = BILLETS_DEF[Math.floor(Math.random() * BILLETS_DEF.length)];
+    const total = noteA.val + noteB.val;
+    setBonneReponse(total);
+
+    const billetsSvg = [noteA, noteB]
+      .map(b => svgBillet(b.val, b.label, b.color))
+      .join('<span style="display:inline-block;width:12px"></span>');
+
+    elQuestion.innerHTML = `<div class="monnaie-question">
+      <p>Quelle est la valeur <strong>totale</strong> de ces billets ?</p>
+      <div style="text-align:center;margin-top:0.6rem">${billetsSvg}</div>
+    </div>`;
+
+    const dist = entiersDistincts(Math.max(500, total - 3000), total + 3000, 3, total);
+    const opts = melanger([total, ...dist]);
+    elChoix.innerHTML = "";
+    opts.forEach((v) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.textContent = labelEuros(v); b.dataset.valeur = String(v);
+      b.addEventListener("click", () => apresReponse(v, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
   const pool = estCE1() ? PIECES_DEF : PIECES_DEF.slice(0, 6);
   const nbPieces = 2 + Math.floor(Math.random() * 2);
   const chosenPieces = [];
@@ -100,6 +146,40 @@ export function lancerMonnaieCp() {
 // ── lancerMonnaieCe1 ──────────────────────────────────────────────────────────
 export function lancerMonnaieCe1() {
   elTitre.textContent = "🛍️ La monnaie";
+
+  if (estCE2()) {
+    // 3 items at integer euro prices (1€–15€ each). Pay with 50€ note.
+    const articles = melanger(ARTICLES_BOUTIQUE).slice(0, 3);
+    const prixA = (1 + Math.floor(Math.random() * 15)) * 100;
+    const prixB = (1 + Math.floor(Math.random() * 15)) * 100;
+    const prixC = (1 + Math.floor(Math.random() * 15)) * 100;
+    const total = prixA + prixB + prixC;
+    const paye = 5000; // 50€
+    if (total >= paye) { lancerMonnaieCe1(); return; }
+    const change = paye - total;
+    setBonneReponse(change);
+
+    elQuestion.innerHTML = `<div class="monnaie-question">
+      <p style="font-size:0.85rem;margin:0 0 0.35rem">Ces 3 articles coûtent <strong>${labelEuros(prixA)}</strong>, <strong>${labelEuros(prixB)}</strong> et <strong>${labelEuros(prixC)}</strong>. Tu paies <strong>50€</strong>. Combien reçois-tu ?</p>
+      <div class="monnaie-ligne">${articles[0].emoji} ${articles[0].nom} → <strong>${labelEuros(prixA)}</strong></div>
+      <div class="monnaie-ligne">${articles[1].emoji} ${articles[1].nom} → <strong>${labelEuros(prixB)}</strong></div>
+      <div class="monnaie-ligne">${articles[2].emoji} ${articles[2].nom} → <strong>${labelEuros(prixC)}</strong></div>
+      <div class="monnaie-ligne">💵 Tu donnes <strong>50€</strong></div>
+      <div class="monnaie-ligne">💰 On te rend <strong>?</strong></div>
+    </div>`;
+
+    const dist = entiersDistincts(Math.max(100, change - 1000), Math.min(4900, change + 1000), 3, change);
+    const opts = melanger([change, ...dist]);
+    elChoix.innerHTML = "";
+    opts.forEach((v) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.textContent = labelEuros(v); b.dataset.valeur = String(v);
+      b.addEventListener("click", () => apresReponse(v, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
 
   // 35% : question total de 2 articles ; 65% : rendu de monnaie
   const typeTotal = Math.random() < 0.35;
