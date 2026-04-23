@@ -152,20 +152,22 @@ h1 {
 
 .niveau-switch {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.3rem;
   background: white;
-  padding: 0.4rem;
+  padding: 0.35rem;
   border-radius: 999px;
   box-shadow: 0 4px 16px var(--ombre);
+  width: 100%;
 }
 
 .niveau-btn {
   flex: 1;
+  min-width: 0;
   border: none;
   border-radius: 999px;
-  padding: 0.7rem 0.5rem;
+  padding: 0.55rem 0.3rem;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: clamp(0.75rem, 3.5vw, 0.95rem);
   font-weight: 700;
   cursor: pointer;
   background: transparent;
