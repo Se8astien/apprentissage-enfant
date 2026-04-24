@@ -196,9 +196,59 @@ h1 {
 }
 
 .btn-classe:active { transform: scale(0.97); }
+.btn-classe.selectionne {
+  box-shadow: 0 0 0 3px var(--primaire), 0 4px 16px var(--ombre);
+  transform: translateY(-2px);
+}
 .classe-emoji { font-size: 2rem; }
 .classe-nom { font-size: 1.2rem; font-weight: 800; color: var(--texte); }
 .classe-desc { font-size: 0.75rem; color: #888; }
+
+/* ── Sélecteur de difficulté (onboarding) ──────────────────────────────── */
+.diff-choix {
+  text-align: center;
+  animation: entree 0.25s ease-out;
+}
+
+.diff-titre {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--texte);
+}
+
+.diff-btns {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btn-diff {
+  flex: 1;
+  max-width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.85rem 0.4rem;
+  border: none;
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 3px 12px var(--ombre);
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-diff:hover, .btn-diff:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--ombre);
+  outline: none;
+}
+
+.btn-diff:active { transform: scale(0.97); }
+.diff-emoji { font-size: 1.6rem; }
+.diff-nom { font-size: 0.8rem; font-weight: 700; color: var(--texte); }
 
 /* ── Classe info bar (menu) ────────────────────────────────────────────── */
 .classe-info-barre {
