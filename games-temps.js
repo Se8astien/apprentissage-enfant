@@ -11,6 +11,7 @@ import {
   melanger,
   propositionsAvecBonne,
   afficherChoix,
+  getDifficulte,
 } from "./app-state.js";
 
 import { apresReponse, resetFeedback } from "./app-nav.js";
@@ -147,6 +148,7 @@ function montrerAideHeure() {
 // ── lancerHeure ───────────────────────────────────────────────────────────────
 export function lancerHeure() {
   elTitre.textContent = "🕐 L'heure";
+  const diff = getDifficulte();
 
   let pool = [];
   if (estCE2()) {
@@ -156,9 +158,10 @@ export function lancerHeure() {
       }
     }
   } else {
+    // CP diff 0: full hours only; diff 1: quarter hours; diff 2: 5-min multiples
     const minutesPool = estCE1()
       ? [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
-      : [0, 15, 30, 45];
+      : (diff === 0 ? [0] : diff === 1 ? [0, 15, 30, 45] : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
     for (let h = 1; h <= 12; h++) {
       for (const m of minutesPool) {
         pool.push(h * 60 + m);

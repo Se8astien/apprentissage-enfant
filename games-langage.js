@@ -9,6 +9,7 @@ import {
   estCE1,
   estCE2,
   melanger,
+  getDifficulte,
 } from "./app-state.js";
 
 import { apresReponse } from "./app-nav.js";
@@ -336,7 +337,16 @@ const TRAD_CE2 = [
 
 export function lancerTraduction() {
   elTitre.textContent = "🇬🇧 Traduction";
-  const liste = estCE2() ? TRAD_CE2 : estCE1() ? TRAD_CE1 : TRAD_CP;
+  const diff = getDifficulte();
+  // At higher difficulty, draw from a larger combined pool
+  let liste;
+  if (estCE2()) {
+    liste = diff === 0 ? TRAD_CE2.slice(0, 10) : diff === 1 ? TRAD_CE2 : [...TRAD_CE1, ...TRAD_CE2];
+  } else if (estCE1()) {
+    liste = diff === 0 ? TRAD_CE1.slice(0, 10) : diff === 1 ? TRAD_CE1 : [...TRAD_CE1, ...TRAD_CE2.slice(0, 8)];
+  } else {
+    liste = diff === 0 ? TRAD_CP.slice(0, 10) : diff === 1 ? TRAD_CP : [...TRAD_CP, ...TRAD_CE1.slice(0, 8)];
+  }
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   elQuestion.innerHTML =
