@@ -11,6 +11,7 @@ import {
   melanger,
   propositionsAvecBonne,
   afficherChoix,
+  getDifficulte,
 } from "./app-state.js";
 
 import { apresReponse } from "./app-nav.js";
@@ -77,6 +78,7 @@ function svgForme(type, taille, couleur) {
 
 export function lancerFormes() {
   elTitre.textContent = "🔷 Les formes";
+  const diff = getDifficulte();
 
   if (estCE2()) {
     // CE2 : 100% texte — "N côtés → quel nom ?"
@@ -108,7 +110,12 @@ export function lancerFormes() {
     return;
   }
 
-  const liste = estCE1() ? FORMES_CE1 : FORMES_CP;
+  // At higher difficulty, expand the available pool
+  const listeBase = estCE1() ? FORMES_CE1 : FORMES_CP;
+  const listeAvec = estCE1()
+    ? (diff >= 2 ? FORMES_CE2 : (diff >= 1 ? FORMES_CE1 : FORMES_CE1))
+    : (diff >= 2 ? FORMES_CE1 : (diff >= 1 ? [...FORMES_CP, "pentagone"] : FORMES_CP));
+  const liste = listeAvec;
   const idx = Math.floor(Math.random() * liste.length);
   const forme = liste[idx];
   const couleurQ = COULEURS_FORMES[Math.floor(Math.random() * COULEURS_FORMES.length)];
@@ -366,7 +373,8 @@ function svgPerimetre(type, a, b) {
 
 export function lancerPerimetre() {
   elTitre.textContent = "🔲 Périmètre";
-  const maxC = (estCE1() || estCE2()) ? 15 : 8;
+  const diff = getDifficulte();
+  const maxC = estCE2() ? [12, 18, 25][diff] : (estCE1() ? [8, 12, 15][diff] : [5, 7, 8][diff]);
   const types = estCE2()
     ? ["carre", "rectangle", "triangle", "trapeze"]
     : estCE1()

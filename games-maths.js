@@ -13,6 +13,7 @@ import {
   melanger,
   propositionsAvecBonne,
   afficherChoix,
+  getDifficulte,
 } from "./app-state.js";
 
 import { apresReponse, apresReponseTexte } from "./app-nav.js";
@@ -116,13 +117,15 @@ export function lancerCompte() {
 // ── lancerAddition ────────────────────────────────────────────────────────────
 export function lancerAddition() {
   elTitre.textContent = "Addition magique";
+  const diff = getDifficulte();
   let a;
   let b;
   let total;
   let html;
 
   if (estCE2()) {
-    total = 100 + Math.floor(Math.random() * 900);
+    const maxCE2 = [300, 600, 999][diff];
+    total = 100 + Math.floor(Math.random() * maxCE2);
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
     html =
@@ -137,8 +140,9 @@ export function lancerAddition() {
   }
 
   if (!estCE1()) {
-    a = 1 + Math.floor(Math.random() * 9);
-    b = 1 + Math.floor(Math.random() * 9);
+    const maxCP = [5, 8, 10][diff];
+    a = 1 + Math.floor(Math.random() * maxCP);
+    b = 1 + Math.floor(Math.random() * maxCP);
     total = a + b;
     if (total <= 10) {
       const e1 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
@@ -166,13 +170,14 @@ export function lancerAddition() {
   }
 
   // CE1 : addition jusqu'à 79, parfois avec un multiple de 10 (20%)
+  const maxCE1 = [30, 55, 79][diff];
   const useDizaine = Math.random() < 0.20;
   if (useDizaine) {
     const dizaines = [10, 20, 30, 40, 50];
     a = dizaines[Math.floor(Math.random() * dizaines.length)];
-    b = 5 + Math.floor(Math.random() * 30);
+    b = 5 + Math.floor(Math.random() * Math.max(5, maxCE1 - 10));
   } else {
-    total = 21 + Math.floor(Math.random() * 59);
+    total = 21 + Math.floor(Math.random() * Math.max(1, maxCE1 - 20));
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
   }
@@ -194,12 +199,14 @@ export function lancerAddition() {
 // ── lancerSoustraction ────────────────────────────────────────────────────────
 export function lancerSoustraction() {
   elTitre.textContent = "Les pommes";
+  const diff = getDifficulte();
   let total;
   let enleve;
   let reste;
 
   if (estCE2()) {
-    total = 100 + Math.floor(Math.random() * 900);
+    const maxCE2s = [300, 600, 999][diff];
+    total = 100 + Math.floor(Math.random() * maxCE2s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
     elQuestion.innerHTML =
@@ -213,9 +220,11 @@ export function lancerSoustraction() {
   }
 
   if (!estCE1()) {
-    total = 4 + Math.floor(Math.random() * 17);
+    const maxCPs = [10, 14, 20][diff];
+    total = 4 + Math.floor(Math.random() * (maxCPs - 3));
   } else {
-    total = 21 + Math.floor(Math.random() * 69);
+    const maxCE1s = [30, 55, 79][diff];
+    total = 21 + Math.floor(Math.random() * Math.max(1, maxCE1s - 20));
   }
   enleve = 1 + Math.floor(Math.random() * (total - 1));
   reste = total - enleve;
@@ -326,20 +335,26 @@ export function lancerCompare() {
 // ── lancerSuite ───────────────────────────────────────────────────────────────
 export function lancerSuite() {
   elTitre.textContent = "Numéro manquant";
+  const diff = getDifficulte();
   let debut, step;
   if (estCE2()) {
-    const stepsCE2 = [3, 4, 6, 7, 8, 9, 25, 50, 100];
-    step = stepsCE2[Math.floor(Math.random() * stepsCE2.length)];
-    debut = 1 + Math.floor(Math.random() * 200);
+    const stepPoolsCE2 = [
+      [1, 2, 5, 10],
+      [3, 4, 6, 7, 8, 9, 25, 50],
+      [3, 4, 6, 7, 8, 9, 25, 50, 100],
+    ];
+    const pool = stepPoolsCE2[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = 1 + Math.floor(Math.random() * [100, 150, 200][diff]);
   } else if (!estCE1()) {
-    step = Math.random() < 0.35 ? 2 : 1;
+    step = diff === 0 ? 1 : (Math.random() < 0.35 ? 2 : 1);
     debut = 1 + Math.floor(Math.random() * Math.max(1, 20 - step * 4));
   } else {
     const r = Math.random();
-    if (r < 0.20) step = 3;
-    else if (r < 0.40) step = 4;
+    if (diff >= 1 && r < 0.20) step = 3;
+    else if (diff >= 1 && r < 0.40) step = 4;
     else step = [1, 2, 5, 10][Math.floor(Math.random() * 4)];
-    debut = 1 + Math.floor(Math.random() * Math.max(1, 95 - step * 4));
+    debut = 1 + Math.floor(Math.random() * Math.max(1, [50, 75, 95][diff] - step * 4));
   }
   const suite = [debut, debut + step, debut + step * 2, debut + step * 3, debut + step * 4];
   const indexCache = 1 + Math.floor(Math.random() * 3);

@@ -3,6 +3,7 @@
 // ── Storage keys ──────────────────────────────────────────────────────────────
 export const STORAGE_KEY        = "maths-cp-etoiles";
 export const STORAGE_NIVEAU     = "maths-cp-niveau";
+export const STORAGE_DIFFICULTE = "apprentissage-difficulte";
 export const STORAGE_GENRE      = "maths-cp-genre";
 export const RENARD_NOM_KEY     = "renard-nom";
 export const RENARD_NAISSANCE_KEY = "renard-naissance";
@@ -59,8 +60,10 @@ export function lireNiveau() {
 }
 
 export function sauverNiveau(n) {
+  const prev = localStorage.getItem(STORAGE_NIVEAU);
   localStorage.setItem(STORAGE_NIVEAU, n);
   niveauCourant = n;
+  if (prev !== n) setDifficulte(0); // reset difficulty on class change
 }
 
 export function estCE1() {
@@ -96,29 +99,30 @@ export function majGenre() {
   if (elIconeGenre) elIconeGenre.textContent = f ? "👧" : "👦";
 }
 
-export function syncNiveauButtons() {
-  document.querySelectorAll(".niveau-btn").forEach((btn) => {
-    btn.classList.toggle("actif", btn.dataset.niveau === niveauCourant);
-  });
+export function getDifficulte() {
+  const v = parseInt(localStorage.getItem(STORAGE_DIFFICULTE) || "0", 10);
+  return (v >= 0 && v <= 2) ? v : 0;
 }
 
-export function majLabelsMenu() {
-  const desc = document.getElementById("desc-addition");
-  if (desc) {
-    if (estCE2()) desc.textContent = "Jusqu'à 999";
-    else if (estCE1()) desc.textContent = "Jusqu'à 79";
-    else desc.textContent = "Jusqu'à 10";
-  }
+export function setDifficulte(v) {
+  localStorage.setItem(STORAGE_DIFFICULTE, String(Math.max(0, Math.min(2, v))));
+}
+
+export function incrementDifficulte() {
+  const cur = getDifficulte();
+  if (cur < 2) setDifficulte(cur + 1);
+}
+
+export function getDiffLabel() {
+  const d = getDifficulte();
+  return ["🌱 Débutant", "⚡ Normal", "🔥 Expert"][d];
 }
 
 export function setBadgeVisible(visible) {
   if (!elBadge) return;
   if (visible) {
     elBadge.hidden = false;
-    let label = "Niveau : CP";
-    if (estCE1()) label = "Niveau : CE1";
-    if (estCE2()) label = "Niveau : CE2";
-    elBadge.textContent = label;
+    elBadge.textContent = getDiffLabel();
   } else {
     elBadge.hidden = true;
   }

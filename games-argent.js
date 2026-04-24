@@ -10,6 +10,7 @@ import {
   estCE2,
   melanger,
   entiersDistincts,
+  getDifficulte,
 } from "./app-state.js";
 
 import { apresReponse } from "./app-nav.js";
@@ -80,6 +81,7 @@ function svgBillet(val, label, color) {
 // ── lancerMonnaieCp ───────────────────────────────────────────────────────────
 export function lancerMonnaieCp() {
   elTitre.textContent = "🪙 La monnaie";
+  const diff = getDifficulte();
 
   if (estCE2()) {
     // Pick 2 notes randomly
@@ -111,11 +113,12 @@ export function lancerMonnaieCp() {
   }
 
   const pool = estCE1() ? PIECES_DEF : PIECES_DEF.slice(0, 6);
-  const nbPieces = 2 + Math.floor(Math.random() * 2);
+  const nbPieces = [2, 3, 4][diff] + Math.floor(Math.random() * 2);
+  const maxTotal = estCE1() ? [150, 200, 300][diff] : [50, 75, 100][diff];
   const chosenPieces = [];
   let total = 0;
   for (let i = 0; i < nbPieces; i++) {
-    const available = pool.filter((p) => total + p.val <= (estCE1() ? 200 : 100));
+    const available = pool.filter((p) => total + p.val <= maxTotal);
     if (!available.length) break;
     const p = available[Math.floor(Math.random() * available.length)];
     chosenPieces.push(p);

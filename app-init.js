@@ -12,14 +12,15 @@ import {
   lireNomRenard,
   sauverNomRenard,
   lireEtoiles,
-  syncNiveauButtons,
-  majLabelsMenu,
   majGenre,
   mettreAJourJauges,
   setBadgeVisible,
   getNiveauCourant,
   getJeuCourant,
   estCE2,
+  STORAGE_NIVEAU,
+  getDifficulte,
+  getDiffLabel,
 } from "./app-state.js";
 
 import {
@@ -29,6 +30,8 @@ import {
   afficherStreakHeader,
   montrerMaison,
   montrerDressing,
+  svgRenard,
+  getStade,
 } from "./app-renard.js";
 
 import {
@@ -76,28 +79,53 @@ const lanceurs = {
   angles:         lancerAngles,
 };
 
+// ── Classe screen ─────────────────────────────────────────────────────────────
+const ecranClasse = document.getElementById("ecran-classe");
+const btnClasse = document.querySelectorAll(".btn-classe");
+
+function montrerClasse() {
+  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+  ecranClasse.hidden = false;
+  ecranClasse.classList.add("actif");
+  const mascot = document.getElementById("classe-mascotte");
+  if (mascot) mascot.innerHTML = svgRenard(getStade(lireEtoiles()), 80, {});
+}
+
+btnClasse.forEach(btn => {
+  btn.addEventListener("click", () => {
+    sauverNiveau(btn.dataset.niveau);
+    if (!lireNomRenard()) {
+      montrerNommage();
+    } else {
+      majGenre();
+      montrerMenu();
+    }
+  });
+});
+
 // ── Initialisation ────────────────────────────────────────────────────────────
 elTotal.textContent = lireEtoiles();
-syncNiveauButtons();
-majLabelsMenu();
+majGenre();
 mettreAJourJauges();
 mettreAJourRenardHeader();
 const streakInit = mettreAJourStreak();
 afficherStreakHeader(streakInit.count);
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
-if (!lireNomRenard()) {
+if (!localStorage.getItem("maths-cp-genre")) {
+  // Show genre screen (default, already active in HTML)
+} else if (!localStorage.getItem(STORAGE_NIVEAU)) {
+  montrerClasse();
+} else if (!lireNomRenard()) {
   montrerNommage();
-} else if (localStorage.getItem("maths-cp-genre")) {
-  majGenre();
+} else {
   montrerMenu();
-  const nom = lireNomRenard();
   if (elSousTitre) {
+    const nom = lireNomRenard();
     elSousTitre.textContent = `${nom} t'attendait ! 🦊`;
     setTimeout(() => majGenre(), 3500);
   }
 }
-// Sinon : #ecran-genre déjà actif dans le HTML
 
 // ── Formulaire de nommage ─────────────────────────────────────────────────────
 const formNommage = document.getElementById("nommage-form");
@@ -110,28 +138,10 @@ if (formNommage) {
     const elNommage = document.getElementById("ecran-nommage");
     elNommage.classList.remove("actif");
     elNommage.hidden = true;
-    elGenre.hidden = false;
-    elGenre.classList.add("actif");
     mettreAJourRenardHeader();
+    montrerMenu();
   });
 }
-
-// ── Boutons niveau ────────────────────────────────────────────────────────────
-document.querySelectorAll(".niveau-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const n = btn.dataset.niveau;
-    if (n === getNiveauCourant()) return;
-    sauverNiveau(n);
-    syncNiveauButtons();
-    majLabelsMenu();
-    const jeu = getJeuCourant();
-    if (jeu) {
-      setBadgeVisible(true);
-      resetFeedback();
-      if (lanceurs[jeu]) lanceurs[jeu]();
-    }
-  });
-});
 
 // ── Boutons jeux ──────────────────────────────────────────────────────────────
 document.querySelectorAll(".carte-jeu").forEach((btn) => {
@@ -146,7 +156,14 @@ elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 document.querySelectorAll(".btn-genre").forEach((btn) => {
   btn.addEventListener("click", () => {
     sauverGenre(btn.dataset.genre);
-    montrerMenu();
+    majGenre();
+    if (!localStorage.getItem(STORAGE_NIVEAU)) {
+      montrerClasse();
+    } else if (!lireNomRenard()) {
+      montrerNommage();
+    } else {
+      montrerMenu();
+    }
   });
 });
 
@@ -160,6 +177,10 @@ if (btnChangerGenre) {
     elGenre.classList.add("actif");
   });
 }
+
+// ── Changer de classe ─────────────────────────────────────────────────────────
+const btnChangerClasse = document.getElementById("btn-changer-classe");
+if (btnChangerClasse) btnChangerClasse.addEventListener("click", montrerClasse);
 
 // ── Ma Maison ─────────────────────────────────────────────────────────────────
 const btnMaison = document.getElementById("btn-maison");

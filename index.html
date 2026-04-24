@@ -54,7 +54,37 @@
       </div>
     </section>
 
+    <section id="ecran-classe" class="ecran" hidden aria-label="Quelle classe ?">
+      <div class="classe-conteneur">
+        <div class="classe-mascotte" id="classe-mascotte" aria-hidden="true"></div>
+        <h2 class="classe-titre">Tu es en quelle classe ?</h2>
+        <div class="classe-btns">
+          <button type="button" class="btn-classe" data-niveau="cp">
+            <span class="classe-emoji">🌱</span>
+            <span class="classe-nom">CP</span>
+            <span class="classe-desc">6–7 ans</span>
+          </button>
+          <button type="button" class="btn-classe" data-niveau="ce1">
+            <span class="classe-emoji">🚀</span>
+            <span class="classe-nom">CE1</span>
+            <span class="classe-desc">7–8 ans</span>
+          </button>
+          <button type="button" class="btn-classe" data-niveau="ce2">
+            <span class="classe-emoji">⭐</span>
+            <span class="classe-nom">CE2</span>
+            <span class="classe-desc">8–9 ans</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <main id="ecran-menu" class="ecran" hidden>
+
+      <div class="classe-info-barre" id="classe-info-barre">
+        <span id="classe-info-label"></span>
+        <span id="difficulte-label"></span>
+        <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer de classe">✏️</button>
+      </div>
 
       <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
       <button type="button" class="maison-banner" id="btn-maison" aria-label="Ma Maison">
@@ -68,15 +98,6 @@
           <span class="maison-banner-fleche" aria-hidden="true">›</span>
         </div>
       </button>
-
-      <!-- ── Sélecteur de niveau ──────────────────────────────── -->
-      <div class="niveau-barre" role="group" aria-label="Niveau de difficulté">
-        <div class="niveau-switch">
-          <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
-          <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>
-          <button type="button" class="niveau-btn" id="niveau-ce2" data-niveau="ce2">⭐ CE2</button>
-        </div>
-      </div>
 
       <p class="accueil">Choisis ton jeu !</p>
 
@@ -174,6 +195,7 @@
 
     <section id="ecran-jeu" class="ecran" hidden>
       <button type="button" class="btn-retour" id="btn-retour">← Menu</button>
+      <div class="diff-badge" id="diff-badge" hidden></div>
       <p class="jeu-niveau" id="jeu-niveau-badge" hidden></p>
       <h2 id="jeu-titre" class="jeu-titre"></h2>
       <div id="zone-question" class="zone-question"></div>

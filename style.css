@@ -132,6 +132,7 @@ h1 {
 
 .ecran.actif {
   display: block;
+  position: relative;
   animation: entree 0.35s ease-out;
 }
 
@@ -146,55 +147,103 @@ h1 {
   }
 }
 
-.niveau-barre {
-  margin-bottom: 0.85rem;
-}
-
-.niveau-switch {
+/* ── Onboarding classe ─────────────────────────────────────────────────── */
+.classe-conteneur {
   display: flex;
-  gap: 0.3rem;
-  background: white;
-  padding: 0.35rem;
-  border-radius: 999px;
-  box-shadow: 0 4px 16px var(--ombre);
-  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 1rem;
 }
 
-.niveau-btn {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  border-radius: 999px;
-  padding: 0.55rem 0.3rem;
-  font-family: inherit;
-  font-size: clamp(0.75rem, 3.5vw, 0.95rem);
-  font-weight: 700;
-  cursor: pointer;
-  background: transparent;
+.classe-titre {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
   color: var(--texte);
-  opacity: 0.6;
-  transition: background 0.18s ease, opacity 0.18s ease, transform 0.1s;
-  letter-spacing: -0.01em;
 }
 
-.niveau-btn:active { transform: scale(0.97); }
+.classe-mascotte { width: 80px; height: 80px; }
 
-.niveau-btn:hover,
-.niveau-btn:focus-visible {
-  opacity: 1;
+.classe-btns {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-classe {
+  flex: 1;
+  max-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 0.5rem;
+  border: none;
+  border-radius: 1.2rem;
+  background: white;
+  box-shadow: 0 4px 16px var(--ombre);
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-classe:hover, .btn-classe:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px var(--ombre);
   outline: none;
 }
 
-.niveau-btn.actif {
-  background: linear-gradient(135deg, var(--primaire), #a29bfe);
-  color: #fff;
-  opacity: 1;
-  box-shadow: 0 3px 12px rgba(108, 92, 231, 0.4);
+.btn-classe:active { transform: scale(0.97); }
+.classe-emoji { font-size: 2rem; }
+.classe-nom { font-size: 1.2rem; font-weight: 800; color: var(--texte); }
+.classe-desc { font-size: 0.75rem; color: #888; }
+
+/* ── Classe info bar (menu) ────────────────────────────────────────────── */
+.classe-info-barre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: white;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px var(--ombre);
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
 }
 
-#niveau-ce2.actif {
-  background: linear-gradient(135deg, #00b894, #00cec9);
-  color: white;
+.btn-changer-classe {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ── Diff badge (in-game) ──────────────────────────────────────────────── */
+.diff-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: white;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px var(--ombre);
+  z-index: 1;
+}
+
+.diff-pulse { animation: diffPulse 0.6s ease forwards; }
+
+@keyframes diffPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.3); background: var(--primaire); color: white; }
+  100% { transform: scale(1); }
 }
 
 .accueil {

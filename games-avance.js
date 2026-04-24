@@ -11,6 +11,7 @@ import {
   estCE2,
   propositionsAvecBonne,
   afficherChoix,
+  getDifficulte,
 } from "./app-state.js";
 
 import { apresReponse } from "./app-nav.js";
@@ -18,9 +19,15 @@ import { apresReponse } from "./app-nav.js";
 // ── lancerMultiplication ──────────────────────────────────────────────────────
 export function lancerMultiplication() {
   elTitre.textContent = "✖️ Multiplication";
+  const diff = getDifficulte();
 
   if (estCE2()) {
-    const tables = [2, 3, 4, 5, 6, 7, 8, 9, 11, 12];
+    const tablesCE2 = [
+      [2, 3, 4, 5, 10],
+      [2, 3, 4, 5, 6, 7, 8, 9, 10],
+      [2, 3, 4, 5, 6, 7, 8, 9, 11, 12],
+    ];
+    const tables = tablesCE2[diff];
     const mult = tables[Math.floor(Math.random() * tables.length)];
     const maxFact = 12;
     const fact = 1 + Math.floor(Math.random() * maxFact);
@@ -48,9 +55,11 @@ export function lancerMultiplication() {
     return;
   }
 
-  const tables = estCE1() ? [2, 3, 4, 5, 10] : [2, 3, 5];
+  const tablesCE1 = [[2, 5], [2, 3, 5], [2, 3, 4, 5, 10]];
+  const tablesCP  = [[2], [2, 3], [2, 3, 5]];
+  const tables = estCE1() ? tablesCE1[diff] : tablesCP[diff];
   const mult = tables[Math.floor(Math.random() * tables.length)];
-  const maxFact = estCE1() ? 10 : 5;
+  const maxFact = estCE1() ? [6, 8, 10][diff] : [3, 4, 5][diff];
   const fact = 1 + Math.floor(Math.random() * maxFact);
   const produit = mult * fact;
   setBonneReponse(produit);
@@ -88,9 +97,15 @@ export function lancerMultiplication() {
 // ── lancerDivision ────────────────────────────────────────────────────────────
 export function lancerDivision() {
   elTitre.textContent = "➗ Division";
+  const diff = getDifficulte();
 
   if (estCE2()) {
-    const diviseurs = [2, 3, 4, 5, 6, 7, 8, 9];
+    const diviseursCE2 = [
+      [2, 3, 4, 5],
+      [2, 3, 4, 5, 6, 7],
+      [2, 3, 4, 5, 6, 7, 8, 9],
+    ];
+    const diviseurs = diviseursCE2[diff];
     const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
     const quotient = 1 + Math.floor(Math.random() * 12);
 
@@ -117,9 +132,11 @@ export function lancerDivision() {
     return;
   }
 
-  const diviseurs = estCE1() ? [2, 3, 4, 5, 10] : [2, 3];
+  const diviseursCE1 = [[2, 5], [2, 3, 5], [2, 3, 4, 5, 10]];
+  const diviseursCP  = [[2], [2, 3], [2, 3]];
+  const diviseurs = estCE1() ? diviseursCE1[diff] : diviseursCP[diff];
   const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
-  const maxQuot = estCE1() ? 10 : 5;
+  const maxQuot = estCE1() ? [5, 8, 10][diff] : [3, 4, 5][diff];
   const quotient = 1 + Math.floor(Math.random() * maxQuot);
   const total = diviseur * quotient;
   setBonneReponse(quotient);

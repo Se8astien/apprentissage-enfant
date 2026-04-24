@@ -20,6 +20,10 @@ import {
   lireEtoiles,
   lireNomRenard,
   confetti,
+  getNiveauCourant,
+  getDifficulte,
+  incrementDifficulte,
+  getDiffLabel,
 } from "./app-state.js";
 
 import {
@@ -132,6 +136,11 @@ export function apresReponse(choix, bouton, correct) {
     declencherReactionRenard(true);
     if (comboActuel === 10) declencherCombo(10);
     else if (comboActuel === 5) declencherCombo(5);
+    // Auto-promote difficulty after ×10 combo
+    if (comboActuel >= 10 && getDifficulte() < 2) {
+      incrementDifficulte();
+      afficherNotifDifficulte();
+    }
   } else {
     comboActuel = 0;
     const ko = messagesKo();
@@ -164,6 +173,11 @@ export function apresReponseTexte(choix, bouton, correct) {
     declencherReactionRenard(true);
     if (comboActuel === 10) declencherCombo(10);
     else if (comboActuel === 5) declencherCombo(5);
+    // Auto-promote difficulty after ×10 combo
+    if (comboActuel >= 10 && getDifficulte() < 2) {
+      incrementDifficulte();
+      afficherNotifDifficulte();
+    }
   } else {
     comboActuel = 0;
     const ko = messagesKo();
@@ -172,6 +186,20 @@ export function apresReponseTexte(choix, bouton, correct) {
     declencherReactionRenard(false);
   }
   elSuivant.hidden = false;
+}
+
+// ── afficherNotifDifficulte ───────────────────────────────────────────────────
+function afficherNotifDifficulte() {
+  const el = document.getElementById("diff-badge");
+  if (el) {
+    el.hidden = false;
+    el.textContent = getDiffLabel();
+    el.classList.add("diff-pulse");
+    setTimeout(() => el.classList.remove("diff-pulse"), 1200);
+  }
+  // Update the in-game badge
+  const badge = document.getElementById("jeu-niveau-badge");
+  if (badge) badge.textContent = getDiffLabel();
 }
 
 // ── montrerMenu ───────────────────────────────────────────────────────────────
@@ -184,10 +212,17 @@ export function montrerMenu() {
   elJeu.classList.remove("actif");
   const elMaison = document.getElementById("ecran-maison");
   if (elMaison) { elMaison.hidden = true; elMaison.classList.remove("actif"); }
+  const elClasse = document.getElementById("ecran-classe");
+  if (elClasse) { elClasse.hidden = true; elClasse.classList.remove("actif"); }
   elMenu.hidden = false;
   elMenu.classList.add("actif");
   majGenre();
   mettreAJourMaisonBanner();
+  // Update classe/difficulte info bar
+  const classeLabel = document.getElementById("classe-info-label");
+  const diffLabel = document.getElementById("difficulte-label");
+  if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2" }[getNiveauCourant()] || "";
+  if (diffLabel) diffLabel.textContent = getDiffLabel();
 }
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────
@@ -199,6 +234,8 @@ export function montrerJeu(nom, lanceurs) {
   elJeu.hidden = false;
   elJeu.classList.add("actif");
   setBadgeVisible(true);
+  const diffBadge = document.getElementById("diff-badge");
+  if (diffBadge) { diffBadge.hidden = false; diffBadge.textContent = getDiffLabel(); }
   resetFeedback();
   lanceurs[nom]();
 }
