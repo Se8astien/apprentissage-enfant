@@ -20,6 +20,7 @@ import {
   estCE2,
   STORAGE_NIVEAU,
   getDifficulte,
+  setDifficulte,
   getDiffLabel,
 } from "./app-state.js";
 
@@ -89,17 +90,36 @@ function montrerClasse() {
   ecranClasse.classList.add("actif");
   const mascot = document.getElementById("classe-mascotte");
   if (mascot) mascot.innerHTML = svgRenard(getStade(lireEtoiles()), 80, {});
+  const diffChoix = document.getElementById("diff-choix");
+  if (diffChoix) diffChoix.hidden = true;
+  btnClasse.forEach(b => b.classList.remove("selectionne"));
+}
+
+function passerAuMenu() {
+  if (!lireNomRenard()) {
+    montrerNommage();
+  } else {
+    majGenre();
+    montrerMenu();
+  }
 }
 
 btnClasse.forEach(btn => {
   btn.addEventListener("click", () => {
     sauverNiveau(btn.dataset.niveau);
-    if (!lireNomRenard()) {
-      montrerNommage();
-    } else {
-      majGenre();
-      montrerMenu();
+    btnClasse.forEach(b => b.classList.toggle("selectionne", b === btn));
+    const diffChoix = document.getElementById("diff-choix");
+    if (diffChoix) {
+      diffChoix.hidden = false;
+      diffChoix.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
+  });
+});
+
+document.querySelectorAll(".btn-diff").forEach(btn => {
+  btn.addEventListener("click", () => {
+    setDifficulte(parseInt(btn.dataset.diff, 10));
+    passerAuMenu();
   });
 });
 
