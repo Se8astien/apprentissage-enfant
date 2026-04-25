@@ -2,6 +2,19 @@
 
 Application web éducative pour enfants CP/CE1/CE2 (6–9 ans). Jeux de maths et de langage avec un compagnon renard.
 
+## Utilisateurs
+
+**Les utilisateurs sont des enfants de 6 à 9 ans.** Toute décision UX doit partir de ce fait.
+
+- Boutons larges, faciles à taper sur tablette ou téléphone avec un petit doigt
+- Textes courts, mots simples, phrases directes — pas de jargon
+- Feedback immédiat et positif — encourager même en cas d'erreur
+- Pas de gestes complexes, pas de double-clic, pas de drag-and-drop
+- Les icônes et emojis aident à comprendre sans lire
+- Les animations et sons renforcent le plaisir et la compréhension
+- Aucune action destructive sans confirmation claire (ex. : ne jamais perdre la progression)
+- Les parents configurent l'app (choix de classe, genre) — les enfants jouent
+
 ## Architecture
 
 **Vanilla JS + ES modules natifs** — pas de bundler, pas de framework, pas de dépendances.
