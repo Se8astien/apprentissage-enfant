@@ -24,6 +24,8 @@ import {
   getDifficulte,
   incrementDifficulte,
   getDiffLabel,
+  marquerMaitrise,
+  lireMaitrise,
 } from "./app-state.js";
 
 import {
@@ -134,8 +136,10 @@ export function apresReponse(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
-    if (comboActuel === 10) declencherCombo(10);
-    else if (comboActuel === 5) declencherCombo(5);
+    if (comboActuel === 10) {
+      declencherCombo(10);
+      marquerMaitrise(getJeuCourant(), getDifficulte());
+    } else if (comboActuel === 5) declencherCombo(5);
     // Auto-promote difficulty after ×10 combo
     if (comboActuel >= 10 && getDifficulte() < 2) {
       incrementDifficulte();
@@ -171,8 +175,10 @@ export function apresReponseTexte(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
-    if (comboActuel === 10) declencherCombo(10);
-    else if (comboActuel === 5) declencherCombo(5);
+    if (comboActuel === 10) {
+      declencherCombo(10);
+      marquerMaitrise(getJeuCourant(), getDifficulte());
+    } else if (comboActuel === 5) declencherCombo(5);
     // Auto-promote difficulty after ×10 combo
     if (comboActuel >= 10 && getDifficulte() < 2) {
       incrementDifficulte();
