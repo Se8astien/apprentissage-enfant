@@ -1,3 +1,6 @@
+/* Garantit que hidden écrase toujours display:flex/grid des classes */
+[hidden] { display: none !important; }
+
 :root {
   --fond: linear-gradient(145deg, #e8f4ff 0%, #fff5e6 45%, #ffe8f0 100%);
   --carte: #ffffff;
