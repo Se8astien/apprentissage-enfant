@@ -23,6 +23,7 @@ import {
   setDifficulte,
   getDiffLabel,
   lireMaitrise,
+  confetti,
 } from "./app-state.js";
 
 import {
@@ -141,7 +142,8 @@ afficherStreakHeader(streakInit.count);
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
 if (!localStorage.getItem("maths-cp-genre")) {
-  // Show genre screen (default, already active in HTML)
+  elGenre.hidden = false;
+  elGenre.classList.add("actif");
 } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
   montrerClasse();
 } else if (!lireNomRenard()) {
@@ -242,3 +244,28 @@ if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => {
   elDressing.classList.remove("actif");
   montrerMaison(montrerMenu);
 });
+
+// ── Modal : passer à la classe suivante ──────────────────────────────────────
+const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: null };
+
+const modalOui = document.getElementById("modal-oui");
+if (modalOui) {
+  modalOui.addEventListener("click", () => {
+    const suivant = CLASSE_SUIVANTE[getNiveauCourant()];
+    const modal = document.getElementById("modal-classe-suivante");
+    if (modal) modal.hidden = true;
+    if (suivant) {
+      sauverNiveau(suivant);
+      confetti();
+    }
+    montrerMenu();
+  });
+}
+
+const modalNon = document.getElementById("modal-non");
+if (modalNon) {
+  modalNon.addEventListener("click", () => {
+    const modal = document.getElementById("modal-classe-suivante");
+    if (modal) modal.hidden = true;
+  });
+}

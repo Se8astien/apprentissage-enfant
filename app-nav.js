@@ -136,15 +136,11 @@ export function apresReponse(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
-    if (comboActuel === 10) {
+    if (comboActuel % 10 === 0) {
       declencherCombo(10);
       marquerMaitrise(getJeuCourant(), getDifficulte());
+      gererProgressionDifficulte();
     } else if (comboActuel === 5) declencherCombo(5);
-    // Auto-promote difficulty after ×10 combo
-    if (comboActuel >= 10 && getDifficulte() < 2) {
-      incrementDifficulte();
-      afficherNotifDifficulte();
-    }
   } else {
     comboActuel = 0;
     const ko = messagesKo();
@@ -175,15 +171,11 @@ export function apresReponseTexte(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
-    if (comboActuel === 10) {
+    if (comboActuel % 10 === 0) {
       declencherCombo(10);
       marquerMaitrise(getJeuCourant(), getDifficulte());
+      gererProgressionDifficulte();
     } else if (comboActuel === 5) declencherCombo(5);
-    // Auto-promote difficulty after ×10 combo
-    if (comboActuel >= 10 && getDifficulte() < 2) {
-      incrementDifficulte();
-      afficherNotifDifficulte();
-    }
   } else {
     comboActuel = 0;
     const ko = messagesKo();
@@ -194,18 +186,34 @@ export function apresReponseTexte(choix, bouton, correct) {
   elSuivant.hidden = false;
 }
 
-// ── afficherNotifDifficulte ───────────────────────────────────────────────────
-function afficherNotifDifficulte() {
-  const el = document.getElementById("diff-badge");
-  if (el) {
-    el.hidden = false;
-    el.textContent = getDiffLabel();
-    el.classList.add("diff-pulse");
-    setTimeout(() => el.classList.remove("diff-pulse"), 1200);
+// ── Progression de difficulté ─────────────────────────────────────────────────
+function gererProgressionDifficulte() {
+  if (getDifficulte() < 2) {
+    incrementDifficulte();
+    afficherToastDifficulte();
+    const badge = document.getElementById("diff-badge");
+    if (badge) { badge.hidden = false; badge.textContent = getDiffLabel(); badge.classList.add("diff-pulse"); setTimeout(() => badge.classList.remove("diff-pulse"), 1200); }
+  } else {
+    proposerClasseSuivante();
   }
-  // Update the in-game badge
-  const badge = document.getElementById("jeu-niveau-badge");
-  if (badge) badge.textContent = getDiffLabel();
+}
+
+function afficherToastDifficulte() {
+  const app = document.querySelector(".app");
+  if (!app) return;
+  const toast = document.createElement("div");
+  toast.className = "toast-progression";
+  toast.innerHTML = `<span>🎉 Niveau augmenté !</span><strong>${getDiffLabel()}</strong>`;
+  app.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+}
+
+function proposerClasseSuivante() {
+  const suivantNom = { cp: "CE1 🚀", ce1: "CE2 ⭐", ce2: null }[getNiveauCourant()];
+  if (!suivantNom) { confetti(); return; }
+  const modal = document.getElementById("modal-classe-suivante");
+  const nomEl = document.getElementById("modal-classe-nom");
+  if (modal && nomEl) { nomEl.textContent = suivantNom; modal.hidden = false; }
 }
 
 // ── montrerMenu ───────────────────────────────────────────────────────────────
@@ -220,6 +228,8 @@ export function montrerMenu() {
   if (elMaison) { elMaison.hidden = true; elMaison.classList.remove("actif"); }
   const elClasse = document.getElementById("ecran-classe");
   if (elClasse) { elClasse.hidden = true; elClasse.classList.remove("actif"); }
+  const modal = document.getElementById("modal-classe-suivante");
+  if (modal) modal.hidden = true;
   elMenu.hidden = false;
   elMenu.classList.add("actif");
   majGenre();

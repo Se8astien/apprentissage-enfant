@@ -40,7 +40,7 @@
       </div>
     </section>
 
-    <section id="ecran-genre" class="ecran actif" aria-label="Qui joue ?">
+    <section id="ecran-genre" class="ecran" hidden aria-label="Qui joue ?">
       <div class="genre-conteneur">
         <div class="genre-mascotte" id="mascotte-genre" aria-hidden="true"></div>
         <h2 class="genre-titre">Qui joue ?</h2>
@@ -243,6 +243,20 @@
       <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
       <button type="button" class="btn-suivant" id="btn-suivant" hidden>Suivant →</button>
     </section>
+
+    <!-- ── Modal : passer à la classe suivante ──────────────────── -->
+    <div id="modal-classe-suivante" class="modal-overlay" hidden role="dialog" aria-modal="true">
+      <div class="modal-contenu">
+        <div class="modal-emoji">🏆</div>
+        <h2 class="modal-titre">Incroyable !</h2>
+        <p class="modal-texte">Tu maîtrises le niveau <strong>Expert</strong> !<br>
+          Veux-tu passer en <strong id="modal-classe-nom"></strong> ?</p>
+        <div class="modal-btns">
+          <button type="button" id="modal-oui" class="btn-modal-oui">Oui, on y va ! 🎉</button>
+          <button type="button" id="modal-non" class="btn-modal-non">Plus tard</button>
+        </div>
+      </div>
+    </div>
 
     <div id="renard-reaction" class="renard-reaction" aria-hidden="true" hidden></div>
     <div id="confetti" class="confetti" aria-hidden="true"></div>
