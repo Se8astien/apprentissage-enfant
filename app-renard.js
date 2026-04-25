@@ -162,6 +162,12 @@ export function montrerNommage() {
   elNommage.classList.add("actif");
   const foxDiv = document.getElementById("nommage-fox");
   if (foxDiv) foxDiv.innerHTML = svgRenard(0, 110);
+  const titre = document.getElementById("nommage-titre");
+  if (titre) titre.innerHTML = estGrand()
+    ? "Comment s'appelle<br>ton compagnon ?"
+    : "Comment s'appelle<br>ton renard ?";
+  const btn = document.querySelector(".btn-nommage");
+  if (btn) btn.textContent = estGrand() ? "C'est parti !" : "C'est parti ! 🎉";
   setTimeout(() => {
     const inp = document.getElementById("input-nom-renard");
     if (inp) inp.focus();

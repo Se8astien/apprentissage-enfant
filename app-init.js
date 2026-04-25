@@ -17,7 +17,7 @@ import {
   setBadgeVisible,
   getNiveauCourant,
   getJeuCourant,
-  estCE2,
+  estGrand,
   STORAGE_NIVEAU,
   getDifficulte,
   setDifficulte,
@@ -167,7 +167,9 @@ if (!localStorage.getItem("maths-cp-genre")) {
   afficherMissions();
   if (elSousTitre) {
     const nom = lireNomRenard();
-    elSousTitre.textContent = `${nom} t'attendait ! 🦊`;
+    elSousTitre.textContent = estGrand()
+      ? `Bon retour, ${nom} !`
+      : `${nom} t'attendait ! 🦊`;
     setTimeout(() => majGenre(), 3500);
   }
 }
