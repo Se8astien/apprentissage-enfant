@@ -20,6 +20,8 @@ export const BADGES = [
   { id: "streak30",     emoji: "🏆",  nom: "Champion",         desc: "Jouer 30 jours de suite" },
   { id: "ce1",          emoji: "🚀",  nom: "Au CE1 !",         desc: "Passer en CE1" },
   { id: "ce2",          emoji: "⭐",  nom: "Au CE2 !",         desc: "Passer en CE2" },
+  { id: "cm1",          emoji: "🌟",  nom: "Au CM1 !",         desc: "Passer en CM1" },
+  { id: "cm2",          emoji: "🏆",  nom: "Au CM2 !",         desc: "Passer en CM2" },
   { id: "jeux5",        emoji: "🎮",  nom: "Joueur",           desc: "Jouer à 5 jeux différents" },
   { id: "jeux15",       emoji: "🗺️",  nom: "Explorateur",      desc: "Jouer à 15 jeux différents" },
   { id: "q50",          emoji: "📝",  nom: "Studieux",         desc: "Répondre à 50 questions" },

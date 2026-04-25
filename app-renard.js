@@ -24,6 +24,7 @@ import {
   peutFaireCalin,
   majGenre,
   confetti,
+  estGrand,
 } from "./app-state.js";
 
 // Re-export peutFaireCalin so other modules don't need to import app-state directly
@@ -31,11 +32,11 @@ export { peutFaireCalin } from "./app-state.js";
 
 // ── Stades d'évolution ────────────────────────────────────────────────────────
 export const RENARD_STADES = [
-  { nom: "Bébé renard",       corps: "#f5b97e", interne: "#fde7c8", yeux: "#3d2b1f" },
-  { nom: "Jeune renard",      corps: "#e8872a", interne: "#f5c07a", yeux: "#1a1a1a" },
-  { nom: "Renard malin",      corps: "#c96416", interne: "#e89050", yeux: "#0d0d0d" },
-  { nom: "Renard magique",    corps: "#9c59d1", interne: "#c99ef0", yeux: "#4b0082" },
-  { nom: "Renard légendaire", corps: "#ffd700", interne: "#ffe999", yeux: "#c8860a" },
+  { nom: "Bébé renard",       nomGrand: "Renard futé",          corps: "#f5b97e", interne: "#fde7c8", yeux: "#3d2b1f" },
+  { nom: "Jeune renard",      nomGrand: "Renard sagace",        corps: "#e8872a", interne: "#f5c07a", yeux: "#1a1a1a" },
+  { nom: "Renard malin",      nomGrand: "Renard expert",        corps: "#c96416", interne: "#e89050", yeux: "#0d0d0d" },
+  { nom: "Renard magique",    nomGrand: "Renard légendaire ⭐",  corps: "#9c59d1", interne: "#c99ef0", yeux: "#4b0082" },
+  { nom: "Renard légendaire", nomGrand: "Maître renard",        corps: "#ffd700", interne: "#ffe999", yeux: "#c8860a" },
 ];
 
 export function getStade(etoiles) {
@@ -148,7 +149,7 @@ export function mettreAJourMaisonBanner() {
   const accessoires = Object.keys(lireTenue());
   foxEl.innerHTML = svgRenard(stade, 46, { triste, accessoires });
   if (nomEl)   nomEl.textContent   = (lireNomRenard() || "Foxy") + " 🏠";
-  if (subEl)   subEl.textContent   = RENARD_STADES[stade].nom;
+  if (subEl)   subEl.textContent   = estGrand() ? RENARD_STADES[stade].nomGrand : RENARD_STADES[stade].nom;
   if (starsEl) starsEl.textContent = "⭐ " + lireEtoiles();
 }
 
@@ -176,10 +177,10 @@ function declencherEvolution(stade) {
   overlay.innerHTML = `
     <div class="evolution-carte">
       <div class="evolution-renard">${svgRenard(stade, 130)}</div>
-      <p class="evolution-titre">✨ Ton renard évolue !</p>
-      <p class="evolution-nom-stade">Il devient : ${s.nom}</p>
-      <p class="evolution-msg">Continue comme ça, tu es incroyable !</p>
-      <button type="button" class="btn-evolution-fermer">Super ! 🎉</button>
+      <p class="evolution-titre">✨ ${estGrand() ? "Ton compagnon évolue !" : "Ton renard évolue !"}</p>
+      <p class="evolution-nom-stade">${estGrand() ? "Niveau" : "Il devient"} : ${estGrand() ? s.nomGrand : s.nom}</p>
+      <p class="evolution-msg">${estGrand() ? "Excellent travail, continue !" : "Continue comme ça, tu es incroyable !"}</p>
+      <button type="button" class="btn-evolution-fermer">${estGrand() ? "Continuer" : "Super ! 🎉"}</button>
     </div>`;
   document.body.appendChild(overlay);
   setTimeout(() => confetti(), 400);

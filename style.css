@@ -170,9 +170,15 @@ h1 {
 
 .classe-btns {
   display: flex;
-  gap: 1rem;
+  gap: 0.6rem;
   width: 100%;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+.classe-btns-5 .btn-classe {
+  max-width: 90px;
+  min-width: 64px;
 }
 
 .btn-classe {

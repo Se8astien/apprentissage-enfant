@@ -14,6 +14,7 @@ import {
   getBonneReponse,
   setBadgeVisible,
   estFille,
+  estGrand,
   majGenre,
   sauverFaim,
   lireFaim,
@@ -54,6 +55,14 @@ let comboActuel = 0;
 
 // ── Messages ──────────────────────────────────────────────────────────────────
 function messagesOk() {
+  if (estGrand()) return [
+    "Excellent !",
+    "Très bon travail !",
+    "Parfait, continue !",
+    "Bien joué !",
+    "Tu maîtrises ça !",
+    "Bonne réponse !",
+  ];
   return estFille()
     ? [
         "Bravo, championne !",
@@ -74,6 +83,11 @@ function messagesOk() {
 }
 
 function messagesKo() {
+  if (estGrand()) return [
+    "Pas tout à fait, réessaie !",
+    "Attention, regarde bien…",
+    "Presque ! Analyse à nouveau.",
+  ];
   return [
     "Pas grave, on réessaie !",
     "Presque ! Regarde bien…",
@@ -256,7 +270,7 @@ function afficherToastDifficulte() {
 }
 
 function proposerClasseSuivante() {
-  const suivantNom = { cp: "CE1 🚀", ce1: "CE2 ⭐", ce2: null }[getNiveauCourant()];
+  const suivantNom = { cp: "CE1 🚀", ce1: "CE2 ⭐", ce2: "CM1 🌟", cm1: "CM2 🏆", cm2: null }[getNiveauCourant()];
   if (!suivantNom) { confetti(); return; }
   const modal = document.getElementById("modal-classe-suivante");
   const nomEl = document.getElementById("modal-classe-nom");
@@ -284,7 +298,7 @@ export function montrerMenu() {
   // Update classe/difficulte info bar
   const classeLabel = document.getElementById("classe-info-label");
   const diffLabel = document.getElementById("difficulte-label");
-  if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2" }[getNiveauCourant()] || "";
+  if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2", cm1: "🌟 CM1", cm2: "🏆 CM2" }[getNiveauCourant()] || "";
   if (diffLabel) diffLabel.textContent = getDiffLabel();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
     const m = lireMaitrise(btn.dataset.jeu);

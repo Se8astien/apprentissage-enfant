@@ -15,7 +15,7 @@ export const RENARD_CALIN_DATE_KEY = "renard-calin-date";
 export const RENARD_STREAK_KEY  = "renard-streak";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2" };
+export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2", CM1: "cm1", CM2: "cm2" };
 export const GENRE  = { FILLE: "fille", GARCON: "garcon" };
 
 export const ANIMAUX = ["🐱", "🐶", "🐰", "🐻", "🦊", "🐸", "🐥", "🐧", "🦋", "🐝"];
@@ -56,6 +56,8 @@ export function lireNiveau() {
   const v = localStorage.getItem(STORAGE_NIVEAU);
   if (v === NIVEAU.CE1) return NIVEAU.CE1;
   if (v === NIVEAU.CE2) return NIVEAU.CE2;
+  if (v === NIVEAU.CM1) return NIVEAU.CM1;
+  if (v === NIVEAU.CM2) return NIVEAU.CM2;
   return NIVEAU.CP;
 }
 
@@ -63,16 +65,14 @@ export function sauverNiveau(n) {
   const prev = localStorage.getItem(STORAGE_NIVEAU);
   localStorage.setItem(STORAGE_NIVEAU, n);
   niveauCourant = n;
-  if (prev !== n) setDifficulte(0); // reset difficulty on class change
+  if (prev !== n) setDifficulte(0);
 }
 
-export function estCE1() {
-  return niveauCourant === NIVEAU.CE1;
-}
-
-export function estCE2() {
-  return niveauCourant === NIVEAU.CE2;
-}
+export function estCE1() { return niveauCourant === NIVEAU.CE1; }
+export function estCE2() { return niveauCourant === NIVEAU.CE2; }
+export function estCM1() { return niveauCourant === NIVEAU.CM1; }
+export function estCM2() { return niveauCourant === NIVEAU.CM2; }
+export function estGrand() { return niveauCourant === NIVEAU.CM1 || niveauCourant === NIVEAU.CM2; }
 
 // ── Genre ─────────────────────────────────────────────────────────────────────
 export function lireGenre() {

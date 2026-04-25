@@ -258,7 +258,7 @@ if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => {
 });
 
 // ── Modal : passer à la classe suivante ──────────────────────────────────────
-const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: null };
+const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: "cm1", cm1: "cm2", cm2: null };
 
 const modalOui = document.getElementById("modal-oui");
 if (modalOui) {
@@ -269,7 +269,7 @@ if (modalOui) {
     if (suivant) {
       sauverNiveau(suivant);
       confetti();
-      const badgeId = suivant === "ce1" ? "ce1" : "ce2";
+      const badgeId = suivant;
       if (debloquerBadge(badgeId)) {
         const b = BADGES.find(x => x.id === badgeId);
         if (b) afficherNotifBadge(b);
