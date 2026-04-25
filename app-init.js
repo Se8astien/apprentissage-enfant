@@ -58,6 +58,7 @@ import { lancerHeure, lancerDurees, lancerMesures, lancerMasse } from "./games-t
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite } from "./games-avance.js";
 import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison } from "./games-langage.js";
+import { afficherIntroHistoire } from "./app-histoire.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -188,6 +189,7 @@ if (formNommage) {
     mettreAJourRenardHeader();
     montrerMenu();
     afficherMissions();
+    afficherIntroHistoire(nom);
   });
 }
 

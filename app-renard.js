@@ -1,5 +1,7 @@
 // app-renard.js — fox companion: SVG, accessories, dressing, streak, evolution
 
+import { getChapitreParStade, afficherContexteHistoireMaison } from "./app-histoire.js";
+
 import {
   STORAGE_KEY,
   RENARD_NAISSANCE_KEY,
@@ -186,6 +188,11 @@ function declencherEvolution(stade) {
       <p class="evolution-titre">✨ ${estGrand() ? "Ton compagnon évolue !" : "Ton renard évolue !"}</p>
       <p class="evolution-nom-stade">${estGrand() ? "Niveau" : "Il devient"} : ${estGrand() ? s.nomGrand : s.nom}</p>
       <p class="evolution-msg">${estGrand() ? "Excellent travail, continue !" : "Continue comme ça, tu es incroyable !"}</p>
+      <div class="histoire-chapitre">
+        <p class="histoire-chapitre-emoji">${getChapitreParStade(stade).emoji}</p>
+        <p class="histoire-chapitre-titre">${getChapitreParStade(stade).titre}</p>
+        <p class="histoire-chapitre-texte">${getChapitreParStade(stade).texte.replace(/\[Nom\]/g, lireNomRenard() || "Foxy")}</p>
+      </div>
       <button type="button" class="btn-evolution-fermer">${estGrand() ? "Continuer" : "Super ! 🎉"}</button>
     </div>`;
   document.body.appendChild(overlay);
@@ -317,6 +324,9 @@ export function montrerMaison(montrerMenuFn) {
     mettreAJourRenardHeader();
     montrerMaison(montrerMenuFn);
   };
+
+  const conteneur = elMaison.querySelector(".maison-conteneur");
+  if (conteneur) afficherContexteHistoireMaison(conteneur);
 }
 
 // ── Dressing screen ───────────────────────────────────────────────────────────

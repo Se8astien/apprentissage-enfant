@@ -1835,3 +1835,19 @@ h1 {
 .badge-notif-emoji { font-size:4rem; display:block; margin:0.5rem 0; }
 .badge-notif-nom { font-size:1.4rem; font-weight:800; color:var(--texte); margin:0 0 0.4rem; }
 .badge-notif-desc { font-size:0.9rem; color:#636e72; margin:0 0 1.5rem; }
+
+/* ── Histoire narrative ─────────────────────────────────────────────────────── */
+.histoire-intro-carte { max-width: 340px; }
+.histoire-intro-emoji { font-size: 2rem; margin: 0 0 0.2rem; letter-spacing: 0.2em; }
+.histoire-intro-texte { font-size: 0.92rem; color: #636e72; line-height: 1.6; margin: 0; }
+.histoire-chapitre { border-top: 1px solid #f0f0f0; padding-top: 0.75rem; width: 100%; text-align: center; }
+.histoire-chapitre-emoji { font-size: 1.8rem; margin: 0 0 0.15rem; }
+.histoire-chapitre-titre { font-size: 0.88rem; font-weight: 700; color: var(--accent); margin: 0 0 0.25rem; }
+.histoire-chapitre-texte { font-size: 0.8rem; color: #636e72; font-style: italic; margin: 0; line-height: 1.5; }
+.histoire-panel { background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%); border-radius: 1.2rem; padding: 1rem 1.2rem; margin: 0.8rem 0; width: 100%; box-sizing: border-box; }
+.histoire-panel-label { font-size: 0.72rem; font-weight: 700; color: var(--primaire); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.4rem; }
+.histoire-panel-chapitre { font-size: 1rem; margin: 0 0 0.35rem; color: var(--texte); }
+.histoire-panel-texte { font-size: 0.84rem; color: #636e72; line-height: 1.5; margin: 0 0 0.7rem; font-style: italic; }
+.histoire-panel-suivant { font-size: 0.78rem; color: var(--primaire); margin: 0 0 0.35rem; font-weight: 600; }
+.histoire-barre-fond { background: rgba(0,0,0,0.08); border-radius: 99px; height: 8px; overflow: hidden; }
+.histoire-barre-fill { background: var(--primaire); border-radius: 99px; height: 100%; transition: width 0.6s ease; }
