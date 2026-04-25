@@ -277,6 +277,26 @@ function proposerClasseSuivante() {
   if (modal && nomEl) { nomEl.textContent = suivantNom; modal.hidden = false; }
 }
 
+// ── Filtrage jeux par niveau (programme EN) ───────────────────────────────────
+function filtrerJeuxParNiveau() {
+  const n = getNiveauCourant();
+  let sectionCourante = null;
+  let sectionVisible = false;
+  document.querySelectorAll(".grille-jeux > *").forEach(el => {
+    if (el.classList.contains("grille-section")) {
+      if (sectionCourante) sectionCourante.hidden = !sectionVisible;
+      sectionCourante = el;
+      sectionVisible = false;
+    } else if (el.classList.contains("carte-jeu")) {
+      const niveaux = (el.dataset.niveaux || "cp ce1 ce2 cm1 cm2").split(" ");
+      const visible = niveaux.includes(n);
+      el.hidden = !visible;
+      if (visible) sectionVisible = true;
+    }
+  });
+  if (sectionCourante) sectionCourante.hidden = !sectionVisible;
+}
+
 // ── montrerMenu ───────────────────────────────────────────────────────────────
 export function montrerMenu() {
   setJeuCourant(null);
@@ -300,6 +320,7 @@ export function montrerMenu() {
   const diffLabel = document.getElementById("difficulte-label");
   if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2", cm1: "🌟 CM1", cm2: "🏆 CM2" }[getNiveauCourant()] || "";
   if (diffLabel) diffLabel.textContent = getDiffLabel();
+  filtrerJeuxParNiveau();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
     const m = lireMaitrise(btn.dataset.jeu);
     const n = m.filter(Boolean).length;
