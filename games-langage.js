@@ -239,9 +239,39 @@ const ANGLAIS_IMAGES_CE2 = [
   { emoji: "🎭", mot: "theatre",     fausses: ["cinema","concert","show"] },
 ];
 
+const ANGLAIS_IMAGES_CM1 = [
+  { emoji: "🔭", mot: "telescope",    fausses: ["microscope","binoculars","camera"] },
+  { emoji: "🗺️", mot: "map",          fausses: ["plan","atlas","chart"] },
+  { emoji: "⚡", mot: "lightning",    fausses: ["thunder","storm","electricity"] },
+  { emoji: "🏛️", mot: "museum",       fausses: ["library","gallery","monument"] },
+  { emoji: "🧲", mot: "magnet",       fausses: ["battery","wire","metal"] },
+  { emoji: "📖", mot: "dictionary",   fausses: ["encyclopedia","grammar","textbook"] },
+  { emoji: "🧪", mot: "experiment",   fausses: ["research","test","study"] },
+  { emoji: "🌐", mot: "internet",     fausses: ["computer","network","website"] },
+  { emoji: "🌋", mot: "volcano",      fausses: ["mountain","crater","lava"] },
+  { emoji: "🧭", mot: "compass",      fausses: ["direction","north","map"] },
+  { emoji: "🏗️", mot: "construction", fausses: ["building","factory","bridge"] },
+  { emoji: "🦠", mot: "virus",        fausses: ["bacteria","germ","disease"] },
+];
+
+const ANGLAIS_IMAGES_CM2 = [
+  { emoji: "⚖️", mot: "justice",      fausses: ["freedom","law","equality"] },
+  { emoji: "🌍", mot: "environment",  fausses: ["nature","climate","planet"] },
+  { emoji: "🧬", mot: "biology",      fausses: ["chemistry","physics","science"] },
+  { emoji: "🏛️", mot: "civilization", fausses: ["culture","empire","society"] },
+  { emoji: "📊", mot: "graph",        fausses: ["chart","table","diagram"] },
+  { emoji: "🔋", mot: "energy",       fausses: ["power","force","fuel"] },
+  { emoji: "🤝", mot: "cooperation",  fausses: ["agreement","alliance","friendship"] },
+  { emoji: "📜", mot: "constitution", fausses: ["law","charter","treaty"] },
+  { emoji: "🔬", mot: "laboratory",   fausses: ["research","science","study"] },
+  { emoji: "💊", mot: "medicine",     fausses: ["drug","treatment","health"] },
+  { emoji: "🌾", mot: "agriculture",  fausses: ["farming","harvest","crop"] },
+  { emoji: "🌡️", mot: "climate",      fausses: ["weather","temperature","atmosphere"] },
+];
+
 export function lancerAnglaisMots() {
   elTitre.textContent = "🇬🇧 English";
-  const liste = estCE2() ? ANGLAIS_IMAGES_CE2 : estCE1() ? ANGLAIS_IMAGES_CE1 : ANGLAIS_IMAGES_CP;
+  const liste = estCM2() ? ANGLAIS_IMAGES_CM2 : estCM1() ? ANGLAIS_IMAGES_CM1 : estCE2() ? ANGLAIS_IMAGES_CE2 : estCE1() ? ANGLAIS_IMAGES_CE1 : ANGLAIS_IMAGES_CP;
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   elQuestion.innerHTML =
@@ -339,12 +369,51 @@ const TRAD_CE2 = [
   { fr: "magnifique",    en: "magnificent", fausses: ["beautiful","wonderful","great"] },
 ];
 
+const TRAD_CM1 = [
+  { fr: "gouvernement",  en: "government",  fausses: ["country","republic","state"] },
+  { fr: "environnement", en: "environment", fausses: ["nature","climate","planet"] },
+  { fr: "expérience",    en: "experiment",  fausses: ["research","test","study"] },
+  { fr: "découverte",    en: "discovery",   fausses: ["invention","finding","research"] },
+  { fr: "électricité",   en: "electricity", fausses: ["energy","power","current"] },
+  { fr: "température",   en: "temperature", fausses: ["weather","heat","degree"] },
+  { fr: "volcan",        en: "volcano",     fausses: ["mountain","crater","eruption"] },
+  { fr: "boussole",      en: "compass",     fausses: ["direction","north","map"] },
+  { fr: "construction",  en: "construction",fausses: ["building","work","project"] },
+  { fr: "expédition",    en: "expedition",  fausses: ["journey","trip","voyage"] },
+  { fr: "laboratoire",   en: "laboratory",  fausses: ["research","science","study"] },
+  { fr: "territoire",    en: "territory",   fausses: ["land","region","area"] },
+  { fr: "population",    en: "population",  fausses: ["people","society","community"] },
+  { fr: "ressource",     en: "resource",    fausses: ["material","supply","asset"] },
+  { fr: "catastrophe",   en: "disaster",    fausses: ["accident","crisis","emergency"] },
+];
+
+const TRAD_CM2 = [
+  { fr: "civilisation",  en: "civilization",  fausses: ["culture","empire","society"] },
+  { fr: "proportionnel", en: "proportional",  fausses: ["equal","similar","related"] },
+  { fr: "constitution",  en: "constitution",  fausses: ["law","charter","treaty"] },
+  { fr: "agriculture",   en: "agriculture",   fausses: ["farming","harvest","crop"] },
+  { fr: "coopération",   en: "cooperation",   fausses: ["agreement","alliance","friendship"] },
+  { fr: "biologie",      en: "biology",       fausses: ["chemistry","physics","science"] },
+  { fr: "révolution",    en: "revolution",    fausses: ["rebellion","change","movement"] },
+  { fr: "démocratie",    en: "democracy",     fausses: ["republic","freedom","politics"] },
+  { fr: "atmosphère",    en: "atmosphere",    fausses: ["air","sky","climate"] },
+  { fr: "continent",     en: "continent",     fausses: ["country","island","peninsula"] },
+  { fr: "patrimoine",    en: "heritage",      fausses: ["culture","history","tradition"] },
+  { fr: "électeur",      en: "voter",         fausses: ["citizen","candidate","deputy"] },
+  { fr: "superficie",    en: "area",          fausses: ["surface","space","size"] },
+  { fr: "reproduction",  en: "reproduction",  fausses: ["growth","evolution","biology"] },
+  { fr: "photosynthèse", en: "photosynthesis",fausses: ["biology","growth","oxygen"] },
+];
+
 export function lancerTraduction() {
   elTitre.textContent = "🇬🇧 Traduction";
   const diff = getDifficulte();
-  // At higher difficulty, draw from a larger combined pool
   let liste;
-  if (estCE2()) {
+  if (estCM2()) {
+    liste = diff === 0 ? TRAD_CM2.slice(0, 10) : diff === 1 ? TRAD_CM2 : [...TRAD_CM1, ...TRAD_CM2];
+  } else if (estCM1()) {
+    liste = diff === 0 ? TRAD_CM1.slice(0, 10) : diff === 1 ? TRAD_CM1 : [...TRAD_CM1, ...TRAD_CM2.slice(0, 8)];
+  } else if (estCE2()) {
     liste = diff === 0 ? TRAD_CE2.slice(0, 10) : diff === 1 ? TRAD_CE2 : [...TRAD_CE1, ...TRAD_CE2];
   } else if (estCE1()) {
     liste = diff === 0 ? TRAD_CE1.slice(0, 10) : diff === 1 ? TRAD_CE1 : [...TRAD_CE1, ...TRAD_CE2.slice(0, 8)];

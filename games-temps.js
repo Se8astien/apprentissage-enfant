@@ -567,6 +567,56 @@ function formatMasse(g) {
 export function lancerMasse() {
   elTitre.textContent = "⚖️ La masse";
 
+  if (estCM2() || estCM1()) {
+    if (estCM2() && Math.random() < 0.30) {
+      const t = 1 + Math.floor(Math.random() * 5);
+      const answer = t * 1000;
+      setBonneReponse(answer);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>1 tonne = 1 000 kg</strong></p>` +
+        `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">` +
+        `<strong>${t} t</strong> = ? kg</p>`;
+      const props = propositionsAvecBonne(answer, Math.max(1, Math.round(answer * 0.6)), Math.round(answer * 1.4), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+      return;
+    }
+    if (Math.random() < 0.35) {
+      const kg = 1 + Math.floor(Math.random() * 20);
+      const answer = kg * 1000;
+      setBonneReponse(answer);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>1 kg = 1 000 g</strong></p>` +
+        `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">` +
+        `<strong>${kg} kg</strong> = ? g</p>`;
+      const props = propositionsAvecBonne(answer, Math.max(1, Math.round(answer * 0.6)), Math.round(answer * 1.4), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+      return;
+    }
+    const trois = melanger(OBJETS_MASSE).slice(0, 3);
+    const [o1, o2, o3] = trois;
+    const total = o1.masse + o2.masse + o3.masse;
+    setBonneReponse(total);
+    elQuestion.innerHTML = `<div class="masse-question">
+      <p>${o1.emoji} ${o1.nom} pèse <strong>${formatMasse(o1.masse)}</strong>.</p>
+      <p>${o2.emoji} ${o2.nom} pèse <strong>${formatMasse(o2.masse)}</strong>.</p>
+      <p>${o3.emoji} ${o3.nom} pèse <strong>${formatMasse(o3.masse)}</strong>.</p>
+      <p>Combien pèsent-ils <strong>ensemble</strong> ?</p>
+    </div>`;
+    const step = total >= 1000 ? 500 : 50;
+    const fausses = [-3, -2, -1, 1, 2, 3].map(d => total + d * step).filter(v => v > 0 && v !== total);
+    const opts = melanger([total, ...melanger(fausses).slice(0, 3)]);
+    elChoix.innerHTML = "";
+    opts.forEach(v => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.textContent = formatMasse(v);
+      b.dataset.valeur = String(v);
+      b.addEventListener("click", () => apresReponse(v, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
   if (estCE2()) {
     // 30% chance: conversion question kg→g
     if (Math.random() < 0.30) {
