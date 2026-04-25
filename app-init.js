@@ -44,6 +44,15 @@ import {
   resetFeedback,
 } from "./app-nav.js";
 
+import {
+  afficherMissions,
+  debloquerBadge,
+  afficherNotifBadge,
+  BADGES,
+  lireBadges,
+  lireStatsQuestions,
+} from "./app-gamification.js";
+
 import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100 } from "./games-maths.js";
 import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles } from "./games-formes.js";
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse } from "./games-temps.js";
@@ -110,6 +119,7 @@ function passerAuMenu() {
   } else {
     majGenre();
     montrerMenu();
+    afficherMissions();
   }
 }
 
@@ -150,6 +160,7 @@ if (!localStorage.getItem("maths-cp-genre")) {
   montrerNommage();
 } else {
   montrerMenu();
+  afficherMissions();
   if (elSousTitre) {
     const nom = lireNomRenard();
     elSousTitre.textContent = `${nom} t'attendait ! 🦊`;
@@ -170,6 +181,7 @@ if (formNommage) {
     elNommage.hidden = true;
     mettreAJourRenardHeader();
     montrerMenu();
+    afficherMissions();
   });
 }
 
@@ -192,7 +204,7 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
 });
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-btnRetour.addEventListener("click", montrerMenu);
+btnRetour.addEventListener("click", () => { montrerMenu(); afficherMissions(); });
 elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
 // ── Sélection du genre ────────────────────────────────────────────────────────
@@ -206,6 +218,7 @@ document.querySelectorAll(".btn-genre").forEach((btn) => {
       montrerNommage();
     } else {
       montrerMenu();
+      afficherMissions();
     }
   });
 });
@@ -230,7 +243,7 @@ const btnMaison = document.getElementById("btn-maison");
 if (btnMaison) btnMaison.addEventListener("click", () => montrerMaison(montrerMenu));
 
 const btnRetourMaison = document.getElementById("btn-retour-maison");
-if (btnRetourMaison) btnRetourMaison.addEventListener("click", montrerMenu);
+if (btnRetourMaison) btnRetourMaison.addEventListener("click", () => { montrerMenu(); afficherMissions(); });
 
 // ── Dressing ──────────────────────────────────────────────────────────────────
 const btnDressing = document.getElementById("btn-dressing");
@@ -257,8 +270,14 @@ if (modalOui) {
     if (suivant) {
       sauverNiveau(suivant);
       confetti();
+      const badgeId = suivant === "ce1" ? "ce1" : "ce2";
+      if (debloquerBadge(badgeId)) {
+        const b = BADGES.find(x => x.id === badgeId);
+        if (b) afficherNotifBadge(b);
+      }
     }
     montrerMenu();
+    afficherMissions();
   });
 }
 
@@ -268,4 +287,68 @@ if (modalNon) {
     const modal = document.getElementById("modal-classe-suivante");
     if (modal) modal.hidden = true;
   });
+}
+
+// ── Badges screen ─────────────────────────────────────────────────────────────
+const btnBadges = document.getElementById("btn-badges");
+if (btnBadges) {
+  btnBadges.addEventListener("click", () => {
+    const ecranBadges = document.getElementById("ecran-badges");
+    const grille = document.getElementById("badges-grille");
+    const compteur = document.getElementById("badges-compteur");
+    document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+    ecranBadges.hidden = false;
+    ecranBadges.classList.add("actif");
+    const obtenus = lireBadges();
+    compteur.textContent = `${obtenus.length} / ${BADGES.length} trophées`;
+    grille.innerHTML = BADGES.map(b => `
+      <div class="badge-carte ${obtenus.includes(b.id) ? "obtenu" : "verrouille"}">
+        <span class="badge-emoji">${obtenus.includes(b.id) ? b.emoji : "🔒"}</span>
+        <div class="badge-nom">${b.nom}</div>
+        <div class="badge-desc">${obtenus.includes(b.id) ? b.desc : "???"}</div>
+      </div>`).join("");
+  });
+}
+
+const btnRetourBadges = document.getElementById("btn-retour-badges");
+if (btnRetourBadges) {
+  btnRetourBadges.addEventListener("click", () => {
+    montrerMenu();
+    afficherMissions();
+  });
+}
+
+// ── Streak badges check at startup ───────────────────────────────────────────
+{
+  const streakCount = streakInit.count || 0;
+  const streakBadges = [
+    { min: 3,  id: "streak3" },
+    { min: 7,  id: "streak7" },
+    { min: 30, id: "streak30" },
+  ];
+  streakBadges.forEach(({ min, id }) => {
+    if (streakCount >= min && debloquerBadge(id)) {
+      const b = BADGES.find(x => x.id === id);
+      if (b) afficherNotifBadge(b);
+    }
+  });
+}
+
+// ── Badge "de retour" après 2 jours d'absence ─────────────────────────────────
+{
+  const rawStreak = localStorage.getItem("renard-streak");
+  if (rawStreak) {
+    try {
+      const s = JSON.parse(rawStreak);
+      if (s.lastVisit) {
+        const last = new Date(s.lastVisit);
+        const now  = new Date();
+        const diffDays = Math.floor((now - last) / 86400000);
+        if (diffDays >= 2 && debloquerBadge("retour")) {
+          const b = BADGES.find(x => x.id === "retour");
+          if (b) afficherNotifBadge(b);
+        }
+      }
+    } catch { /* ignore */ }
+  }
 }

@@ -113,7 +113,21 @@ function declencherCombo(nb, onFermer) {
     </div>`;
   document.body.appendChild(overlay);
   confetti();
-  const fermer = () => { overlay.remove(); if (onFermer) onFermer(); };
+  if (nb >= 5) {
+    progresserMission("combo5");
+    afficherMissions();
+    if (debloquerBadge("combo5")) { const b = BADGES.find(x => x.id === "combo5"); if (b) afficherNotifBadge(b); }
+  }
+  if (nb >= 10) {
+    if (debloquerBadge("combo10")) { const b = BADGES.find(x => x.id === "combo10"); if (b) afficherNotifBadge(b); }
+  }
+  if (comboActuel >= 20) {
+    if (debloquerBadge("combo20")) { const b = BADGES.find(x => x.id === "combo20"); if (b) afficherNotifBadge(b); }
+  }
+  const fermer = () => {
+    overlay.remove();
+    if (onFermer) onFermer();
+  };
   overlay.querySelector(".btn-evolution-fermer").addEventListener("click", fermer);
   overlay.addEventListener("click", (e) => { if (e.target === overlay) fermer(); });
 }
@@ -158,6 +172,9 @@ export function apresReponse(choix, bouton, correct) {
       declencherCombo(10, () => {
         marquerMaitrise(getJeuCourant(), getDifficulte());
         gererProgressionDifficulte();
+        if (getDifficulte() === 2) {
+          if (debloquerBadge("diff_expert")) { const b = BADGES.find(x => x.id === "diff_expert"); if (b) afficherNotifBadge(b); }
+        }
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
@@ -201,6 +218,9 @@ export function apresReponseTexte(choix, bouton, correct) {
       declencherCombo(10, () => {
         marquerMaitrise(getJeuCourant(), getDifficulte());
         gererProgressionDifficulte();
+        if (getDifficulte() === 2) {
+          if (debloquerBadge("diff_expert")) { const b = BADGES.find(x => x.id === "diff_expert"); if (b) afficherNotifBadge(b); }
+        }
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
