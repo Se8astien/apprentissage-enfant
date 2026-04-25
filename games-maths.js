@@ -1,5 +1,6 @@
 // games-maths.js — lancerCompte, lancerAddition, lancerSoustraction, lancerCompare,
-//                  lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair
+//                  lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair,
+//                  lancerPerlesDorees, lancerPlanche100
 
 import {
   ANIMAUX,
@@ -740,4 +741,166 @@ export function lancerPairImpair() {
     b.addEventListener("click", () => apresReponse(val, b, getBonneReponse()));
     elChoix.appendChild(b);
   });
+}
+
+// ── Perles dorées helpers ─────────────────────────────────────────────────────
+function htmlPerles(milliers, centaines, dizaines, unites) {
+  const groupes = [];
+  if (milliers > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-millier">${"🟫".repeat(milliers)}</span>` +
+      `<span class="perle-label">×1000</span>` +
+      `</div>`
+    );
+  }
+  if (centaines > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-centaine">${"🟧".repeat(centaines)}</span>` +
+      `<span class="perle-label">×100</span>` +
+      `</div>`
+    );
+  }
+  if (dizaines > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-dizaine">${"🟪".repeat(dizaines)}</span>` +
+      `<span class="perle-label">×10</span>` +
+      `</div>`
+    );
+  }
+  if (unites > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-unite">${"🟡".repeat(unites)}</span>` +
+      `<span class="perle-label">×1</span>` +
+      `</div>`
+    );
+  }
+  return `<div class="perles-conteneur">${groupes.join("")}</div>`;
+}
+
+// ── lancerPerlesDorees ────────────────────────────────────────────────────────
+export function lancerPerlesDorees() {
+  elTitre.textContent = "🟡 Perles dorées";
+  const diff = getDifficulte();
+
+  let n, mil, cent, diz, un, question, bonne, maxDigit;
+
+  if (estCE2()) {
+    mil  = 1 + Math.floor(Math.random() * 9);
+    cent = Math.floor(Math.random() * 10);
+    diz  = Math.floor(Math.random() * 10);
+    un   = Math.floor(Math.random() * 10);
+    n = mil * 1000 + cent * 100 + diz * 10 + un;
+    const dim = Math.floor(Math.random() * 4);
+    if (dim === 0) { bonne = mil;  question = "milliers"; maxDigit = 9; }
+    else if (dim === 1) { bonne = cent; question = "centaines"; maxDigit = 9; }
+    else if (dim === 2) { bonne = diz;  question = "dizaines"; maxDigit = 9; }
+    else               { bonne = un;   question = "unités"; maxDigit = 9; }
+  } else if (estCE1()) {
+    if (diff <= 0) {
+      cent = 1 + Math.floor(Math.random() * 1);
+      diz  = Math.floor(Math.random() * 10);
+      un   = Math.floor(Math.random() * 10);
+      n = cent * 100 + diz * 10 + un;
+      const dim = Math.random() < 0.5 ? "dizaines" : "unités";
+      bonne = dim === "dizaines" ? diz : un;
+      question = dim;
+      maxDigit = 9;
+    } else {
+      cent = 1 + Math.floor(Math.random() * 9);
+      diz  = Math.floor(Math.random() * 10);
+      un   = Math.floor(Math.random() * 10);
+      n = cent * 100 + diz * 10 + un;
+      const dim2 = Math.floor(Math.random() * 3);
+      if (dim2 === 0) { bonne = cent; question = "centaines"; maxDigit = 9; }
+      else if (dim2 === 1) { bonne = diz; question = "dizaines"; maxDigit = 9; }
+      else               { bonne = un;  question = "unités"; maxDigit = 9; }
+    }
+    mil = 0;
+  } else {
+    mil = 0; cent = 0;
+    if (diff === 0) {
+      diz = 1 + Math.floor(Math.random() * 9);
+      un = 0;
+      n = diz * 10;
+      bonne = diz; question = "dizaines"; maxDigit = 9;
+    } else if (diff === 1) {
+      n = 10 + Math.floor(Math.random() * 89);
+      diz = Math.floor(n / 10); un = n % 10;
+      bonne = un; question = "unités"; maxDigit = 9;
+    } else {
+      n = 10 + Math.floor(Math.random() * 89);
+      diz = Math.floor(n / 10); un = n % 10;
+      bonne = diz; question = "dizaines"; maxDigit = 9;
+    }
+  }
+
+  setBonneReponse(bonne);
+  elQuestion.innerHTML =
+    `<p class="equation" style="font-size:2.4rem;font-weight:700;margin-bottom:0.3rem">${n}</p>` +
+    htmlPerles(mil || 0, cent || 0, diz || 0, un || 0) +
+    `<p style="font-size:0.95rem;margin-top:0.3rem">Combien de <strong>${question}</strong> dans ce nombre ?</p>`;
+
+  const props = propositionsAvecBonne(bonne, 0, maxDigit, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── lancerPlanche100 ──────────────────────────────────────────────────────────
+export function lancerPlanche100() {
+  elTitre.textContent = "🔢 Planche des cent";
+
+  let min, max, step;
+  if (estCE2()) {
+    step = 10;
+    min = 10; max = 990;
+  } else if (estCE1()) {
+    step = 1;
+    min = 1; max = 100;
+  } else {
+    step = 1;
+    min = 1; max = 20;
+  }
+
+  const plage = [];
+  for (let i = min; i <= max; i += step) plage.push(i);
+  const n = plage[Math.floor(Math.random() * plage.length)];
+  setBonneReponse(n);
+
+  function cellVal(v) {
+    if (v < min || v > max) return "·";
+    return String(v);
+  }
+
+  const noisins = [
+    [cellVal(n - step - step), cellVal(n - step - 1 * (estCE2() ? 10 : 1)), cellVal(n - step + step - step + step - step + step)],
+  ];
+
+  const row1 = [n - (estCE2() ? 11 : 11), n - (estCE2() ? 10 : 10), n - (estCE2() ? 9 : 9)];
+  const row2 = [n - (estCE2() ? 1 : 1), n, n + (estCE2() ? 1 : 1)];
+  const row3 = [n + (estCE2() ? 9 : 9), n + (estCE2() ? 10 : 10), n + (estCE2() ? 11 : 11)];
+
+  function tdVal(v) {
+    if (v === n) return `<td class="planche-vide">?</td>`;
+    if (v < min || v > max) return `<td>·</td>`;
+    return `<td>${v}</td>`;
+  }
+
+  const tableHtml =
+    `<table class="planche-mini">` +
+    `<tr>${row1.map(tdVal).join("")}</tr>` +
+    `<tr>${row2.map(tdVal).join("")}</tr>` +
+    `<tr>${row3.map(tdVal).join("")}</tr>` +
+    `</table>`;
+
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.2rem">Quel nombre se cache sous le <strong style="color:var(--primaire)">?</strong> ?</p>` +
+    tableHtml;
+
+  const pmin = Math.max(min, n - step * 5);
+  const pmax = Math.min(max, n + step * 5);
+  const props = propositionsAvecBonne(n, pmin, pmax, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }

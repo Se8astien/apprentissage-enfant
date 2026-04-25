@@ -229,6 +229,13 @@ export function montrerMenu() {
   const diffLabel = document.getElementById("difficulte-label");
   if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2" }[getNiveauCourant()] || "";
   if (diffLabel) diffLabel.textContent = getDiffLabel();
+  document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
+    const m = lireMaitrise(btn.dataset.jeu);
+    const n = m.filter(Boolean).length;
+    let el = btn.querySelector(".maitrise-stars");
+    if (!el) { el = document.createElement("span"); el.className = "maitrise-stars"; btn.appendChild(el); }
+    el.textContent = n > 0 ? "★".repeat(n) + "☆".repeat(3 - n) : "";
+  });
 }
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────

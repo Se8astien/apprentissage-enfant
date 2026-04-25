@@ -1,4 +1,5 @@
-// games-langage.js — lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction
+// games-langage.js — lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction,
+//                   lancerSons, lancerGrammaire
 
 import {
   elTitre,
@@ -12,7 +13,7 @@ import {
   getDifficulte,
 } from "./app-state.js";
 
-import { apresReponse } from "./app-nav.js";
+import { apresReponse, apresReponseTexte } from "./app-nav.js";
 
 // ── Syllabes ──────────────────────────────────────────────────────────────────
 const MOTS_SYLLABES_CP = [
@@ -366,6 +367,192 @@ export function lancerTraduction() {
     b.textContent = mot;
     b.dataset.valeur = String(idx);
     b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Sons (phonétique Montessori) ──────────────────────────────────────────────
+const MOTS_SONS_CP = [
+  { mot: "POMME",  emoji: "🍎",  initial: "P",  final: "M" },
+  { mot: "BATEAU", emoji: "⛵",  initial: "B",  final: "O" },
+  { mot: "CHAT",   emoji: "🐱",  initial: "CH", final: "A" },
+  { mot: "DENT",   emoji: "🦷",  initial: "D",  final: "AN" },
+  { mot: "FLEUR",  emoji: "🌸",  initial: "F",  final: "EU" },
+  { mot: "GIRAFE", emoji: "🦒",  initial: "G",  final: "F" },
+  { mot: "HIBOU",  emoji: "🦉",  initial: "H",  final: "OU" },
+  { mot: "LIVRE",  emoji: "📚",  initial: "L",  final: "R" },
+  { mot: "MAISON", emoji: "🏠",  initial: "M",  final: "ON" },
+  { mot: "NUAGE",  emoji: "☁️",  initial: "N",  final: "J" },
+  { mot: "OISEAU", emoji: "🐦",  initial: "OI", final: "O" },
+  { mot: "PLUIE",  emoji: "🌧️", initial: "P",  final: "I" },
+  { mot: "RENARD", emoji: "🦊",  initial: "R",  final: "D" },
+  { mot: "SOLEIL", emoji: "☀️",  initial: "S",  final: "L" },
+  { mot: "TABLE",  emoji: "🪑",  initial: "T",  final: "L" },
+  { mot: "VACHE",  emoji: "🐄",  initial: "V",  final: "SH" },
+];
+
+const SONS_CE1 = [
+  { mot: "BOUCHE",  emoji: "👄", son: "OU", position: "milieu" },
+  { mot: "LAPIN",   emoji: "🐰", son: "IN", position: "fin" },
+  { mot: "BANANE",  emoji: "🍌", son: "AN", position: "milieu" },
+  { mot: "CITRON",  emoji: "🍋", son: "ON", position: "fin" },
+  { mot: "BLEU",    emoji: "🔵", son: "EU", position: "fin" },
+  { mot: "CANARD",  emoji: "🦆", son: "AN", position: "milieu" },
+  { mot: "FENÊTRE", emoji: "🪟", son: "EU", position: "milieu" },
+  { mot: "JARDIN",  emoji: "🌱", son: "IN", position: "fin" },
+  { mot: "MOUTON",  emoji: "🐑", son: "OU", position: "milieu" },
+  { mot: "PINGOUIN",emoji: "🐧", son: "IN", position: "milieu" },
+];
+
+const SONS_CE2 = [
+  { mot: "CAILLOU",   emoji: "🪨", son: "AIL",   position: "milieu" },
+  { mot: "GENOU",     emoji: "🦵", son: "OU",    position: "fin" },
+  { mot: "TABLEAU",   emoji: "🖼️", son: "EAU",   position: "fin" },
+  { mot: "GRENOUILLE",emoji: "🐸", son: "OUIL",  position: "milieu" },
+  { mot: "PAILLE",    emoji: "🌾", son: "AILLE", position: "milieu" },
+  { mot: "BOUTEILLE", emoji: "🍼", son: "EILLE", position: "fin" },
+  { mot: "FEUILLE",   emoji: "🍃", son: "EUIL",  position: "fin" },
+  { mot: "SOLEIL",    emoji: "☀️", son: "EIL",   position: "fin" },
+  { mot: "OISEAU",    emoji: "🐦", son: "EAU",   position: "fin" },
+  { mot: "CHAPEAU",   emoji: "🎩", son: "EAU",   position: "fin" },
+];
+
+const POOL_SONS_CP = ["A","B","CH","D","E","F","G","H","I","J","L","M","N","O","OI","OU","P","R","S","T","V","AN","EU","SH"];
+const POOL_SONS_CE1 = ["OU","IN","AN","ON","EU","AI","OI","UN","EN"];
+const POOL_SONS_CE2 = ["EAU","AIL","OUIL","AILLE","EILLE","EUIL","EIL","OU","AN","IN"];
+
+export function lancerSons() {
+  elTitre.textContent = "🔤 Les sons";
+  const diff = getDifficulte();
+
+  if (estCE2()) {
+    const item = SONS_CE2[Math.floor(Math.random() * SONS_CE2.length)];
+    const bonne = item.son;
+    setBonneReponse(bonne);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin-bottom:0.3rem">Quel son entends-tu dans ce mot ?</p>` +
+      `<span style="font-size:4rem;line-height:1.2;display:block">${item.emoji}</span>` +
+      `<p style="font-size:1.8rem;font-weight:700;color:var(--primaire);letter-spacing:0.05em">${item.mot}</p>`;
+    const distracteurs = melanger(POOL_SONS_CE2.filter(s => s !== bonne)).slice(0, 3);
+    const options = melanger([bonne, ...distracteurs]);
+    elChoix.innerHTML = "";
+    options.forEach(son => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "1.1rem";
+      b.textContent = son; b.dataset.valeur = son;
+      b.addEventListener("click", () => apresReponseTexte(son, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
+  if (estCE1()) {
+    const item = SONS_CE1[Math.floor(Math.random() * SONS_CE1.length)];
+    const bonne = item.son;
+    setBonneReponse(bonne);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin-bottom:0.3rem">Quel son entends-tu dans ce mot ?</p>` +
+      `<span style="font-size:4rem;line-height:1.2;display:block">${item.emoji}</span>` +
+      `<p style="font-size:1.8rem;font-weight:700;color:var(--primaire);letter-spacing:0.05em">${item.mot}</p>`;
+    const distracteurs = melanger(POOL_SONS_CE1.filter(s => s !== bonne)).slice(0, 3);
+    const options = melanger([bonne, ...distracteurs]);
+    elChoix.innerHTML = "";
+    options.forEach(son => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "1.1rem";
+      b.textContent = son; b.dataset.valeur = son;
+      b.addEventListener("click", () => apresReponseTexte(son, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
+  // CP
+  const item = MOTS_SONS_CP[Math.floor(Math.random() * MOTS_SONS_CP.length)];
+  const demanderFinal = diff >= 1 && Math.random() < 0.5;
+  const bonne = demanderFinal ? item.final : item.initial;
+  const posLabel = demanderFinal ? "à la <strong>fin</strong>" : "au <strong>début</strong>";
+  setBonneReponse(bonne);
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.3rem">Quel son entends-tu ${posLabel} de ce mot ?</p>` +
+    `<span style="font-size:4rem;line-height:1.2;display:block">${item.emoji}</span>` +
+    `<p style="font-size:1.8rem;font-weight:700;color:var(--primaire);letter-spacing:0.05em">${item.mot}</p>`;
+  const distracteurs = melanger(POOL_SONS_CP.filter(s => s !== bonne)).slice(0, 3);
+  const options = melanger([bonne, ...distracteurs]);
+  elChoix.innerHTML = "";
+  options.forEach(son => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "1.1rem";
+    b.textContent = son; b.dataset.valeur = son;
+    b.addEventListener("click", () => apresReponseTexte(son, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Grammaire Montessori ──────────────────────────────────────────────────────
+const PHRASES_GRAMMAIRE = [
+  { phrase: "Le **chat** mange.", mot: "chat", nature: "nom" },
+  { phrase: "La fille **court** vite.", mot: "court", nature: "verbe" },
+  { phrase: "Un gros **chien** aboie.", mot: "chien", nature: "nom" },
+  { phrase: "Le chat **mange** du poisson.", mot: "mange", nature: "verbe" },
+  { phrase: "La **petite** souris dort.", mot: "petite", nature: "adjectif" },
+  { phrase: "**Le** soleil brille.", mot: "Le", nature: "determinant" },
+  { phrase: "Un **beau** jardin fleuri.", mot: "beau", nature: "adjectif" },
+  { phrase: "Les enfants **jouent** dehors.", mot: "jouent", nature: "verbe" },
+  { phrase: "**Une** pomme rouge tombe.", mot: "Une", nature: "determinant" },
+  { phrase: "Le lapin **saute** haut.", mot: "saute", nature: "verbe" },
+  { phrase: "La **grande** maison blanche.", mot: "grande", nature: "adjectif" },
+  { phrase: "**Mon** renard est roux.", mot: "Mon", nature: "determinant" },
+  { phrase: "Le **papillon** vole.", mot: "papillon", nature: "nom" },
+  { phrase: "Les **jolis** fleurs parfumées.", mot: "jolis", nature: "adjectif" },
+  { phrase: "**Ta** sœur chante bien.", mot: "Ta", nature: "determinant" },
+  { phrase: "Les oiseaux **chantent** le matin.", mot: "chantent", nature: "verbe" },
+  { phrase: "Une **grosse** tortue marche.", mot: "grosse", nature: "adjectif" },
+  { phrase: "**L'**éléphant boit de l'eau.", mot: "L'", nature: "determinant" },
+  { phrase: "Le **soleil** réchauffe la terre.", mot: "soleil", nature: "nom" },
+  { phrase: "Les enfants **dessinent** des maisons.", mot: "dessinent", nature: "verbe" },
+];
+
+const NATURES_LABELS = {
+  nom:         { label: "▲ Nom",         css: "grammaire-nom" },
+  verbe:       { label: "● Verbe",        css: "grammaire-verbe" },
+  adjectif:    { label: "▲ Adjectif",     css: "grammaire-adjectif" },
+  determinant: { label: "▲ Déterminant",  css: "grammaire-determinant" },
+};
+
+export function lancerGrammaire() {
+  elTitre.textContent = "▲ Grammaire";
+  const diff = getDifficulte();
+
+  let naturesDisponibles;
+  if (estCE2() || (estCE1() && diff >= 2)) {
+    naturesDisponibles = ["nom", "verbe", "adjectif", "determinant"];
+  } else if (estCE1() || diff >= 1) {
+    naturesDisponibles = ["nom", "verbe", "adjectif"];
+  } else {
+    naturesDisponibles = ["nom", "verbe"];
+  }
+
+  const candidats = PHRASES_GRAMMAIRE.filter(p => naturesDisponibles.includes(p.nature));
+  const item = candidats[Math.floor(Math.random() * candidats.length)];
+
+  const phraseHtml = item.phrase.replace(/\*\*(.+?)\*\*/g, '<strong class="mot-cible">$1</strong>');
+  setBonneReponse(item.nature);
+
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quelle est la nature du mot en gras ?</p>` +
+    `<p style="font-size:1.3rem;font-weight:600;line-height:1.5">${phraseHtml}</p>`;
+
+  elChoix.innerHTML = "";
+  naturesDisponibles.forEach(nature => {
+    const info = NATURES_LABELS[nature];
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = `btn-choix ${info.css}`;
+    b.style.fontSize = "1rem";
+    b.textContent = info.label;
+    b.dataset.valeur = nature;
+    b.addEventListener("click", () => apresReponseTexte(nature, b, getBonneReponse()));
     elChoix.appendChild(b);
   });
 }
