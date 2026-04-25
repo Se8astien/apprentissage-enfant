@@ -234,9 +234,39 @@ const ANGLAIS_IMAGES_CE2 = [
   { emoji: "🎭", mot: "theatre",     fausses: ["cinema","concert","show"] },
 ];
 
+const ANGLAIS_IMAGES_CM1 = [
+  { emoji: "🔭", mot: "telescope",   fausses: ["microscope","binoculars","camera"] },
+  { emoji: "🗺️", mot: "map",         fausses: ["atlas","compass","guide"] },
+  { emoji: "⚡", mot: "lightning",   fausses: ["thunder","storm","cloud"] },
+  { emoji: "🏛️", mot: "museum",      fausses: ["library","theatre","palace"] },
+  { emoji: "🧲", mot: "magnet",      fausses: ["battery","compass","metal"] },
+  { emoji: "📖", mot: "dictionary",  fausses: ["encyclopedia","novel","atlas"] },
+  { emoji: "🔋", mot: "battery",     fausses: ["charger","cable","motor"] },
+  { emoji: "🌋", mot: "volcano",     fausses: ["mountain","crater","island"] },
+  { emoji: "🧪", mot: "experiment",  fausses: ["research","test","mixture"] },
+  { emoji: "🌀", mot: "hurricane",   fausses: ["tornado","storm","cyclone"] },
+  { emoji: "🏔️", mot: "summit",      fausses: ["peak","top","cliff"] },
+  { emoji: "🌱", mot: "seedling",    fausses: ["plant","sprout","bud"] },
+];
+
+const ANGLAIS_IMAGES_CM2 = [
+  { emoji: "⚖️", mot: "justice",      fausses: ["freedom","law","equality"] },
+  { emoji: "🌍", mot: "environment",  fausses: ["nature","climate","planet"] },
+  { emoji: "🔬", mot: "microscope",   fausses: ["telescope","binoculars","lens"] },
+  { emoji: "🧬", mot: "biology",      fausses: ["chemistry","physics","science"] },
+  { emoji: "📰", mot: "newspaper",    fausses: ["magazine","journal","article"] },
+  { emoji: "⚡", mot: "electricity",  fausses: ["energy","power","lightning"] },
+  { emoji: "🏛️", mot: "civilization", fausses: ["culture","empire","society"] },
+  { emoji: "📊", mot: "graph",        fausses: ["table","chart","diagram"] },
+  { emoji: "🧪", mot: "laboratory",   fausses: ["classroom","hospital","factory"] },
+  { emoji: "🌐", mot: "network",      fausses: ["internet","connection","system"] },
+  { emoji: "🏆", mot: "achievement",  fausses: ["reward","success","medal"] },
+  { emoji: "🌱", mot: "ecology",      fausses: ["biology","botany","nature"] },
+];
+
 export function lancerAnglaisMots() {
   elTitre.textContent = "🇬🇧 English";
-  const liste = estCE2() ? ANGLAIS_IMAGES_CE2 : estCE1() ? ANGLAIS_IMAGES_CE1 : ANGLAIS_IMAGES_CP;
+  const liste = estCM2() ? ANGLAIS_IMAGES_CM2 : estCM1() ? ANGLAIS_IMAGES_CM1 : estCE2() ? ANGLAIS_IMAGES_CE2 : estCE1() ? ANGLAIS_IMAGES_CE1 : ANGLAIS_IMAGES_CP;
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   elQuestion.innerHTML =

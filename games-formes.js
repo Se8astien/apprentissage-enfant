@@ -255,6 +255,34 @@ function svgIrregulier(taille) {
 export function lancerSymetrie() {
   elTitre.textContent = "🪞 Symétrie";
 
+  if (estCM2()) {
+    const AXES_DATA = [
+      { nom: "carré",     axes: 4 },
+      { nom: "rectangle", axes: 2 },
+      { nom: "triangle",  axes: 3 },
+      { nom: "losange",   axes: 2 },
+      { nom: "pentagone", axes: 5 },
+      { nom: "hexagone",  axes: 6 },
+    ];
+    const item = AXES_DATA[Math.floor(Math.random() * AXES_DATA.length)];
+    setBonneReponse(item.axes);
+    const couleur = COULEURS_FORMES[Math.floor(Math.random() * COULEURS_FORMES.length)];
+    elQuestion.innerHTML =
+      `<p style="font-size:0.88rem;margin:0 0 0.4rem">Combien d'<strong>axes de symétrie</strong> a cette figure ?</p>` +
+      `<div class="forme-question">${svgForme(item.nom, 130, couleur)}</div>` +
+      `<p style="font-size:0.78rem;color:#888;margin-top:0.3rem">💡 Un axe divise la figure en 2 parties identiques</p>`;
+    const fausses = melanger([0, 1, 2, 3, 4, 5, 6].filter(n => n !== item.axes)).slice(0, 3);
+    elChoix.innerHTML = "";
+    melanger([item.axes, ...fausses]).forEach(val => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.textContent = String(val); b.dataset.valeur = String(val);
+      b.addEventListener("click", () => apresReponse(val, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
   if (estCE2()) {
     const SYMETRIQUES = ["cercle", "carré", "rectangle", "triangle", "losange", "pentagone", "hexagone"];
     const estSym = Math.random() < 0.50;

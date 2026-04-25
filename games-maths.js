@@ -251,6 +251,83 @@ export function lancerCompare() {
   let a;
   let b;
 
+  if (estCM2()) {
+    const type = Math.floor(Math.random() * 3);
+    if (type === 0) {
+      a = 100000 + Math.floor(Math.random() * 900000);
+      b = 100000 + Math.floor(Math.random() * 900000);
+      if (a === b) b = b < 999999 ? b + 1 : b - 1;
+      setBonneReponse(Math.max(a, b));
+      elQuestion.innerHTML =
+        "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.2rem,5vw,1.8rem);text-align:center;margin-top:0.5rem">' +
+        a + " &nbsp; ou &nbsp; " + b + "</p>";
+      afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else if (type === 1) {
+      const entA = 1 + Math.floor(Math.random() * 9);
+      const decA = Math.floor(Math.random() * 10);
+      let entB = 1 + Math.floor(Math.random() * 9);
+      let decB = Math.floor(Math.random() * 10);
+      while (entA === entB && decA === decB) decB = (decB + 1) % 10;
+      const aStr = entA + "," + decA;
+      const bStr = entB + "," + decB;
+      const bonneRep = (entA + decA / 10) > (entB + decB / 10) ? aStr : bStr;
+      setBonneReponse(bonneRep);
+      elQuestion.innerHTML =
+        "<p>Quel nombre décimal est le <strong>plus grand</strong> ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.4rem,6vw,2.2rem);text-align:center;margin-top:0.5rem">' +
+        aStr + " &nbsp; ou &nbsp; " + bStr + "</p>";
+      afficherChoixTexte(melanger([aStr, bStr]), getBonneReponse());
+    } else {
+      const n1 = 10000 + Math.floor(Math.random() * 990000);
+      let n2 = 10000 + Math.floor(Math.random() * 990000);
+      let n3 = 10000 + Math.floor(Math.random() * 990000);
+      while (n2 === n1) n2 = 10000 + Math.floor(Math.random() * 990000);
+      while (n3 === n1 || n3 === n2) n3 = 10000 + Math.floor(Math.random() * 990000);
+      setBonneReponse(Math.min(n1, n2, n3));
+      elQuestion.innerHTML =
+        "<p>Quel est le <strong>plus petit</strong> de ces trois nombres ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.1rem,4.5vw,1.6rem);text-align:center;margin-top:0.5rem">' +
+        n1 + " &nbsp; " + n2 + " &nbsp; " + n3 + "</p>";
+      afficherChoix(melanger([n1, n2, n3]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
+
+  if (estCM1()) {
+    if (Math.random() < 0.50) {
+      a = 10000 + Math.floor(Math.random() * 90000);
+      b = 10000 + Math.floor(Math.random() * 90000);
+      if (a === b) b = b < 99999 ? b + 1 : b - 1;
+      setBonneReponse(Math.max(a, b));
+      elQuestion.innerHTML =
+        "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.2rem,5vw,2rem);text-align:center;margin-top:0.5rem">' +
+        a + " &nbsp; ou &nbsp; " + b + "</p>";
+      afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      a = 1000 + Math.floor(Math.random() * 99000);
+      b = 1000 + Math.floor(Math.random() * 99000);
+      if (a === b) b = b < 99999 ? b + 1 : b - 1;
+      const symbole = a < b ? "<" : ">";
+      setBonneReponse(symbole);
+      elQuestion.innerHTML =
+        "<p>Quel signe faut-il mettre entre ces deux nombres ?</p>" +
+        '<p class="equation" style="font-size:clamp(1.4rem,6vw,2rem);text-align:center;margin-top:0.5rem">' +
+        a + " &nbsp; <span style='color:#fd79a8'>?</span> &nbsp; " + b + "</p>";
+      elChoix.innerHTML = "";
+      ["<", ">"].forEach(sym => {
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "btn-choix";
+        btn.style.fontSize = "2rem"; btn.style.fontWeight = "700";
+        btn.textContent = sym; btn.dataset.valeur = sym;
+        btn.addEventListener("click", () => apresReponseTexte(sym, btn, getBonneReponse()));
+        elChoix.appendChild(btn);
+      });
+    }
+    return;
+  }
+
   if (estCE2()) {
     if (Math.random() < 0.50) {
       // 50% : deux nombres à 4 chiffres → plus grand
