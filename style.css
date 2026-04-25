@@ -1792,3 +1792,37 @@ h1 {
   transition: border-color 0.14s, color 0.14s;
 }
 .btn-modal-non:hover { border-color: var(--texte); color: var(--texte); }
+
+/* ── Missions du jour ──────────────────────────────────────────────────────── */
+.missions-section { margin: 1rem 0; }
+.missions-titre { font-size: 1rem; font-weight: 700; color: var(--primaire); margin-bottom: 0.6rem; }
+.mission-item { display:flex; align-items:center; gap:0.6rem; background:white; border-radius:1rem; padding:0.7rem 1rem; margin-bottom:0.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+.mission-emoji { font-size:1.4rem; flex-shrink:0; }
+.mission-texte { flex:1; font-size:0.85rem; font-weight:600; }
+.mission-progress { font-size:0.75rem; color:#999; }
+.mission-item.complete { opacity:0.6; }
+.mission-item.complete .mission-texte { text-decoration:line-through; }
+.mission-barre { height:4px; background:#eee; border-radius:2px; margin-top:4px; }
+.mission-barre-fill { height:100%; background:linear-gradient(90deg,var(--primaire),var(--accent)); border-radius:2px; transition:width 0.4s ease; }
+
+/* ── Badges / Trophées ─────────────────────────────────────────────────────── */
+.btn-badges-menu { background:white; border:2px solid var(--primaire); color:var(--primaire); border-radius:999px; padding:0.4rem 1rem; font-family:inherit; font-weight:700; font-size:0.85rem; cursor:pointer; }
+.badges-header { display:flex; align-items:center; gap:1rem; padding:1rem; flex-wrap:wrap; }
+.badges-header h2 { margin:0; font-size:1.4rem; flex:1; }
+#badges-compteur { font-size:0.9rem; color:#999; margin:0; }
+.badges-grille { display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; padding:0.5rem 1rem 2rem; }
+.badge-carte { background:white; border-radius:1.2rem; padding:1rem 0.6rem; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:transform 0.15s; }
+.badge-carte.obtenu { border:2px solid var(--primaire); }
+.badge-carte.verrouille { opacity:0.4; filter:grayscale(1); }
+.badge-emoji { font-size:2rem; display:block; margin-bottom:0.3rem; }
+.badge-nom { font-size:0.72rem; font-weight:700; line-height:1.2; }
+.badge-desc { font-size:0.62rem; color:#999; margin-top:0.2rem; line-height:1.3; }
+.btn-retour-small { background:none; border:none; font-size:1.2rem; cursor:pointer; padding:0.3rem; }
+
+/* ── Notif badge (overlay) ─────────────────────────────────────────────────── */
+.badge-notif-overlay { position:fixed; inset:0; background:rgba(45,52,54,0.6); display:flex; align-items:center; justify-content:center; z-index:300; animation:entree 0.25s ease; padding:1rem; }
+.badge-notif-carte { background:white; border-radius:1.8rem; padding:2rem 1.5rem; max-width:20rem; width:100%; text-align:center; box-shadow:0 12px 48px rgba(0,0,0,0.2); }
+.badge-notif-label { font-size:0.8rem; font-weight:700; color:var(--primaire); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; }
+.badge-notif-emoji { font-size:4rem; display:block; margin:0.5rem 0; }
+.badge-notif-nom { font-size:1.4rem; font-weight:800; color:var(--texte); margin:0 0 0.4rem; }
+.badge-notif-desc { font-size:0.9rem; color:#636e72; margin:0 0 1.5rem; }

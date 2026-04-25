@@ -104,6 +104,7 @@
         <span id="classe-info-label"></span>
         <span id="difficulte-label"></span>
         <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer de classe">✏️</button>
+        <button type="button" id="btn-badges" class="btn-badges-menu">🏅 Trophées</button>
       </div>
 
       <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
@@ -171,7 +172,23 @@
         <button type="button" class="carte-jeu" data-jeu="traduction"    data-cat="langage"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction</span><span class="desc-jeu">Français → Anglais</span></button>
 
       </div>
+
+      <!-- Missions du jour -->
+      <div class="missions-section">
+        <h3 class="missions-titre">🎯 Missions du jour</h3>
+        <div id="missions-widget"></div>
+      </div>
+
     </main>
+
+    <section class="ecran" id="ecran-badges" hidden>
+      <div class="badges-header">
+        <button type="button" id="btn-retour-badges" class="btn-retour-small">← Retour</button>
+        <h2>Mes trophées 🏅</h2>
+        <p id="badges-compteur"></p>
+      </div>
+      <div id="badges-grille" class="badges-grille"></div>
+    </section>
 
     <section id="ecran-maison" class="ecran" hidden aria-label="Ma Maison">
       <button type="button" class="btn-retour" id="btn-retour-maison">← Menu</button>

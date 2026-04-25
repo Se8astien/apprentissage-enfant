@@ -36,6 +36,16 @@ import {
   mettreAJourRenardHeader,
 } from "./app-renard.js";
 
+import {
+  incrementStats,
+  progresserMission,
+  afficherMissions,
+  verifierBadgesStats,
+  debloquerBadge,
+  afficherNotifBadge,
+  BADGES,
+} from "./app-gamification.js";
+
 // Re-export confetti so game files can import it from here if desired
 export { confetti } from "./app-state.js";
 
@@ -137,6 +147,13 @@ export function apresReponse(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
+    incrementStats(true, getJeuCourant());
+    progresserMission("bonnes");
+    progresserMission("etoiles");
+    progresserMission("jeux", getJeuCourant());
+    afficherMissions();
+    const newBadges = verifierBadgesStats();
+    newBadges.forEach(id => { const b = BADGES.find(x => x.id === id); if (b) afficherNotifBadge(b); });
     if (comboActuel % 10 === 0) {
       declencherCombo(10, () => {
         marquerMaitrise(getJeuCourant(), getDifficulte());
@@ -173,6 +190,13 @@ export function apresReponseTexte(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
+    incrementStats(true, getJeuCourant());
+    progresserMission("bonnes");
+    progresserMission("etoiles");
+    progresserMission("jeux", getJeuCourant());
+    afficherMissions();
+    const newBadges = verifierBadgesStats();
+    newBadges.forEach(id => { const b = BADGES.find(x => x.id === id); if (b) afficherNotifBadge(b); });
     if (comboActuel % 10 === 0) {
       declencherCombo(10, () => {
         marquerMaitrise(getJeuCourant(), getDifficulte());

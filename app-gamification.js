@@ -1,0 +1,256 @@
+// app-gamification.js — badges, missions du jour, stats
+
+import { lireEtoiles, confetti, lireStreak } from "./app-state.js";
+
+// ── Badges ────────────────────────────────────────────────────────────────────
+export const BADGES = [
+  { id: "premier_pas",  emoji: "🌱", nom: "Premiers pas",     desc: "Répondre à ta première question" },
+  { id: "etoile_10",    emoji: "⭐",  nom: "Collectionneur",   desc: "Gagner 10 étoiles" },
+  { id: "etoile_50",    emoji: "🌟",  nom: "Super étoile",     desc: "Gagner 50 étoiles" },
+  { id: "etoile_100",   emoji: "💫",  nom: "Étoile filante",   desc: "Gagner 100 étoiles" },
+  { id: "etoile_300",   emoji: "✨",  nom: "Galaxie",          desc: "Gagner 300 étoiles" },
+  { id: "combo5",       emoji: "🔥",  nom: "En feu !",         desc: "Faire un combo ×5" },
+  { id: "combo10",      emoji: "🚀",  nom: "Supersonique !",   desc: "Faire un combo ×10" },
+  { id: "combo20",      emoji: "💥",  nom: "Inarrêtable !",    desc: "Faire un combo ×20" },
+  { id: "maitrise1",    emoji: "🥉",  nom: "Apprenti",         desc: "Maîtriser un premier jeu" },
+  { id: "maitrise3",    emoji: "🥈",  nom: "Confirmé",         desc: "Maîtriser 3 jeux" },
+  { id: "maitrise10",   emoji: "🥇",  nom: "Expert",           desc: "Maîtriser 10 jeux" },
+  { id: "streak3",      emoji: "📅",  nom: "Assidu",           desc: "Jouer 3 jours de suite" },
+  { id: "streak7",      emoji: "🏅",  nom: "Régulier",         desc: "Jouer 7 jours de suite" },
+  { id: "streak30",     emoji: "🏆",  nom: "Champion",         desc: "Jouer 30 jours de suite" },
+  { id: "ce1",          emoji: "🚀",  nom: "Au CE1 !",         desc: "Passer en CE1" },
+  { id: "ce2",          emoji: "⭐",  nom: "Au CE2 !",         desc: "Passer en CE2" },
+  { id: "jeux5",        emoji: "🎮",  nom: "Joueur",           desc: "Jouer à 5 jeux différents" },
+  { id: "jeux15",       emoji: "🗺️",  nom: "Explorateur",      desc: "Jouer à 15 jeux différents" },
+  { id: "q50",          emoji: "📝",  nom: "Studieux",         desc: "Répondre à 50 questions" },
+  { id: "q200",         emoji: "📚",  nom: "Passionné",        desc: "Répondre à 200 questions" },
+  { id: "mission1",     emoji: "🎯",  nom: "Première mission", desc: "Compléter une mission du jour" },
+  { id: "mission7",     emoji: "🌈",  nom: "Fidèle",           desc: "Compléter 7 missions du jour" },
+  { id: "renard_lv2",   emoji: "🦊",  nom: "Ami du renard",    desc: "Faire évoluer le renard" },
+  { id: "diff_expert",  emoji: "💎",  nom: "Niveau Expert",    desc: "Atteindre le niveau Expert" },
+  { id: "retour",       emoji: "🌞",  nom: "De retour !",      desc: "Rejouer après 2 jours d'absence" },
+];
+
+const BADGES_STORAGE_KEY = "badges-obtenus";
+
+export function lireBadges() {
+  try { return JSON.parse(localStorage.getItem(BADGES_STORAGE_KEY) || "[]"); }
+  catch { return []; }
+}
+
+export function debloquerBadge(id) {
+  const liste = lireBadges();
+  if (liste.includes(id)) return false;
+  liste.push(id);
+  localStorage.setItem(BADGES_STORAGE_KEY, JSON.stringify(liste));
+  return true;
+}
+
+// ── File d'attente des notifs badges ──────────────────────────────────────────
+let _notifQueue = [];
+let _notifVisible = false;
+
+export function afficherNotifBadge(badge) {
+  _notifQueue.push(badge);
+  if (!_notifVisible) _afficherProchaineBadge();
+}
+
+function _afficherProchaineBadge() {
+  if (_notifQueue.length === 0) { _notifVisible = false; return; }
+  _notifVisible = true;
+  const badge = _notifQueue.shift();
+
+  const overlay = document.createElement("div");
+  overlay.className = "badge-notif-overlay";
+  overlay.innerHTML = `
+    <div class="badge-notif-carte">
+      <p class="badge-notif-label">Nouveau trophée !</p>
+      <span class="badge-notif-emoji">${badge.emoji}</span>
+      <h3 class="badge-notif-nom">${badge.nom}</h3>
+      <p class="badge-notif-desc">${badge.desc}</p>
+      <button type="button" class="btn-evolution-fermer">Super !</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  confetti();
+
+  const fermer = () => {
+    overlay.remove();
+    _afficherProchaineBadge();
+  };
+  overlay.querySelector(".btn-evolution-fermer").addEventListener("click", fermer);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) fermer(); });
+}
+
+// ── Missions du jour ──────────────────────────────────────────────────────────
+const MISSIONS_STORAGE_KEY = "missions-jour";
+const STATS_QUESTIONS_KEY  = "stats-questions";
+const JEUX_JOUES_KEY       = "jeux-joues";
+const MISSIONS_TOTAL_KEY   = "missions-total-completees";
+
+const TYPES_MISSIONS = [
+  () => { const n = [3, 5, 8][~~(Math.random() * 3)]; return { type: "bonnes", emoji: "✅", texte: `Donne ${n} bonnes réponses`, cible: n, progres: 0, complete: false }; },
+  () => { const n = [5, 10, 15][~~(Math.random() * 3)]; return { type: "etoiles", emoji: "⭐", texte: `Gagne ${n} étoiles`, cible: n, progres: 0, complete: false }; },
+  () => { const n = [2, 3][~~(Math.random() * 2)]; return { type: "jeux", emoji: "🎮", texte: `Joue à ${n} jeux différents`, cible: n, progres: 0, complete: false, joues: [] }; },
+  () => ({ type: "combo5", emoji: "🔥", texte: "Fais un combo ×5 🔥", cible: 1, progres: 0, complete: false }),
+];
+
+function dateAujourdhui() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function lireMissionsJour() {
+  try {
+    const raw = localStorage.getItem(MISSIONS_STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.date === dateAujourdhui()) return data;
+    }
+  } catch { /* ignore */ }
+  return _genererMissionsJour();
+}
+
+function _genererMissionsJour() {
+  const shuffled = TYPES_MISSIONS.slice().sort(() => Math.random() - 0.5);
+  const missions = shuffled.slice(0, 3).map(fn => fn());
+  const data = { date: dateAujourdhui(), missions, totalCompletees: 0 };
+  localStorage.setItem(MISSIONS_STORAGE_KEY, JSON.stringify(data));
+  return data;
+}
+
+function _sauverMissionsJour(data) {
+  localStorage.setItem(MISSIONS_STORAGE_KEY, JSON.stringify(data));
+}
+
+export function progresserMission(type, data) {
+  const store = lireMissionsJour();
+  const nouvCompletes = [];
+
+  store.missions.forEach(m => {
+    if (m.complete) return;
+    if (m.type !== type) return;
+
+    if (type === "bonnes" || type === "etoiles") {
+      m.progres++;
+    } else if (type === "jeux") {
+      const jeuId = data;
+      if (!m.joues) m.joues = [];
+      if (!m.joues.includes(jeuId)) {
+        m.joues.push(jeuId);
+        m.progres = m.joues.length;
+      }
+    } else if (type === "combo5") {
+      m.progres = 1;
+    }
+
+    if (m.progres >= m.cible) {
+      m.complete = true;
+      m.progres = m.cible;
+      nouvCompletes.push(m);
+      store.totalCompletees = (store.totalCompletees || 0) + 1;
+    }
+  });
+
+  _sauverMissionsJour(store);
+  return nouvCompletes;
+}
+
+export function afficherMissions() {
+  const widget = document.getElementById("missions-widget");
+  if (!widget) return;
+  const store = lireMissionsJour();
+  widget.innerHTML = store.missions.map(m => {
+    const pct = Math.min(100, Math.round((m.progres / m.cible) * 100));
+    return `
+      <div class="mission-item${m.complete ? " complete" : ""}">
+        <span class="mission-emoji">${m.emoji}</span>
+        <div style="flex:1">
+          <div class="mission-texte">${m.texte}</div>
+          <div class="mission-progress">${m.progres} / ${m.cible}</div>
+          <div class="mission-barre"><div class="mission-barre-fill" style="width:${pct}%"></div></div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+export function lireStatsQuestions() {
+  return parseInt(localStorage.getItem(STATS_QUESTIONS_KEY) || "0", 10);
+}
+
+export function incrementStats(bonneReponse, jeuId) {
+  const total = lireStatsQuestions() + 1;
+  localStorage.setItem(STATS_QUESTIONS_KEY, String(total));
+
+  if (jeuId) {
+    try {
+      const joues = JSON.parse(localStorage.getItem(JEUX_JOUES_KEY) || "[]");
+      if (!joues.includes(jeuId)) {
+        joues.push(jeuId);
+        localStorage.setItem(JEUX_JOUES_KEY, JSON.stringify(joues));
+      }
+    } catch { /* ignore */ }
+  }
+}
+
+function _lireJeuxJoues() {
+  try { return JSON.parse(localStorage.getItem(JEUX_JOUES_KEY) || "[]"); }
+  catch { return []; }
+}
+
+function _compterJeuxMaitrises() {
+  let count = 0;
+  const keys = Object.keys(localStorage);
+  for (const key of keys) {
+    if (key.startsWith("maitrise-")) {
+      try {
+        const m = JSON.parse(localStorage.getItem(key) || "[]");
+        if (Array.isArray(m) && m.some(Boolean)) count++;
+      } catch { /* ignore */ }
+    }
+  }
+  return count;
+}
+
+function _lireTotalMissionsCompletees() {
+  const total = parseInt(localStorage.getItem(MISSIONS_TOTAL_KEY) || "0", 10);
+  const store = lireMissionsJour();
+  const completeesCeJour = store.missions.filter(m => m.complete).length;
+  return total + completeesCeJour;
+}
+
+export function verifierBadgesStats() {
+  const nouveaux = [];
+
+  const etoiles = lireEtoiles();
+  const questions = lireStatsQuestions();
+  const jeuxJoues = _lireJeuxJoues();
+  const streak = lireStreak();
+  const streakCount = streak.count || 0;
+  const maitrises = _compterJeuxMaitrises();
+  const missionsTotal = _lireTotalMissionsCompletees();
+
+  const checks = [
+    { id: "premier_pas",  cond: questions >= 1 },
+    { id: "etoile_10",    cond: etoiles >= 10 },
+    { id: "etoile_50",    cond: etoiles >= 50 },
+    { id: "etoile_100",   cond: etoiles >= 100 },
+    { id: "etoile_300",   cond: etoiles >= 300 },
+    { id: "maitrise1",    cond: maitrises >= 1 },
+    { id: "maitrise3",    cond: maitrises >= 3 },
+    { id: "maitrise10",   cond: maitrises >= 10 },
+    { id: "streak3",      cond: streakCount >= 3 },
+    { id: "streak7",      cond: streakCount >= 7 },
+    { id: "streak30",     cond: streakCount >= 30 },
+    { id: "jeux5",        cond: jeuxJoues.length >= 5 },
+    { id: "jeux15",       cond: jeuxJoues.length >= 15 },
+    { id: "q50",          cond: questions >= 50 },
+    { id: "q200",         cond: questions >= 200 },
+    { id: "mission1",     cond: missionsTotal >= 1 },
+    { id: "mission7",     cond: missionsTotal >= 7 },
+  ];
+
+  for (const { id, cond } of checks) {
+    if (cond && debloquerBadge(id)) nouveaux.push(id);
+  }
+
+  return nouveaux;
+}
