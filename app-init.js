@@ -50,7 +50,6 @@ import {
   afficherNotifBadge,
   BADGES,
   lireBadges,
-  lireStatsQuestions,
 } from "./app-gamification.js";
 
 import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100 } from "./games-maths.js";

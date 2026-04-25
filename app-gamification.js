@@ -110,6 +110,17 @@ export function lireMissionsJour() {
 }
 
 function _genererMissionsJour() {
+  // Persist previous day's completions before resetting
+  try {
+    const raw = localStorage.getItem(MISSIONS_STORAGE_KEY);
+    if (raw) {
+      const prev = JSON.parse(raw);
+      if (prev.date !== dateAujourdhui() && prev.totalCompletees) {
+        const cumul = parseInt(localStorage.getItem(MISSIONS_TOTAL_KEY) || "0", 10);
+        localStorage.setItem(MISSIONS_TOTAL_KEY, String(cumul + prev.totalCompletees));
+      }
+    }
+  } catch { /* ignore */ }
   const shuffled = TYPES_MISSIONS.slice().sort(() => Math.random() - 0.5);
   const missions = shuffled.slice(0, 3).map(fn => fn());
   const data = { date: dateAujourdhui(), missions, totalCompletees: 0 };
@@ -244,6 +255,7 @@ export function verifierBadgesStats() {
     { id: "jeux15",       cond: jeuxJoues.length >= 15 },
     { id: "q50",          cond: questions >= 50 },
     { id: "q200",         cond: questions >= 200 },
+    { id: "renard_lv2",   cond: etoiles >= 21 },
     { id: "mission1",     cond: missionsTotal >= 1 },
     { id: "mission7",     cond: missionsTotal >= 7 },
   ];
