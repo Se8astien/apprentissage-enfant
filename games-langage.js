@@ -1,5 +1,6 @@
 // games-langage.js — lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction,
-//                   lancerSons, lancerGrammaire
+//                   lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile,
+//                   lancerLectureTexte
 
 import {
   elTitre,
@@ -553,6 +554,208 @@ export function lancerGrammaire() {
     b.textContent = info.label;
     b.dataset.valeur = nature;
     b.addEventListener("click", () => apresReponseTexte(nature, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Lecture de phrases (phrase → image) ──────────────────────────────────────
+const SCENES_CP = [
+  { emoji: "🐱😴", phrase: "Le chat dort.", fausses: ["Le chien mange.", "La fille court.", "Le lapin saute."] },
+  { emoji: "🐶🏃", phrase: "Le chien court.", fausses: ["Le chat dort.", "La fille mange.", "Le chien saute."] },
+  { emoji: "👧🍎", phrase: "La fille mange une pomme.", fausses: ["Le garçon boit.", "La fille dort.", "Le chat mange."] },
+  { emoji: "☀️🌧️", phrase: "Il fait beau et chaud.", fausses: ["Il pleut beaucoup.", "Il neige dehors.", "Il fait froid."] },
+  { emoji: "🐸🌿", phrase: "La grenouille saute dans l'herbe.", fausses: ["Le canard nage.", "Le lapin court.", "La grenouille dort."] },
+  { emoji: "🎈🎉", phrase: "C'est une fête joyeuse.", fausses: ["Il fait froid.", "La fille pleure.", "Le chat miaule."] },
+  { emoji: "📚✏️", phrase: "L'enfant lit et écrit.", fausses: ["L'enfant dort.", "Le chien joue.", "L'enfant mange."] },
+  { emoji: "🚂🏔️", phrase: "Le train passe dans la montagne.", fausses: ["Le bateau navigue.", "L'avion vole.", "Le train est à l'arrêt."] },
+  { emoji: "🌹🐝", phrase: "L'abeille butine la rose.", fausses: ["Le papillon vole.", "L'abeille dort.", "La fleur pousse."] },
+  { emoji: "⛵🌊", phrase: "Le bateau vogue sur la mer.", fausses: ["Le train roule.", "L'oiseau vole.", "Le bateau est au port."] },
+];
+
+const SCENES_CE1 = [
+  { emoji: "👦🎒🏫", phrase: "Le garçon part à l'école avec son cartable.", fausses: ["La fille rentre à la maison.", "Le garçon joue au parc.", "Le chien attend dehors."] },
+  { emoji: "🌦️🌈", phrase: "Après la pluie, un arc-en-ciel apparaît.", fausses: ["Il neige toute la nuit.", "Le soleil se couche.", "Un orage éclate."] },
+  { emoji: "🐦🌳🍂", phrase: "L'oiseau chante dans le grand arbre automnal.", fausses: ["Le renard dort sous l'arbre.", "La feuille tombe dans l'eau.", "L'oiseau cherche de la nourriture."] },
+  { emoji: "👩‍🍳🥣🌡️", phrase: "La cuisinière prépare une soupe chaude.", fausses: ["Le boulanger fait du pain.", "La cuisinière mange une salade.", "Le cuisinier prépare un gâteau."] },
+  { emoji: "🚀⭐🌙", phrase: "La fusée voyage parmi les étoiles vers la lune.", fausses: ["Le satellite tourne autour de la Terre.", "L'astronaute marche sur Mars.", "La comète traverse le ciel."] },
+];
+
+const SCENES_CE2 = [
+  { emoji: "🏛️📜🗺️", phrase: "Les explorateurs ont découvert une ancienne carte du trésor.", fausses: ["Les pirates ont caché leur or.", "Les archéologues ont trouvé une momie.", "Les savants ont inventé une machine."] },
+  { emoji: "🌱💧☀️", phrase: "La plante a besoin d'eau et de lumière pour grandir.", fausses: ["L'animal hiberne pendant l'hiver.", "La graine devient un arbre en cent ans.", "La fleur s'épanouit uniquement la nuit."] },
+  { emoji: "🎻🎼🎭", phrase: "L'orchestre joue une symphonie devant un grand public.", fausses: ["Le chanteur répète sa chanson seul.", "Les danseurs répètent leur chorégraphie.", "Le pianiste compose une nouvelle mélodie."] },
+];
+
+export function lancerLecturePhrase() {
+  elTitre.textContent = "🖼️ Lire une phrase";
+  const liste = estCE2() ? SCENES_CE2 : estCE1() ? SCENES_CE1 : SCENES_CP;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.4rem">Quelle phrase correspond à cette image ?</p>` +
+    `<span style="font-size:3.5rem;line-height:1.3;display:block;letter-spacing:0.05em">${item.emoji}</span>`;
+
+  const options = melanger([item.phrase, ...item.fausses.slice(0, 3)]);
+  setBonneReponse(item.phrase);
+  elChoix.innerHTML = "";
+  options.forEach(phrase => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.cssText = "font-size:0.85rem;text-align:left;padding:0.6rem 0.8rem;";
+    b.textContent = phrase;
+    b.dataset.valeur = phrase;
+    b.addEventListener("click", () => apresReponseTexte(phrase, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Phrase mobile (compléter la phrase — mot manquant) ────────────────────────
+const PHRASES_TROU_CP = [
+  { avant: "Le chat", trou: "mange", apres: "du poisson.", fausses: ["court", "dort", "saute"] },
+  { avant: "La fille", trou: "dessine", apres: "une maison.", fausses: ["mange", "dort", "court"] },
+  { avant: "Le soleil", trou: "brille", apres: "dans le ciel.", fausses: ["tombe", "mange", "court"] },
+  { avant: "Le chien", trou: "aboie", apres: "très fort.", fausses: ["miaule", "chante", "dort"] },
+  { avant: "Les enfants", trou: "jouent", apres: "dans le jardin.", fausses: ["dorment", "mangent", "lisent"] },
+  { avant: "Le lapin", trou: "saute", apres: "dans l'herbe.", fausses: ["nage", "vole", "dort"] },
+  { avant: "La petite fille", trou: "pleure", apres: "car elle est triste.", fausses: ["rit", "chante", "court"] },
+  { avant: "L'oiseau", trou: "chante", apres: "sur la branche.", fausses: ["miaule", "aboie", "rugit"] },
+];
+
+const PHRASES_TROU_CE1 = [
+  { avant: "Le boulanger prépare", trou: "délicieux", apres: "du pain.", fausses: ["chaud", "frais", "croustillant"] },
+  { avant: "Les élèves écoutent", trou: "attentivement", apres: "la maîtresse.", fausses: ["vite", "rarement", "ensemble"] },
+  { avant: "La tortue marche", trou: "lentement", apres: "dans le jardin.", fausses: ["vite", "souvent", "haut"] },
+  { avant: "Le vent souffle", trou: "fortement", apres: "sur les arbres.", fausses: ["doucement", "rarement", "souvent"] },
+  { avant: "Chaque matin, le coq", trou: "chante", apres: "pour réveiller la ferme.", fausses: ["dort", "mange", "court"] },
+  { avant: "La rivière coule", trou: "paisiblement", apres: "dans la vallée.", fausses: ["vite", "rarement", "partout"] },
+  { avant: "Les étoiles", trou: "brillent", apres: "dans la nuit noire.", fausses: ["tombent", "disparaissent", "tournent"] },
+  { avant: "La bibliothèque est remplie de", trou: "livres", apres: "passionnants.", fausses: ["jeux", "jouets", "images"] },
+];
+
+const PHRASES_TROU_CE2 = [
+  { avant: "Les chercheurs ont", trou: "découvert", apres: "une nouvelle espèce d'insecte.", fausses: ["inventé", "mangé", "oublié"] },
+  { avant: "La cathédrale a été", trou: "construite", apres: "au Moyen Âge.", fausses: ["détruite", "peinte", "visitée"] },
+  { avant: "Le photographe a", trou: "immortalisé", apres: "ce magnifique coucher de soleil.", fausses: ["raté", "regardé", "oublié"] },
+  { avant: "Les astronautes", trou: "flottent", apres: "en apesanteur dans la station.", fausses: ["dorment", "marchent", "tombent"] },
+  { avant: "Les abeilles", trou: "pollinisent", apres: "les fleurs en récoltant le nectar.", fausses: ["mangent", "protègent", "coupent"] },
+];
+
+export function lancerPhraseMobile() {
+  elTitre.textContent = "📝 Phrase mobile";
+  const liste = estCE2() ? PHRASES_TROU_CE2 : estCE1() ? PHRASES_TROU_CE1 : PHRASES_TROU_CP;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  setBonneReponse(item.trou);
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quel mot manque dans cette phrase ?</p>` +
+    `<p style="font-size:1.2rem;font-weight:600;line-height:1.6">` +
+    `${item.avant} <span style="background:var(--primaire);color:white;padding:0.1em 0.5em;border-radius:0.4em">___</span> ${item.apres}` +
+    `</p>`;
+
+  const options = melanger([item.trou, ...item.fausses.slice(0, 3)]);
+  elChoix.innerHTML = "";
+  options.forEach(mot => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = mot;
+    b.addEventListener("click", () => apresReponseTexte(mot, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Lecture + compréhension ───────────────────────────────────────────────────
+const TEXTES_CE1 = [
+  {
+    texte: "Léa a un petit chat roux. Il s'appelle Caramel. Chaque soir, Caramel dort sur le lit de Léa.",
+    question: "Comment s'appelle le chat de Léa ?",
+    bonne: "Caramel",
+    fausses: ["Foxy", "Léa", "Roux"],
+  },
+  {
+    texte: "Tom aime beaucoup les livres. Il va à la bibliothèque tous les mercredis. Il rapporte toujours trois livres à la maison.",
+    question: "Combien de livres Tom rapporte-t-il ?",
+    bonne: "Trois",
+    fausses: ["Un", "Deux", "Quatre"],
+  },
+  {
+    texte: "Ce matin, il neige dans le jardin. Les enfants mettent leurs bottes et leur écharpe. Ils vont construire un bonhomme de neige.",
+    question: "Que vont faire les enfants ?",
+    bonne: "Un bonhomme de neige",
+    fausses: ["Un château de sable", "Un gâteau", "Un dessin"],
+  },
+  {
+    texte: "La ferme de Paul a des poules, des lapins et un cheval. Chaque matin, Paul ramasse les œufs des poules. Le cheval s'appelle Sultan.",
+    question: "Comment s'appelle le cheval de Paul ?",
+    bonne: "Sultan",
+    fausses: ["Paul", "Poule", "Lapin"],
+  },
+  {
+    texte: "Emma adore la peinture. Elle a des pinceaux de toutes les tailles. Hier, elle a peint un magnifique arc-en-ciel.",
+    question: "Qu'a peint Emma hier ?",
+    bonne: "Un arc-en-ciel",
+    fausses: ["Un soleil", "Une maison", "Un chien"],
+  },
+];
+
+const TEXTES_CE2 = [
+  {
+    texte: "Les dauphins sont des mammifères marins très intelligents. Ils communiquent entre eux grâce à des sifflements. Ils vivent en groupes appelés « bancs ».",
+    question: "Comment les dauphins communiquent-ils ?",
+    bonne: "Par des sifflements",
+    fausses: ["Par des cris", "Par des gestes", "Par des couleurs"],
+  },
+  {
+    texte: "Le Nil est le plus long fleuve d'Afrique. Il traverse plusieurs pays avant de se jeter dans la mer Méditerranée. Les Égyptiens anciens dépendaient de ses crues pour cultiver.",
+    question: "Dans quelle mer se jette le Nil ?",
+    bonne: "La mer Méditerranée",
+    fausses: ["La mer Rouge", "L'océan Atlantique", "La mer Noire"],
+  },
+  {
+    texte: "La photosynthèse permet aux plantes de fabriquer leur nourriture. Elles utilisent la lumière du soleil, l'eau et le dioxyde de carbone. En échange, elles rejettent de l'oxygène.",
+    question: "Que rejettent les plantes grâce à la photosynthèse ?",
+    bonne: "De l'oxygène",
+    fausses: ["Du CO₂", "De l'eau", "De l'azote"],
+  },
+  {
+    texte: "Gutenberg inventa l'imprimerie en Europe vers 1450. Cette invention permit de reproduire les livres beaucoup plus vite. Elle contribua à répandre les idées à travers le monde.",
+    question: "Vers quelle année Gutenberg inventa-t-il l'imprimerie ?",
+    bonne: "1450",
+    fausses: ["1350", "1550", "1650"],
+  },
+  {
+    texte: "Les abeilles jouent un rôle essentiel dans la pollinisation des fleurs. Sans elles, de nombreuses plantes ne pourraient pas se reproduire. Leur disparition menacerait l'agriculture mondiale.",
+    question: "Quel rôle jouent les abeilles ?",
+    bonne: "La pollinisation",
+    fausses: ["La décomposition", "L'irrigation", "La photosynthèse"],
+  },
+];
+
+export function lancerLectureTexte() {
+  elTitre.textContent = "📖 Lecture";
+  const liste = estCE2() ? TEXTES_CE2 : TEXTES_CE1;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  setBonneReponse(item.bonne);
+  elQuestion.innerHTML =
+    `<div style="background:white;border-radius:0.8rem;padding:0.75rem 1rem;margin-bottom:0.6rem;font-size:0.95rem;line-height:1.6;text-align:left;box-shadow:0 2px 8px var(--ombre)">` +
+    item.texte +
+    `</div>` +
+    `<p style="font-size:0.9rem;font-weight:700">${item.question}</p>`;
+
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  elChoix.innerHTML = "";
+  options.forEach(rep => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.cssText = "font-size:0.85rem;text-align:left;padding:0.6rem 0.8rem;";
+    b.textContent = rep;
+    b.dataset.valeur = rep;
+    b.addEventListener("click", () => apresReponseTexte(rep, b, getBonneReponse()));
     elChoix.appendChild(b);
   });
 }

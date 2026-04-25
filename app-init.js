@@ -48,7 +48,7 @@ import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerA
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire } from "./games-langage.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte } from "./games-langage.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -83,6 +83,9 @@ const lanceurs = {
   planche100:     lancerPlanche100,
   sons:           lancerSons,
   grammaire:      lancerGrammaire,
+  lecturePhrase:  lancerLecturePhrase,
+  phraseMobile:   lancerPhraseMobile,
+  lectureTexte:   lancerLectureTexte,
 };
 
 // ── Classe screen ─────────────────────────────────────────────────────────────
