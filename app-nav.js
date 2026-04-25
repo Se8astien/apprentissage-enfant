@@ -86,7 +86,7 @@ function declencherReactionRenard(correct) {
 }
 
 // ── Combo ─────────────────────────────────────────────────────────────────────
-function declencherCombo(nb) {
+function declencherCombo(nb, onFermer) {
   const bonus = nb >= 10 ? 3 : 1;
   ajouterEtoiles(bonus);
   const nom  = lireNomRenard() || "Foxy";
@@ -103,8 +103,9 @@ function declencherCombo(nb) {
     </div>`;
   document.body.appendChild(overlay);
   confetti();
-  overlay.querySelector(".btn-evolution-fermer").addEventListener("click", () => overlay.remove());
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  const fermer = () => { overlay.remove(); if (onFermer) onFermer(); };
+  overlay.querySelector(".btn-evolution-fermer").addEventListener("click", fermer);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) fermer(); });
 }
 
 // ── Reset feedback ────────────────────────────────────────────────────────────
@@ -137,9 +138,10 @@ export function apresReponse(choix, bouton, correct) {
     confetti();
     declencherReactionRenard(true);
     if (comboActuel % 10 === 0) {
-      declencherCombo(10);
-      marquerMaitrise(getJeuCourant(), getDifficulte());
-      gererProgressionDifficulte();
+      declencherCombo(10, () => {
+        marquerMaitrise(getJeuCourant(), getDifficulte());
+        gererProgressionDifficulte();
+      });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
     comboActuel = 0;
@@ -172,9 +174,10 @@ export function apresReponseTexte(choix, bouton, correct) {
     confetti();
     declencherReactionRenard(true);
     if (comboActuel % 10 === 0) {
-      declencherCombo(10);
-      marquerMaitrise(getJeuCourant(), getDifficulte());
-      gererProgressionDifficulte();
+      declencherCombo(10, () => {
+        marquerMaitrise(getJeuCourant(), getDifficulte());
+        gererProgressionDifficulte();
+      });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
     comboActuel = 0;
