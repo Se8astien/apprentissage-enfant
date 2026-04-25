@@ -1825,6 +1825,9 @@ h1 {
 .badge-desc { font-size:0.62rem; color:#999; margin-top:0.2rem; line-height:1.3; }
 .btn-retour-small { background:none; border:none; font-size:1.2rem; cursor:pointer; padding:0.3rem; }
 
+/* ── Cartes CM1/CM2 ─────────────────────────────────────────────────────────── */
+.carte-jeu[data-cat="cm"]::before { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+
 /* ── Notif badge (overlay) ─────────────────────────────────────────────────── */
 .badge-notif-overlay { position:fixed; inset:0; background:rgba(45,52,54,0.6); display:flex; align-items:center; justify-content:center; z-index:300; animation:entree 0.25s ease; padding:1rem; }
 .badge-notif-carte { background:white; border-radius:1.8rem; padding:2rem 1.5rem; max-width:20rem; width:100%; text-align:center; box-shadow:0 12px 48px rgba(0,0,0,0.2); }

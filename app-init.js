@@ -52,12 +52,12 @@ import {
   lireBadges,
 } from "./app-gamification.js";
 
-import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100 } from "./games-maths.js";
-import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles } from "./games-formes.js";
+import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100, lancerDecimaux } from "./games-maths.js";
+import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles, lancerAires } from "./games-formes.js";
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
-import { lancerMultiplication, lancerDivision, lancerProbleme } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte } from "./games-langage.js";
+import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite } from "./games-avance.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison } from "./games-langage.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -95,6 +95,11 @@ const lanceurs = {
   lecturePhrase:  lancerLecturePhrase,
   phraseMobile:   lancerPhraseMobile,
   lectureTexte:   lancerLectureTexte,
+  aires:          lancerAires,
+  decimaux:       lancerDecimaux,
+  fractionsCM:    lancerFractionsCM,
+  proportionnalite: lancerProportionnalite,
+  conjugaison:    lancerConjugaison,
 };
 
 // ── Classe screen ─────────────────────────────────────────────────────────────

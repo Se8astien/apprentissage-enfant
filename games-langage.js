@@ -10,6 +10,8 @@ import {
   getBonneReponse,
   estCE1,
   estCE2,
+  estCM1,
+  estCM2,
   melanger,
   getDifficulte,
 } from "./app-state.js";
@@ -521,9 +523,72 @@ const NATURES_LABELS = {
   determinant: { label: "▲ Déterminant",  css: "grammaire-determinant" },
 };
 
+const PHRASES_CM1 = [
+  { phrase: "**Le chat** dort sur le canapé.", mot: "Le chat", nature: "sujet" },
+  { phrase: "Les enfants **jouent** dans la cour.", mot: "jouent", nature: "verbe" },
+  { phrase: "**La maîtresse** explique la leçon.", mot: "La maîtresse", nature: "sujet" },
+  { phrase: "Le chien **court** très vite.", mot: "court", nature: "verbe" },
+  { phrase: "**Les oiseaux** chantent dans le jardin.", mot: "Les oiseaux", nature: "sujet" },
+  { phrase: "Marie **mange** une pomme rouge.", mot: "mange", nature: "verbe" },
+  { phrase: "**Le soleil** réchauffe la terre.", mot: "Le soleil", nature: "sujet" },
+  { phrase: "Les fleurs **poussent** au printemps.", mot: "poussent", nature: "verbe" },
+];
+
+const PHRASES_CM2 = [
+  { phrase: "Je **le** mange.", mot: "le", nature: "cod" },
+  { phrase: "Il **lui** parle tous les jours.", mot: "lui", nature: "coi" },
+  { phrase: "Nous **les** voyons souvent.", mot: "les", nature: "cod" },
+  { phrase: "Elle **leur** écrit une lettre.", mot: "leur", nature: "coi" },
+  { phrase: "Tu **me** donnes ce livre.", mot: "me", nature: "cod" },
+  { phrase: "Il **y** pense souvent.", mot: "y", nature: "coi" },
+];
+
 export function lancerGrammaire() {
   elTitre.textContent = "▲ Grammaire";
   const diff = getDifficulte();
+
+  if (estCM2()) {
+    const item = PHRASES_CM2[Math.floor(Math.random() * PHRASES_CM2.length)];
+    const phraseHtml = item.phrase.replace(/\*\*(.+?)\*\*/g, '<strong class="mot-cible">$1</strong>');
+    setBonneReponse(item.nature);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin-bottom:0.5rem">Le mot en gras est-il un COD ou un COI ?</p>` +
+      `<p style="font-size:1.3rem;font-weight:600;line-height:1.5">${phraseHtml}</p>`;
+    elChoix.innerHTML = "";
+    [
+      { val: "cod", label: "COD (complément d'objet direct)" },
+      { val: "coi", label: "COI (complément d'objet indirect)" },
+    ].forEach(({ val, label }) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.style.cssText = "font-size:0.85rem;text-align:left;";
+      b.textContent = label; b.dataset.valeur = val;
+      b.addEventListener("click", () => apresReponseTexte(val, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
+  if (estCM1()) {
+    const item = PHRASES_CM1[Math.floor(Math.random() * PHRASES_CM1.length)];
+    const phraseHtml = item.phrase.replace(/\*\*(.+?)\*\*/g, '<strong class="mot-cible">$1</strong>');
+    setBonneReponse(item.nature);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin-bottom:0.5rem">Le groupe en gras est-il le sujet ou le verbe ?</p>` +
+      `<p style="font-size:1.3rem;font-weight:600;line-height:1.5">${phraseHtml}</p>`;
+    elChoix.innerHTML = "";
+    [
+      { val: "sujet", label: "Sujet" },
+      { val: "verbe", label: "Verbe" },
+    ].forEach(({ val, label }) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.textContent = label; b.dataset.valeur = val;
+      b.addEventListener("click", () => apresReponseTexte(val, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
 
   let naturesDisponibles;
   if (estCE2() || (estCE1() && diff >= 2)) {
@@ -734,9 +799,63 @@ const TEXTES_CE2 = [
   },
 ];
 
+const TEXTES_CM1 = [
+  {
+    texte: "Le renard est un animal sauvage très rusé. Il vit dans les forêts et les campagnes. La nuit, il chasse des lapins, des souris et des poules. Sa fourrure rousse lui permet de se cacher parmi les feuilles d'automne. Les petits renards s'appellent des renardeaux.",
+    question: "Comment appelle-t-on les petits renards ?",
+    bonne: "Des renardeaux",
+    fausses: ["Des renards", "Des renardes", "Des renardins"],
+  },
+  {
+    texte: "Au Moyen Âge, les chevaliers portaient une armure en métal pour se protéger au combat. Cette armure pouvait peser jusqu'à 25 kg. Les chevaliers devaient s'entraîner de nombreuses années pour manier leur épée et monter à cheval. La plupart des châteaux étaient entourés de douves remplies d'eau.",
+    question: "Que peut peser une armure de chevalier ?",
+    bonne: "Jusqu'à 25 kg",
+    fausses: ["Jusqu'à 10 kg", "Jusqu'à 50 kg", "Jusqu'à 5 kg"],
+  },
+  {
+    texte: "Le système solaire comprend le Soleil et huit planètes. La Terre est la troisième planète à partir du Soleil. Elle est la seule planète connue à abriter la vie. Sa surface est couverte à 71% par des océans. La Lune est le seul satellite naturel de la Terre.",
+    question: "Quelle proportion de la Terre est couverte par les océans ?",
+    bonne: "71%",
+    fausses: ["50%", "85%", "60%"],
+  },
+  {
+    texte: "La migration des oiseaux est un phénomène remarquable. Chaque automne, des millions d'oiseaux quittent nos régions pour passer l'hiver dans des pays plus chauds. Ils utilisent les étoiles, le Soleil et le champ magnétique terrestre pour s'orienter. Au printemps, ils reviennent pour se reproduire.",
+    question: "Pourquoi les oiseaux migrent-ils en automne ?",
+    bonne: "Pour passer l'hiver dans des pays plus chauds",
+    fausses: ["Pour chercher de la nourriture", "Pour se reproduire", "Pour fuir les prédateurs"],
+  },
+  {
+    texte: "La photosynthèse est le processus par lequel les plantes fabriquent leur propre nourriture. Elles utilisent la lumière solaire, le dioxyde de carbone de l'air et l'eau du sol. En retour, elles produisent de l'oxygène. C'est pourquoi les forêts sont si importantes pour notre planète.",
+    question: "Que produisent les plantes grâce à la photosynthèse ?",
+    bonne: "De l'oxygène",
+    fausses: ["Du CO₂", "De l'eau", "Du sucre uniquement"],
+  },
+];
+
+const TEXTES_CM2 = [
+  {
+    texte: "La démocratie est un système politique dans lequel le pouvoir appartient au peuple. Les citoyens élisent leurs représentants lors d'élections. En France, chaque citoyen de plus de 18 ans a le droit de voter. La démocratie garantit aussi des libertés fondamentales comme la liberté d'expression et la liberté de la presse.",
+    question: "Quelle est l'idée principale de ce texte ?",
+    bonne: "La démocratie donne le pouvoir au peuple",
+    fausses: ["Les élections sont obligatoires", "La France est une dictature", "Voter est interdit avant 21 ans"],
+  },
+  {
+    texte: "Le réchauffement climatique est causé principalement par les activités humaines. L'utilisation des énergies fossiles (pétrole, charbon, gaz) libère du dioxyde de carbone qui retient la chaleur dans l'atmosphère. Les conséquences incluent la montée du niveau des mers, des événements météorologiques extrêmes et la disparition d'espèces animales.",
+    question: "Quelle est la principale cause du réchauffement climatique selon ce texte ?",
+    bonne: "Les activités humaines et les énergies fossiles",
+    fausses: ["Les volcans", "Le Soleil", "Les animaux"],
+  },
+  {
+    texte: "Internet a révolutionné notre façon de communiquer et d'accéder à l'information. En quelques secondes, on peut contacter une personne à l'autre bout du monde. Cependant, il faut être vigilant : certaines informations sur Internet sont fausses. Il est important d'apprendre à vérifier les sources avant de croire ce qu'on lit.",
+    question: "Quel conseil donne ce texte à propos d'Internet ?",
+    bonne: "Vérifier les sources avant de croire une information",
+    fausses: ["Ne jamais utiliser Internet", "Croire tout ce qu'on lit", "Internet est toujours fiable"],
+  },
+];
+
 export function lancerLectureTexte() {
   elTitre.textContent = "📖 Lecture";
-  const liste = estCE2() ? TEXTES_CE2 : TEXTES_CE1;
+  const liste = estCM2() ? TEXTES_CM2 : estCM1() ? TEXTES_CM1 : estCE2() ? TEXTES_CE2 : TEXTES_CE1;
   const item = liste[Math.floor(Math.random() * liste.length)];
 
   setBonneReponse(item.bonne);
@@ -756,6 +875,49 @@ export function lancerLectureTexte() {
     b.textContent = rep;
     b.dataset.valeur = rep;
     b.addEventListener("click", () => apresReponseTexte(rep, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── lancerConjugaison ─────────────────────────────────────────────────────────
+const CONJ_CM1 = [
+  { phrase: "Hier, il ___ (manger) une pomme.", bonne: "a mangé",   fausses: ["mange", "mangera", "mangeait"] },
+  { phrase: "Nous ___ (jouer) au foot hier.", bonne: "avons joué",   fausses: ["jouons", "jouerons", "jouions"] },
+  { phrase: "Elles ___ (chanter) une chanson.", bonne: "chantent",   fausses: ["ont chanté", "chanteront", "chantaient"] },
+  { phrase: "Tu ___ (finir) tes devoirs ?",  bonne: "as fini",       fausses: ["finis", "finiras", "finissais"] },
+  { phrase: "Je ___ (avoir) faim maintenant.", bonne: "ai",          fausses: ["avais", "aurai", "aie"] },
+  { phrase: "Il ___ (être) malade hier.",    bonne: "a été",          fausses: ["est", "sera", "était"] },
+  { phrase: "Ils ___ (partir) tôt ce matin.", bonne: "sont partis",  fausses: ["partent", "partiront", "partaient"] },
+  { phrase: "Vous ___ (travailler) bien.",   bonne: "travaillez",     fausses: ["avez travaillé", "travaillerez", "travailliez"] },
+];
+
+const CONJ_CM2 = [
+  { phrase: "Si j'avais le temps, je ___ (voyager).", bonne: "voyagerais", fausses: ["voyage", "voyagerai", "voyageais"] },
+  { phrase: "L'année prochaine, ils ___ (partir) en vacances.", bonne: "partiront", fausses: ["partent", "partaient", "partiraient"] },
+  { phrase: "Quand j'___ (être) petit, j'aimais les bonbons.", bonne: "étais", fausses: ["suis", "serai", "serais"] },
+  { phrase: "Si tu ___ (vouloir), tu pourrais réussir.", bonne: "voulais", fausses: ["veux", "voudras", "voudrais"] },
+  { phrase: "Demain, nous ___ (finir) ce projet.", bonne: "finirons", fausses: ["finissons", "finissions", "finirions"] },
+  { phrase: "Autrefois, les gens ___ (vivre) sans électricité.", bonne: "vivaient", fausses: ["vivent", "vivront", "vivraient"] },
+  { phrase: "Si elle était là, elle ___ (aider) tout le monde.", bonne: "aiderait", fausses: ["aide", "aidera", "aidait"] },
+  { phrase: "Vous ___ (choisir) votre métier quand vous serez grands.", bonne: "choisirez", fausses: ["choisissez", "choisiriez", "choisissiez"] },
+];
+
+export function lancerConjugaison() {
+  elTitre.textContent = "✍️ Conjugaison";
+  const pool = estCM2() ? CONJ_CM2 : CONJ_CM1;
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  setBonneReponse(item.bonne);
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quelle est la bonne conjugaison ?</p>` +
+    `<p style="font-size:1.2rem;font-weight:600;line-height:1.6;background:white;border-radius:0.8rem;padding:0.75rem 1rem;box-shadow:0 2px 8px var(--ombre)">${item.phrase}</p>`;
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  elChoix.innerHTML = "";
+  options.forEach(mot => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot; b.dataset.valeur = mot;
+    b.addEventListener("click", () => apresReponseTexte(mot, b, getBonneReponse()));
     elChoix.appendChild(b);
   });
 }

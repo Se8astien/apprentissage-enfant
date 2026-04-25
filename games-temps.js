@@ -8,13 +8,15 @@ import {
   getBonneReponse,
   estCE1,
   estCE2,
+  estCM1,
+  estCM2,
   melanger,
   propositionsAvecBonne,
   afficherChoix,
   getDifficulte,
 } from "./app-state.js";
 
-import { apresReponse, resetFeedback } from "./app-nav.js";
+import { apresReponse, apresReponseTexte, resetFeedback } from "./app-nav.js";
 
 // ── SVG horloge analogique ────────────────────────────────────────────────────
 export function svgHorloge(heure, minute, taille) {
@@ -150,6 +152,52 @@ export function lancerHeure() {
   elTitre.textContent = "🕐 L'heure";
   const diff = getDifficulte();
 
+  if (estCM2()) {
+    // CM2 : fuseaux horaires simples
+    const offsets = [1, 2, -1, -2, -5, 3, -3];
+    const decalage = offsets[Math.floor(Math.random() * offsets.length)];
+    const heureDepart = 8 + Math.floor(Math.random() * 12);
+    const minuteDepart = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
+    const heureArr = ((heureDepart + decalage + 24) % 24);
+    const bonneVal = heureArr * 60 + minuteDepart;
+    setBonneReponse(bonneVal);
+    const heureStr = heureDepart + "h" + String(minuteDepart).padStart(2, "0");
+    const sens = decalage > 0 ? "+" : "";
+    elQuestion.innerHTML =
+      `<div class="grande-horloge">${svgHorloge(heureDepart || 12, minuteDepart, 150)}</div>` +
+      `<p style="font-size:0.9rem;margin:0.4rem 0 0.2rem;font-weight:700">Il est <strong>${heureStr}</strong> à Paris.</p>` +
+      `<p style="font-size:0.88rem">À New York le décalage est <strong>${sens}${decalage}h</strong>. Quelle heure est-il là-bas ?</p>`;
+    const fausses = [-2, -1, 1, 2, -3, 3].map(d => {
+      const h = ((heureArr + d + 24) % 24);
+      return h * 60 + minuteDepart;
+    }).filter(t => t !== bonneVal);
+    afficherChoixHorloge(melanger([bonneVal, ...melanger(fausses).slice(0, 3)]));
+    return;
+  }
+
+  if (estCM1()) {
+    // CM1 : calculs sur 24h
+    const heureDepart = Math.floor(Math.random() * 22);
+    const minuteDepart = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
+    const durees = [30, 45, 60, 90, 120, 150];
+    const dureeMin = durees[Math.floor(Math.random() * durees.length)];
+    const totalDepart = heureDepart * 60 + minuteDepart;
+    const bonneVal = totalDepart + dureeMin;
+    const bonneH = Math.floor(bonneVal / 60) % 24;
+    const bonneM = bonneVal % 60;
+    setBonneReponse(bonneVal);
+    const heureStr = heureDepart + "h" + String(minuteDepart).padStart(2, "0");
+    const dureeStr = dureeMin < 60 ? dureeMin + " minutes" : dureeMin === 60 ? "1 heure" : (Math.floor(dureeMin / 60) + "h" + String(dureeMin % 60).padStart(2, "0"));
+    elQuestion.innerHTML =
+      `<div class="grande-horloge">${svgHorloge(heureDepart || 12, minuteDepart, 150)}</div>` +
+      `<p style="font-size:0.88rem;margin:0.4rem 0 0">Il est <strong>${heureStr}</strong>. Dans <strong>${dureeStr}</strong>, quelle heure sera-t-il ?</p>`;
+    const fausses = [-60, -45, -30, -15, 15, 30, 45, 60]
+      .map(d => bonneVal + d)
+      .filter(t => t > 0 && t !== bonneVal);
+    afficherChoixHorloge(melanger([bonneVal, ...melanger(fausses).slice(0, 3)]));
+    return;
+  }
+
   let pool = [];
   if (estCE2()) {
     for (let h = 1; h <= 12; h++) {
@@ -284,6 +332,91 @@ export function lancerDurees() {
 // ── lancerMesures ─────────────────────────────────────────────────────────────
 export function lancerMesures() {
   elTitre.textContent = "📏 Mesures";
+
+  if (estCM2()) {
+    // CM2 : calculs d'aires (m², cm²) et conversions complexes
+    const type = Math.floor(Math.random() * 4);
+    let question, answer, rappel;
+    if (type === 0) {
+      const l = 2 + Math.floor(Math.random() * 8);
+      const L = 2 + Math.floor(Math.random() * 8);
+      answer = l * L;
+      question = `Quelle est l'aire d'un rectangle de <strong>${L} m × ${l} m</strong> ?`;
+      rappel = "Aire = longueur × largeur";
+    } else if (type === 1) {
+      const mg = 1 + Math.floor(Math.random() * 20);
+      answer = mg * 1000;
+      question = `Combien de mg dans <strong>${mg} g</strong> ?`;
+      rappel = "1 g = 1 000 mg";
+    } else if (type === 2) {
+      const m2 = 1 + Math.floor(Math.random() * 10);
+      answer = m2 * 10000;
+      question = `Combien de cm² dans <strong>${m2} m²</strong> ?`;
+      rappel = "1 m² = 10 000 cm²";
+    } else {
+      const mL = 1 + Math.floor(Math.random() * 20);
+      answer = mL * 1000;
+      question = `Combien de mL dans <strong>${mL} L</strong> ?`;
+      rappel = "1 L = 1 000 mL";
+    }
+    setBonneReponse(answer);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>${rappel}</strong></p>` +
+      `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">${question}</p>`;
+    const minVal = Math.max(1, Math.round(answer * 0.6));
+    const maxVal = Math.round(answer * 1.4);
+    const props = propositionsAvecBonne(answer, minVal, maxVal, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  if (estCM1()) {
+    // CM1 : conversions km↔m, kg↔g↔mg, L↔mL
+    const type = Math.floor(Math.random() * 5);
+    let question, answer, rappel;
+    if (type === 0) {
+      const km = 1 + Math.floor(Math.random() * 20);
+      answer = km * 1000;
+      question = `Combien de mètres dans <strong>${km} km</strong> ?`;
+      rappel = "1 km = 1 000 m";
+    } else if (type === 1) {
+      const m = 1 + Math.floor(Math.random() * 20);
+      answer = m / 1000;
+      const mStr = m + " m = ? km";
+      question = mStr;
+      setBonneReponse(answer);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>1 000 m = 1 km</strong></p>` +
+        `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">${m} m = ? km</p>`;
+      const props = propositionsAvecBonne(answer, Math.max(0, answer - 5), answer + 10, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+      return;
+    } else if (type === 2) {
+      const kg = 1 + Math.floor(Math.random() * 20);
+      answer = kg * 1000;
+      question = `Combien de grammes dans <strong>${kg} kg</strong> ?`;
+      rappel = "1 kg = 1 000 g";
+    } else if (type === 3) {
+      const g = 1 + Math.floor(Math.random() * 20);
+      answer = g * 1000;
+      question = `Combien de mg dans <strong>${g} g</strong> ?`;
+      rappel = "1 g = 1 000 mg";
+    } else {
+      const l = 1 + Math.floor(Math.random() * 20);
+      answer = l * 1000;
+      question = `Combien de mL dans <strong>${l} L</strong> ?`;
+      rappel = "1 L = 1 000 mL";
+    }
+    setBonneReponse(answer);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin:0 0 0.35rem">💡 Rappel : <strong>${rappel}</strong></p>` +
+      `<p class="equation" style="font-size:1.9rem;font-weight:700;margin-top:0.5rem">${question}</p>`;
+    const minVal = Math.max(1, Math.round(answer * 0.6));
+    const maxVal = Math.round(answer * 1.4);
+    const props = propositionsAvecBonne(answer, minVal, maxVal, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
 
   if (estCE2()) {
     const type = Math.floor(Math.random() * 4);

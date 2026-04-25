@@ -8,6 +8,8 @@ import {
   getBonneReponse,
   estCE1,
   estCE2,
+  estCM1,
+  estCM2,
   melanger,
   propositionsAvecBonne,
   afficherChoix,
@@ -178,6 +180,63 @@ function svgFraction(num, denom, taille) {
 
 export function lancerFractions() {
   elTitre.textContent = "🍕";
+
+  if (estCM2()) {
+    // CM2 : addition de fractions même dénominateur
+    const denom = 3 + Math.floor(Math.random() * 8);
+    const num1 = 1 + Math.floor(Math.random() * (denom - 1));
+    const num2 = 1 + Math.floor(Math.random() * (denom - 1));
+    const numResult = num1 + num2;
+    setBonneReponse(numResult);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.9rem;margin:0 0 0.4rem">Calcule :</p>` +
+      `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${num1}/${denom} + ${num2}/${denom} = ?/${denom}</p>` +
+      `<p style="font-size:0.78rem;color:#888">💡 Même dénominateur : additionne les numérateurs</p>`;
+    const props = propositionsAvecBonne(numResult, Math.max(1, numResult - 4), numResult + 4, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  if (estCM1()) {
+    const type = Math.random() < 0.5 ? "compare" : "quantite";
+    if (type === "compare") {
+      // comparer fractions même dénominateur
+      const denom = 4 + Math.floor(Math.random() * 6);
+      const num1 = 1 + Math.floor(Math.random() * (denom - 1));
+      let num2 = 1 + Math.floor(Math.random() * (denom - 1));
+      while (num2 === num1) num2 = 1 + Math.floor(Math.random() * (denom - 1));
+      const bonne = num1 > num2 ? num1 : num2;
+      setBonneReponse(bonne);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.4rem">Quelle fraction est la plus grande ?</p>` +
+        `<p class="equation" style="font-size:2rem;font-weight:700;margin:0.4rem 0">${num1}/${denom} ou ${num2}/${denom}</p>`;
+      const opts = melanger([num1, num2]);
+      elChoix.innerHTML = "";
+      opts.forEach(val => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix";
+        b.textContent = val + "/" + denom; b.dataset.valeur = String(val);
+        b.addEventListener("click", () => apresReponse(val, b, getBonneReponse()));
+        elChoix.appendChild(b);
+      });
+    } else {
+      // fraction d'une quantité
+      const couples = [
+        { num: 1, denom: 2, qty: 10 }, { num: 3, denom: 4, qty: 20 }, { num: 2, denom: 5, qty: 25 },
+        { num: 2, denom: 3, qty: 15 }, { num: 1, denom: 4, qty: 20 }, { num: 3, denom: 5, qty: 30 },
+      ];
+      const item = couples[Math.floor(Math.random() * couples.length)];
+      const rep = Math.round(item.qty * item.num / item.denom);
+      setBonneReponse(rep);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.4rem">Calcule :</p>` +
+        `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${item.num}/${item.denom} de ${item.qty} = ?</p>`;
+      const props = propositionsAvecBonne(rep, Math.max(1, rep - 6), rep + 6, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
+
   const pool = estCE2()
     ? [
         { n: 1, d: 2 }, { n: 1, d: 4 }, { n: 3, d: 4 },
@@ -374,6 +433,53 @@ function svgPerimetre(type, a, b) {
 export function lancerPerimetre() {
   elTitre.textContent = "🔲 Périmètre";
   const diff = getDifficulte();
+
+  if (estCM2()) {
+    // CM2 : aire rectangle (l × L), résultat en cm²
+    const l = 2 + Math.floor(Math.random() * [10, 20, 30][diff]);
+    const L = 2 + Math.floor(Math.random() * [10, 20, 30][diff]);
+    const aire = l * L;
+    setBonneReponse(aire);
+    elQuestion.innerHTML = `<div class="perimetre-question">
+      <p>Calcule l'<strong>aire</strong> de ce rectangle (en cm²).</p>
+      ${svgPerimetre("rectangle", L, l)}
+    </div>` +
+      `<p style="font-size:0.78rem;color:#888;margin-top:0.4rem">💡 Aire = longueur × largeur</p>`;
+    const props = propositionsAvecBonne(aire, Math.max(1, aire - Math.max(10, aire / 3)), aire + Math.max(10, aire / 3), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  if (estCM1()) {
+    // CM1 : périmètre triangle quelconque (3 côtés différents)
+    const maxT = [8, 15, 20][diff];
+    let a = 2 + Math.floor(Math.random() * maxT);
+    let b, c;
+    do { b = 2 + Math.floor(Math.random() * maxT); } while (b === a);
+    do { c = 2 + Math.floor(Math.random() * maxT); } while (c === a || c === b);
+    const perimetre = a + b + c;
+    setBonneReponse(perimetre);
+    const W = 260, H = 190, cx = W / 2, cy = H / 2 + 10;
+    const h = 100;
+    const p1 = `${cx},${cy - h * 0.6}`;
+    const p2 = `${cx - 70},${cy + h * 0.4}`;
+    const p3 = `${cx + 70},${cy + h * 0.4}`;
+    const fs = 15, fw = 700, fc = "#5344c7";
+    const svgT = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:Fredoka,sans-serif">
+      <polygon points="${p1} ${p2} ${p3}" fill="#f0eeff" stroke="#6c5ce7" stroke-width="3"/>
+      <text x="${cx}" y="${cy + h * 0.4 + 18}" text-anchor="middle" font-size="${fs}" font-weight="${fw}" fill="${fc}">${a} cm</text>
+      <text x="${cx - 50}" y="${cy - 5}" text-anchor="end" font-size="${fs}" font-weight="${fw}" fill="${fc}">${b} cm</text>
+      <text x="${cx + 50}" y="${cy - 5}" text-anchor="start" font-size="${fs}" font-weight="${fw}" fill="${fc}">${c} cm</text>
+    </svg>`;
+    elQuestion.innerHTML = `<div class="perimetre-question">
+      <p>Calcule le <strong>périmètre</strong> de ce triangle (en cm).</p>
+      ${svgT}
+    </div>`;
+    const props = propositionsAvecBonne(perimetre, Math.max(6, perimetre - 15), perimetre + 15, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
   const maxC = estCE2() ? [12, 18, 25][diff] : (estCE1() ? [8, 12, 15][diff] : [5, 7, 8][diff]);
   const types = estCE2()
     ? ["carre", "rectangle", "triangle", "trapeze"]
@@ -483,6 +589,44 @@ export function lancerAngles() {
   elTitre.textContent = "📐 Les angles";
   let degres, bonneVal;
 
+  if (estCM2()) {
+    // CM2 : somme des angles d'un triangle = 180°, trouver l'angle manquant
+    const a1 = 20 + Math.floor(Math.random() * 80);
+    const a2 = 20 + Math.floor(Math.random() * (140 - a1));
+    const manquant = 180 - a1 - a2;
+    if (manquant <= 0 || manquant >= 180) { lancerAngles(); return; }
+    setBonneReponse(manquant);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.88rem;margin:0 0 0.4rem">💡 La somme des angles d'un triangle = <strong>180°</strong></p>` +
+      `<p class="equation" style="font-size:1.8rem;font-weight:700;margin:0.4rem 0">${a1}° + ${a2}° + ? = 180°</p>` +
+      `<p style="font-size:0.9rem;margin-top:0.3rem">Quel est l'angle manquant ?</p>`;
+    const props = propositionsAvecBonne(manquant, Math.max(1, manquant - 20), Math.min(170, manquant + 20), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  if (estCM1()) {
+    // CM1 : mesurer un angle en degrés (choix parmi 4 valeurs)
+    const angleVals = [30, 45, 60, 90, 120, 135, 150];
+    const idx = Math.floor(Math.random() * angleVals.length);
+    degres = angleVals[idx];
+    bonneVal = degres;
+    setBonneReponse(bonneVal);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.78rem;color:#888;margin:0 0 0.3rem">📐 Combien de degrés mesure cet angle ?</p>` +
+      `<div class="angle-question">${svgAngle(degres, 160)}</div>`;
+    elChoix.innerHTML = "";
+    const faux = melanger(angleVals.filter(v => v !== degres)).slice(0, 3);
+    melanger([degres, ...faux]).forEach(val => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "btn-choix";
+      b.textContent = val + "°"; b.dataset.valeur = String(val);
+      b.addEventListener("click", () => apresReponse(val, b, getBonneReponse()));
+      elChoix.appendChild(b);
+    });
+    return;
+  }
+
   if (estCE2()) {
     if (Math.random() < 0.40) {
       // CE2 variant : "Combien d'angles droits dans ce polygone ?"
@@ -573,5 +717,66 @@ export function lancerAngles() {
       b.addEventListener("click", () => apresReponse(val, b, getBonneReponse()));
       elChoix.appendChild(b);
     });
+  }
+}
+
+// ── lancerAires ───────────────────────────────────────────────────────────────
+export function lancerAires() {
+  elTitre.textContent = "📐 Aires";
+  const diff = getDifficulte();
+
+  if (estCM2()) {
+    // CM2 : aire triangle (base × hauteur / 2)
+    const base = 2 + Math.floor(Math.random() * [8, 14, 20][diff]);
+    const hauteur = 2 + Math.floor(Math.random() * [8, 14, 20][diff]);
+    const aire = Math.round(base * hauteur / 2);
+    setBonneReponse(aire);
+    const W = 260, H = 190;
+    const cx = W / 2, cy = H / 2;
+    const bpx = base * 10, hpx = hauteur * 8;
+    const x0 = cx - bpx / 2, x1 = cx + bpx / 2, y0 = cy + hpx / 2, y2 = cy - hpx / 2;
+    const svgT = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:Fredoka,sans-serif">
+      <polygon points="${x0},${y0} ${x1},${y0} ${cx},${y2}" fill="#f0eeff" stroke="#6c5ce7" stroke-width="3"/>
+      <line x1="${cx}" y1="${y0}" x2="${cx}" y2="${y2}" stroke="#fd79a8" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="${cx}" y="${y0 + 18}" text-anchor="middle" font-size="14" font-weight="700" fill="#5344c7">${base} cm</text>
+      <text x="${cx + 10}" y="${(y0 + y2) / 2}" text-anchor="start" font-size="13" font-weight="700" fill="#c0226a">h = ${hauteur} cm</text>
+    </svg>`;
+    elQuestion.innerHTML = `<div class="perimetre-question">
+      <p>Calcule l'<strong>aire</strong> de ce triangle (en cm²).</p>
+      ${svgT}
+      <p style="font-size:0.78rem;color:#888">💡 Aire = base × hauteur ÷ 2</p>
+    </div>`;
+    const pMin = Math.max(1, aire - Math.max(5, Math.round(aire / 3)));
+    const pMax = aire + Math.max(5, Math.round(aire / 3));
+    const props = propositionsAvecBonne(aire, pMin, pMax, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  // CM1 : aire rectangle (l × L) et carré (c²)
+  const useSquare = Math.random() < 0.4;
+  if (useSquare) {
+    const c = 2 + Math.floor(Math.random() * [6, 10, 15][diff]);
+    const aire = c * c;
+    setBonneReponse(aire);
+    elQuestion.innerHTML = `<div class="perimetre-question">
+      <p>Calcule l'<strong>aire</strong> de ce carré (en cm²).</p>
+      ${svgPerimetre("carre", c, c)}
+      <p style="font-size:0.78rem;color:#888">💡 Aire = côté × côté = ${c} × ${c}</p>
+    </div>`;
+    const props = propositionsAvecBonne(aire, Math.max(1, aire - Math.max(5, Math.round(aire / 3))), aire + Math.max(5, Math.round(aire / 3)), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+  } else {
+    const l = 2 + Math.floor(Math.random() * [6, 10, 15][diff]);
+    const L = 2 + Math.floor(Math.random() * [6, 10, 15][diff]);
+    const aire = l * L;
+    setBonneReponse(aire);
+    elQuestion.innerHTML = `<div class="perimetre-question">
+      <p>Calcule l'<strong>aire</strong> de ce rectangle (en cm²).</p>
+      ${svgPerimetre("rectangle", L, l)}
+      <p style="font-size:0.78rem;color:#888">💡 Aire = longueur × largeur</p>
+    </div>`;
+    const props = propositionsAvecBonne(aire, Math.max(1, aire - Math.max(5, Math.round(aire / 3))), aire + Math.max(5, Math.round(aire / 3)), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
   }
 }
