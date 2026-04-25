@@ -1836,6 +1836,81 @@ h1 {
 .badge-notif-nom { font-size:1.4rem; font-weight:800; color:var(--texte); margin:0 0 0.4rem; }
 .badge-notif-desc { font-size:0.9rem; color:#636e72; margin:0 0 1.5rem; }
 
+/* ── Tamagotchi UI ──────────────────────────────────────────────────────────── */
+.tama-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(180deg, #e8f4ff 0%, #fff5e6 100%);
+  border-radius: 2rem;
+  padding: 1.2rem 1rem 0.8rem;
+  width: 100%;
+  max-width: 320px;
+  gap: 0.2rem;
+  position: relative;
+}
+@keyframes bulle-pop { 0%{transform:scale(0.85);opacity:0} 70%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
+.tama-bulle {
+  background: white;
+  border: 2px solid var(--primaire);
+  border-radius: 1rem;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--primaire);
+  text-align: center;
+  position: relative;
+  min-height: 1.8rem;
+  animation: bulle-pop 0.3s ease;
+}
+.tama-bulle::after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--primaire);
+}
+.tama-jauges { display:flex; flex-direction:column; gap:0.55rem; width:100%; max-width:260px; }
+.tama-jauge-ligne { display:flex; align-items:center; gap:0.5rem; }
+.tama-jauge-icone { font-size:1.4rem; width:1.8rem; text-align:center; }
+.tama-segments { display:flex; gap:5px; flex:1; }
+.tama-segment { flex:1; height:20px; border-radius:6px; transition:background 0.4s ease; }
+.tama-segment.plein    { background: var(--succes); }
+.tama-segment.mi-plein { background: var(--soleil); }
+.tama-segment.vide     { background: #e0e0e0; }
+@keyframes clignoter { 0%,100%{opacity:1} 50%{opacity:0.25} }
+.tama-segment.critique { background: var(--erreur); animation: clignoter 0.8s ease infinite; }
+.tama-actions { display:flex; gap:0.65rem; width:100%; max-width:320px; justify-content:center; }
+.tama-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  border: none;
+  border-radius: 1.2rem;
+  padding: 0.85rem 0.3rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.18);
+  color: white;
+  min-height: 84px;
+}
+.tama-btn:active:not(:disabled) { transform:translateY(4px); box-shadow:0 1px 0 rgba(0,0,0,0.18); }
+.tama-btn:disabled { opacity:0.42; cursor:not-allowed; }
+.tama-btn-emoji { font-size:1.9rem; display:block; line-height:1.1; }
+.tama-btn small { font-size:0.62rem; opacity:0.88; display:block; margin-top:0.1rem; }
+.tama-btn-nourrir { background: linear-gradient(145deg, #fdcb6e, #e17055); }
+.tama-btn-calin   { background: linear-gradient(145deg, #fd79a8, #d63031); }
+.tama-btn-jouer   { background: linear-gradient(145deg, #00cec9, #0984e3); }
+@keyframes monterEmoji { 0%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-90px) scale(1.7);opacity:0} }
+.emoji-flottant { position:fixed; font-size:2rem; pointer-events:none; z-index:500; animation:monterEmoji 0.9s ease-out forwards; transform-origin:center; }
+
 /* ── Histoire narrative ─────────────────────────────────────────────────────── */
 .histoire-intro-carte { max-width: 340px; }
 .histoire-intro-emoji { font-size: 2rem; margin: 0 0 0.2rem; letter-spacing: 0.2em; }

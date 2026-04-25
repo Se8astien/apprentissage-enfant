@@ -252,6 +252,49 @@ export function afficherStreakHeader(count) {
   el.title = `${count} jour${count > 1 ? "s" : ""} d'affilée !`;
 }
 
+// ── Tamagotchi helpers ────────────────────────────────────────────────────────
+function majBulle(faim, bonheur, nom) {
+  const el = document.getElementById("tama-bulle");
+  if (!el) return;
+  let msg;
+  if (faim < 20)         msg = "J'ai très faim ! 🍎";
+  else if (bonheur < 20) msg = "Je m'ennuie ! 🎮";
+  else if (faim < 40)    msg = "J'aurais bien mangé... 🍎";
+  else if (bonheur < 40) msg = "Joue avec moi ! 🎮";
+  else {
+    const pool = ["Je t'aime ! 💜", "Je suis heureux !", "C'est magique ! ✨", `Merci ${nom} !`, "Quelle belle journée !"];
+    msg = pool[Math.floor(Math.random() * pool.length)];
+  }
+  el.textContent = msg;
+}
+
+function renderSegments(containerId, valeur) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const total = 5;
+  const pleins = Math.round((valeur / 100) * total);
+  const basse = valeur < 30;
+  el.innerHTML = "";
+  for (let i = 0; i < total; i++) {
+    const seg = document.createElement("div");
+    seg.className = "tama-segment " + (i < pleins
+      ? (basse ? "critique" : (pleins <= 2 ? "mi-plein" : "plein"))
+      : "vide");
+    el.appendChild(seg);
+  }
+}
+
+function flotterEmoji(emoji, bouton) {
+  const rect = bouton.getBoundingClientRect();
+  const el   = document.createElement("div");
+  el.className  = "emoji-flottant";
+  el.textContent = emoji;
+  el.style.left = (rect.left + rect.width / 2 - 16) + "px";
+  el.style.top  = rect.top + "px";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
 // ── Maison screen ─────────────────────────────────────────────────────────────
 export function montrerMaison(montrerMenuFn) {
   const elMaison = document.getElementById("ecran-maison");
@@ -265,10 +308,12 @@ export function montrerMaison(montrerMenuFn) {
   const stade   = getStade(etoiles);
   const s       = RENARD_STADES[stade];
   const nom     = lireNomRenard() || "Foxy";
+  const faim    = lireFaim();
+  const bonheur = lireBonheur();
 
-  const triste = lireFaim() < 20 || lireBonheur() < 20;
-  document.getElementById("maison-renard").innerHTML = svgRenard(stade, 160, { triste, accessoires: Object.keys(lireTenue()) });
-  document.getElementById("maison-nom").textContent  = nom;
+  const triste = faim < 20 || bonheur < 20;
+  document.getElementById("maison-renard").innerHTML = svgRenard(stade, 180, { triste, accessoires: Object.keys(lireTenue()) });
+  document.getElementById("maison-nom").textContent   = nom;
   document.getElementById("maison-stade").textContent = "✦ " + s.nom;
   document.getElementById("maison-etoiles-total").textContent = etoiles;
 
@@ -293,17 +338,22 @@ export function montrerMaison(montrerMenuFn) {
     document.getElementById("maison-barre-remplie").style.width = "100%";
   }
 
-  function majJaugeEl(id, barreId, valId, val) {
+  function majJaugeEl(barreId, valId, val) {
     document.getElementById(barreId).style.width = val + "%";
     document.getElementById(valId).textContent = Math.round(val) + "%";
   }
-  majJaugeEl("faim",    "jauge-faim-barre",    "jauge-faim-val",    lireFaim());
-  majJaugeEl("bonheur", "jauge-bonheur-barre",  "jauge-bonheur-val", lireBonheur());
+  majJaugeEl("jauge-faim-barre",    "jauge-faim-val",    faim);
+  majJaugeEl("jauge-bonheur-barre", "jauge-bonheur-val", bonheur);
+
+  majBulle(faim, bonheur, nom);
+  renderSegments("tama-faim-segments",    faim);
+  renderSegments("tama-bonheur-segments", bonheur);
 
   const btnNourrir = document.getElementById("btn-nourrir");
-  btnNourrir.disabled = etoiles < 2 || lireFaim() >= 95;
+  btnNourrir.disabled = etoiles < 2 || faim >= 95;
   btnNourrir.onclick = () => {
     if (lireEtoiles() < 2) return;
+    flotterEmoji("🍎", btnNourrir);
     const t = lireEtoiles() - 2;
     localStorage.setItem(STORAGE_KEY, String(t));
     elTotal.textContent = t;
@@ -319,11 +369,21 @@ export function montrerMaison(montrerMenuFn) {
     peutCalin ? "1× par jour" : "✓ Déjà fait !";
   btnCalin.onclick = () => {
     if (!peutFaireCalin()) return;
+    flotterEmoji("❤️", btnCalin);
     localStorage.setItem(RENARD_CALIN_DATE_KEY, new Date().toISOString().slice(0, 10));
     sauverBonheur(lireBonheur() + 20);
     mettreAJourRenardHeader();
     montrerMaison(montrerMenuFn);
   };
+
+  const btnJouer = document.getElementById("btn-jouer-tama");
+  if (btnJouer) {
+    btnJouer.onclick = () => {
+      elMaison.hidden = true;
+      elMaison.classList.remove("actif");
+      montrerMenuFn();
+    };
+  }
 
   const conteneur = elMaison.querySelector(".maison-conteneur");
   if (conteneur) afficherContexteHistoireMaison(conteneur);

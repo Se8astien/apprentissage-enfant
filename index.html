@@ -209,14 +209,48 @@
 
     <section id="ecran-maison" class="ecran" hidden aria-label="Ma Maison">
       <button type="button" class="btn-retour" id="btn-retour-maison">← Menu</button>
-      <h2 class="maison-titre">🏠 Ma Maison</h2>
       <div class="maison-conteneur">
-        <div class="maison-renard" id="maison-renard" aria-hidden="true"></div>
-        <div class="maison-infos">
+
+        <!-- Scène : bulle + renard + nom -->
+        <div class="tama-scene">
+          <div class="tama-bulle" id="tama-bulle" aria-live="polite"></div>
+          <div class="maison-renard" id="maison-renard" aria-hidden="true"></div>
           <p class="maison-nom" id="maison-nom"></p>
           <p class="maison-stade" id="maison-stade"></p>
-          <p class="maison-jours" id="maison-jours"></p>
         </div>
+
+        <!-- Jauges à segments -->
+        <div class="tama-jauges">
+          <div class="tama-jauge-ligne">
+            <span class="tama-jauge-icone">🍎</span>
+            <div class="tama-segments" id="tama-faim-segments" aria-label="Faim"></div>
+          </div>
+          <div class="tama-jauge-ligne">
+            <span class="tama-jauge-icone">❤️</span>
+            <div class="tama-segments" id="tama-bonheur-segments" aria-label="Bonheur"></div>
+          </div>
+        </div>
+
+        <!-- Boutons d'action (grands, tactiles) -->
+        <div class="tama-actions">
+          <button type="button" class="tama-btn tama-btn-nourrir" id="btn-nourrir">
+            <span class="tama-btn-emoji">🍎</span>
+            <span>Nourrir</span>
+            <small>−2 ⭐</small>
+          </button>
+          <button type="button" class="tama-btn tama-btn-calin" id="btn-calin">
+            <span class="tama-btn-emoji">❤️</span>
+            <span>Câlin</span>
+            <small id="calin-dispo-label">1× par jour</small>
+          </button>
+          <button type="button" class="tama-btn tama-btn-jouer" id="btn-jouer-tama">
+            <span class="tama-btn-emoji">🎮</span>
+            <span>Jouer</span>
+            <small>+❤️</small>
+          </button>
+        </div>
+
+        <!-- Étoiles + progression -->
         <div class="maison-etoiles">
           <span class="maison-etoiles-icone">⭐</span>
           <span class="maison-etoiles-total" id="maison-etoiles-total"></span>
@@ -227,30 +261,27 @@
             <div class="maison-barre-remplie" id="maison-barre-remplie"></div>
           </div>
         </div>
-        <div class="maison-jauges">
+
+        <!-- Jours -->
+        <p class="maison-jours" id="maison-jours"></p>
+
+        <!-- Éléments de jauge cachés — ancre DOM pour app-histoire.js -->
+        <div class="maison-jauges" hidden aria-hidden="true">
           <div class="jauge-ligne">
-            <span class="jauge-label">🍎 Faim</span>
             <div class="jauge-barre-fond">
               <div class="jauge-barre-fill jauge-faim" id="jauge-faim-barre"></div>
             </div>
             <span class="jauge-val" id="jauge-faim-val"></span>
           </div>
           <div class="jauge-ligne">
-            <span class="jauge-label">❤️ Bonheur</span>
             <div class="jauge-barre-fond">
               <div class="jauge-barre-fill jauge-bonheur" id="jauge-bonheur-barre"></div>
             </div>
             <span class="jauge-val" id="jauge-bonheur-val"></span>
           </div>
         </div>
-        <div class="maison-actions">
-          <button type="button" class="btn-action-renard" id="btn-nourrir">
-            🍎 Nourrir<br><small>−2 ⭐</small>
-          </button>
-          <button type="button" class="btn-action-renard" id="btn-calin">
-            ❤️ Câlin<br><small id="calin-dispo-label">1× par jour</small>
-          </button>
-        </div>
+
+        <!-- Dressing + réglages -->
         <button type="button" class="btn-dressing" id="btn-dressing">👗 Dressing</button>
         <div class="maison-reglages">
           <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
