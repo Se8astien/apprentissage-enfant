@@ -594,13 +594,33 @@ h1 {
   }
 }
 
+/* ── Responsive : petits écrans (< 360px) ─────────────────────────────── */
+@media (max-width: 360px) {
+  .classe-btns { gap: 0.5rem; }
+  .btn-classe { max-width: 90px; padding: 0.75rem 0.3rem; }
+  .classe-emoji { font-size: 1.6rem; }
+  .classe-nom { font-size: 1rem; }
+  .diff-btns { gap: 0.4rem; }
+  .btn-diff { padding: 0.65rem 0.3rem; max-width: 80px; }
+  .genre-btns { gap: 1rem; }
+  .btn-genre { min-width: 6.5rem; padding: 0.75rem 1rem; }
+  html { font-size: 14px; }
+}
+
+/* ── Responsive : grands écrans (> 600px) ─────────────────────────────── */
+@media (min-width: 600px) {
+  .app { padding: 1.5rem 2rem 3rem; }
+  .btn-classe { max-width: 140px; }
+  .genre-emoji { font-size: 4rem; }
+}
+
 /* ── Écran sélection du genre ────────────────────────────────────────────── */
 
 #ecran-genre {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 70dvh;
+  padding: 1.5rem 0;
 }
 
 #ecran-genre.actif {
@@ -611,12 +631,14 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  padding: 1rem;
+  gap: 1.25rem;
+  padding: 0.5rem 1rem;
 }
 
 .genre-mascotte {
   line-height: 0;
+  max-height: 80px;
+  overflow: hidden;
 }
 
 .genre-titre {
@@ -707,16 +729,17 @@ h1 {
 .btn-genre {
   border: none;
   border-radius: 1.5rem;
-  padding: 1.25rem 1rem;
+  padding: 1rem 1.5rem;
   background: var(--carte);
-  box-shadow: 0 8px 28px var(--ombre);
+  box-shadow: 0 6px 20px var(--ombre);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.3rem;
-  min-width: 7rem;
+  min-width: 8rem;
+  font-family: inherit;
 }
 
 .btn-genre:hover,
@@ -732,7 +755,7 @@ h1 {
 }
 
 .genre-emoji {
-  font-size: clamp(3.5rem, 14vw, 5rem);
+  font-size: clamp(2.8rem, 11vw, 3.8rem);
   line-height: 1;
   display: block;
   animation: flotte 3s ease-in-out infinite;
@@ -755,25 +778,34 @@ h1 {
 #btn-fille  { animation: genre-entree 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 #btn-garcon { animation: genre-entree 0.4s 0.12s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
-/* Bouton discret "changer de profil" dans le menu */
+.maison-reglages {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
 .btn-changer-genre {
-  display: block;
-  margin: 1.5rem auto 0;
-  border: none;
-  background: transparent;
-  font-size: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 2px solid var(--ombre);
+  background: white;
+  color: var(--texte);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  opacity: 0.45;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  padding: 0.3rem;
+  opacity: 0.75;
+  padding: 0.45rem 1rem;
   border-radius: 999px;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .btn-changer-genre:hover,
 .btn-changer-genre:focus-visible {
   opacity: 1;
-  transform: scale(1.15);
-  outline: 2px solid var(--accent);
+  transform: translateY(-1px);
+  outline: none;
+  border-color: var(--primaire);
 }
 
 /* ── Boutons visuels generiques ─────────────────────────────────────────── */
