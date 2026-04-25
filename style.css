@@ -1557,3 +1557,68 @@ h1 {
   margin: 0;
   animation: flotte 1s ease-in-out infinite;
 }
+
+/* ── Planche des cent ──────────────────────────── */
+.planche-mini {
+  border-collapse: collapse;
+  margin: 1rem auto;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.planche-mini td {
+  width: 2.8rem;
+  height: 2.8rem;
+  text-align: center;
+  border: 2px solid var(--ombre);
+  border-radius: 0.4rem;
+  background: white;
+}
+.planche-vide {
+  background: linear-gradient(135deg, var(--primaire), #a29bfe) !important;
+  color: white;
+  font-size: 1.5rem;
+}
+
+/* ── Grammaire Montessori ──────────────────────── */
+.mot-cible {
+  text-decoration: underline;
+  text-decoration-color: var(--primaire);
+  font-size: 1.3em;
+}
+.grammaire-nom    { color: #111; }
+.grammaire-verbe  { color: #c0392b; }
+.grammaire-adjectif { color: #2980b9; }
+.grammaire-determinant { color: #1a6b3a; }
+
+/* ── Perles dorées ─────────────────────────────── */
+.perles-conteneur {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1rem 0;
+}
+.perle-groupe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.perle-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #888;
+}
+.perle-unite  { font-size: 1.2rem; color: #f39c12; }
+.perle-dizaine { font-size: 1.6rem; color: #e67e22; }
+.perle-centaine { font-size: 2rem; color: #d4ac0d; }
+.perle-millier  { font-size: 2.4rem; color: #b7950b; }
+
+/* ── Maîtrise (stars) ──────────────────────────── */
+.maitrise-stars {
+  display: block;
+  font-size: 0.7rem;
+  color: #f39c12;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
+}

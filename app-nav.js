@@ -24,6 +24,8 @@ import {
   getDifficulte,
   incrementDifficulte,
   getDiffLabel,
+  marquerMaitrise,
+  lireMaitrise,
 } from "./app-state.js";
 
 import {
@@ -134,8 +136,10 @@ export function apresReponse(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
-    if (comboActuel === 10) declencherCombo(10);
-    else if (comboActuel === 5) declencherCombo(5);
+    if (comboActuel === 10) {
+      declencherCombo(10);
+      marquerMaitrise(getJeuCourant(), getDifficulte());
+    } else if (comboActuel === 5) declencherCombo(5);
     // Auto-promote difficulty after ×10 combo
     if (comboActuel >= 10 && getDifficulte() < 2) {
       incrementDifficulte();
@@ -171,8 +175,10 @@ export function apresReponseTexte(choix, bouton, correct) {
     sauverFaim(lireFaim() + 5);
     confetti();
     declencherReactionRenard(true);
-    if (comboActuel === 10) declencherCombo(10);
-    else if (comboActuel === 5) declencherCombo(5);
+    if (comboActuel === 10) {
+      declencherCombo(10);
+      marquerMaitrise(getJeuCourant(), getDifficulte());
+    } else if (comboActuel === 5) declencherCombo(5);
     // Auto-promote difficulty after ×10 combo
     if (comboActuel >= 10 && getDifficulte() < 2) {
       incrementDifficulte();
@@ -223,6 +229,13 @@ export function montrerMenu() {
   const diffLabel = document.getElementById("difficulte-label");
   if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2" }[getNiveauCourant()] || "";
   if (diffLabel) diffLabel.textContent = getDiffLabel();
+  document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
+    const m = lireMaitrise(btn.dataset.jeu);
+    const n = m.filter(Boolean).length;
+    let el = btn.querySelector(".maitrise-stars");
+    if (!el) { el = document.createElement("span"); el.className = "maitrise-stars"; btn.appendChild(el); }
+    el.textContent = n > 0 ? "★".repeat(n) + "☆".repeat(3 - n) : "";
+  });
 }
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────

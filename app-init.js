@@ -22,6 +22,7 @@ import {
   getDifficulte,
   setDifficulte,
   getDiffLabel,
+  lireMaitrise,
 } from "./app-state.js";
 
 import {
@@ -42,12 +43,12 @@ import {
   resetFeedback,
 } from "./app-nav.js";
 
-import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair } from "./games-maths.js";
+import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100 } from "./games-maths.js";
 import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles } from "./games-formes.js";
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction } from "./games-langage.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte } from "./games-langage.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -78,6 +79,13 @@ const lanceurs = {
   masse:          lancerMasse,
   perimetre:      lancerPerimetre,
   angles:         lancerAngles,
+  perlesDorees:   lancerPerlesDorees,
+  planche100:     lancerPlanche100,
+  sons:           lancerSons,
+  grammaire:      lancerGrammaire,
+  lecturePhrase:  lancerLecturePhrase,
+  phraseMobile:   lancerPhraseMobile,
+  lectureTexte:   lancerLectureTexte,
 };
 
 // ── Classe screen ─────────────────────────────────────────────────────────────
@@ -162,6 +170,19 @@ if (formNommage) {
     montrerMenu();
   });
 }
+
+// ── Étoiles de maîtrise ───────────────────────────────────────────────────────
+function majEtoilesMaitrise() {
+  document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
+    const jeu = btn.dataset.jeu;
+    const m = lireMaitrise(jeu);
+    const etoiles = m.filter(Boolean).length;
+    let el = btn.querySelector(".maitrise-stars");
+    if (!el) { el = document.createElement("span"); el.className = "maitrise-stars"; btn.appendChild(el); }
+    el.textContent = etoiles > 0 ? "★".repeat(etoiles) + "☆".repeat(3 - etoiles) : "";
+  });
+}
+majEtoilesMaitrise();
 
 // ── Boutons jeux ──────────────────────────────────────────────────────────────
 document.querySelectorAll(".carte-jeu").forEach((btn) => {

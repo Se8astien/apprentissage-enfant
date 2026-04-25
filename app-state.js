@@ -272,6 +272,18 @@ export function afficherChoix(nombres, handler) {
   });
 }
 
+// ── Maîtrise (mastery stars) ──────────────────────────────────────────────────
+export function lireMaitrise(jeu) {
+  try { return JSON.parse(localStorage.getItem("maitrise-" + jeu)) || [false, false, false]; }
+  catch { return [false, false, false]; }
+}
+
+export function marquerMaitrise(jeu, diff) {
+  const m = lireMaitrise(jeu);
+  m[diff] = true;
+  localStorage.setItem("maitrise-" + jeu, JSON.stringify(m));
+}
+
 // ── Confetti ──────────────────────────────────────────────────────────────────
 export function confetti() {
   const root = document.getElementById("confetti");
