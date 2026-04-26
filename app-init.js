@@ -12,14 +12,18 @@ import {
   lireNomRenard,
   sauverNomRenard,
   lireEtoiles,
-  syncNiveauButtons,
-  majLabelsMenu,
   majGenre,
   mettreAJourJauges,
   setBadgeVisible,
   getNiveauCourant,
   getJeuCourant,
-  estCE2,
+  estGrand,
+  STORAGE_NIVEAU,
+  getDifficulte,
+  setDifficulte,
+  getDiffLabel,
+  lireMaitrise,
+  confetti,
 } from "./app-state.js";
 
 import {
@@ -29,6 +33,8 @@ import {
   afficherStreakHeader,
   montrerMaison,
   montrerDressing,
+  svgRenard,
+  getStade,
 } from "./app-renard.js";
 
 import {
@@ -38,12 +44,21 @@ import {
   resetFeedback,
 } from "./app-nav.js";
 
-import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair } from "./games-maths.js";
-import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles } from "./games-formes.js";
-import { lancerHeure, lancerDurees, lancerMesures, lancerMasse } from "./games-temps.js";
+import {
+  afficherMissions,
+  debloquerBadge,
+  afficherNotifBadge,
+  BADGES,
+  lireBadges,
+} from "./app-gamification.js";
+
+import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100, lancerDecimaux } from "./games-maths.js";
+import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles, lancerAires } from "./games-formes.js";
+import { lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
-import { lancerMultiplication, lancerDivision, lancerProbleme } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction } from "./games-langage.js";
+import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes } from "./games-langage.js";
+import { afficherIntroHistoire } from "./app-histoire.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -74,30 +89,95 @@ const lanceurs = {
   masse:          lancerMasse,
   perimetre:      lancerPerimetre,
   angles:         lancerAngles,
+  perlesDorees:   lancerPerlesDorees,
+  planche100:     lancerPlanche100,
+  sons:           lancerSons,
+  grammaire:      lancerGrammaire,
+  lecturePhrase:  lancerLecturePhrase,
+  phraseMobile:   lancerPhraseMobile,
+  lectureTexte:   lancerLectureTexte,
+  aires:          lancerAires,
+  decimaux:       lancerDecimaux,
+  fractionsCM:    lancerFractionsCM,
+  proportionnalite: lancerProportionnalite,
+  pourcentages:   lancerPourcentages,
+  conjugaison:    lancerConjugaison,
+  homophones:     lancerHomophones,
+  synonymes:      lancerSynonymes,
+  calendrier:     lancerCalendrier,
 };
+
+// ── Classe screen ─────────────────────────────────────────────────────────────
+const ecranClasse = document.getElementById("ecran-classe");
+const btnClasse = document.querySelectorAll(".btn-classe");
+
+function montrerClasse() {
+  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+  ecranClasse.hidden = false;
+  ecranClasse.classList.add("actif");
+  const mascot = document.getElementById("classe-mascotte");
+  if (mascot) mascot.innerHTML = svgRenard(getStade(lireEtoiles()), 80, {});
+  const diffChoix = document.getElementById("diff-choix");
+  if (diffChoix) diffChoix.hidden = true;
+  btnClasse.forEach(b => b.classList.remove("selectionne"));
+}
+
+function passerAuMenu() {
+  if (!lireNomRenard()) {
+    montrerNommage();
+  } else {
+    majGenre();
+    montrerMenu();
+    afficherMissions();
+  }
+}
+
+btnClasse.forEach(btn => {
+  btn.addEventListener("click", () => {
+    sauverNiveau(btn.dataset.niveau);
+    btnClasse.forEach(b => b.classList.toggle("selectionne", b === btn));
+    const diffChoix = document.getElementById("diff-choix");
+    if (diffChoix) {
+      diffChoix.hidden = false;
+      diffChoix.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  });
+});
+
+document.querySelectorAll(".btn-diff").forEach(btn => {
+  btn.addEventListener("click", () => {
+    setDifficulte(parseInt(btn.dataset.diff, 10));
+    passerAuMenu();
+  });
+});
 
 // ── Initialisation ────────────────────────────────────────────────────────────
 elTotal.textContent = lireEtoiles();
-syncNiveauButtons();
-majLabelsMenu();
+majGenre();
 mettreAJourJauges();
 mettreAJourRenardHeader();
 const streakInit = mettreAJourStreak();
 afficherStreakHeader(streakInit.count);
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
-if (!lireNomRenard()) {
+if (!localStorage.getItem("maths-cp-genre")) {
+  elGenre.hidden = false;
+  elGenre.classList.add("actif");
+} else if (!localStorage.getItem(STORAGE_NIVEAU)) {
+  montrerClasse();
+} else if (!lireNomRenard()) {
   montrerNommage();
-} else if (localStorage.getItem("maths-cp-genre")) {
-  majGenre();
+} else {
   montrerMenu();
-  const nom = lireNomRenard();
+  afficherMissions();
   if (elSousTitre) {
-    elSousTitre.textContent = `${nom} t'attendait ! 🦊`;
+    const nom = lireNomRenard();
+    elSousTitre.textContent = estGrand()
+      ? `Bon retour, ${nom} !`
+      : `${nom} t'attendait ! 🦊`;
     setTimeout(() => majGenre(), 3500);
   }
 }
-// Sinon : #ecran-genre déjà actif dans le HTML
 
 // ── Formulaire de nommage ─────────────────────────────────────────────────────
 const formNommage = document.getElementById("nommage-form");
@@ -110,28 +190,25 @@ if (formNommage) {
     const elNommage = document.getElementById("ecran-nommage");
     elNommage.classList.remove("actif");
     elNommage.hidden = true;
-    elGenre.hidden = false;
-    elGenre.classList.add("actif");
     mettreAJourRenardHeader();
+    montrerMenu();
+    afficherMissions();
+    afficherIntroHistoire(nom);
   });
 }
 
-// ── Boutons niveau ────────────────────────────────────────────────────────────
-document.querySelectorAll(".niveau-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const n = btn.dataset.niveau;
-    if (n === getNiveauCourant()) return;
-    sauverNiveau(n);
-    syncNiveauButtons();
-    majLabelsMenu();
-    const jeu = getJeuCourant();
-    if (jeu) {
-      setBadgeVisible(true);
-      resetFeedback();
-      if (lanceurs[jeu]) lanceurs[jeu]();
-    }
+// ── Étoiles de maîtrise ───────────────────────────────────────────────────────
+function majEtoilesMaitrise() {
+  document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
+    const jeu = btn.dataset.jeu;
+    const m = lireMaitrise(jeu);
+    const etoiles = m.filter(Boolean).length;
+    let el = btn.querySelector(".maitrise-stars");
+    if (!el) { el = document.createElement("span"); el.className = "maitrise-stars"; btn.appendChild(el); }
+    el.textContent = etoiles > 0 ? "★".repeat(etoiles) + "☆".repeat(3 - etoiles) : "";
   });
-});
+}
+majEtoilesMaitrise();
 
 // ── Boutons jeux ──────────────────────────────────────────────────────────────
 document.querySelectorAll(".carte-jeu").forEach((btn) => {
@@ -139,14 +216,22 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
 });
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-btnRetour.addEventListener("click", montrerMenu);
+btnRetour.addEventListener("click", () => { montrerMenu(); afficherMissions(); });
 elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
 // ── Sélection du genre ────────────────────────────────────────────────────────
 document.querySelectorAll(".btn-genre").forEach((btn) => {
   btn.addEventListener("click", () => {
     sauverGenre(btn.dataset.genre);
-    montrerMenu();
+    majGenre();
+    if (!localStorage.getItem(STORAGE_NIVEAU)) {
+      montrerClasse();
+    } else if (!lireNomRenard()) {
+      montrerNommage();
+    } else {
+      montrerMenu();
+      afficherMissions();
+    }
   });
 });
 
@@ -161,12 +246,16 @@ if (btnChangerGenre) {
   });
 }
 
+// ── Changer de classe ─────────────────────────────────────────────────────────
+const btnChangerClasse = document.getElementById("btn-changer-classe");
+if (btnChangerClasse) btnChangerClasse.addEventListener("click", montrerClasse);
+
 // ── Ma Maison ─────────────────────────────────────────────────────────────────
 const btnMaison = document.getElementById("btn-maison");
 if (btnMaison) btnMaison.addEventListener("click", () => montrerMaison(montrerMenu));
 
 const btnRetourMaison = document.getElementById("btn-retour-maison");
-if (btnRetourMaison) btnRetourMaison.addEventListener("click", montrerMenu);
+if (btnRetourMaison) btnRetourMaison.addEventListener("click", () => { montrerMenu(); afficherMissions(); });
 
 // ── Dressing ──────────────────────────────────────────────────────────────────
 const btnDressing = document.getElementById("btn-dressing");
@@ -180,3 +269,98 @@ if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => {
   elDressing.classList.remove("actif");
   montrerMaison(montrerMenu);
 });
+
+// ── Modal : passer à la classe suivante ──────────────────────────────────────
+const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: "cm1", cm1: "cm2", cm2: null };
+
+const modalOui = document.getElementById("modal-oui");
+if (modalOui) {
+  modalOui.addEventListener("click", () => {
+    const suivant = CLASSE_SUIVANTE[getNiveauCourant()];
+    const modal = document.getElementById("modal-classe-suivante");
+    if (modal) modal.hidden = true;
+    if (suivant) {
+      sauverNiveau(suivant);
+      confetti();
+      const badgeId = suivant;
+      if (debloquerBadge(badgeId)) {
+        const b = BADGES.find(x => x.id === badgeId);
+        if (b) afficherNotifBadge(b);
+      }
+    }
+    montrerMenu();
+    afficherMissions();
+  });
+}
+
+const modalNon = document.getElementById("modal-non");
+if (modalNon) {
+  modalNon.addEventListener("click", () => {
+    const modal = document.getElementById("modal-classe-suivante");
+    if (modal) modal.hidden = true;
+  });
+}
+
+// ── Badges screen ─────────────────────────────────────────────────────────────
+const btnBadges = document.getElementById("btn-badges");
+if (btnBadges) {
+  btnBadges.addEventListener("click", () => {
+    const ecranBadges = document.getElementById("ecran-badges");
+    const grille = document.getElementById("badges-grille");
+    const compteur = document.getElementById("badges-compteur");
+    document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+    ecranBadges.hidden = false;
+    ecranBadges.classList.add("actif");
+    const obtenus = lireBadges();
+    compteur.textContent = `${obtenus.length} / ${BADGES.length} trophées`;
+    grille.innerHTML = BADGES.map(b => `
+      <div class="badge-carte ${obtenus.includes(b.id) ? "obtenu" : "verrouille"}">
+        <span class="badge-emoji">${obtenus.includes(b.id) ? b.emoji : "🔒"}</span>
+        <div class="badge-nom">${b.nom}</div>
+        <div class="badge-desc">${obtenus.includes(b.id) ? b.desc : "???"}</div>
+      </div>`).join("");
+  });
+}
+
+const btnRetourBadges = document.getElementById("btn-retour-badges");
+if (btnRetourBadges) {
+  btnRetourBadges.addEventListener("click", () => {
+    montrerMenu();
+    afficherMissions();
+  });
+}
+
+// ── Streak badges check at startup ───────────────────────────────────────────
+{
+  const streakCount = streakInit.count || 0;
+  const streakBadges = [
+    { min: 3,  id: "streak3" },
+    { min: 7,  id: "streak7" },
+    { min: 30, id: "streak30" },
+  ];
+  streakBadges.forEach(({ min, id }) => {
+    if (streakCount >= min && debloquerBadge(id)) {
+      const b = BADGES.find(x => x.id === id);
+      if (b) afficherNotifBadge(b);
+    }
+  });
+}
+
+// ── Badge "de retour" après 2 jours d'absence ─────────────────────────────────
+{
+  const rawStreak = localStorage.getItem("renard-streak");
+  if (rawStreak) {
+    try {
+      const s = JSON.parse(rawStreak);
+      if (s.lastVisit) {
+        const last = new Date(s.lastVisit);
+        const now  = new Date();
+        const diffDays = Math.floor((now - last) / 86400000);
+        if (diffDays >= 2 && debloquerBadge("retour")) {
+          const b = BADGES.find(x => x.id === "retour");
+          if (b) afficherNotifBadge(b);
+        }
+      }
+    } catch { /* ignore */ }
+  }
+}

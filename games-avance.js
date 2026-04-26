@@ -9,18 +9,63 @@ import {
   getBonneReponse,
   estCE1,
   estCE2,
+  estCM1,
+  estCM2,
+  melanger,
   propositionsAvecBonne,
   afficherChoix,
+  getDifficulte,
 } from "./app-state.js";
 
-import { apresReponse } from "./app-nav.js";
+import { apresReponse, apresReponseTexte } from "./app-nav.js";
 
 // ── lancerMultiplication ──────────────────────────────────────────────────────
 export function lancerMultiplication() {
   elTitre.textContent = "✖️ Multiplication";
+  const diff = getDifficulte();
+
+  if (estCM2()) {
+    // CM2 : deux facteurs à 2 chiffres
+    const a = 10 + Math.floor(Math.random() * [20, 50, 89][diff]);
+    const b = 10 + Math.floor(Math.random() * [20, 50, 89][diff]);
+    const produit = a * b;
+    setBonneReponse(produit);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.85rem;margin:0 0 0.3rem">Calcule ce produit :</p>` +
+      `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${a} × ${b} = ?</p>` +
+      `<p style="font-size:0.78rem;color:#888">💡 Décompose : (${Math.floor(a/10)*10} + ${a%10}) × ${b}</p>`;
+    const pmin = Math.max(100, produit - 200), pmax = Math.min(9801, produit + 200);
+    const props = propositionsAvecBonne(produit, pmin, pmax, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  if (estCM1()) {
+    // CM1 : tables jusqu'à 12, un facteur peut être à 2 chiffres
+    const tables12 = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const mult = tables12[Math.floor(Math.random() * tables12.length)];
+    const useDeuxChiffres = diff >= 1 && Math.random() < 0.40;
+    const fact = useDeuxChiffres
+      ? 11 + Math.floor(Math.random() * [4, 9, 19][diff])
+      : 1 + Math.floor(Math.random() * 12);
+    const produit = mult * fact;
+    setBonneReponse(produit);
+    elQuestion.innerHTML =
+      `<p style="font-size:0.85rem;margin:0 0 0.3rem">Calcule ce produit :</p>` +
+      `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${fact} × ${mult} = ?</p>`;
+    const pmin = Math.max(2, produit - 30), pmax = Math.min(500, produit + 30);
+    const props = propositionsAvecBonne(produit, pmin, pmax, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
 
   if (estCE2()) {
-    const tables = [2, 3, 4, 5, 6, 7, 8, 9, 11, 12];
+    const tablesCE2 = [
+      [2, 3, 4, 5, 10],
+      [2, 3, 4, 5, 6, 7, 8, 9, 10],
+      [2, 3, 4, 5, 6, 7, 8, 9, 11, 12],
+    ];
+    const tables = tablesCE2[diff];
     const mult = tables[Math.floor(Math.random() * tables.length)];
     const maxFact = 12;
     const fact = 1 + Math.floor(Math.random() * maxFact);
@@ -48,9 +93,11 @@ export function lancerMultiplication() {
     return;
   }
 
-  const tables = estCE1() ? [2, 3, 4, 5, 10] : [2, 3, 5];
+  const tablesCE1 = [[2, 5], [2, 3, 5], [2, 3, 4, 5, 10]];
+  const tablesCP  = [[2], [2, 3], [2, 3, 5]];
+  const tables = estCE1() ? tablesCE1[diff] : tablesCP[diff];
   const mult = tables[Math.floor(Math.random() * tables.length)];
-  const maxFact = estCE1() ? 10 : 5;
+  const maxFact = estCE1() ? [6, 8, 10][diff] : [3, 4, 5][diff];
   const fact = 1 + Math.floor(Math.random() * maxFact);
   const produit = mult * fact;
   setBonneReponse(produit);
@@ -88,9 +135,49 @@ export function lancerMultiplication() {
 // ── lancerDivision ────────────────────────────────────────────────────────────
 export function lancerDivision() {
   elTitre.textContent = "➗ Division";
+  const diff = getDifficulte();
+
+  if (estCM2()) {
+    // CM2 : division avec reste
+    const diviseurs12 = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const diviseur = diviseurs12[Math.floor(Math.random() * diviseurs12.length)];
+    const quotient = 10 + Math.floor(Math.random() * [20, 40, 90][diff]);
+    const reste = Math.floor(Math.random() * diviseur);
+    const total = diviseur * quotient + reste;
+    setBonneReponse(quotient);
+    elQuestion.innerHTML = `<div class="div-question">
+      <p style="font-size:0.88rem;margin:0 0 0.5rem">Calcule le quotient (partie entière) :</p>
+      <p class="equation" style="font-size:2.2rem;font-weight:700;margin:.4rem 0">${total} ÷ ${diviseur} = ?</p>
+      <p style="font-size:0.78rem;color:#888">💡 Résultat entier, il peut y avoir un reste</p>
+    </div>`;
+    const props = propositionsAvecBonne(quotient, Math.max(1, quotient - 8), quotient + 8, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  if (estCM1()) {
+    // CM1 : diviseurs jusqu'à 12, quotient 2 chiffres
+    const diviseurs12 = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const diviseur = diviseurs12[Math.floor(Math.random() * diviseurs12.length)];
+    const quotient = 10 + Math.floor(Math.random() * [10, 20, 40][diff]);
+    const total = diviseur * quotient;
+    setBonneReponse(quotient);
+    elQuestion.innerHTML = `<div class="div-question">
+      <p style="font-size:0.88rem;margin:0 0 0.5rem">Calcule cette division :</p>
+      <p class="equation" style="font-size:2.2rem;font-weight:700;margin:.4rem 0">${total} ÷ ${diviseur} = ?</p>
+    </div>`;
+    const props = propositionsAvecBonne(quotient, Math.max(1, quotient - 8), quotient + 8, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
 
   if (estCE2()) {
-    const diviseurs = [2, 3, 4, 5, 6, 7, 8, 9];
+    const diviseursCE2 = [
+      [2, 3, 4, 5],
+      [2, 3, 4, 5, 6, 7],
+      [2, 3, 4, 5, 6, 7, 8, 9],
+    ];
+    const diviseurs = diviseursCE2[diff];
     const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
     const quotient = 1 + Math.floor(Math.random() * 12);
 
@@ -117,9 +204,11 @@ export function lancerDivision() {
     return;
   }
 
-  const diviseurs = estCE1() ? [2, 3, 4, 5, 10] : [2, 3];
+  const diviseursCE1 = [[2, 5], [2, 3, 5], [2, 3, 4, 5, 10]];
+  const diviseursCP  = [[2], [2, 3], [2, 3]];
+  const diviseurs = estCE1() ? diviseursCE1[diff] : diviseursCP[diff];
   const diviseur = diviseurs[Math.floor(Math.random() * diviseurs.length)];
-  const maxQuot = estCE1() ? 10 : 5;
+  const maxQuot = estCE1() ? [5, 8, 10][diff] : [3, 4, 5][diff];
   const quotient = 1 + Math.floor(Math.random() * maxQuot);
   const total = diviseur * quotient;
   setBonneReponse(quotient);
@@ -287,13 +376,187 @@ const PROBLEMES = {
   ],
 };
 
+const PROBLEMES_CM1 = [
+  { generer() {
+    const prix = 5 + Math.floor(Math.random() * 20);
+    const nb = 3 + Math.floor(Math.random() * 8);
+    const remise = Math.floor(Math.random() * 10) + 1;
+    const rep = prix * nb - remise;
+    return { texte: `Un livre coûte <strong>${prix}€</strong>. Paul achète <strong>${nb}</strong> livres et bénéficie d'une remise de <strong>${remise}€</strong>. Combien paie-t-il en tout ?`, rep, min: Math.max(0, rep - 20), max: rep + 20 };
+  } },
+  { generer() {
+    const vitesse = 4 + Math.floor(Math.random() * 6);
+    const temps = 2 + Math.floor(Math.random() * 4);
+    const rep = vitesse * temps;
+    return { texte: `Un cycliste roule à <strong>${vitesse} km/h</strong> pendant <strong>${temps} heures</strong>. Quelle distance a-t-il parcourue ?`, rep, min: Math.max(0, rep - 15), max: rep + 15 };
+  } },
+  { generer() {
+    const largeur = 5 + Math.floor(Math.random() * 15);
+    const longueur = 10 + Math.floor(Math.random() * 20);
+    const rep = 2 * (largeur + longueur);
+    return { texte: `Un jardin rectangulaire mesure <strong>${longueur} m</strong> de long et <strong>${largeur} m</strong> de large. Quel est son périmètre ?`, rep, min: Math.max(0, rep - 20), max: rep + 20 };
+  } },
+  { generer() {
+    const total = 100 + Math.floor(Math.random() * 500);
+    const parts = 3 + Math.floor(Math.random() * 5);
+    const p1 = Math.floor(Math.random() * (total / 2));
+    const p2 = Math.floor(Math.random() * (total - p1 - 10));
+    const rep = total - p1 - p2;
+    return { texte: `Une cagnotte contient <strong>${total}€</strong>. On en dépense <strong>${p1}€</strong> puis encore <strong>${p2}€</strong>. Combien reste-t-il ?`, rep, min: Math.max(0, rep - 30), max: rep + 30 };
+  } },
+];
+
+const PROBLEMES_CM2 = [
+  { generer() {
+    const n = 3 + Math.floor(Math.random() * 4);
+    const prixUnit = 1 + Math.floor(Math.random() * 5);
+    const qte = n + 1 + Math.floor(Math.random() * n * 2);
+    const rep = prixUnit * qte;
+    return { texte: `<strong>${n}</strong> stylos coûtent <strong>${n * prixUnit}€</strong>. Combien coûtent <strong>${qte}</strong> stylos ?`, rep, min: Math.max(0, rep - 10), max: rep + 10 };
+  } },
+  { generer() {
+    const n = 2 + Math.floor(Math.random() * 3);
+    const prixUnit = 2 + Math.floor(Math.random() * 8);
+    const qte = n + Math.floor(Math.random() * 5) + 1;
+    const rep = prixUnit * qte;
+    return { texte: `<strong>${n}</strong> cahiers coûtent <strong>${n * prixUnit}€</strong>. Quel est le prix de <strong>${qte}</strong> cahiers ?`, rep, min: Math.max(0, rep - 15), max: rep + 15 };
+  } },
+  { generer() {
+    const vitesse = 60 + Math.floor(Math.random() * 40) * 10;
+    const temps = 1 + Math.floor(Math.random() * 4);
+    const rep = vitesse * temps;
+    return { texte: `Une voiture roule à <strong>${vitesse} km/h</strong>. Quelle distance parcourt-elle en <strong>${temps} heure${temps > 1 ? "s" : ""}</strong> ?`, rep, min: Math.max(0, rep - 100), max: rep + 100 };
+  } },
+];
+
 export function lancerProbleme() {
   elTitre.textContent = "📖 Problème du jour";
-  const pool = estCE2() ? PROBLEMES.ce2 : estCE1() ? PROBLEMES.ce1 : PROBLEMES.cp;
+  const pool = estCM2() ? PROBLEMES_CM2 : estCM1() ? PROBLEMES_CM1 : estCE2() ? PROBLEMES.ce2 : estCE1() ? PROBLEMES.ce1 : PROBLEMES.cp;
   const tmpl = pool[Math.floor(Math.random() * pool.length)];
   const { texte, rep, min, max } = tmpl.generer();
   setBonneReponse(rep);
   elQuestion.innerHTML = `<div class="probleme-question"><p>${texte}</p></div>`;
   const props = propositionsAvecBonne(rep, Math.max(0, min), Math.max(max, min + 5), 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── lancerFractionsCM ─────────────────────────────────────────────────────────
+export function lancerFractionsCM() {
+  elTitre.textContent = "½ Fractions CM";
+
+  if (estCM2()) {
+    const type = Math.random() < 0.5 ? "addition" : "reduction";
+    if (type === "addition") {
+      const denom = 3 + Math.floor(Math.random() * 8);
+      const num1 = 1 + Math.floor(Math.random() * (denom - 1));
+      const num2 = 1 + Math.floor(Math.random() * (denom - 1));
+      const numResult = num1 + num2;
+      setBonneReponse(numResult);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.4rem">Calcule :</p>` +
+        `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${num1}/${denom} + ${num2}/${denom} = ?/${denom}</p>` +
+        `<p style="font-size:0.78rem;color:#888">💡 Même dénominateur : additionne les numérateurs</p>`;
+      const props = propositionsAvecBonne(numResult, Math.max(1, numResult - 4), numResult + 4, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      const multiples = [2, 3, 4, 5, 6];
+      const k = multiples[Math.floor(Math.random() * multiples.length)];
+      const numSimp = 1 + Math.floor(Math.random() * 4);
+      const denomSimp = numSimp + 1 + Math.floor(Math.random() * 4);
+      const numBig = numSimp * k;
+      const denomBig = denomSimp * k;
+      setBonneReponse(numSimp);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin:0 0 0.4rem">Simplifie cette fraction :</p>` +
+        `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${numBig}/${denomBig} = ?/${denomSimp}</p>` +
+        `<p style="font-size:0.78rem;color:#888">💡 Divise le numérateur par ${k}</p>`;
+      const props = propositionsAvecBonne(numSimp, Math.max(1, numSimp - 3), numSimp + 4, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
+
+  // CM1 : fraction d'une quantité
+  const couples = [
+    { num: 1, denom: 2, qty: 10 }, { num: 1, denom: 2, qty: 20 }, { num: 3, denom: 4, qty: 20 },
+    { num: 2, denom: 5, qty: 25 }, { num: 3, denom: 4, qty: 12 }, { num: 2, denom: 3, qty: 15 },
+    { num: 1, denom: 4, qty: 20 }, { num: 3, denom: 5, qty: 30 },
+  ];
+  const item = couples[Math.floor(Math.random() * couples.length)];
+  const rep = Math.round(item.qty * item.num / item.denom);
+  setBonneReponse(rep);
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin:0 0 0.4rem">Calcule :</p>` +
+    `<p class="equation" style="font-size:2.4rem;font-weight:700;margin:0.4rem 0">${item.num}/${item.denom} de ${item.qty} = ?</p>` +
+    `<p style="font-size:0.78rem;color:#888">💡 Divise ${item.qty} par ${item.denom} puis multiplie par ${item.num}</p>`;
+  const props = propositionsAvecBonne(rep, Math.max(1, rep - 6), rep + 6, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── lancerProportionnalite ────────────────────────────────────────────────────
+export function lancerProportionnalite() {
+  elTitre.textContent = "⚖️ Proportionnalité";
+
+  if (!estCM2()) {
+    setBonneReponse(0);
+    elQuestion.innerHTML =
+      `<div style="text-align:center;padding:1rem">` +
+      `<p style="font-size:2rem">🎓</p>` +
+      `<p style="font-size:1rem;font-weight:700;color:var(--primaire)">Ce jeu est pour le CM2</p>` +
+      `<p style="font-size:0.9rem;color:#888">Passe en CM2 pour débloquer la proportionnalité !</p>` +
+      `</div>`;
+    elChoix.innerHTML = "";
+    return;
+  }
+
+  const situations = [
+    { contexte: (n, pu, q) => `${n} stylos coûtent <strong>${n * pu}€</strong>. Combien coûtent <strong>${q}</strong> stylos ?`, n: null, pu: null },
+    { contexte: (n, pu, q) => `${n} cahiers coûtent <strong>${n * pu}€</strong>. Quel est le prix de <strong>${q}</strong> cahiers ?`, n: null, pu: null },
+    { contexte: (n, pu, q) => `Pour faire ${n} gâteaux il faut <strong>${n * pu} œufs</strong>. Combien d'œufs pour <strong>${q}</strong> gâteaux ?`, n: null, pu: null },
+    { contexte: (n, pu, q) => `${n} pommes pèsent <strong>${n * pu} g</strong>. Combien pèsent <strong>${q}</strong> pommes ?`, n: null, pu: null },
+  ];
+  const sit = situations[Math.floor(Math.random() * situations.length)];
+  const n = 2 + Math.floor(Math.random() * 4);
+  const prixUnit = 1 + Math.floor(Math.random() * 5);
+  const q = n + 1 + Math.floor(Math.random() * (n * 3));
+  const rep = prixUnit * q;
+  setBonneReponse(rep);
+  elQuestion.innerHTML =
+    `<div class="probleme-question"><p>${sit.contexte(n, prixUnit, q)}</p></div>`;
+  const props = propositionsAvecBonne(rep, Math.max(1, rep - 10), rep + 10, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── lancerPourcentages ────────────────────────────────────────────────────────
+export function lancerPourcentages() {
+  elTitre.textContent = "% Pourcentages";
+  const diff = getDifficulte();
+  const typesDisponibles = diff === 0 ? [50] : diff === 1 ? [50, 25] : [50, 25, 10];
+  const pct = typesDisponibles[Math.floor(Math.random() * typesDisponibles.length)];
+
+  const valeursParPct = {
+    50: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200],
+    25: [20, 40, 60, 80, 100, 120, 160, 200],
+    10: [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150],
+  };
+  const vals = valeursParPct[pct];
+  const N = vals[Math.floor(Math.random() * vals.length)];
+  const rep = Math.round(N * pct / 100);
+  setBonneReponse(rep);
+
+  const contextes = [
+    `Un jouet coûte <strong>${N}€</strong>. Les soldes donnent <strong>${pct}%</strong> de réduction. Combien économises-tu ?`,
+    `Il y a <strong>${N}</strong> élèves dans l'école. <strong>${pct}%</strong> sont des filles. Combien de filles ?`,
+    `Un vélo vaut <strong>${N}€</strong>. Tu as une remise de <strong>${pct}%</strong>. Quel est le montant de la remise ?`,
+    `Dans une classe de <strong>${N}</strong> enfants, <strong>${pct}%</strong> ont un animal. Combien ont un animal ?`,
+    `Un livre coûte <strong>${N}€</strong>. Tu paies <strong>${pct}%</strong> de moins. Combien paies-tu en moins ?`,
+  ];
+  const contexte = contextes[Math.floor(Math.random() * contextes.length)];
+  const rappel = pct === 50 ? "50% = la moitié" : pct === 25 ? "25% = le quart" : "10% = diviser par 10";
+
+  elQuestion.innerHTML =
+    `<p style="font-size:0.82rem;margin:0 0 0.3rem;color:#888">💡 ${rappel}</p>` +
+    `<div class="probleme-question"><p>${contexte}</p></div>`;
+  const props = propositionsAvecBonne(rep, Math.max(0, rep - 20), rep + 20, 3);
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }

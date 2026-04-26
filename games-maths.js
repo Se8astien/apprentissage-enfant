@@ -1,5 +1,6 @@
 // games-maths.js — lancerCompte, lancerAddition, lancerSoustraction, lancerCompare,
-//                  lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair
+//                  lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair,
+//                  lancerPerlesDorees, lancerPlanche100
 
 import {
   ANIMAUX,
@@ -10,12 +11,26 @@ import {
   getBonneReponse,
   estCE1,
   estCE2,
+  estCM1,
+  estCM2,
   melanger,
   propositionsAvecBonne,
   afficherChoix,
+  getDifficulte,
 } from "./app-state.js";
 
 import { apresReponse, apresReponseTexte } from "./app-nav.js";
+
+function afficherChoixTexte(options, bonne) {
+  elChoix.innerHTML = "";
+  options.forEach(v => {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "btn-choix";
+    btn.textContent = v; btn.dataset.valeur = v;
+    btn.addEventListener("click", () => apresReponseTexte(v, btn, bonne));
+    elChoix.appendChild(btn);
+  });
+}
 
 // ── lancerCompte ──────────────────────────────────────────────────────────────
 export function lancerCompte() {
@@ -116,13 +131,65 @@ export function lancerCompte() {
 // ── lancerAddition ────────────────────────────────────────────────────────────
 export function lancerAddition() {
   elTitre.textContent = "Addition magique";
+  const diff = getDifficulte();
   let a;
   let b;
   let total;
   let html;
 
+  if (estCM2()) {
+    // CM2 : addition de décimaux simples (ex: 3,5 + 2,7)
+    const entA = 1 + Math.floor(Math.random() * 9);
+    const decA = 1 + Math.floor(Math.random() * 9);
+    const entB = 1 + Math.floor(Math.random() * 9);
+    const decB = 1 + Math.floor(Math.random() * 9);
+    a = entA + decA / 10;
+    b = entB + decB / 10;
+    total = Math.round((a + b) * 10) / 10;
+    const aStr = entA + "," + decA;
+    const bStr = entB + "," + decB;
+    const totalStr = Math.floor(total) + "," + (Math.round(total * 10) % 10);
+    setBonneReponse(totalStr);
+    html =
+      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette addition :</p>" +
+      '<p class="equation" style="font-size:2.2rem;font-weight:700">' + aStr + " + " + bStr + " = ?</p>" +
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Aligne les virgules !</p>";
+    elQuestion.innerHTML = html;
+    const fausses = [];
+    const variants = [-1, 1, -2, 2, -11, 11];
+    for (const v of melanger(variants)) {
+      const candidate = Math.round(total * 10 + v);
+      if (candidate > 0) {
+        const cStr = Math.floor(candidate / 10) + "," + (candidate % 10);
+        if (!fausses.includes(cStr) && cStr !== totalStr) fausses.push(cStr);
+        if (fausses.length >= 3) break;
+      }
+    }
+    while (fausses.length < 3) fausses.push(Math.floor(total + fausses.length + 1) + ",0");
+    const options = melanger([totalStr, ...fausses.slice(0, 3)]);
+    afficherChoixTexte(options, getBonneReponse());
+    return;
+  }
+
+  if (estCM1()) {
+    const maxCM1 = [999, 4999, 9999][diff];
+    total = 100 + Math.floor(Math.random() * maxCM1);
+    a = 1 + Math.floor(Math.random() * (total - 1));
+    b = total - a;
+    html =
+      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette addition :</p>" +
+      '<p class="equation" style="font-size:2.2rem;font-weight:700">' + a + " + " + b + " = ?</p>" +
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à l'addition posée</p>";
+    elQuestion.innerHTML = html;
+    setBonneReponse(total);
+    const props = propositionsAvecBonne(total, Math.max(100, total - 500), Math.min(9999, total + 500), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
   if (estCE2()) {
-    total = 100 + Math.floor(Math.random() * 900);
+    const maxCE2 = [300, 600, 999][diff];
+    total = 100 + Math.floor(Math.random() * maxCE2);
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
     html =
@@ -137,8 +204,9 @@ export function lancerAddition() {
   }
 
   if (!estCE1()) {
-    a = 1 + Math.floor(Math.random() * 9);
-    b = 1 + Math.floor(Math.random() * 9);
+    const maxCP = [5, 8, 10][diff];
+    a = 1 + Math.floor(Math.random() * maxCP);
+    b = 1 + Math.floor(Math.random() * maxCP);
     total = a + b;
     if (total <= 10) {
       const e1 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
@@ -166,13 +234,14 @@ export function lancerAddition() {
   }
 
   // CE1 : addition jusqu'à 79, parfois avec un multiple de 10 (20%)
+  const maxCE1 = [30, 55, 79][diff];
   const useDizaine = Math.random() < 0.20;
   if (useDizaine) {
     const dizaines = [10, 20, 30, 40, 50];
     a = dizaines[Math.floor(Math.random() * dizaines.length)];
-    b = 5 + Math.floor(Math.random() * 30);
+    b = 5 + Math.floor(Math.random() * Math.max(5, maxCE1 - 10));
   } else {
-    total = 21 + Math.floor(Math.random() * 59);
+    total = 21 + Math.floor(Math.random() * Math.max(1, maxCE1 - 20));
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
   }
@@ -194,12 +263,44 @@ export function lancerAddition() {
 // ── lancerSoustraction ────────────────────────────────────────────────────────
 export function lancerSoustraction() {
   elTitre.textContent = "Les pommes";
+  const diff = getDifficulte();
   let total;
   let enleve;
   let reste;
 
+  if (estCM2()) {
+    const maxCM2s = [9999, 49999, 99999][diff];
+    total = 1000 + Math.floor(Math.random() * maxCM2s);
+    enleve = 1 + Math.floor(Math.random() * (total - 1));
+    reste = total - enleve;
+    elQuestion.innerHTML =
+      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
+      '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Soustraction posée</p>";
+    setBonneReponse(reste);
+    const props = propositionsAvecBonne(reste, Math.max(0, reste - 5000), Math.min(99998, reste + 5000), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  if (estCM1()) {
+    const maxCM1s = [999, 4999, 9999][diff];
+    total = 100 + Math.floor(Math.random() * maxCM1s);
+    enleve = 1 + Math.floor(Math.random() * (total - 1));
+    reste = total - enleve;
+    elQuestion.innerHTML =
+      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
+      '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
+    setBonneReponse(reste);
+    const props = propositionsAvecBonne(reste, Math.max(0, reste - 500), Math.min(9998, reste + 500), 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
   if (estCE2()) {
-    total = 100 + Math.floor(Math.random() * 900);
+    const maxCE2s = [300, 600, 999][diff];
+    total = 100 + Math.floor(Math.random() * maxCE2s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
     elQuestion.innerHTML =
@@ -213,9 +314,11 @@ export function lancerSoustraction() {
   }
 
   if (!estCE1()) {
-    total = 4 + Math.floor(Math.random() * 17);
+    const maxCPs = [10, 14, 20][diff];
+    total = 4 + Math.floor(Math.random() * (maxCPs - 3));
   } else {
-    total = 21 + Math.floor(Math.random() * 69);
+    const maxCE1s = [30, 55, 79][diff];
+    total = 21 + Math.floor(Math.random() * Math.max(1, maxCE1s - 20));
   }
   enleve = 1 + Math.floor(Math.random() * (total - 1));
   reste = total - enleve;
@@ -261,35 +364,43 @@ export function lancerCompare() {
       elQuestion.innerHTML =
         "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
         '<p class="equation" style="font-size:clamp(1.2rem,5vw,1.8rem);text-align:center;margin-top:0.5rem">' +
-        a + " &nbsp; ou &nbsp; " + b + "</p>";
+        a.toLocaleString("fr-FR") + " &nbsp; ou &nbsp; " + b.toLocaleString("fr-FR") + "</p>";
       afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else if (type === 1) {
       const entA = 1 + Math.floor(Math.random() * 9);
-      const decA = Math.floor(Math.random() * 10);
-      let entB = 1 + Math.floor(Math.random() * 9);
-      let decB = Math.floor(Math.random() * 10);
-      while (entA === entB && decA === decB) decB = (decB + 1) % 10;
-      const aStr = entA + "," + decA;
-      const bStr = entB + "," + decB;
-      const bonneRep = (entA + decA / 10) > (entB + decB / 10) ? aStr : bStr;
-      setBonneReponse(bonneRep);
+      const decA = 1 + Math.floor(Math.random() * 9);
+      const entB = 1 + Math.floor(Math.random() * 9);
+      const decB = 1 + Math.floor(Math.random() * 9);
+      const valA = entA + decA / 10;
+      const valB = entB + decB / 10;
+      if (valA === valB) { lancerCompare(); return; }
+      const strA = entA + "," + decA;
+      const strB = entB + "," + decB;
+      setBonneReponse(valA > valB ? strA : strB);
       elQuestion.innerHTML =
         "<p>Quel nombre décimal est le <strong>plus grand</strong> ?</p>" +
         '<p class="equation" style="font-size:clamp(1.4rem,6vw,2.2rem);text-align:center;margin-top:0.5rem">' +
-        aStr + " &nbsp; ou &nbsp; " + bStr + "</p>";
-      afficherChoixTexte(melanger([aStr, bStr]), getBonneReponse());
+        strA + " &nbsp; ou &nbsp; " + strB + "</p>";
+      elChoix.innerHTML = "";
+      [strA, strB].forEach(str => {
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "btn-choix";
+        btn.textContent = str; btn.dataset.valeur = str;
+        btn.addEventListener("click", () => apresReponseTexte(str, btn, getBonneReponse()));
+        elChoix.appendChild(btn);
+      });
     } else {
-      const n1 = 10000 + Math.floor(Math.random() * 990000);
-      let n2 = 10000 + Math.floor(Math.random() * 990000);
-      let n3 = 10000 + Math.floor(Math.random() * 990000);
-      while (n2 === n1) n2 = 10000 + Math.floor(Math.random() * 990000);
-      while (n3 === n1 || n3 === n2) n3 = 10000 + Math.floor(Math.random() * 990000);
-      setBonneReponse(Math.min(n1, n2, n3));
+      a = 100000 + Math.floor(Math.random() * 900000);
+      b = 100000 + Math.floor(Math.random() * 900000);
+      let c = 100000 + Math.floor(Math.random() * 900000);
+      while (c === a || c === b) c = 100000 + Math.floor(Math.random() * 900000);
+      if (a === b) b = b < 999999 ? b + 1 : b - 1;
+      setBonneReponse(Math.min(a, b, c));
       elQuestion.innerHTML =
         "<p>Quel est le <strong>plus petit</strong> de ces trois nombres ?</p>" +
         '<p class="equation" style="font-size:clamp(1.1rem,4.5vw,1.6rem);text-align:center;margin-top:0.5rem">' +
-        n1 + " &nbsp; " + n2 + " &nbsp; " + n3 + "</p>";
-      afficherChoix(melanger([n1, n2, n3]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
+        a.toLocaleString("fr-FR") + " &nbsp; " + b.toLocaleString("fr-FR") + " &nbsp; " + c.toLocaleString("fr-FR") + "</p>";
+      afficherChoix(melanger([a, b, c]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
     }
     return;
   }
@@ -302,19 +413,20 @@ export function lancerCompare() {
       setBonneReponse(Math.max(a, b));
       elQuestion.innerHTML =
         "<p>Quel nombre est le <strong>plus grand</strong> ?</p>" +
-        '<p class="equation" style="font-size:clamp(1.2rem,5vw,2rem);text-align:center;margin-top:0.5rem">' +
-        a + " &nbsp; ou &nbsp; " + b + "</p>";
+        '<p class="equation" style="font-size:clamp(1.3rem,5.5vw,2rem);text-align:center;margin-top:0.5rem">' +
+        a.toLocaleString("fr-FR") + " &nbsp; ou &nbsp; " + b.toLocaleString("fr-FR") + "</p>";
       afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else {
-      a = 1000 + Math.floor(Math.random() * 99000);
-      b = 1000 + Math.floor(Math.random() * 99000);
+      a = 10000 + Math.floor(Math.random() * 90000);
+      b = 10000 + Math.floor(Math.random() * 90000);
       if (a === b) b = b < 99999 ? b + 1 : b - 1;
       const symbole = a < b ? "<" : ">";
       setBonneReponse(symbole);
       elQuestion.innerHTML =
         "<p>Quel signe faut-il mettre entre ces deux nombres ?</p>" +
-        '<p class="equation" style="font-size:clamp(1.4rem,6vw,2rem);text-align:center;margin-top:0.5rem">' +
-        a + " &nbsp; <span style='color:#fd79a8'>?</span> &nbsp; " + b + "</p>";
+        '<p class="equation" style="font-size:clamp(1.3rem,5.5vw,2rem);text-align:center;margin-top:0.5rem">' +
+        a.toLocaleString("fr-FR") + " &nbsp; <span style='color:#fd79a8'>?</span> &nbsp; " + b.toLocaleString("fr-FR") + "</p>" +
+        "<p style='font-size:0.78rem;color:#888;margin-top:0.3rem'>💡 Le signe \"ouvre la bouche\" vers le plus grand</p>";
       elChoix.innerHTML = "";
       ["<", ">"].forEach(sym => {
         const btn = document.createElement("button");
@@ -403,20 +515,44 @@ export function lancerCompare() {
 // ── lancerSuite ───────────────────────────────────────────────────────────────
 export function lancerSuite() {
   elTitre.textContent = "Numéro manquant";
+  const diff = getDifficulte();
   let debut, step;
-  if (estCE2()) {
-    const stepsCE2 = [3, 4, 6, 7, 8, 9, 25, 50, 100];
-    step = stepsCE2[Math.floor(Math.random() * stepsCE2.length)];
-    debut = 1 + Math.floor(Math.random() * 200);
+  if (estCM2()) {
+    const stepPools = [
+      [500, 1000],
+      [250, 500, 1000, 2000],
+      [100, 250, 500, 1000, 2000, 5000],
+    ];
+    const pool = stepPools[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = step * (1 + Math.floor(Math.random() * 8));
+  } else if (estCM1()) {
+    const stepPools = [
+      [100, 500],
+      [100, 250, 500, 1000],
+      [100, 250, 500, 1000],
+    ];
+    const pool = stepPools[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = step * (1 + Math.floor(Math.random() * 10));
+  } else if (estCE2()) {
+    const stepPoolsCE2 = [
+      [1, 2, 5, 10],
+      [3, 4, 6, 7, 8, 9, 25, 50],
+      [3, 4, 6, 7, 8, 9, 25, 50, 100],
+    ];
+    const pool = stepPoolsCE2[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = 1 + Math.floor(Math.random() * [100, 150, 200][diff]);
   } else if (!estCE1()) {
-    step = Math.random() < 0.35 ? 2 : 1;
+    step = diff === 0 ? 1 : (Math.random() < 0.35 ? 2 : 1);
     debut = 1 + Math.floor(Math.random() * Math.max(1, 20 - step * 4));
   } else {
     const r = Math.random();
-    if (r < 0.20) step = 3;
-    else if (r < 0.40) step = 4;
+    if (diff >= 1 && r < 0.20) step = 3;
+    else if (diff >= 1 && r < 0.40) step = 4;
     else step = [1, 2, 5, 10][Math.floor(Math.random() * 4)];
-    debut = 1 + Math.floor(Math.random() * Math.max(1, 95 - step * 4));
+    debut = 1 + Math.floor(Math.random() * Math.max(1, [50, 75, 95][diff] - step * 4));
   }
   const suite = [debut, debut + step, debut + step * 2, debut + step * 3, debut + step * 4];
   const indexCache = 1 + Math.floor(Math.random() * 3);
@@ -802,4 +938,287 @@ export function lancerPairImpair() {
     b.addEventListener("click", () => apresReponse(val, b, getBonneReponse()));
     elChoix.appendChild(b);
   });
+}
+
+// ── Perles dorées helpers ─────────────────────────────────────────────────────
+function htmlPerles(milliers, centaines, dizaines, unites) {
+  const groupes = [];
+  if (milliers > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-millier">${"🟫".repeat(milliers)}</span>` +
+      `<span class="perle-label">×1000</span>` +
+      `</div>`
+    );
+  }
+  if (centaines > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-centaine">${"🟧".repeat(centaines)}</span>` +
+      `<span class="perle-label">×100</span>` +
+      `</div>`
+    );
+  }
+  if (dizaines > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-dizaine">${"🟪".repeat(dizaines)}</span>` +
+      `<span class="perle-label">×10</span>` +
+      `</div>`
+    );
+  }
+  if (unites > 0) {
+    groupes.push(
+      `<div class="perle-groupe">` +
+      `<span class="perle-unite">${"🟡".repeat(unites)}</span>` +
+      `<span class="perle-label">×1</span>` +
+      `</div>`
+    );
+  }
+  return `<div class="perles-conteneur">${groupes.join("")}</div>`;
+}
+
+// ── lancerPerlesDorees ────────────────────────────────────────────────────────
+export function lancerPerlesDorees() {
+  elTitre.textContent = "🟡 Perles dorées";
+  const diff = getDifficulte();
+
+  let n, mil, cent, diz, un, question, bonne, maxDigit;
+
+  if (estCE2()) {
+    mil  = 1 + Math.floor(Math.random() * 9);
+    cent = Math.floor(Math.random() * 10);
+    diz  = Math.floor(Math.random() * 10);
+    un   = Math.floor(Math.random() * 10);
+    n = mil * 1000 + cent * 100 + diz * 10 + un;
+    const dim = Math.floor(Math.random() * 4);
+    if (dim === 0) { bonne = mil;  question = "milliers"; maxDigit = 9; }
+    else if (dim === 1) { bonne = cent; question = "centaines"; maxDigit = 9; }
+    else if (dim === 2) { bonne = diz;  question = "dizaines"; maxDigit = 9; }
+    else               { bonne = un;   question = "unités"; maxDigit = 9; }
+  } else if (estCE1()) {
+    if (diff <= 0) {
+      cent = 1 + Math.floor(Math.random() * 1);
+      diz  = Math.floor(Math.random() * 10);
+      un   = Math.floor(Math.random() * 10);
+      n = cent * 100 + diz * 10 + un;
+      const dim = Math.random() < 0.5 ? "dizaines" : "unités";
+      bonne = dim === "dizaines" ? diz : un;
+      question = dim;
+      maxDigit = 9;
+    } else {
+      cent = 1 + Math.floor(Math.random() * 9);
+      diz  = Math.floor(Math.random() * 10);
+      un   = Math.floor(Math.random() * 10);
+      n = cent * 100 + diz * 10 + un;
+      const dim2 = Math.floor(Math.random() * 3);
+      if (dim2 === 0) { bonne = cent; question = "centaines"; maxDigit = 9; }
+      else if (dim2 === 1) { bonne = diz; question = "dizaines"; maxDigit = 9; }
+      else               { bonne = un;  question = "unités"; maxDigit = 9; }
+    }
+    mil = 0;
+  } else {
+    mil = 0; cent = 0;
+    if (diff === 0) {
+      diz = 1 + Math.floor(Math.random() * 9);
+      un = 0;
+      n = diz * 10;
+      bonne = diz; question = "dizaines"; maxDigit = 9;
+    } else if (diff === 1) {
+      n = 10 + Math.floor(Math.random() * 89);
+      diz = Math.floor(n / 10); un = n % 10;
+      bonne = un; question = "unités"; maxDigit = 9;
+    } else {
+      n = 10 + Math.floor(Math.random() * 89);
+      diz = Math.floor(n / 10); un = n % 10;
+      bonne = diz; question = "dizaines"; maxDigit = 9;
+    }
+  }
+
+  setBonneReponse(bonne);
+  elQuestion.innerHTML =
+    `<p class="equation" style="font-size:2.4rem;font-weight:700;margin-bottom:0.3rem">${n}</p>` +
+    htmlPerles(mil || 0, cent || 0, diz || 0, un || 0) +
+    `<p style="font-size:0.95rem;margin-top:0.3rem">Combien de <strong>${question}</strong> dans ce nombre ?</p>`;
+
+  const props = propositionsAvecBonne(bonne, 0, maxDigit, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── lancerPlanche100 ──────────────────────────────────────────────────────────
+export function lancerPlanche100() {
+  elTitre.textContent = "🔢 Planche des cent";
+
+  let min, max, step;
+  if (estCE2()) {
+    step = 10;
+    min = 10; max = 990;
+  } else if (estCE1()) {
+    step = 1;
+    min = 1; max = 100;
+  } else {
+    step = 1;
+    min = 1; max = 20;
+  }
+
+  const plage = [];
+  for (let i = min; i <= max; i += step) plage.push(i);
+  const n = plage[Math.floor(Math.random() * plage.length)];
+  setBonneReponse(n);
+
+  function cellVal(v) {
+    if (v < min || v > max) return "·";
+    return String(v);
+  }
+
+  const noisins = [
+    [cellVal(n - step - step), cellVal(n - step - 1 * (estCE2() ? 10 : 1)), cellVal(n - step + step - step + step - step + step)],
+  ];
+
+  const row1 = [n - (estCE2() ? 11 : 11), n - (estCE2() ? 10 : 10), n - (estCE2() ? 9 : 9)];
+  const row2 = [n - (estCE2() ? 1 : 1), n, n + (estCE2() ? 1 : 1)];
+  const row3 = [n + (estCE2() ? 9 : 9), n + (estCE2() ? 10 : 10), n + (estCE2() ? 11 : 11)];
+
+  function tdVal(v) {
+    if (v === n) return `<td class="planche-vide">?</td>`;
+    if (v < min || v > max) return `<td>·</td>`;
+    return `<td>${v}</td>`;
+  }
+
+  const tableHtml =
+    `<table class="planche-mini">` +
+    `<tr>${row1.map(tdVal).join("")}</tr>` +
+    `<tr>${row2.map(tdVal).join("")}</tr>` +
+    `<tr>${row3.map(tdVal).join("")}</tr>` +
+    `</table>`;
+
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.2rem">Quel nombre se cache sous le <strong style="color:var(--primaire)">?</strong> ?</p>` +
+    tableHtml;
+
+  const pmin = Math.max(min, n - step * 5);
+  const pmax = Math.min(max, n + step * 5);
+  const props = propositionsAvecBonne(n, pmin, pmax, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── lancerDecimaux ────────────────────────────────────────────────────────────
+export function lancerDecimaux() {
+  elTitre.textContent = "🔢 Décimaux";
+  const diff = getDifficulte();
+
+  if (estCM2()) {
+    const type = Math.floor(Math.random() * 3);
+    if (type === 0) {
+      // addition de décimaux
+      const entA = 1 + Math.floor(Math.random() * 9);
+      const decA = 1 + Math.floor(Math.random() * 9);
+      const entB = 1 + Math.floor(Math.random() * 9);
+      const decB = 1 + Math.floor(Math.random() * 9);
+      const total = Math.round((entA + decA / 10 + entB + decB / 10) * 10) / 10;
+      const totalStr = Math.floor(total) + "," + (Math.round(total * 10) % 10);
+      setBonneReponse(totalStr);
+      elQuestion.innerHTML =
+        "<p style='font-size:0.9rem;margin:0 0 0.3rem'>Calcule :</p>" +
+        `<div class="equation">${entA},${decA} + ${entB},${decB} = ?</div>`;
+      const fausses = [];
+      for (const v of [-1, 1, -2, 2, 10, -10]) {
+        const c = Math.round(total * 10) + v;
+        if (c > 0) {
+          const s = Math.floor(c / 10) + "," + (c % 10);
+          if (!fausses.includes(s) && s !== totalStr) fausses.push(s);
+          if (fausses.length >= 3) break;
+        }
+      }
+      while (fausses.length < 3) fausses.push((Math.floor(total) + fausses.length + 1) + ",0");
+      afficherChoixTexte(melanger([totalStr, ...fausses.slice(0, 3)]), getBonneReponse());
+    } else if (type === 1) {
+      // multiplication par 10 ou 100
+      const facteurs = [10, 100, 1000];
+      const facteur = facteurs[Math.floor(Math.random() * facteurs.length)];
+      const entN = 1 + Math.floor(Math.random() * 9);
+      const decN = 1 + Math.floor(Math.random() * 9);
+      const nombre = entN + decN / 10;
+      const result = Math.round(nombre * facteur * 10) / 10;
+      setBonneReponse(result);
+      elQuestion.innerHTML =
+        "<p style='font-size:0.9rem;margin:0 0 0.3rem'>Calcule :</p>" +
+        `<div class="equation">${entN},${decN} × ${facteur} = ?</div>` +
+        "<p style='font-size:0.78rem;color:#888'>💡 Multiplie par " + facteur + " : déplace la virgule</p>";
+      const props = propositionsAvecBonne(result, Math.max(1, result - result / 2), result + result, 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      // soustraction de décimaux
+      const entA = 5 + Math.floor(Math.random() * 9);
+      const decA = 1 + Math.floor(Math.random() * 9);
+      const entB = 1 + Math.floor(Math.random() * (entA - 1));
+      const decB = 1 + Math.floor(Math.random() * 9);
+      const total = Math.round((entA + decA / 10 - entB - decB / 10) * 10) / 10;
+      if (total <= 0) { lancerDecimaux(); return; }
+      const totalStr = Math.floor(total) + "," + (Math.abs(Math.round(total * 10) % 10));
+      setBonneReponse(totalStr);
+      elQuestion.innerHTML =
+        "<p style='font-size:0.9rem;margin:0 0 0.3rem'>Calcule :</p>" +
+        `<div class="equation">${entA},${decA} − ${entB},${decB} = ?</div>`;
+      const fausses = [];
+      for (const v of [-1, 1, -2, 2, 10, -10]) {
+        const c = Math.round(total * 10) + v;
+        if (c > 0) {
+          const s = Math.floor(c / 10) + "," + (c % 10);
+          if (!fausses.includes(s) && s !== totalStr) fausses.push(s);
+          if (fausses.length >= 3) break;
+        }
+      }
+      while (fausses.length < 3) fausses.push((Math.floor(total) + fausses.length + 1) + ",0");
+      afficherChoixTexte(melanger([totalStr, ...fausses.slice(0, 3)]), getBonneReponse());
+    }
+    return;
+  }
+
+  // CM1
+  if (diff === 0) {
+    // lire un décimal : "3 unités + 7 dixièmes"
+    const entN = 1 + Math.floor(Math.random() * 9);
+    const decN = 1 + Math.floor(Math.random() * 9);
+    const nombreStr = entN + "," + decN;
+    setBonneReponse(nombreStr);
+    elQuestion.innerHTML =
+      "<p style='font-size:0.9rem;margin:0 0 0.4rem'>Quel nombre est représenté ?</p>" +
+      `<p class="equation" style="font-size:1.6rem;font-weight:700">${entN} unités + ${decN} dixièmes</p>`;
+    const fausses = [];
+    const variants = [[entN + 1, decN], [entN, decN + 1], [entN - 1 > 0 ? entN - 1 : entN + 2, decN]];
+    for (const [e, d] of variants) {
+      const s = e + "," + d;
+      if (!fausses.includes(s) && s !== nombreStr) fausses.push(s);
+    }
+    while (fausses.length < 3) fausses.push((entN + fausses.length + 1) + "," + decN);
+    afficherChoixTexte(melanger([nombreStr, ...fausses.slice(0, 3)]), getBonneReponse());
+  } else if (diff === 1) {
+    // comparer deux décimaux
+    const entA = 1 + Math.floor(Math.random() * 9);
+    const decA = Math.floor(Math.random() * 10);
+    let entB = 1 + Math.floor(Math.random() * 9);
+    let decB = Math.floor(Math.random() * 10);
+    while (entA === entB && decA === decB) decB = (decB + 1) % 10;
+    const aStr = entA + "," + decA;
+    const bStr = entB + "," + decB;
+    const bonneRep = (entA + decA / 10) > (entB + decB / 10) ? aStr : bStr;
+    setBonneReponse(bonneRep);
+    elQuestion.innerHTML =
+      "<p style='font-size:0.9rem;margin:0 0 0.3rem'>Quel nombre est le plus grand ?</p>" +
+      `<p class="equation" style="font-size:2rem;font-weight:700">${aStr} ou ${bStr}</p>`;
+    afficherChoixTexte(melanger([aStr, bStr]), getBonneReponse());
+  } else {
+    // arrondir à l'unité
+    const entN = 1 + Math.floor(Math.random() * 9);
+    const decN = 1 + Math.floor(Math.random() * 9);
+    const arrondi = decN >= 5 ? entN + 1 : entN;
+    setBonneReponse(arrondi);
+    elQuestion.innerHTML =
+      "<p style='font-size:0.9rem;margin:0 0 0.3rem'>Arrondis à l'unité la plus proche :</p>" +
+      `<p class="equation" style="font-size:2.4rem;font-weight:700">${entN},${decN}</p>` +
+      "<p style='font-size:0.78rem;color:#888'>💡 Si le chiffre après la virgule est ≥ 5, on arrondit vers le haut</p>";
+    const props = propositionsAvecBonne(arrondi, Math.max(1, arrondi - 3), arrondi + 3, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+  }
 }

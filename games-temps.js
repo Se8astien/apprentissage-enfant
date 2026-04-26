@@ -1,4 +1,4 @@
-// games-temps.js — lancerHeure, lancerDurees, lancerMesures, lancerMasse
+// games-temps.js — lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier
 
 import {
   elTitre,
@@ -521,4 +521,64 @@ export function lancerMasse() {
       elChoix.appendChild(b);
     });
   }
+}
+
+// ── lancerCalendrier ──────────────────────────────────────────────────────────
+const JOURS_SEM = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"];
+const MOIS_AN = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+const JOURS_PAR_MOIS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+export function lancerCalendrier() {
+  elTitre.textContent = "📅 Calendrier";
+
+  if (estCE1()) {
+    const type = Math.random() < 0.5 ? "ordre" : "jours";
+    if (type === "ordre") {
+      const idx = Math.floor(Math.random() * 12);
+      const bonne = MOIS_AN[(idx + 1) % 12];
+      setBonneReponse(bonne);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quel mois vient <strong>après</strong> :</p>` +
+        `<p style="font-size:2rem;font-weight:700;color:var(--primaire);margin:0.3rem 0">${MOIS_AN[idx]}</p>`;
+      const fausses = melanger(MOIS_AN.filter((_, i) => i !== (idx + 1) % 12)).slice(0, 3);
+      const options = melanger([bonne, ...fausses]);
+      elChoix.innerHTML = "";
+      options.forEach(m => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "0.95rem";
+        b.textContent = m; b.dataset.valeur = m;
+        b.addEventListener("click", () => apresReponseTexte(m, b, getBonneReponse()));
+        elChoix.appendChild(b);
+      });
+    } else {
+      const idx = Math.floor(Math.random() * 12);
+      const jours = JOURS_PAR_MOIS[idx];
+      setBonneReponse(jours);
+      elQuestion.innerHTML =
+        `<p style="font-size:0.9rem;margin-bottom:0.5rem">Combien de jours dans <strong>${MOIS_AN[idx]}</strong> ?</p>`;
+      const fausses = [28, 29, 30, 31].filter(n => n !== jours);
+      const options = melanger([jours, ...melanger(fausses).slice(0, 3)]);
+      afficherChoix(options, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
+    return;
+  }
+
+  // CP : quel jour vient après ?
+  const idx = Math.floor(Math.random() * 7);
+  const suiv = (idx + 1) % 7;
+  const bonne = JOURS_SEM[suiv];
+  setBonneReponse(bonne);
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quel jour vient <strong>après</strong> :</p>` +
+    `<p style="font-size:2rem;font-weight:700;color:var(--primaire);margin:0.3rem 0">${JOURS_SEM[idx]}</p>`;
+  const fausses = melanger(JOURS_SEM.filter((_, i) => i !== suiv)).slice(0, 3);
+  const options = melanger([bonne, ...fausses]);
+  elChoix.innerHTML = "";
+  options.forEach(j => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn-choix"; b.style.fontSize = "0.95rem";
+    b.textContent = j; b.dataset.valeur = j;
+    b.addEventListener("click", () => apresReponseTexte(j, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
 }
