@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Apprentissage Magique — Du CP au CM2</title>
+  <title>Maths Magiques — CP, CE1 &amp; CE2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -14,8 +14,8 @@
     <header class="top">
       <div class="mascotte" id="mascotte-header" aria-hidden="true"></div>
       <div class="titre-bloc">
-        <h1>Apprentissage magique</h1>
-        <p class="sous-titre" id="sous-titre">Du CP au CM2 — Apprends en jouant !</p>
+        <h1>Maths magiques</h1>
+        <p class="sous-titre" id="sous-titre">Des jeux pour devenir champion·ne !</p>
       </div>
       <div class="header-droite">
         <div class="streak-header" id="streak-header"></div>
@@ -29,7 +29,7 @@
     <section id="ecran-nommage" class="ecran" hidden aria-label="Bienvenue !">
       <div class="nommage-conteneur">
         <div class="nommage-fox" id="nommage-fox" aria-hidden="true"></div>
-        <h2 class="nommage-titre" id="nommage-titre">Comment s'appelle<br>ton renard ?</h2>
+        <h2 class="nommage-titre">Comment s'appelle<br>ton renard ?</h2>
         <form class="nommage-form" id="nommage-form" autocomplete="off">
           <input type="text" id="input-nom-renard" class="input-nom"
                  maxlength="12" placeholder="Ex : Foxy"
@@ -40,81 +40,21 @@
       </div>
     </section>
 
-    <section id="ecran-genre" class="ecran" hidden aria-label="Qui joue ?">
+    <section id="ecran-genre" class="ecran actif" aria-label="Qui joue ?">
       <div class="genre-conteneur">
         <div class="genre-mascotte" id="mascotte-genre" aria-hidden="true"></div>
-        <h2 class="genre-titre">Qui joue ?</h2>
         <div class="genre-btns">
           <button type="button" class="btn-genre" id="btn-fille" data-genre="fille" aria-label="Fille">
             <span class="genre-emoji">👧</span>
-            <span class="genre-label">Fille</span>
           </button>
           <button type="button" class="btn-genre" id="btn-garcon" data-genre="garcon" aria-label="Garçon">
             <span class="genre-emoji">👦</span>
-            <span class="genre-label">Garçon</span>
           </button>
-        </div>
-      </div>
-    </section>
-
-    <section id="ecran-classe" class="ecran" hidden aria-label="Quelle classe ?">
-      <div class="classe-conteneur">
-        <div class="classe-mascotte" id="classe-mascotte" aria-hidden="true"></div>
-        <h2 class="classe-titre">Tu es en quelle classe ?</h2>
-        <div class="classe-btns classe-btns-5">
-          <button type="button" class="btn-classe" data-niveau="cp">
-            <span class="classe-emoji">🌱</span>
-            <span class="classe-nom">CP</span>
-            <span class="classe-desc">6–7 ans</span>
-          </button>
-          <button type="button" class="btn-classe" data-niveau="ce1">
-            <span class="classe-emoji">🚀</span>
-            <span class="classe-nom">CE1</span>
-            <span class="classe-desc">7–8 ans</span>
-          </button>
-          <button type="button" class="btn-classe" data-niveau="ce2">
-            <span class="classe-emoji">⭐</span>
-            <span class="classe-nom">CE2</span>
-            <span class="classe-desc">8–9 ans</span>
-          </button>
-          <button type="button" class="btn-classe" data-niveau="cm1">
-            <span class="classe-emoji">🌟</span>
-            <span class="classe-nom">CM1</span>
-            <span class="classe-desc">9–10 ans</span>
-          </button>
-          <button type="button" class="btn-classe" data-niveau="cm2">
-            <span class="classe-emoji">🏆</span>
-            <span class="classe-nom">CM2</span>
-            <span class="classe-desc">10–11 ans</span>
-          </button>
-        </div>
-        <div class="diff-choix" id="diff-choix" hidden>
-          <h3 class="diff-titre">Comment tu te sens ?</h3>
-          <div class="diff-btns">
-            <button type="button" class="btn-diff" data-diff="0">
-              <span class="diff-emoji">🌱</span>
-              <span class="diff-nom">Débutant</span>
-            </button>
-            <button type="button" class="btn-diff" data-diff="1">
-              <span class="diff-emoji">⚡</span>
-              <span class="diff-nom">Normal</span>
-            </button>
-            <button type="button" class="btn-diff" data-diff="2">
-              <span class="diff-emoji">🔥</span>
-              <span class="diff-nom">Expert</span>
-            </button>
-          </div>
         </div>
       </div>
     </section>
 
     <main id="ecran-menu" class="ecran" hidden>
-
-      <div class="classe-info-barre" id="classe-info-barre">
-        <span id="classe-info-label"></span>
-        <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer de classe">✏️</button>
-        <button type="button" id="btn-badges" class="btn-badges-menu">🏅 Trophées</button>
-      </div>
 
       <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
       <button type="button" class="maison-banner" id="btn-maison" aria-label="Ma Maison">
@@ -129,6 +69,15 @@
         </div>
       </button>
 
+      <!-- ── Sélecteur de niveau ──────────────────────────────── -->
+      <div class="niveau-barre" role="group" aria-label="Niveau de difficulté">
+        <div class="niveau-switch">
+          <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
+          <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>
+          <button type="button" class="niveau-btn" id="niveau-ce2" data-niveau="ce2">⭐ CE2</button>
+        </div>
+      </div>
+
       <p class="accueil">Choisis ton jeu !</p>
 
       <!-- ── Grille des jeux ─────────────────────────────────── -->
@@ -139,7 +88,7 @@
         <button type="button" class="carte-jeu" data-jeu="addition"      data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🎈</span><span class="nom-jeu">Addition</span><span class="desc-jeu" id="desc-addition">Jusqu'à 10</span></button>
         <button type="button" class="carte-jeu" data-jeu="soustraction"  data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🍎</span><span class="nom-jeu">Soustraction</span><span class="desc-jeu">On enlève, combien reste ?</span></button>
         <button type="button" class="carte-jeu" data-jeu="compare"       data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">Comparer</span><span class="desc-jeu">Le plus grand gagne</span></button>
-        <button type="button" class="carte-jeu" data-jeu="suite"         data-cat="maths" data-niveaux="cp ce1 ce2"><span class="emoji-jeu">🔢</span><span class="nom-jeu">Numéro manquant</span><span class="desc-jeu">Trouve le chiffre caché</span></button>
+        <button type="button" class="carte-jeu" data-jeu="suite"         data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔢</span><span class="nom-jeu">Numéro manquant</span><span class="desc-jeu">Trouve le chiffre caché</span></button>
         <button type="button" class="carte-jeu" data-jeu="doubles"       data-cat="maths" data-niveaux="cp ce1"><span class="emoji-jeu">👯</span><span class="nom-jeu">Doubles</span><span class="desc-jeu">2+2, 3+3…</span></button>
         <button type="button" class="carte-jeu" data-jeu="moitie"        data-cat="maths" data-niveaux="cp ce1 ce2"><span class="emoji-jeu">✂️</span><span class="nom-jeu">La moitié</span><span class="desc-jeu">Partage en 2 parts égales</span></button>
         <button type="button" class="carte-jeu" data-jeu="dizaines"      data-cat="maths" data-niveaux="cp ce1 ce2"><span class="emoji-jeu">📊</span><span class="nom-jeu">Dizaines &amp; Unités</span><span class="desc-jeu">Barres et points</span></button>
@@ -155,10 +104,11 @@
         <button type="button" class="carte-jeu" data-jeu="angles"        data-cat="formes" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">📐</span><span class="nom-jeu">Les angles</span><span class="desc-jeu">Droit, aigu, obtus</span></button>
 
         <h3 class="grille-section">⏰ Temps &amp; Mesures</h3>
+        <button type="button" class="carte-jeu" data-jeu="calendrier"    data-cat="temps" data-niveaux="cp ce1"><span class="emoji-jeu">📅</span><span class="nom-jeu">Calendrier</span><span class="desc-jeu">Jours et mois</span></button>
         <button type="button" class="carte-jeu" data-jeu="heure"         data-cat="temps" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🕐</span><span class="nom-jeu">L'heure</span><span class="desc-jeu">Lis l'horloge !</span></button>
         <button type="button" class="carte-jeu" data-jeu="durees"        data-cat="temps" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">⏱️</span><span class="nom-jeu">Durées</span><span class="desc-jeu">Calcule l'heure de fin</span></button>
         <button type="button" class="carte-jeu" data-jeu="mesures"       data-cat="temps" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">📏</span><span class="nom-jeu">Mesures</span><span class="desc-jeu">Longueurs et masses</span></button>
-        <button type="button" class="carte-jeu" data-jeu="masse"         data-cat="temps" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">La masse</span><span class="desc-jeu">Poids et pesées</span></button>
+        <button type="button" class="carte-jeu" data-jeu="masse"         data-cat="temps" data-niveaux="cp ce1 ce2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">La masse</span><span class="desc-jeu">Poids et pesées</span></button>
 
         <h3 class="grille-section">🪙 Argent</h3>
         <button type="button" class="carte-jeu" data-jeu="monnaiecp"     data-cat="argent" data-niveaux="cp ce1"><span class="emoji-jeu">🪙</span><span class="nom-jeu">La monnaie</span><span class="desc-jeu">Pièces et petites sommes</span></button>
@@ -176,7 +126,10 @@
         <button type="button" class="carte-jeu" data-jeu="lecturePhrase" data-cat="langage" data-niveaux="cp ce1 ce2"><span class="emoji-jeu">🖼️</span><span class="nom-jeu">Lire une phrase</span><span class="desc-jeu">Image → phrase</span></button>
         <button type="button" class="carte-jeu" data-jeu="phraseMobile"  data-cat="langage" data-niveaux="ce1 ce2 cm1"><span class="emoji-jeu">📝</span><span class="nom-jeu">Phrase mobile</span><span class="desc-jeu">Mot manquant</span></button>
         <button type="button" class="carte-jeu" data-jeu="lectureTexte"  data-cat="langage" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">📖</span><span class="nom-jeu">Lecture</span><span class="desc-jeu">Comprendre un texte</span></button>
-        <button type="button" class="carte-jeu" data-jeu="grammaire"     data-cat="langage" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">▲</span><span class="nom-jeu">Grammaire</span><span class="desc-jeu">Nature des mots</span></button>
+        <button type="button" class="carte-jeu" data-jeu="grammaire"     data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">▲</span><span class="nom-jeu">Grammaire</span><span class="desc-jeu">Nature des mots</span></button>
+        <button type="button" class="carte-jeu" data-jeu="homophones"    data-cat="langage" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">📝</span><span class="nom-jeu">Homophones</span><span class="desc-jeu">a/à, est/et, on/ont…</span></button>
+        <button type="button" class="carte-jeu" data-jeu="synonymes"     data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔁</span><span class="nom-jeu">Synonymes</span><span class="desc-jeu">Mots de même sens</span></button>
+        <button type="button" class="carte-jeu" data-jeu="conjugaison"   data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">✍️</span><span class="nom-jeu">Conjugaison</span><span class="desc-jeu">Temps et personnes</span></button>
         <button type="button" class="carte-jeu" data-jeu="anglais"       data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇬🇧</span><span class="nom-jeu">English</span><span class="desc-jeu">What is this?</span></button>
         <button type="button" class="carte-jeu" data-jeu="traduction"    data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction</span><span class="desc-jeu">Français → Anglais</span></button>
 
@@ -185,7 +138,7 @@
         <button type="button" class="carte-jeu" data-jeu="decimaux"          data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">🔢</span><span class="nom-jeu">Décimaux</span><span class="desc-jeu">Virgules et dixièmes</span></button>
         <button type="button" class="carte-jeu" data-jeu="fractionsCM"       data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">½</span><span class="nom-jeu">Fractions CM</span><span class="desc-jeu">Calcul sur fractions</span></button>
         <button type="button" class="carte-jeu" data-jeu="proportionnalite"  data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">Proportionnalité</span><span class="desc-jeu">Règle de trois</span></button>
-        <button type="button" class="carte-jeu" data-jeu="conjugaison"       data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">✍️</span><span class="nom-jeu">Conjugaison</span><span class="desc-jeu">Temps et personnes</span></button>
+        <button type="button" class="carte-jeu" data-jeu="pourcentages"      data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">%</span><span class="nom-jeu">Pourcentages</span><span class="desc-jeu">50%, 25%, 10%</span></button>
 
       </div>
 
@@ -195,61 +148,21 @@
         <div id="missions-widget"></div>
       </div>
 
+      <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
+        <span id="icone-genre-actuel">👧</span>
+      </button>
     </main>
-
-    <section class="ecran" id="ecran-badges" hidden>
-      <div class="badges-header">
-        <button type="button" id="btn-retour-badges" class="btn-retour-small">← Retour</button>
-        <h2>Mes trophées 🏅</h2>
-        <p id="badges-compteur"></p>
-      </div>
-      <div id="badges-grille" class="badges-grille"></div>
-    </section>
 
     <section id="ecran-maison" class="ecran" hidden aria-label="Ma Maison">
       <button type="button" class="btn-retour" id="btn-retour-maison">← Menu</button>
+      <h2 class="maison-titre">🏠 Ma Maison</h2>
       <div class="maison-conteneur">
-
-        <!-- Scène : bulle + renard + nom -->
-        <div class="tama-scene">
-          <div class="tama-bulle" id="tama-bulle" aria-live="polite"></div>
-          <div class="maison-renard" id="maison-renard" aria-hidden="true"></div>
+        <div class="maison-renard" id="maison-renard" aria-hidden="true"></div>
+        <div class="maison-infos">
           <p class="maison-nom" id="maison-nom"></p>
           <p class="maison-stade" id="maison-stade"></p>
+          <p class="maison-jours" id="maison-jours"></p>
         </div>
-
-        <!-- Jauges à segments -->
-        <div class="tama-jauges">
-          <div class="tama-jauge-ligne">
-            <span class="tama-jauge-icone">🍎</span>
-            <div class="tama-segments" id="tama-faim-segments" aria-label="Faim"></div>
-          </div>
-          <div class="tama-jauge-ligne">
-            <span class="tama-jauge-icone">❤️</span>
-            <div class="tama-segments" id="tama-bonheur-segments" aria-label="Bonheur"></div>
-          </div>
-        </div>
-
-        <!-- Boutons d'action (grands, tactiles) -->
-        <div class="tama-actions">
-          <button type="button" class="tama-btn tama-btn-nourrir" id="btn-nourrir">
-            <span class="tama-btn-emoji">🍎</span>
-            <span>Nourrir</span>
-            <small>−2 ⭐</small>
-          </button>
-          <button type="button" class="tama-btn tama-btn-calin" id="btn-calin">
-            <span class="tama-btn-emoji">❤️</span>
-            <span>Câlin</span>
-            <small id="calin-dispo-label">1× par jour</small>
-          </button>
-          <button type="button" class="tama-btn tama-btn-jouer" id="btn-jouer-tama">
-            <span class="tama-btn-emoji">🎮</span>
-            <span>Jouer</span>
-            <small>+❤️</small>
-          </button>
-        </div>
-
-        <!-- Étoiles + progression -->
         <div class="maison-etoiles">
           <span class="maison-etoiles-icone">⭐</span>
           <span class="maison-etoiles-total" id="maison-etoiles-total"></span>
@@ -260,33 +173,31 @@
             <div class="maison-barre-remplie" id="maison-barre-remplie"></div>
           </div>
         </div>
-
-        <!-- Jours -->
-        <p class="maison-jours" id="maison-jours"></p>
-
-        <!-- Éléments de jauge cachés — ancre DOM pour app-histoire.js -->
-        <div class="maison-jauges" hidden aria-hidden="true">
+        <div class="maison-jauges">
           <div class="jauge-ligne">
+            <span class="jauge-label">🍎 Faim</span>
             <div class="jauge-barre-fond">
               <div class="jauge-barre-fill jauge-faim" id="jauge-faim-barre"></div>
             </div>
             <span class="jauge-val" id="jauge-faim-val"></span>
           </div>
           <div class="jauge-ligne">
+            <span class="jauge-label">❤️ Bonheur</span>
             <div class="jauge-barre-fond">
               <div class="jauge-barre-fill jauge-bonheur" id="jauge-bonheur-barre"></div>
             </div>
             <span class="jauge-val" id="jauge-bonheur-val"></span>
           </div>
         </div>
-
-        <!-- Dressing + réglages -->
-        <button type="button" class="btn-dressing" id="btn-dressing">👗 Dressing</button>
-        <div class="maison-reglages">
-          <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
-            <span id="icone-genre-actuel">👧</span> Changer de profil
+        <div class="maison-actions">
+          <button type="button" class="btn-action-renard" id="btn-nourrir">
+            🍎 Nourrir<br><small>−2 ⭐</small>
+          </button>
+          <button type="button" class="btn-action-renard" id="btn-calin">
+            ❤️ Câlin<br><small id="calin-dispo-label">1× par jour</small>
           </button>
         </div>
+        <button type="button" class="btn-dressing" id="btn-dressing">👗 Dressing</button>
       </div>
     </section>
 
@@ -300,27 +211,13 @@
 
     <section id="ecran-jeu" class="ecran" hidden>
       <button type="button" class="btn-retour" id="btn-retour">← Menu</button>
-      <div class="diff-badge" id="diff-badge" hidden></div>
+      <p class="jeu-niveau" id="jeu-niveau-badge" hidden></p>
       <h2 id="jeu-titre" class="jeu-titre"></h2>
       <div id="zone-question" class="zone-question"></div>
       <div id="zone-choix" class="zone-choix"></div>
       <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
-      <button type="button" class="btn-suivant" id="btn-suivant" hidden>Suivant →</button>
+      <button type="button" class="btn-suivant" id="btn-suivant" hidden>Question suivante →</button>
     </section>
-
-    <!-- ── Modal : passer à la classe suivante ──────────────────── -->
-    <div id="modal-classe-suivante" class="modal-overlay" hidden role="dialog" aria-modal="true">
-      <div class="modal-contenu">
-        <div class="modal-emoji">🏆</div>
-        <h2 class="modal-titre">Incroyable !</h2>
-        <p class="modal-texte">Tu maîtrises le niveau <strong>Expert</strong> !<br>
-          Veux-tu passer en <strong id="modal-classe-nom"></strong> ?</p>
-        <div class="modal-btns">
-          <button type="button" id="modal-oui" class="btn-modal-oui">Oui, on y va ! 🎉</button>
-          <button type="button" id="modal-non" class="btn-modal-non">Plus tard</button>
-        </div>
-      </div>
-    </div>
 
     <div id="renard-reaction" class="renard-reaction" aria-hidden="true" hidden></div>
     <div id="confetti" class="confetti" aria-hidden="true"></div>

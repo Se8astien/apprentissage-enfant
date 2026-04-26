@@ -526,3 +526,37 @@ export function lancerProportionnalite() {
   const props = propositionsAvecBonne(rep, Math.max(1, rep - 10), rep + 10, 3);
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }
+
+// ── lancerPourcentages ────────────────────────────────────────────────────────
+export function lancerPourcentages() {
+  elTitre.textContent = "% Pourcentages";
+  const diff = getDifficulte();
+  const typesDisponibles = diff === 0 ? [50] : diff === 1 ? [50, 25] : [50, 25, 10];
+  const pct = typesDisponibles[Math.floor(Math.random() * typesDisponibles.length)];
+
+  const valeursParPct = {
+    50: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200],
+    25: [20, 40, 60, 80, 100, 120, 160, 200],
+    10: [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150],
+  };
+  const vals = valeursParPct[pct];
+  const N = vals[Math.floor(Math.random() * vals.length)];
+  const rep = Math.round(N * pct / 100);
+  setBonneReponse(rep);
+
+  const contextes = [
+    `Un jouet coûte <strong>${N}€</strong>. Les soldes donnent <strong>${pct}%</strong> de réduction. Combien économises-tu ?`,
+    `Il y a <strong>${N}</strong> élèves dans l'école. <strong>${pct}%</strong> sont des filles. Combien de filles ?`,
+    `Un vélo vaut <strong>${N}€</strong>. Tu as une remise de <strong>${pct}%</strong>. Quel est le montant de la remise ?`,
+    `Dans une classe de <strong>${N}</strong> enfants, <strong>${pct}%</strong> ont un animal. Combien ont un animal ?`,
+    `Un livre coûte <strong>${N}€</strong>. Tu paies <strong>${pct}%</strong> de moins. Combien paies-tu en moins ?`,
+  ];
+  const contexte = contextes[Math.floor(Math.random() * contextes.length)];
+  const rappel = pct === 50 ? "50% = la moitié" : pct === 25 ? "25% = le quart" : "10% = diviser par 10";
+
+  elQuestion.innerHTML =
+    `<p style="font-size:0.82rem;margin:0 0 0.3rem;color:#888">💡 ${rappel}</p>` +
+    `<div class="probleme-question"><p>${contexte}</p></div>`;
+  const props = propositionsAvecBonne(rep, Math.max(0, rep - 20), rep + 20, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
