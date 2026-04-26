@@ -54,6 +54,30 @@ export { confetti } from "./app-state.js";
 // ── Module-level combo counter (only used in nav) ─────────────────────────────
 let comboActuel = 0;
 
+// ── Anti-répétition : historique des questions par jeu (session) ──────────────
+const _histoireQuestions = {};
+const HIST_MAX = 10;
+const HIST_ESSAIS = 8;
+
+function empreinteQuestion() {
+  const el = document.getElementById("zone-question");
+  return el ? el.innerHTML.trim() : "";
+}
+
+function lancerAvecAntiRepeat(jeu, lanceurs) {
+  const hist = _histoireQuestions[jeu] || [];
+  let essais = 0;
+  let fp;
+  do {
+    lanceurs[jeu]();
+    fp = empreinteQuestion();
+    essais++;
+  } while (essais < HIST_ESSAIS && hist.includes(fp));
+  if (!_histoireQuestions[jeu]) _histoireQuestions[jeu] = [];
+  _histoireQuestions[jeu].push(fp);
+  if (_histoireQuestions[jeu].length > HIST_MAX) _histoireQuestions[jeu].shift();
+}
+
 // ── Messages ──────────────────────────────────────────────────────────────────
 function messagesOk() {
   if (estGrand()) return [
@@ -353,12 +377,13 @@ export function montrerJeu(nom, lanceurs) {
   const diffBadge = document.getElementById("diff-badge");
   if (diffBadge) { diffBadge.hidden = false; diffBadge.textContent = getDiffLabel(); }
   resetFeedback();
-  lanceurs[nom]();
+  _histoireQuestions[nom] = [];
+  lancerAvecAntiRepeat(nom, lanceurs);
 }
 
 // ── questionSuivante ──────────────────────────────────────────────────────────
 export function questionSuivante(lanceurs) {
   resetFeedback();
   const jeu = getJeuCourant();
-  if (jeu && lanceurs[jeu]) lanceurs[jeu]();
+  if (jeu && lanceurs[jeu]) lancerAvecAntiRepeat(jeu, lanceurs);
 }
