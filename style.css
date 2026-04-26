@@ -1699,6 +1699,25 @@ h1 {
   letter-spacing: 0.05em;
   margin-top: 0.15rem;
 }
+.carte-diff-badge {
+  position: absolute;
+  bottom: 0.32rem;
+  right: 0.38rem;
+  font-size: 0.78rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+.carte-jeu.jeu-maitrise {
+  opacity: 0.55;
+}
+.carte-jeu.jeu-maitrise::after {
+  content: "✅";
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  font-size: 0.8rem;
+  line-height: 1;
+}
 
 /* ── Toast progression difficulté ─────────────────────────────────────────── */
 .toast-progression {

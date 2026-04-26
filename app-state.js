@@ -99,7 +99,17 @@ export function majGenre() {
   if (elIconeGenre) elIconeGenre.textContent = f ? "👧" : "👦";
 }
 
+export function getDifficulteJeu(jeu) {
+  const v = parseInt(localStorage.getItem("diff-jeu-" + jeu) || "0", 10);
+  return (v >= 0 && v <= 2) ? v : 0;
+}
+
+export function setDifficulteJeu(jeu, v) {
+  localStorage.setItem("diff-jeu-" + jeu, String(Math.max(0, Math.min(2, v))));
+}
+
 export function getDifficulte() {
+  if (jeuCourant) return getDifficulteJeu(jeuCourant);
   const v = parseInt(localStorage.getItem(STORAGE_DIFFICULTE) || "0", 10);
   return (v >= 0 && v <= 2) ? v : 0;
 }

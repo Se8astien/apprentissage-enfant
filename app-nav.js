@@ -23,7 +23,8 @@ import {
   confetti,
   getNiveauCourant,
   getDifficulte,
-  incrementDifficulte,
+  getDifficulteJeu,
+  setDifficulteJeu,
   getDiffLabel,
   marquerMaitrise,
   lireMaitrise,
@@ -249,8 +250,10 @@ export function apresReponseTexte(choix, bouton, correct) {
 
 // ── Progression de difficulté ─────────────────────────────────────────────────
 function gererProgressionDifficulte() {
-  if (getDifficulte() < 2) {
-    incrementDifficulte();
+  const jeu = getJeuCourant();
+  const diff = getDifficulteJeu(jeu);
+  if (diff < 2) {
+    setDifficulteJeu(jeu, diff + 1);
     afficherToastDifficulte();
     const badge = document.getElementById("diff-badge");
     if (badge) { badge.hidden = false; badge.textContent = getDiffLabel(); badge.classList.add("diff-pulse"); setTimeout(() => badge.classList.remove("diff-pulse"), 1200); }
@@ -317,16 +320,24 @@ export function montrerMenu() {
   mettreAJourMaisonBanner();
   // Update classe/difficulte info bar
   const classeLabel = document.getElementById("classe-info-label");
-  const diffLabel = document.getElementById("difficulte-label");
   if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2", cm1: "🌟 CM1", cm2: "🏆 CM2" }[getNiveauCourant()] || "";
-  if (diffLabel) diffLabel.textContent = getDiffLabel();
   filtrerJeuxParNiveau();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
-    const m = lireMaitrise(btn.dataset.jeu);
+    const jeu = btn.dataset.jeu;
+    const m = lireMaitrise(jeu);
     const n = m.filter(Boolean).length;
-    let el = btn.querySelector(".maitrise-stars");
-    if (!el) { el = document.createElement("span"); el.className = "maitrise-stars"; btn.appendChild(el); }
-    el.textContent = n > 0 ? "★".repeat(n) + "☆".repeat(3 - n) : "";
+
+    let starsEl = btn.querySelector(".maitrise-stars");
+    if (!starsEl) { starsEl = document.createElement("span"); starsEl.className = "maitrise-stars"; btn.appendChild(starsEl); }
+    starsEl.textContent = n > 0 ? "★".repeat(n) + "☆".repeat(3 - n) : "";
+
+    let diffEl = btn.querySelector(".carte-diff-badge");
+    if (!diffEl) { diffEl = document.createElement("span"); diffEl.className = "carte-diff-badge"; btn.appendChild(diffEl); }
+    const d = getDifficulteJeu(jeu);
+    diffEl.textContent = ["🌱", "⚡", "🔥"][d];
+    diffEl.title = ["Débutant", "Normal", "Expert"][d];
+
+    btn.classList.toggle("jeu-maitrise", n === 3);
   });
 }
 
