@@ -405,3 +405,37 @@ if (btnLandingPartager) btnLandingPartager.addEventListener("click", partager);
 
 const btnPartagerMenu = document.getElementById("btn-partager");
 if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
+
+// ── RGPD — consentement cookies ───────────────────────────────────────────────
+(function () {
+  const CLE = "rgpd-consent";
+  const banner = document.getElementById("banner-rgpd");
+  if (!banner) return;
+
+  function appliquerConsent(valeur) {
+    if (typeof gtag === "function") {
+      gtag("consent", "update", {
+        analytics_storage: valeur === "accepte" ? "granted" : "denied"
+      });
+    }
+  }
+
+  const consentSauve = localStorage.getItem(CLE);
+  if (!consentSauve) {
+    banner.hidden = false;
+  } else {
+    appliquerConsent(consentSauve);
+  }
+
+  document.getElementById("btn-rgpd-accepter").addEventListener("click", () => {
+    localStorage.setItem(CLE, "accepte");
+    appliquerConsent("accepte");
+    banner.hidden = true;
+  });
+
+  document.getElementById("btn-rgpd-refuser").addEventListener("click", () => {
+    localStorage.setItem(CLE, "refuse");
+    appliquerConsent("refuse");
+    banner.hidden = true;
+  });
+})();
