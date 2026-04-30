@@ -38,35 +38,33 @@ export function lancerCompte() {
   const diff = getDifficulte();
 
   if (estCE2()) {
-    const mins = [2, 3, 5][diff];
-    const maxs = [6, 8, 10][diff];
+    const [minPer, maxPer] = [[2, 5], [3, 8], [4, 11]][diff];
     const idxs = [];
     while (idxs.length < 3) {
       const i = Math.floor(Math.random() * ANIMAUX.length);
       if (!idxs.includes(i)) idxs.push(i);
     }
     const [eA, eB, eC] = idxs.map(i => ANIMAUX[i]);
-    const nA = mins + Math.floor(Math.random() * (maxs - mins + 1));
-    const nB = mins + Math.floor(Math.random() * (maxs - mins + 1));
-    const nC = mins + Math.floor(Math.random() * (maxs - mins + 1));
-    const total3 = nA + nB + nC;
+    const rand3 = () => minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
+    const nA = rand3(), nB = rand3(), nC = rand3();
     const lA = Array(nA).fill(eA).join(" ");
     const lB = Array(nB).fill(eB).join(" ");
     const lC = Array(nC).fill(eC).join(" ");
-    const typeEcart3 = diff >= 1 && Math.random() < 0.40;
-    if (typeEcart3) {
-      const maxN3 = Math.max(nA, nB, nC);
-      const minN3 = Math.min(nA, nB, nC);
-      const ecart3 = maxN3 - minN3;
-      const emGrand = nA === maxN3 ? eA : (nB === maxN3 ? eB : eC);
-      const emPetit = nA === minN3 ? eA : (nB === minN3 ? eB : eC);
-      setBonneReponse(ecart3);
+    const total3 = nA + nB + nC;
+    const typeDiff3 = diff >= 1 && Math.random() < 0.40;
+    if (typeDiff3) {
+      const maxN = Math.max(nA, nB, nC);
+      const minN = Math.min(nA, nB, nC);
+      const diff3 = maxN - minN;
+      const emGrand = nA === maxN ? eA : (nB === maxN ? eB : eC);
+      const emPetit = nA === minN ? eA : (nB === minN ? eB : eC);
+      setBonneReponse(diff3);
       elQuestion.innerHTML =
         `<p>Combien de ${emGrand} <strong>de plus</strong> que de ${emPetit} ?</p>` +
         `<p class="ligne-emojis petit">${lA}</p>` +
         `<p class="ligne-emojis petit">${lB}</p>` +
         `<p class="ligne-emojis petit">${lC}</p>`;
-      const props = propositionsAvecBonne(ecart3, Math.max(0, ecart3 - 5), Math.min(12, ecart3 + 5), 3);
+      const props = propositionsAvecBonne(diff3, Math.max(0, diff3 - 5), Math.min(12, diff3 + 5), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else {
       setBonneReponse(total3);
@@ -82,28 +80,27 @@ export function lancerCompte() {
   }
 
   if (estCE1()) {
-    const mins = [2, 3, 5][diff];
-    const maxs = [5, 9, 12][diff];
+    const [minPer, maxPer] = [[2, 5], [3, 8], [4, 12]][diff];
     const idxA = Math.floor(Math.random() * ANIMAUX.length);
     let idxB = Math.floor(Math.random() * ANIMAUX.length);
     if (idxB === idxA) idxB = (idxA + 1) % ANIMAUX.length;
     const emojiA = ANIMAUX[idxA];
     const emojiB = ANIMAUX[idxB];
-    const nA = mins + Math.floor(Math.random() * (maxs - mins + 1));
-    const nB = mins + Math.floor(Math.random() * (maxs - mins + 1));
+    const nA = minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
+    const nB = minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
     const ligneA = Array(nA).fill(emojiA).join(" ");
     const ligneB = Array(nB).fill(emojiB).join(" ");
-    const typeEcart = diff >= 1 && Math.random() < 0.4 && nA !== nB;
-    if (typeEcart) {
-      const ecart = Math.abs(nA - nB);
+    const typeDiff = diff >= 1 && Math.random() < 0.4 && nA !== nB;
+    if (typeDiff) {
+      const difference = Math.abs(nA - nB);
       const plusGrand = nA > nB ? emojiA : emojiB;
       const plusPetit = nA > nB ? emojiB : emojiA;
-      setBonneReponse(ecart);
+      setBonneReponse(difference);
       elQuestion.innerHTML =
         `<p>Combien de ${plusGrand} <strong>de plus</strong> que de ${plusPetit} ?</p>` +
         `<p class="ligne-emojis petit">${ligneA}</p>` +
         `<p class="ligne-emojis petit">${ligneB}</p>`;
-      const props = propositionsAvecBonne(ecart, Math.max(0, ecart - 4), Math.min(12, ecart + 4), 3);
+      const props = propositionsAvecBonne(difference, Math.max(0, difference - 4), Math.min(12, difference + 4), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else {
       const total = nA + nB;
@@ -118,42 +115,30 @@ export function lancerCompte() {
     return;
   }
 
-  // CP (default)
-  const minN = [1, 3, 8][diff];
-  const maxN = [5, 10, 15][diff];
+  // CP : difficulté progressive
+  const [minN, maxN] = [[1, 5], [3, 10], [6, 15]][diff];
   const n = minN + Math.floor(Math.random() * (maxN - minN + 1));
   const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-  // Regroup emojis in rows of 5 for easier counting
-  let lignesHtml = "";
-  for (let i = 0; i < n; i += 5) {
-    const row = Array(Math.min(5, n - i)).fill(emoji).join(" ");
-    lignesHtml += `<p class="ligne-emojis${n > 5 ? " petit" : ""}">${row}</p>`;
+
+  // Débutant : regrouper en rangées de 5 pour faciliter le comptage
+  let lignesHtml;
+  if (diff === 0) {
+    const rows = [];
+    let rem = n;
+    while (rem > 0) {
+      const take = Math.min(5, rem);
+      rows.push(`<p class="ligne-emojis">${Array(take).fill(emoji).join(" ")}</p>`);
+      rem -= take;
+    }
+    lignesHtml = rows.join("");
+  } else {
+    lignesHtml = `<p class="ligne-emojis${n > 8 ? " petit" : ""}">${Array(n).fill(emoji).join(" ")}</p>`;
   }
-  elQuestion.innerHTML = "<p>Combien d'animaux tu vois ?</p>" + lignesHtml;
+
+  elQuestion.innerHTML = `<p>Combien d'animaux tu vois ?</p>${lignesHtml}`;
   setBonneReponse(n);
   const props = propositionsAvecBonne(n, Math.max(1, n - 3), Math.min(maxN + 3, n + 3), 3);
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
-}
-
-function cadreDixAddition(a, b) {
-  let cells = '';
-  for (let i = 0; i < 10; i++) {
-    if (i < a) cells += '<div class="dix-cel dix-a"></div>';
-    else if (i < a + b) cells += '<div class="dix-cel dix-b"></div>';
-    else cells += '<div class="dix-cel"></div>';
-  }
-  return '<div class="cadre-dix-add">' + cells + '</div>';
-}
-
-function cadreDixSoustraction(total, enleve) {
-  const reste = total - enleve;
-  let cells = '';
-  for (let i = 0; i < 10; i++) {
-    if (i < reste) cells += '<div class="dix-cel dix-a"></div>';
-    else if (i < total) cells += '<div class="dix-cel dix-retire"></div>';
-    else cells += '<div class="dix-cel"></div>';
-  }
-  return '<div class="cadre-dix-add">' + cells + '</div>';
 }
 
 // ── lancerAddition ────────────────────────────────────────────────────────────
