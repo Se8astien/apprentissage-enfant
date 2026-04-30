@@ -517,7 +517,25 @@ export function lancerSuite() {
   elTitre.textContent = "Numéro manquant";
   const diff = getDifficulte();
   let debut, step;
-  if (estCE2()) {
+  if (estCM2()) {
+    const stepPools = [
+      [500, 1000],
+      [250, 500, 1000, 2000],
+      [100, 250, 500, 1000, 2000, 5000],
+    ];
+    const pool = stepPools[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = step * (1 + Math.floor(Math.random() * 8));
+  } else if (estCM1()) {
+    const stepPools = [
+      [100, 500],
+      [100, 250, 500, 1000],
+      [100, 250, 500, 1000],
+    ];
+    const pool = stepPools[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = step * (1 + Math.floor(Math.random() * 10));
+  } else if (estCE2()) {
     const stepPoolsCE2 = [
       [1, 2, 5, 10],
       [3, 4, 6, 7, 8, 9, 25, 50],
