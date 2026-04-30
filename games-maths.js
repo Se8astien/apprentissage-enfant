@@ -66,7 +66,7 @@ export function lancerCompte() {
         `<p class="ligne-emojis petit">${lA}</p>` +
         `<p class="ligne-emojis petit">${lB}</p>` +
         `<p class="ligne-emojis petit">${lC}</p>`;
-      const props = propositionsAvecBonne(ecart3, Math.max(0, ecart3 - 5), Math.min(10, ecart3 + 5), 3);
+      const props = propositionsAvecBonne(ecart3, Math.max(0, ecart3 - 5), Math.min(12, ecart3 + 5), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else {
       setBonneReponse(total3);
@@ -75,7 +75,7 @@ export function lancerCompte() {
         `<p class="ligne-emojis petit">${lA}</p>` +
         `<p class="ligne-emojis petit">${lB}</p>` +
         `<p class="ligne-emojis petit">${lC}</p>`;
-      const props = propositionsAvecBonne(total3, Math.max(9, total3 - 8), Math.min(30, total3 + 8), 3);
+      const props = propositionsAvecBonne(total3, Math.max(6, total3 - 8), Math.min(36, total3 + 8), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
     }
     return;
@@ -112,7 +112,7 @@ export function lancerCompte() {
         `<p>Combien d'animaux <strong>en tout</strong> ?</p>` +
         `<p class="ligne-emojis petit">${ligneA}</p>` +
         `<p class="ligne-emojis petit">${ligneB}</p>`;
-      const props = propositionsAvecBonne(total, Math.max(4, total - 5), Math.min(24, total + 5), 3);
+      const props = propositionsAvecBonne(total, Math.max(4, total - 5), Math.min(28, total + 5), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
     }
     return;
@@ -131,7 +131,7 @@ export function lancerCompte() {
   }
   elQuestion.innerHTML = "<p>Combien d'animaux tu vois ?</p>" + lignesHtml;
   setBonneReponse(n);
-  const props = propositionsAvecBonne(n, Math.max(1, n - 3), Math.min(maxN + 2, n + 3), 3);
+  const props = propositionsAvecBonne(n, Math.max(1, n - 3), Math.min(maxN + 3, n + 3), 3);
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }
 
