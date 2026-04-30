@@ -2,6 +2,108 @@
 
 import { lireEtoiles, lireNomRenard } from "./app-state.js";
 
+const HISTOIRES_JEUX = {
+  compte: {
+    emoji: "🐱🐶🐸",
+    titre: "Les animaux de la ferme",
+    texte: "Les animaux de la ferme se sont tous mélangés ! Aide [Nom] à les compter un par un.",
+  },
+  addition: {
+    emoji: "🎈🎈🎈",
+    titre: "La fête des ballons",
+    texte: "Des ballons colorés s'envolent dans le ciel de la forêt ! Combien y en a-t-il en tout ? [Nom] compte sur toi !",
+  },
+  soustraction: {
+    emoji: "🍎🍏",
+    titre: "Le panier de pommes",
+    texte: "Un beau panier plein de pommes… mais des petits lutins en ont mangé quelques-unes ! Combien en reste-t-il ?",
+  },
+  compare: {
+    emoji: "⚖️🦊",
+    titre: "Le jeu de la balance",
+    texte: "Deux groupes d'animaux se regardent dans la forêt. [Nom] veut savoir lequel est le plus grand. Aide-le à comparer !",
+  },
+  suite: {
+    emoji: "🔢❓",
+    titre: "Le chiffre mystère",
+    texte: "Un chiffre coquin s'est caché dans la suite ! [Nom] cherche partout dans la forêt. Sauras-tu le retrouver ?",
+  },
+  doubles: {
+    emoji: "👯🦊",
+    titre: "La danse des jumeaux",
+    texte: "Les animaux adorent danser en paires ! [Nom] veut doubler chaque groupe. Aide-le à trouver les doubles !",
+  },
+  moitie: {
+    emoji: "✂️🎂",
+    titre: "Partage le goûter",
+    texte: "[Nom] veut partager son gâteau avec son ami en deux parts égales. Aide-le à trouver la moitié !",
+  },
+  dizaines: {
+    emoji: "📊🟡",
+    titre: "Les barres magiques",
+    texte: "[Nom] range ses billes en barres de 10. Aide-le à compter les dizaines et les petites unités !",
+  },
+  pairimpair: {
+    emoji: "🟣⚡",
+    titre: "La fête de la forêt",
+    texte: "Les animaux font la fête ! Certains dansent en paires, d'autres sont tout seuls. Pair ou impair ? [Nom] a besoin de toi !",
+  },
+  perlesDorees: {
+    emoji: "🟡✨",
+    titre: "Le trésor des perles",
+    texte: "[Nom] a trouvé un coffre plein de perles dorées magiques ! Aide-le à les compter avec les grandes barres et les petites billes.",
+  },
+  planche100: {
+    emoji: "🔢🗺️",
+    titre: "La carte des nombres",
+    texte: "La planche des cent est une carte magique de la forêt ! [Nom] doit trouver les bons nombres sur la carte.",
+  },
+  formes: {
+    emoji: "🔷🔺🟡",
+    titre: "Les formes cachées",
+    texte: "Des formes magiques se cachent partout dans la forêt ! Cercles, carrés, triangles… [Nom] a besoin de toi pour les reconnaître.",
+  },
+  calendrier: {
+    emoji: "📅🌞",
+    titre: "La fête des animaux",
+    texte: "[Nom] ne veut pas rater la grande fête des animaux ! Aide-le à lire le calendrier pour savoir quel jour c'est.",
+  },
+  masse: {
+    emoji: "⚖️🐣",
+    titre: "La balance de la forêt",
+    texte: "La balance magique de [Nom] est toute chamboulée ! Aide-le à trouver le bon poids de chaque objet.",
+  },
+  monnaiecp: {
+    emoji: "🪙🛒",
+    titre: "Le marché de la forêt",
+    texte: "[Nom] va au marché avec ses pièces brillantes ! Aide-le à compter son argent pour acheter quelque chose de délicieux.",
+  },
+  sons: {
+    emoji: "🔤👂",
+    titre: "Les sons de la forêt",
+    texte: "[Nom] entend des sons mystérieux dans la forêt. Reconnais la lettre qui se cache dans chaque mot !",
+  },
+  syllabes: {
+    emoji: "📖🌀",
+    titre: "Les syllabes envolées",
+    texte: "Les syllabes jouent à cache-cache ! [Nom] cherche celles qui manquent dans les mots. Sauras-tu les retrouver ?",
+  },
+  lecture: {
+    emoji: "📚🖼️",
+    titre: "Mots et images",
+    texte: "Les mots et les images font une randonnée dans la forêt ! Aide [Nom] à réunir chaque mot avec sa bonne image.",
+  },
+  lecturePhrase: {
+    emoji: "🖼️📝",
+    titre: "La phrase secrète",
+    texte: "[Nom] a trouvé de vieilles images avec des phrases mystérieuses ! Lis bien pour choisir la bonne phrase.",
+  },
+};
+
+export function getHistoireJeu(jeuId) {
+  return HISTOIRES_JEUX[jeuId] || null;
+}
+
 const CHAPITRES = [
   {
     stade: 0,
