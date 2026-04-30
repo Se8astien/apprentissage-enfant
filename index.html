@@ -3,7 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Maths Magiques — CP, CE1 &amp; CE2</title>
+  <title>Jeux Montessori — Apprendre en s'amusant pour enfants du CP au CM2</title>
+
+  <!-- SEO de base -->
+  <meta name="description" content="Jeux éducatifs Montessori gratuits pour enfants de 6 à 11 ans. 40 mini-jeux de maths, lecture et grammaire adaptés au CP, CE1, CE2, CM1 et CM2. Apprendre en s'amusant, à son rythme !" />
+  <meta name="keywords" content="montessori enfants, jeux éducatifs montessori, apprendre en jouant enfants, jeux maths primaire gratuits, méthode montessori jeux, apprentissage CP CE1 CE2 CM1 CM2, jeux éducatifs 6 ans 7 ans 8 ans 9 ans 10 ans 11 ans, perles dorées montessori, planche des cent" />
+  <meta name="author" content="Apprentissage Magique" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph (partage réseaux sociaux) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Jeux Montessori — Apprendre en s'amusant pour enfants" />
+  <meta property="og:description" content="40 mini-jeux éducatifs Montessori gratuits pour les enfants du CP au CM2 (6–11 ans). Maths, lecture, grammaire, géométrie. Gratuit, sans inscription." />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:site_name" content="Apprentissage Magique" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Jeux Montessori — Apprendre en s'amusant pour enfants" />
+  <meta name="twitter:description" content="40 mini-jeux éducatifs Montessori gratuits pour les enfants du CP au CM2. Maths, lecture, grammaire, géométrie. Gratuit, sans inscription." />
+
+  <!-- Données structurées : application éducative -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["WebApplication", "EducationalApplication"],
+    "name": "Apprentissage Magique",
+    "description": "Application éducative inspirée de la méthode Montessori pour enfants du CP au CM2. 40 jeux interactifs de maths, lecture et grammaire pour apprendre en s'amusant, à son rythme.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Navigateur Web",
+    "isAccessibleForFree": true,
+    "inLanguage": "fr",
+    "audience": {
+      "@type": "EducationalAudience",
+      "educationalRole": "student",
+      "suggestedMinAge": "6",
+      "suggestedMaxAge": "11"
+    },
+    "teaches": [
+      "Mathématiques", "Calcul mental", "Lecture", "Grammaire",
+      "Conjugaison", "Géométrie", "Anglais", "Orthographe"
+    ],
+    "educationalLevel": ["CP", "CE1", "CE2", "CM1", "CM2"],
+    "educationalFramework": "Montessori",
+    "learningResourceType": "Jeu éducatif interactif",
+    "about": { "@type": "Thing", "name": "Méthode Montessori" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+  }
+  </script>
+
+  <!-- Données structurées : FAQ (pour les extraits enrichis Google) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Pour quels enfants ces jeux Montessori sont-ils adaptés ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Apprentissage Magique est conçu pour les enfants de 6 à 11 ans, du CP au CM2. Les jeux s'adaptent automatiquement au niveau et à la progression de l'enfant."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Ces jeux suivent-ils vraiment la méthode Montessori ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, les jeux s'inspirent de la pédagogie Montessori : apprentissage par l'expérience, progression individualisée et matériel concret comme les perles dorées et la planche des cent."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "L'application est-elle gratuite ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, Apprentissage Magique est entièrement gratuit. Aucune inscription ni téléchargement n'est nécessaire : il suffit d'ouvrir la page dans un navigateur."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien y a-t-il de jeux disponibles ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "L'application propose plus de 40 mini-jeux couvrant les mathématiques, la lecture, la grammaire, la conjugaison, la géométrie et l'anglais, tous adaptés au programme de l'école primaire française."
+        }
+      }
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -14,8 +104,8 @@
     <header class="top">
       <div class="mascotte" id="mascotte-header" aria-hidden="true"></div>
       <div class="titre-bloc">
-        <h1>Maths magiques</h1>
-        <p class="sous-titre" id="sous-titre">Des jeux pour devenir champion·ne !</p>
+        <h1>Apprentissage Magique</h1>
+        <p class="sous-titre" id="sous-titre">Jeux Montessori pour apprendre en s'amusant !</p>
       </div>
       <div class="header-droite">
         <div class="streak-header" id="streak-header"></div>
@@ -301,6 +391,14 @@
     <div id="renard-reaction" class="renard-reaction" aria-hidden="true" hidden></div>
     <div id="confetti" class="confetti" aria-hidden="true"></div>
   </div>
+  <footer class="seo-footer">
+    <p>
+      <strong>Apprentissage Magique</strong> est une application éducative gratuite inspirée de la
+      <strong>méthode Montessori</strong> pour les enfants de 6 à 11 ans (CP, CE1, CE2, CM1, CM2).
+      Plus de 40 mini-jeux de <em>maths</em>, <em>lecture</em>, <em>grammaire</em> et <em>géométrie</em>
+      permettent d'<strong>apprendre en s'amusant</strong>, à son propre rythme, sur tablette ou ordinateur.
+    </p>
+  </footer>
   <script type="module" src="app-init.js"></script>
 </body>
 </html>

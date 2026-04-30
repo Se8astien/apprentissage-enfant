@@ -1956,3 +1956,8 @@ h1 {
 .dix-leg-a { color:#d98600; }
 .dix-leg-b { color:#0063c6; }
 .decomp-hint { font-size:0.82rem; color:#6c5ce7; background:#f0eeff; border-radius:0.6rem; padding:0.35rem 0.7rem; margin-top:0.5rem; }
+
+
+/* ── Footer SEO ──────────────────────────────────────────────────────────── */
+.seo-footer { margin-top: 2rem; padding: 1rem 1.5rem; background: rgba(0,0,0,0.03); border-top: 1px solid rgba(0,0,0,0.06); text-align: center; }
+.seo-footer p { font-size: 0.75rem; color: #888; line-height: 1.6; max-width: 680px; margin: 0 auto; }
