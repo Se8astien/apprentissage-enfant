@@ -59,6 +59,7 @@ import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
 import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
+import { lancerSequence, lancerCode } from "./games-algo.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -107,6 +108,8 @@ const lanceurs = {
   calendrier:           lancerCalendrier,
   allemand:             lancerAllemandMots,
   traductionAllemand:   lancerTraductionAllemand,
+  sequence:             lancerSequence,
+  code:                 lancerCode,
 };
 
 // ── Classe screen ─────────────────────────────────────────────────────────────
