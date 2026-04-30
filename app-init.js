@@ -57,7 +57,7 @@ import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerA
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes } from "./games-langage.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
@@ -101,10 +101,12 @@ const lanceurs = {
   fractionsCM:    lancerFractionsCM,
   proportionnalite: lancerProportionnalite,
   pourcentages:   lancerPourcentages,
-  conjugaison:    lancerConjugaison,
-  homophones:     lancerHomophones,
-  synonymes:      lancerSynonymes,
-  calendrier:     lancerCalendrier,
+  conjugaison:          lancerConjugaison,
+  homophones:           lancerHomophones,
+  synonymes:            lancerSynonymes,
+  calendrier:           lancerCalendrier,
+  allemand:             lancerAllemandMots,
+  traductionAllemand:   lancerTraductionAllemand,
 };
 
 // ── Classe screen ─────────────────────────────────────────────────────────────

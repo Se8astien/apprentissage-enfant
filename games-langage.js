@@ -1151,3 +1151,242 @@ export function lancerSynonymes() {
     elChoix.appendChild(b);
   });
 }
+
+// ── Allemand mots ─────────────────────────────────────────────────────────────
+const ALLEMAND_IMAGES_CP = [
+  { emoji: "🐱", mot: "Katze",   fausses: ["Hund", "Vogel", "Fisch"] },
+  { emoji: "🐶", mot: "Hund",    fausses: ["Katze", "Kuh", "Schwein"] },
+  { emoji: "🏠", mot: "Haus",    fausses: ["Schule", "Auto", "Baum"] },
+  { emoji: "🌳", mot: "Baum",    fausses: ["Blume", "Gras", "Blatt"] },
+  { emoji: "⭐", mot: "Stern",   fausses: ["Mond", "Sonne", "Wolke"] },
+  { emoji: "🌙", mot: "Mond",    fausses: ["Stern", "Sonne", "Himmel"] },
+  { emoji: "🍎", mot: "Apfel",   fausses: ["Orange", "Banane", "Birne"] },
+  { emoji: "🎈", mot: "Ballon",  fausses: ["Ball", "Drachen", "Seife"] },
+  { emoji: "📚", mot: "Buch",    fausses: ["Stift", "Tasche", "Tisch"] },
+  { emoji: "🚗", mot: "Auto",    fausses: ["Bus", "Fahrrad", "Boot"] },
+  { emoji: "🌸", mot: "Blume",   fausses: ["Baum", "Blatt", "Pflanze"] },
+  { emoji: "🐟", mot: "Fisch",   fausses: ["Vogel", "Frosch", "Krabbe"] },
+  { emoji: "☀️", mot: "Sonne",   fausses: ["Mond", "Stern", "Wolke"] },
+  { emoji: "🍰", mot: "Kuchen",  fausses: ["Brot", "Torte", "Keks"] },
+  { emoji: "🐸", mot: "Frosch",  fausses: ["Fisch", "Schlange", "Ente"] },
+];
+
+const ALLEMAND_IMAGES_CE1 = [
+  { emoji: "🦋", mot: "Schmetterling", fausses: ["Libelle", "Marienkäfer", "Biene"] },
+  { emoji: "🐘", mot: "Elefant",       fausses: ["Nilpferd", "Nashorn", "Giraffe"] },
+  { emoji: "🚀", mot: "Rakete",        fausses: ["Flugzeug", "Schiff", "Ballon"] },
+  { emoji: "🌋", mot: "Vulkan",        fausses: ["Berg", "Hügel", "Insel"] },
+  { emoji: "🦊", mot: "Fuchs",         fausses: ["Wolf", "Bär", "Hirsch"] },
+  { emoji: "🌵", mot: "Kaktus",        fausses: ["Palme", "Bambus", "Busch"] },
+  { emoji: "🦜", mot: "Papagei",       fausses: ["Adler", "Eule", "Schwan"] },
+  { emoji: "🍕", mot: "Pizza",         fausses: ["Nudeln", "Burger", "Salat"] },
+  { emoji: "🌈", mot: "Regenbogen",    fausses: ["Gewitter", "Sturm", "Wolke"] },
+  { emoji: "🎸", mot: "Gitarre",       fausses: ["Klavier", "Geige", "Trommel"] },
+  { emoji: "🐙", mot: "Tintenfisch",   fausses: ["Qualle", "Krabbe", "Krebs"] },
+  { emoji: "🦒", mot: "Giraffe",       fausses: ["Zebra", "Elefant", "Kamel"] },
+  { emoji: "👁️", mot: "Auge",         fausses: ["Ohr", "Nase", "Mund"] },
+  { emoji: "👂", mot: "Ohr",           fausses: ["Auge", "Nase", "Hand"] },
+  { emoji: "✏️", mot: "Bleistift",     fausses: ["Stift", "Lineal", "Radiergummi"] },
+  { emoji: "📐", mot: "Lineal",        fausses: ["Bleistift", "Schere", "Buch"] },
+  { emoji: "🎒", mot: "Rucksack",      fausses: ["Tasche", "Koffer", "Beutel"] },
+];
+
+const ALLEMAND_IMAGES_CE2 = [
+  { emoji: "🌍", mot: "Welt",        fausses: ["Land", "Erde", "Globus"] },
+  { emoji: "🏔️", mot: "Berg",        fausses: ["Hügel", "Vulkan", "Fels"] },
+  { emoji: "🌊", mot: "Ozean",       fausses: ["Meer", "See", "Fluss"] },
+  { emoji: "🏙️", mot: "Stadt",       fausses: ["Dorf", "Hauptstadt", "Gebiet"] },
+  { emoji: "✈️", mot: "Flugzeug",    fausses: ["Hubschrauber", "Rakete", "Ballon"] },
+  { emoji: "🌿", mot: "Pflanze",     fausses: ["Baum", "Blume", "Gras"] },
+  { emoji: "🔬", mot: "Mikroskop",   fausses: ["Teleskop", "Fernglas", "Kamera"] },
+  { emoji: "📱", mot: "Telefon",     fausses: ["Computer", "Tablet", "Bildschirm"] },
+  { emoji: "💡", mot: "Licht",       fausses: ["Lampe", "Kerze", "Feuer"] },
+  { emoji: "🚂", mot: "Zug",         fausses: ["U-Bahn", "Straßenbahn", "Taxi"] },
+  { emoji: "🎭", mot: "Theater",     fausses: ["Kino", "Konzert", "Vorstellung"] },
+];
+
+const ALLEMAND_IMAGES_CM1 = [
+  { emoji: "🔭", mot: "Teleskop",     fausses: ["Mikroskop", "Fernglas", "Kamera"] },
+  { emoji: "🗺️", mot: "Karte",        fausses: ["Plan", "Atlas", "Diagramm"] },
+  { emoji: "⚡", mot: "Blitz",        fausses: ["Donner", "Sturm", "Elektrizität"] },
+  { emoji: "🏛️", mot: "Museum",       fausses: ["Bibliothek", "Galerie", "Denkmal"] },
+  { emoji: "🧲", mot: "Magnet",       fausses: ["Batterie", "Draht", "Metall"] },
+  { emoji: "📖", mot: "Wörterbuch",   fausses: ["Enzyklopädie", "Grammatik", "Lehrbuch"] },
+  { emoji: "🧪", mot: "Experiment",   fausses: ["Forschung", "Test", "Studie"] },
+  { emoji: "🌐", mot: "Internet",     fausses: ["Computer", "Netzwerk", "Webseite"] },
+  { emoji: "🧭", mot: "Kompass",      fausses: ["Richtung", "Norden", "Karte"] },
+  { emoji: "🏗️", mot: "Baustelle",   fausses: ["Gebäude", "Fabrik", "Brücke"] },
+  { emoji: "🦠", mot: "Virus",        fausses: ["Bakterium", "Keim", "Krankheit"] },
+];
+
+const ALLEMAND_IMAGES_CM2 = [
+  { emoji: "⚖️", mot: "Gerechtigkeit",  fausses: ["Freiheit", "Gesetz", "Gleichheit"] },
+  { emoji: "🌍", mot: "Umwelt",         fausses: ["Natur", "Klima", "Planet"] },
+  { emoji: "🧬", mot: "Biologie",       fausses: ["Chemie", "Physik", "Wissenschaft"] },
+  { emoji: "🏛️", mot: "Zivilisation",   fausses: ["Kultur", "Reich", "Gesellschaft"] },
+  { emoji: "📊", mot: "Diagramm",       fausses: ["Tabelle", "Grafik", "Schema"] },
+  { emoji: "🔋", mot: "Energie",        fausses: ["Kraft", "Macht", "Brennstoff"] },
+  { emoji: "🤝", mot: "Zusammenarbeit", fausses: ["Abkommen", "Bündnis", "Freundschaft"] },
+  { emoji: "📜", mot: "Verfassung",     fausses: ["Gesetz", "Charta", "Vertrag"] },
+  { emoji: "🔬", mot: "Labor",          fausses: ["Forschung", "Wissenschaft", "Studie"] },
+  { emoji: "💊", mot: "Medizin",        fausses: ["Droge", "Behandlung", "Gesundheit"] },
+  { emoji: "🌾", mot: "Landwirtschaft", fausses: ["Ernte", "Bauernhof", "Anbau"] },
+  { emoji: "🌡️", mot: "Klima",          fausses: ["Wetter", "Temperatur", "Atmosphäre"] },
+];
+
+export function lancerAllemandMots() {
+  elTitre.textContent = "🇩🇪 Deutsch";
+  const liste = estCM2() ? ALLEMAND_IMAGES_CM2 : estCM1() ? ALLEMAND_IMAGES_CM1 : estCE2() ? ALLEMAND_IMAGES_CE2 : estCE1() ? ALLEMAND_IMAGES_CE1 : ALLEMAND_IMAGES_CP;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.95rem;margin-bottom:0.25rem'>Was ist das auf Deutsch?</p>" +
+    `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.mot, ...fausses]);
+  setBonneReponse(options.indexOf(item.mot));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Traduction Français → Allemand ────────────────────────────────────────────
+const TRAD_DE_CP = [
+  { fr: "chat",    de: "Katze",  fausses: ["Hund", "Vogel", "Fisch"] },
+  { fr: "chien",   de: "Hund",   fausses: ["Katze", "Kuh", "Schwein"] },
+  { fr: "rouge",   de: "rot",    fausses: ["blau", "grün", "gelb"] },
+  { fr: "bleu",    de: "blau",   fausses: ["rot", "grün", "rosa"] },
+  { fr: "un",      de: "eins",   fausses: ["zwei", "drei", "vier"] },
+  { fr: "deux",    de: "zwei",   fausses: ["eins", "drei", "fünf"] },
+  { fr: "grand",   de: "groß",   fausses: ["klein", "lang", "alt"] },
+  { fr: "petit",   de: "klein",  fausses: ["groß", "lang", "jung"] },
+  { fr: "maison",  de: "Haus",   fausses: ["Schule", "Park", "Laden"] },
+  { fr: "livre",   de: "Buch",   fausses: ["Stift", "Tasche", "Tisch"] },
+  { fr: "ami",     de: "Freund", fausses: ["Familie", "Lehrer", "Baby"] },
+  { fr: "eau",     de: "Wasser", fausses: ["Milch", "Saft", "Tee"] },
+  { fr: "soleil",  de: "Sonne",  fausses: ["Mond", "Stern", "Wolke"] },
+  { fr: "pomme",   de: "Apfel",  fausses: ["Birne", "Orange", "Traube"] },
+  { fr: "trois",   de: "drei",   fausses: ["eins", "zwei", "vier"] },
+  { fr: "voiture", de: "Auto",   fausses: ["Bus", "Fahrrad", "Boot"] },
+  { fr: "jaune",   de: "gelb",   fausses: ["rot", "blau", "grün"] },
+  { fr: "vert",    de: "grün",   fausses: ["gelb", "blau", "rot"] },
+];
+
+const TRAD_DE_CE1 = [
+  { fr: "école",   de: "Schule",    fausses: ["Haus", "Park", "Kirche"] },
+  { fr: "famille", de: "Familie",   fausses: ["Freund", "Lehrer", "Team"] },
+  { fr: "heureux", de: "glücklich", fausses: ["traurig", "wütend", "müde"] },
+  { fr: "rapide",  de: "schnell",   fausses: ["langsam", "groß", "laut"] },
+  { fr: "beau",    de: "schön",     fausses: ["hässlich", "seltsam", "gewöhnlich"] },
+  { fr: "manger",  de: "essen",     fausses: ["trinken", "schlafen", "laufen"] },
+  { fr: "jouer",   de: "spielen",   fausses: ["essen", "schlafen", "lesen"] },
+  { fr: "courir",  de: "laufen",    fausses: ["springen", "gehen", "schwimmen"] },
+  { fr: "dormir",  de: "schlafen",  fausses: ["essen", "laufen", "träumen"] },
+  { fr: "mer",     de: "Meer",      fausses: ["See", "Fluss", "Teich"] },
+  { fr: "fleur",   de: "Blume",     fausses: ["Baum", "Blatt", "Gras"] },
+  { fr: "tête",    de: "Kopf",      fausses: ["Hand", "Fuß", "Arm"] },
+  { fr: "main",    de: "Hand",      fausses: ["Fuß", "Arm", "Finger"] },
+  { fr: "pied",    de: "Fuß",       fausses: ["Bein", "Hand", "Knie"] },
+  { fr: "nez",     de: "Nase",      fausses: ["Mund", "Ohr", "Auge"] },
+  { fr: "crayon",  de: "Bleistift", fausses: ["Stift", "Lineal", "Radiergummi"] },
+  { fr: "chaud",   de: "heiß",      fausses: ["kalt", "warm", "kühl"] },
+  { fr: "froid",   de: "kalt",      fausses: ["heiß", "warm", "kühl"] },
+];
+
+const TRAD_DE_CE2 = [
+  { fr: "nager",         de: "schwimmen",         fausses: ["laufen", "fliegen", "tauchen"] },
+  { fr: "chanter",       de: "singen",            fausses: ["tanzen", "spielen", "hören"] },
+  { fr: "écrire",        de: "schreiben",         fausses: ["lesen", "zeichnen", "kopieren"] },
+  { fr: "lire",          de: "lesen",             fausses: ["schreiben", "studieren", "lernen"] },
+  { fr: "difficile",     de: "schwierig",         fausses: ["einfach", "simpel", "hart"] },
+  { fr: "facile",        de: "einfach",           fausses: ["schwierig", "hart", "simpel"] },
+  { fr: "important",     de: "wichtig",           fausses: ["nützlich", "notwendig", "ernst"] },
+  { fr: "différent",     de: "verschieden",       fausses: ["ähnlich", "gleich", "identisch"] },
+  { fr: "mathématiques", de: "Mathematik",        fausses: ["Wissenschaft", "Geschichte", "Kunst"] },
+  { fr: "histoire",      de: "Geschichte",        fausses: ["Geographie", "Wissenschaft", "Sprache"] },
+  { fr: "géographie",    de: "Geographie",        fausses: ["Geschichte", "Wissenschaft", "Mathematik"] },
+  { fr: "musique",       de: "Musik",             fausses: ["Kunst", "Tanz", "Drama"] },
+  { fr: "pays",          de: "Land",              fausses: ["Stadt", "Dorf", "Region"] },
+  { fr: "montagne",      de: "Berg",              fausses: ["Hügel", "Vulkan", "Fels"] },
+  { fr: "forêt",         de: "Wald",              fausses: ["Dschungel", "Park", "Garten"] },
+  { fr: "rivière",       de: "Fluss",             fausses: ["See", "Meer", "Bach"] },
+];
+
+const TRAD_DE_CM1 = [
+  { fr: "gouvernement",  de: "Regierung",    fausses: ["Land", "Republik", "Staat"] },
+  { fr: "environnement", de: "Umwelt",       fausses: ["Natur", "Klima", "Planet"] },
+  { fr: "expérience",    de: "Experiment",   fausses: ["Forschung", "Test", "Studie"] },
+  { fr: "découverte",    de: "Entdeckung",   fausses: ["Erfindung", "Ergebnis", "Forschung"] },
+  { fr: "électricité",   de: "Elektrizität", fausses: ["Energie", "Strom", "Kraft"] },
+  { fr: "température",   de: "Temperatur",   fausses: ["Wetter", "Hitze", "Grad"] },
+  { fr: "volcan",        de: "Vulkan",       fausses: ["Berg", "Krater", "Ausbruch"] },
+  { fr: "boussole",      de: "Kompass",      fausses: ["Richtung", "Norden", "Karte"] },
+  { fr: "expédition",    de: "Expedition",   fausses: ["Reise", "Ausflug", "Tour"] },
+  { fr: "laboratoire",   de: "Labor",        fausses: ["Forschung", "Wissenschaft", "Studie"] },
+  { fr: "territoire",    de: "Gebiet",       fausses: ["Land", "Region", "Fläche"] },
+  { fr: "population",    de: "Bevölkerung",  fausses: ["Menschen", "Gesellschaft", "Gemeinschaft"] },
+  { fr: "catastrophe",   de: "Katastrophe",  fausses: ["Unfall", "Krise", "Notfall"] },
+];
+
+const TRAD_DE_CM2 = [
+  { fr: "civilisation",  de: "Zivilisation",   fausses: ["Kultur", "Reich", "Gesellschaft"] },
+  { fr: "constitution",  de: "Verfassung",     fausses: ["Gesetz", "Charta", "Vertrag"] },
+  { fr: "agriculture",   de: "Landwirtschaft", fausses: ["Ernte", "Bauernhof", "Anbau"] },
+  { fr: "coopération",   de: "Zusammenarbeit", fausses: ["Abkommen", "Bündnis", "Freundschaft"] },
+  { fr: "biologie",      de: "Biologie",       fausses: ["Chemie", "Physik", "Wissenschaft"] },
+  { fr: "révolution",    de: "Revolution",     fausses: ["Aufstand", "Wandel", "Bewegung"] },
+  { fr: "démocratie",    de: "Demokratie",     fausses: ["Republik", "Freiheit", "Politik"] },
+  { fr: "atmosphère",    de: "Atmosphäre",     fausses: ["Luft", "Himmel", "Klima"] },
+  { fr: "continent",     de: "Kontinent",      fausses: ["Land", "Insel", "Halbinsel"] },
+  { fr: "patrimoine",    de: "Erbe",           fausses: ["Kultur", "Geschichte", "Tradition"] },
+  { fr: "photosynthèse", de: "Photosynthese",  fausses: ["Biologie", "Wachstum", "Sauerstoff"] },
+  { fr: "énergie",       de: "Energie",        fausses: ["Kraft", "Strom", "Brennstoff"] },
+];
+
+export function lancerTraductionAllemand() {
+  elTitre.textContent = "🇩🇪 Traduction";
+  const diff = getDifficulte();
+  let liste;
+  if (estCM2()) {
+    liste = diff === 0 ? TRAD_DE_CM2.slice(0, 8) : diff === 1 ? TRAD_DE_CM2 : [...TRAD_DE_CM1, ...TRAD_DE_CM2];
+  } else if (estCM1()) {
+    liste = diff === 0 ? TRAD_DE_CM1.slice(0, 8) : diff === 1 ? TRAD_DE_CM1 : [...TRAD_DE_CM1, ...TRAD_DE_CM2.slice(0, 6)];
+  } else if (estCE2()) {
+    liste = diff === 0 ? TRAD_DE_CE2.slice(0, 8) : diff === 1 ? TRAD_DE_CE2 : [...TRAD_DE_CE1, ...TRAD_DE_CE2];
+  } else if (estCE1()) {
+    liste = diff === 0 ? TRAD_DE_CE1.slice(0, 8) : diff === 1 ? TRAD_DE_CE1 : [...TRAD_DE_CE1, ...TRAD_DE_CE2.slice(0, 6)];
+  } else {
+    liste = diff === 0 ? TRAD_DE_CP.slice(0, 8) : diff === 1 ? TRAD_DE_CP : [...TRAD_DE_CP, ...TRAD_DE_CE1.slice(0, 6)];
+  }
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.9rem;margin-bottom:0.4rem'>Comment dit-on en allemand ?</p>" +
+    `<p style="font-size:2.2rem;font-weight:700;color:var(--primaire);margin:0">${item.fr}</p>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.de, ...fausses]);
+  setBonneReponse(options.indexOf(item.de));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
