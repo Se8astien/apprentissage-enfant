@@ -135,6 +135,16 @@ export function lancerCompte() {
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }
 
+function cadreDixAddition(a, b) {
+  let cells = '';
+  for (let i = 0; i < 10; i++) {
+    if (i < a) cells += '<div class="dix-cel dix-a"></div>';
+    else if (i < a + b) cells += '<div class="dix-cel dix-b"></div>';
+    else cells += '<div class="dix-cel"></div>';
+  }
+  return '<div class="cadre-dix-add">' + cells + '</div>';
+}
+
 // ── lancerAddition ────────────────────────────────────────────────────────────
 export function lancerAddition() {
   elTitre.textContent = "Addition magique";
@@ -215,7 +225,12 @@ export function lancerAddition() {
     a = 1 + Math.floor(Math.random() * maxCP);
     b = 1 + Math.floor(Math.random() * maxCP);
     total = a + b;
-    if (total <= 10) {
+    if (diff === 0 && total <= 10) {
+      html =
+        "<p>Combien <strong>en tout</strong> ?</p>" +
+        cadreDixAddition(a, b) +
+        '<p class="dix-legende"><span class="dix-leg-a">' + a + '</span> + <span class="dix-leg-b">' + b + '</span> = ?</p>';
+    } else if (total <= 10) {
       const e1 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
       let e2 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
       if (e2 === e1) e2 = ANIMAUX[(ANIMAUX.indexOf(e1) + 1) % ANIMAUX.length];
@@ -258,6 +273,15 @@ export function lancerAddition() {
     "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette addition :</p>" +
     '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.75rem">' +
     a + " + " + b + " = ?</p>";
+
+  if (diff <= 1) {
+    const dA = Math.floor(a / 10), uA = a % 10;
+    const dB = Math.floor(b / 10), uB = b % 10;
+    if (dA > 0 || dB > 0) {
+      html += '<p class="decomp-hint">💡 ' + a + ' = ' + (dA * 10) + ' + ' + uA +
+              ' &nbsp;et&nbsp; ' + b + ' = ' + (dB * 10) + ' + ' + uB + '</p>';
+    }
+  }
 
   elQuestion.innerHTML = html;
   setBonneReponse(total);
