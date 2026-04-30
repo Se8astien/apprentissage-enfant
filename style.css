@@ -1983,3 +1983,11 @@ h1 {
 
 .landing-matieres { display:flex; flex-wrap:wrap; gap:0.45rem; justify-content:center; max-width:480px; }
 .landing-matieres span { background:#fff; border-radius:2rem; padding:0.38rem 0.85rem; font-size:0.82rem; color:var(--texte); box-shadow:0 1px 6px var(--ombre); }
+
+/* ── Bouton partage landing ──────────────────────────────────────────────────── */
+.btn-landing-partager { background:none; border:2px solid var(--primaire); color:var(--primaire); border-radius:2rem; padding:0.5rem 1.4rem; font-size:0.88rem; font-weight:600; font-family:inherit; cursor:pointer; transition:background 0.15s, color 0.15s; }
+.btn-landing-partager:hover { background:var(--primaire); color:#fff; }
+
+/* ── Bouton partage menu ─────────────────────────────────────────────────────── */
+.btn-partager-menu { background:none; border:none; font-size:1.1rem; cursor:pointer; padding:0.3rem 0.5rem; border-radius:0.6rem; transition:background 0.15s; }
+.btn-partager-menu:hover { background:rgba(108,92,231,0.1); }

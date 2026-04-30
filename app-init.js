@@ -382,3 +382,26 @@ if (btnRetourBadges) {
     } catch { /* ignore */ }
   }
 }
+
+// ── Partage ───────────────────────────────────────────────────────────────────
+function partager() {
+  const data = {
+    title: "Apprentissage Magique — Jeux Montessori",
+    text: "🦊 Des jeux Montessori gratuits pour apprendre en s'amusant, du CP au CM2 !",
+    url: "https://apprentissage-magique.fr"
+  };
+  if (navigator.share) {
+    navigator.share(data).catch(() => {});
+  } else {
+    window.open(
+      "https://wa.me/?text=" + encodeURIComponent(data.text + " " + data.url),
+      "_blank", "noopener"
+    );
+  }
+}
+
+const btnLandingPartager = document.getElementById("btn-landing-partager");
+if (btnLandingPartager) btnLandingPartager.addEventListener("click", partager);
+
+const btnPartagerMenu = document.getElementById("btn-partager");
+if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
