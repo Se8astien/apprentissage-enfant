@@ -3,105 +3,136 @@
 import { lireEtoiles, lireNomRenard } from "./app-state.js";
 
 const HISTOIRES_JEUX = {
+  // ── Maths ─────────────────────────────────────────────────────────────────
   compte: {
-    emoji: "🐱🐶🐸",
-    titre: "Les animaux de la ferme",
-    texte: "Les animaux de la ferme se sont tous mélangés ! Aide [Nom] à les compter un par un.",
+    cp:  { emoji: "🐱🐶🐸", titre: "Les animaux de la ferme",    texte: "Les animaux de la ferme se sont tous mélangés ! Aide [Nom] à les compter un par un." },
+    ce1: { emoji: "🐄🐑🐓", titre: "La prairie du fermier",      texte: "[Nom] aide le fermier à compter deux types d'animaux mélangés dans la prairie. Compare-les et trouve le total !" },
   },
   addition: {
-    emoji: "🎈🎈🎈",
-    titre: "La fête des ballons",
-    texte: "Des ballons colorés s'envolent dans le ciel de la forêt ! Combien y en a-t-il en tout ? [Nom] compte sur toi !",
+    cp:  { emoji: "🎈🎈🎈", titre: "La fête des ballons",        texte: "Des ballons colorés s'envolent dans le ciel de la forêt ! Combien y en a-t-il en tout ? [Nom] compte sur toi !" },
+    ce1: { emoji: "🎉🎊🎈", titre: "Préparatifs de fête",        texte: "[Nom] prépare les décorations pour la grande fête de la forêt. Aide-le à additionner toutes ses fournitures !" },
   },
   soustraction: {
-    emoji: "🍎🍏",
-    titre: "Le panier de pommes",
-    texte: "Un beau panier plein de pommes… mais des petits lutins en ont mangé quelques-unes ! Combien en reste-t-il ?",
+    cp:  { emoji: "🍎🍏",   titre: "Le panier de pommes",        texte: "Un beau panier plein de pommes… mais des petits lutins en ont mangé quelques-unes ! Combien en reste-t-il ?" },
+    ce1: { emoji: "🧺🦔",   titre: "Le pique-nique de [Nom]",    texte: "[Nom] prépare un pique-nique, mais des amis ont déjà pris leur part. Calcule ce qu'il reste dans le panier !" },
   },
   compare: {
-    emoji: "⚖️🦊",
-    titre: "Le jeu de la balance",
-    texte: "Deux groupes d'animaux se regardent dans la forêt. [Nom] veut savoir lequel est le plus grand. Aide-le à comparer !",
+    cp:  { emoji: "⚖️🦊",   titre: "Le jeu de la balance",      texte: "Deux groupes d'animaux se regardent dans la forêt. [Nom] veut savoir lequel est le plus grand. Aide-le à comparer !" },
+    ce1: { emoji: "🏆⚖️",   titre: "Le tournoi de la forêt",    texte: "[Nom] arbitre le tournoi de la forêt. Il faut comparer les scores de chaque équipe — qui remporte la manche ?" },
   },
   suite: {
-    emoji: "🔢❓",
-    titre: "Le chiffre mystère",
-    texte: "Un chiffre coquin s'est caché dans la suite ! [Nom] cherche partout dans la forêt. Sauras-tu le retrouver ?",
+    cp:  { emoji: "🔢❓",   titre: "Le chiffre mystère",         texte: "Un chiffre coquin s'est caché dans la suite ! [Nom] cherche partout dans la forêt. Sauras-tu le retrouver ?" },
+    ce1: { emoji: "🔢🔍",   titre: "La suite mystérieuse",       texte: "La suite de nombres a un trou mystérieux ! Observe bien le schéma et aide [Nom] à trouver l'intrus." },
   },
   doubles: {
-    emoji: "👯🦊",
-    titre: "La danse des jumeaux",
-    texte: "Les animaux adorent danser en paires ! [Nom] veut doubler chaque groupe. Aide-le à trouver les doubles !",
+    cp:  { emoji: "👯🦊",   titre: "La danse des jumeaux",       texte: "Les animaux adorent danser en paires ! [Nom] veut doubler chaque groupe. Aide-le à trouver les doubles !" },
+    ce1: { emoji: "👯🏅",   titre: "Le tournoi en binômes",      texte: "[Nom] organise un tournoi en binômes et doit vite doubler chaque score pour remplir le tableau. Aide-le !" },
   },
   moitie: {
-    emoji: "✂️🎂",
-    titre: "Partage le goûter",
-    texte: "[Nom] veut partager son gâteau avec son ami en deux parts égales. Aide-le à trouver la moitié !",
+    cp:  { emoji: "✂️🎂",   titre: "Partage le goûter",          texte: "[Nom] veut partager son gâteau avec son ami en deux parts égales. Aide-le à trouver la moitié !" },
+    ce1: { emoji: "✂️🏅",   titre: "Partage équitable",          texte: "[Nom] partage les récompenses entre deux équipes à égalité. Calcule la moitié de chaque lot !" },
   },
   dizaines: {
-    emoji: "📊🟡",
-    titre: "Les barres magiques",
-    texte: "[Nom] range ses billes en barres de 10. Aide-le à compter les dizaines et les petites unités !",
+    cp:  { emoji: "📊🟡",   titre: "Les barres magiques",        texte: "[Nom] range ses billes en barres de 10. Aide-le à compter les dizaines et les petites unités !" },
+    ce1: { emoji: "📚📊",   titre: "La bibliothèque de [Nom]",   texte: "[Nom] est bibliothécaire et range ses livres en barres de dix. Compte les dizaines et les unités !" },
   },
   pairimpair: {
-    emoji: "🟣⚡",
-    titre: "La fête de la forêt",
-    texte: "Les animaux font la fête ! Certains dansent en paires, d'autres sont tout seuls. Pair ou impair ? [Nom] a besoin de toi !",
+    cp:  { emoji: "🟣⚡",   titre: "La fête de la forêt",        texte: "Les animaux font la fête ! Certains dansent en paires, d'autres sont tout seuls. Pair ou impair ? [Nom] a besoin de toi !" },
+    ce1: { emoji: "🗃️⚡",   titre: "Le grand rangement",         texte: "[Nom] trie les objets de son grenier avant le grand rangement. Pair ou impair — teste ta rapidité !" },
   },
   perlesDorees: {
-    emoji: "🟡✨",
-    titre: "Le trésor des perles",
-    texte: "[Nom] a trouvé un coffre plein de perles dorées magiques ! Aide-le à les compter avec les grandes barres et les petites billes.",
+    cp:  { emoji: "🟡✨",   titre: "Le trésor des perles",       texte: "[Nom] a trouvé un coffre plein de perles dorées magiques ! Aide-le à les compter avec les grandes barres et les petites billes." },
+    ce1: { emoji: "🟡📐",   titre: "L'atelier des perles",       texte: "[Nom] apprend à composer des nombres avec les perles dorées. Barres de dix et billes d'unités — à toi de jouer !" },
   },
   planche100: {
-    emoji: "🔢🗺️",
-    titre: "La carte des nombres",
-    texte: "La planche des cent est une carte magique de la forêt ! [Nom] doit trouver les bons nombres sur la carte.",
+    cp:  { emoji: "🔢🗺️",  titre: "La carte des nombres",       texte: "La planche des cent est une carte magique de la forêt ! [Nom] doit trouver les bons nombres sur la carte." },
+    ce1: { emoji: "🗺️🚀",  titre: "La course aux nombres",      texte: "[Nom] navigue rapidement sur la planche des cent. Repère les bons nombres pour gagner la course !" },
   },
+  // ── Formes ────────────────────────────────────────────────────────────────
   formes: {
-    emoji: "🔷🔺🟡",
-    titre: "Les formes cachées",
-    texte: "Des formes magiques se cachent partout dans la forêt ! Cercles, carrés, triangles… [Nom] a besoin de toi pour les reconnaître.",
+    cp:  { emoji: "🔷🔺🟡", titre: "Les formes cachées",         texte: "Des formes magiques se cachent partout dans la forêt ! Cercles, carrés, triangles… [Nom] a besoin de toi pour les reconnaître." },
+    ce1: { emoji: "📐🔷🔺", titre: "Le cours de géométrie",      texte: "[Nom] étudie les figures géométriques de la forêt : côtés, sommets, angles droits. Seras-tu un bon géomètre ?" },
   },
+  symetrie: {
+    ce1: { emoji: "🪞✨",   titre: "Le château des miroirs",     texte: "[Nom] décore le château de la forêt avec des motifs symétriques. Trouve l'image miroir exacte !" },
+  },
+  perimetre: {
+    ce1: { emoji: "🔲🌿",   titre: "La clôture du jardin",       texte: "[Nom] construit une clôture autour de son jardin secret. Aide-le à calculer le périmètre total !" },
+  },
+  // ── Temps & Mesures ───────────────────────────────────────────────────────
   calendrier: {
-    emoji: "📅🌞",
-    titre: "La fête des animaux",
-    texte: "[Nom] ne veut pas rater la grande fête des animaux ! Aide-le à lire le calendrier pour savoir quel jour c'est.",
+    cp:  { emoji: "📅🌞",   titre: "La fête des animaux",        texte: "[Nom] ne veut pas rater la grande fête des animaux ! Aide-le à lire le calendrier pour savoir quel jour c'est." },
+    ce1: { emoji: "📅📋",   titre: "Le planning de la semaine",  texte: "[Nom] planifie la semaine des animaux de la forêt. Jours, semaines et mois — aide-le à bien lire le calendrier !" },
+  },
+  heure: {
+    ce1: { emoji: "🕐⏰",   titre: "En route pour la réunion !", texte: "[Nom] doit être à l'heure à la réunion des animaux. Lis bien l'horloge pour ne pas être en retard !" },
+  },
+  durees: {
+    ce1: { emoji: "⏱️🐻",   titre: "La sieste de l'ours",        texte: "[Nom] calcule combien de temps dure la sieste de l'ours. Aide-le à trouver la bonne heure de fin !" },
+  },
+  mesures: {
+    ce1: { emoji: "📏🔨",   titre: "L'atelier de [Nom]",         texte: "[Nom] mesure les planches de son atelier. Centimètres et mètres — aide-le à mesurer juste !" },
   },
   masse: {
-    emoji: "⚖️🐣",
-    titre: "La balance de la forêt",
-    texte: "La balance magique de [Nom] est toute chamboulée ! Aide-le à trouver le bon poids de chaque objet.",
+    cp:  { emoji: "⚖️🐣",   titre: "La balance de la forêt",    texte: "La balance magique de [Nom] est toute chamboulée ! Aide-le à trouver le bon poids de chaque objet." },
+    ce1: { emoji: "⚖️📦",   titre: "Les colis de [Nom]",         texte: "[Nom] prépare des colis pour ses amis de la forêt. Grammes et kilogrammes — aide-le à bien peser chaque paquet !" },
   },
+  // ── Argent ────────────────────────────────────────────────────────────────
   monnaiecp: {
-    emoji: "🪙🛒",
-    titre: "Le marché de la forêt",
-    texte: "[Nom] va au marché avec ses pièces brillantes ! Aide-le à compter son argent pour acheter quelque chose de délicieux.",
+    cp:  { emoji: "🪙🛒",   titre: "Le marché de la forêt",     texte: "[Nom] va au marché avec ses pièces brillantes ! Aide-le à compter son argent pour acheter quelque chose de délicieux." },
+    ce1: { emoji: "🪙🏪",   titre: "Le stand de [Nom]",          texte: "[Nom] tient un stand au marché et reçoit des pièces de clients. Aide-le à compter et à rendre la monnaie !" },
   },
+  monnaiece1: {
+    ce1: { emoji: "💶🏦",   titre: "La caisse de la foire",      texte: "[Nom] gère la caisse de la grande foire de la forêt. Calcule les totaux et rends la monnaie avec précision !" },
+  },
+  // ── Calcul avancé ─────────────────────────────────────────────────────────
+  multiplication: {
+    ce1: { emoji: "✖️🍪",   titre: "Les paquets de biscuits",    texte: "[Nom] prépare des paquets de biscuits pour toute la forêt. Multiplier, c'est additionner en beaucoup plus rapide !" },
+  },
+  probleme: {
+    ce1: { emoji: "📩🔍",   titre: "La lettre mystérieuse",      texte: "[Nom] reçoit une lettre avec un problème à résoudre. Lis bien l'énoncé, réfléchis et trouve la solution !" },
+  },
+  // ── Langage ───────────────────────────────────────────────────────────────
   sons: {
-    emoji: "🔤👂",
-    titre: "Les sons de la forêt",
-    texte: "[Nom] entend des sons mystérieux dans la forêt. Reconnais la lettre qui se cache dans chaque mot !",
+    cp:  { emoji: "🔤👂",   titre: "Les sons de la forêt",       texte: "[Nom] entend des sons mystérieux dans la forêt. Reconnais la lettre qui se cache dans chaque mot !" },
+    ce1: { emoji: "👂🔊",   titre: "L'oreille de [Nom]",         texte: "[Nom] entraîne son oreille aux sons complexes de la forêt. Sons composés et phonèmes — à toi de les reconnaître !" },
   },
   syllabes: {
-    emoji: "📖🌀",
-    titre: "Les syllabes envolées",
-    texte: "Les syllabes jouent à cache-cache ! [Nom] cherche celles qui manquent dans les mots. Sauras-tu les retrouver ?",
+    cp:  { emoji: "📖🌀",   titre: "Les syllabes envolées",      texte: "Les syllabes jouent à cache-cache ! [Nom] cherche celles qui manquent dans les mots. Sauras-tu les retrouver ?" },
+    ce1: { emoji: "📖✏️",   titre: "Le dictionnaire de la forêt", texte: "[Nom] complète le dictionnaire de la forêt avec les syllabes manquantes. Découpe bien chaque mot !" },
   },
   lecture: {
-    emoji: "📚🖼️",
-    titre: "Mots et images",
-    texte: "Les mots et les images font une randonnée dans la forêt ! Aide [Nom] à réunir chaque mot avec sa bonne image.",
+    cp:  { emoji: "📚🖼️",  titre: "Mots et images",             texte: "Les mots et les images font une randonnée dans la forêt ! Aide [Nom] à réunir chaque mot avec sa bonne image." },
+    ce1: { emoji: "🖼️📚",  titre: "Le classement de la forêt",  texte: "[Nom] classe les objets de la forêt par catégories. Associe chaque mot à son image exacte !" },
   },
   lecturePhrase: {
-    emoji: "🖼️📝",
-    titre: "La phrase secrète",
-    texte: "[Nom] a trouvé de vieilles images avec des phrases mystérieuses ! Lis bien pour choisir la bonne phrase.",
+    cp:  { emoji: "🖼️📝",  titre: "La phrase secrète",          texte: "[Nom] a trouvé de vieilles images avec des phrases mystérieuses ! Lis bien pour choisir la bonne phrase." },
+    ce1: { emoji: "📝🔎",   titre: "Les messages codés",         texte: "[Nom] lit des messages codés envoyés par les animaux de la forêt. Choisis la phrase qui correspond exactement à l'image !" },
+  },
+  phraseMobile: {
+    ce1: { emoji: "🧩📝",   titre: "La phrase cassée",           texte: "[Nom] répare des phrases cassées dans le journal de la forêt ! Remets le mot manquant exactement à sa bonne place." },
+  },
+  grammaire: {
+    ce1: { emoji: "▲📚",    titre: "La langue des animaux",      texte: "[Nom] apprend la langue des animaux de la forêt. Repère si chaque mot est un nom, un verbe ou un adjectif !" },
+  },
+  synonymes: {
+    ce1: { emoji: "🔁📖",   titre: "Le dictionnaire des synonymes", texte: "[Nom] enrichit le grand dictionnaire de la forêt. Trouve les mots qui ont le même sens !" },
+  },
+  conjugaison: {
+    ce1: { emoji: "✍️📓",   titre: "Le journal de [Nom]",        texte: "[Nom] raconte les aventures de la forêt dans son journal. Conjugue bien les verbes au bon temps !" },
+  },
+  anglais: {
+    ce1: { emoji: "🇬🇧🦊",  titre: "Les amis de la forêt",       texte: "[Nom] rencontre des amis anglophones dans la forêt ! Reconnais les objets du quotidien en anglais." },
+  },
+  traduction: {
+    ce1: { emoji: "🔤🌍",   titre: "L'interprète de la forêt",   texte: "[Nom] aide ses amis anglophones à comprendre le français. Traduis les mots qu'ils ne connaissent pas !" },
   },
 };
 
-export function getHistoireJeu(jeuId) {
-  return HISTOIRES_JEUX[jeuId] || null;
+export function getHistoireJeu(jeuId, niveau) {
+  const jeu = HISTOIRES_JEUX[jeuId];
+  if (!jeu) return null;
+  return jeu[niveau] || null;
 }
 
 const CHAPITRES = [

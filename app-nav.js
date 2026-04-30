@@ -60,9 +60,8 @@ let comboActuel = 0;
 const _histoiresVues = new Set();
 
 function afficherHistoireJeu(jeu) {
-  if (getNiveauCourant() !== "cp") return;
   if (_histoiresVues.has(jeu)) return;
-  const info = getHistoireJeu(jeu);
+  const info = getHistoireJeu(jeu, getNiveauCourant());
   if (!info) return;
   _histoiresVues.add(jeu);
 
