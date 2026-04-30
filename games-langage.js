@@ -949,6 +949,32 @@ export function lancerLectureTexte() {
 }
 
 // ── lancerConjugaison ─────────────────────────────────────────────────────────
+const CONJ_CE1 = [
+  { phrase: "Je ___ (chanter) une chanson.", bonne: "chante", fausses: ["chantes", "chantons", "chantez"] },
+  { phrase: "Elle ___ (avoir) un chien.", bonne: "a", fausses: ["as", "avons", "ont"] },
+  { phrase: "Nous ___ (être) fatigués.", bonne: "sommes", fausses: ["êtes", "sont", "es"] },
+  { phrase: "Tu ___ (jouer) au foot.", bonne: "joues", fausses: ["joue", "jouons", "jouez"] },
+  { phrase: "Ils ___ (marcher) vite.", bonne: "marchent", fausses: ["marche", "marchons", "marchez"] },
+  { phrase: "Vous ___ (dessiner) bien.", bonne: "dessinez", fausses: ["dessine", "dessinons", "dessinent"] },
+  { phrase: "Le chien ___ (courir) dans le jardin.", bonne: "court", fausses: ["courent", "courrons", "coures"] },
+  { phrase: "Je ___ (être) content aujourd'hui.", bonne: "suis", fausses: ["es", "est", "sommes"] },
+  { phrase: "Nous ___ (avoir) deux chats.", bonne: "avons", fausses: ["avez", "ont", "ai"] },
+  { phrase: "Les enfants ___ (aimer) jouer dehors.", bonne: "aiment", fausses: ["aime", "aimons", "aimez"] },
+];
+
+const CONJ_CE2 = [
+  { phrase: "Demain, elle ___ (partir) en voyage.", bonne: "partira", fausses: ["part", "est partie", "partait"] },
+  { phrase: "Hier, nous ___ (manger) une pizza.", bonne: "avons mangé", fausses: ["mangeons", "mangerons", "mangions"] },
+  { phrase: "L'année prochaine, ils ___ (visiter) Paris.", bonne: "visiteront", fausses: ["visitent", "ont visité", "visitaient"] },
+  { phrase: "Ce matin, tu ___ (finir) tes devoirs.", bonne: "as fini", fausses: ["finis", "finiras", "finissais"] },
+  { phrase: "Aujourd'hui, je ___ (lire) un livre.", bonne: "lis", fausses: ["lirai", "ai lu", "lisais"] },
+  { phrase: "La semaine prochaine, vous ___ (venir) chez moi.", bonne: "viendrez", fausses: ["venez", "êtes venus", "veniez"] },
+  { phrase: "Hier soir, il ___ (regarder) un film.", bonne: "a regardé", fausses: ["regarde", "regardera", "regardait"] },
+  { phrase: "Bientôt, les oiseaux ___ (revenir) du Sud.", bonne: "reviendront", fausses: ["reviennent", "sont revenus", "revenaient"] },
+  { phrase: "La semaine dernière, elles ___ (chanter) sur scène.", bonne: "ont chanté", fausses: ["chantent", "chanteront", "chantaient"] },
+  { phrase: "Dans un an, je ___ (avoir) 10 ans.", bonne: "aurai", fausses: ["ai", "avais", "aie"] },
+];
+
 const CONJ_CM1 = [
   { phrase: "Hier, il ___ (manger) une pomme.", bonne: "a mangé",   fausses: ["mange", "mangera", "mangeait"] },
   { phrase: "Nous ___ (jouer) au foot hier.", bonne: "avons joué",   fausses: ["jouons", "jouerons", "jouions"] },
@@ -973,13 +999,148 @@ const CONJ_CM2 = [
 
 export function lancerConjugaison() {
   elTitre.textContent = "✍️ Conjugaison";
-  const pool = estCM2() ? CONJ_CM2 : CONJ_CM1;
+  const pool = estCM2() ? CONJ_CM2 : estCM1() ? CONJ_CM1 : estCE2() ? CONJ_CE2 : CONJ_CE1;
   const item = pool[Math.floor(Math.random() * pool.length)];
   setBonneReponse(item.bonne);
   elQuestion.innerHTML =
     `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quelle est la bonne conjugaison ?</p>` +
     `<p style="font-size:1.2rem;font-weight:600;line-height:1.6;background:white;border-radius:0.8rem;padding:0.75rem 1rem;box-shadow:0 2px 8px var(--ombre)">${item.phrase}</p>`;
   const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  elChoix.innerHTML = "";
+  options.forEach(mot => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot; b.dataset.valeur = mot;
+    b.addEventListener("click", () => apresReponseTexte(mot, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── lancerHomophones ──────────────────────────────────────────────────────────
+const HOMOPHONES_CE2 = [
+  { phrase: "Le chat ___ dormi toute la journée.", bonne: "a", fausse: "à" },
+  { phrase: "Je vais ___ l'école à pied.", bonne: "à", fausse: "a" },
+  { phrase: "Le ciel ___ bleu aujourd'hui.", bonne: "est", fausse: "et" },
+  { phrase: "Elle mange une pomme ___ une poire.", bonne: "et", fausse: "est" },
+  { phrase: "___ mange à midi dans la cantine.", bonne: "On", fausse: "Ont" },
+  { phrase: "Les enfants ___ faim après l'école.", bonne: "ont", fausse: "on" },
+  { phrase: "___ cartable est très lourd.", bonne: "Son", fausse: "Sont" },
+  { phrase: "Les fleurs ___ très belles.", bonne: "sont", fausse: "son" },
+  { phrase: "Tu préfères le chocolat ___ la vanille ?", bonne: "ou", fausse: "où" },
+  { phrase: "___ habites-tu ?", bonne: "Où", fausse: "Ou" },
+  { phrase: "Papa ___ acheté du pain.", bonne: "a", fausse: "à" },
+  { phrase: "Il parle ___ son ami.", bonne: "à", fausse: "a" },
+  { phrase: "Le chien ___ très gentil.", bonne: "est", fausse: "et" },
+  { phrase: "La fille chante ___ danse.", bonne: "et", fausse: "est" },
+];
+
+const HOMOPHONES_CM1 = [
+  { phrase: "___ matin, le soleil brille fort.", bonne: "Ce", fausse: "Se" },
+  { phrase: "Il ___ lève très tôt chaque jour.", bonne: "se", fausse: "ce" },
+  { phrase: "Pose le livre ___.", bonne: "là", fausse: "la" },
+  { phrase: "___ fille est très gentille.", bonne: "La", fausse: "Là" },
+  { phrase: "Je ___ vois souvent dans le parc.", bonne: "la", fausse: "là" },
+  { phrase: "Reste ___, ne bouge pas !", bonne: "là", fausse: "la" },
+  { phrase: "___ problème est difficile.", bonne: "Ce", fausse: "Se" },
+  { phrase: "Le chat ___ cache sous le lit.", bonne: "se", fausse: "ce" },
+  ...HOMOPHONES_CE2,
+];
+
+const HOMOPHONES_CM2 = [
+  { phrase: "___ élèves sont très sérieux.", bonne: "Ces", fausse: "Ses" },
+  { phrase: "Il range ___ affaires dans son sac.", bonne: "ses", fausse: "ces" },
+  { phrase: "___ livres sont passionnants.", bonne: "Ces", fausse: "Ses" },
+  { phrase: "La fille aime ___ amis.", bonne: "ses", fausse: "ces" },
+  { phrase: "Ils donnent ___ avis franchement.", bonne: "leur", fausse: "leurs" },
+  { phrase: "Elles rangent ___ affaires.", bonne: "leurs", fausse: "leur" },
+  { phrase: "Il ___ a dit bonjour.", bonne: "leur", fausse: "leurs" },
+  { phrase: "Les enfants prennent ___ goûters.", bonne: "leurs", fausse: "leur" },
+  ...HOMOPHONES_CM1,
+];
+
+export function lancerHomophones() {
+  elTitre.textContent = "📝 Homophones";
+  const pool = estCM2() ? HOMOPHONES_CM2 : estCM1() ? HOMOPHONES_CM1 : HOMOPHONES_CE2;
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  setBonneReponse(item.bonne);
+  const phraseAff = item.phrase.replace("___",
+    `<span style="background:var(--primaire);color:white;padding:0.1em 0.5em;border-radius:0.4em">___</span>`);
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quel mot complète la phrase ?</p>` +
+    `<p style="font-size:1.2rem;font-weight:600;line-height:1.8;background:white;border-radius:0.8rem;padding:0.75rem 1rem;box-shadow:0 2px 8px var(--ombre)">${phraseAff}</p>`;
+  elChoix.innerHTML = "";
+  melanger([item.bonne, item.fausse]).forEach(mot => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "btn-choix";
+    b.style.cssText = "font-size:1.4rem;font-weight:700;min-width:5rem;";
+    b.textContent = mot; b.dataset.valeur = mot;
+    b.addEventListener("click", () => apresReponseTexte(mot, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── lancerSynonymes ───────────────────────────────────────────────────────────
+const SYNONYMES_CE1 = [
+  { mot: "rapide", syn: "vite",     ant: "lent" },
+  { mot: "grand",  syn: "immense",  ant: "petit" },
+  { mot: "beau",   syn: "joli",     ant: "laid" },
+  { mot: "content",syn: "heureux",  ant: "triste" },
+  { mot: "chaud",  syn: "brûlant",  ant: "froid" },
+  { mot: "fort",   syn: "puissant", ant: "faible" },
+  { mot: "propre", syn: "net",      ant: "sale" },
+  { mot: "vieux",  syn: "ancien",   ant: "neuf" },
+];
+
+const SYNONYMES_CE2 = [
+  { mot: "courageux",  syn: "brave",     ant: "peureux" },
+  { mot: "difficile",  syn: "compliqué", ant: "facile" },
+  { mot: "tranquille", syn: "calme",     ant: "agité" },
+  { mot: "intelligent",syn: "malin",     ant: "bête" },
+  { mot: "généreux",   syn: "gentil",    ant: "avare" },
+  { mot: "bizarre",    syn: "étrange",   ant: "normal" },
+  { mot: "joyeux",     syn: "gai",       ant: "triste" },
+  { mot: "énorme",     syn: "gigantesque",ant: "minuscule" },
+];
+
+const SYNONYMES_CM1 = [
+  { mot: "minuscule",  syn: "infime",     ant: "immense" },
+  { mot: "furieux",    syn: "enragé",     ant: "calme" },
+  { mot: "lumineux",   syn: "brillant",   ant: "sombre" },
+  { mot: "précis",     syn: "exact",      ant: "approximatif" },
+  { mot: "courageux",  syn: "intrépide",  ant: "peureux" },
+  { mot: "agréable",   syn: "plaisant",   ant: "désagréable" },
+];
+
+const SYNONYMES_CM2 = [
+  { mot: "bénéfique",  syn: "favorable",  ant: "nuisible" },
+  { mot: "abondant",   syn: "copieux",    ant: "rare" },
+  { mot: "délicat",    syn: "subtil",     ant: "grossier" },
+  { mot: "audacieux",  syn: "intrépide",  ant: "timide" },
+  { mot: "perspicace", syn: "clairvoyant",ant: "naïf" },
+];
+
+export function lancerSynonymes() {
+  elTitre.textContent = "🔁 Synonymes";
+  let pool;
+  if (estCM2()) pool = [...SYNONYMES_CE1, ...SYNONYMES_CE2, ...SYNONYMES_CM1, ...SYNONYMES_CM2];
+  else if (estCM1()) pool = [...SYNONYMES_CE1, ...SYNONYMES_CE2, ...SYNONYMES_CM1];
+  else if (estCE2()) pool = [...SYNONYMES_CE1, ...SYNONYMES_CE2];
+  else pool = SYNONYMES_CE1;
+
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const demanderSynonyme = Math.random() < 0.5;
+  const bonne = demanderSynonyme ? item.syn : item.ant;
+  const typeLabel = demanderSynonyme ? "synonyme" : "antonyme (contraire)";
+  setBonneReponse(bonne);
+
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quel est le <strong>${typeLabel}</strong> de :</p>` +
+    `<p style="font-size:2rem;font-weight:700;color:var(--primaire);margin:0.4rem 0">${item.mot}</p>`;
+
+  const tousLesMots = pool.flatMap(p => [p.syn, p.ant]).filter(m => m !== bonne);
+  const distracteurs = melanger(tousLesMots).slice(0, 3);
+  const options = melanger([bonne, ...distracteurs]);
   elChoix.innerHTML = "";
   options.forEach(mot => {
     const b = document.createElement("button");

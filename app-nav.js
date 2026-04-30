@@ -48,11 +48,46 @@ import {
   BADGES,
 } from "./app-gamification.js";
 
+import { getHistoireJeu } from "./app-histoire.js";
+
 // Re-export confetti so game files can import it from here if desired
 export { confetti } from "./app-state.js";
 
 // ── Module-level combo counter (only used in nav) ─────────────────────────────
 let comboActuel = 0;
+
+// ── Histoires jeu : vues une fois par session ─────────────────────────────────
+const _histoiresVues = new Set();
+
+function afficherHistoireJeu(jeu) {
+  if (_histoiresVues.has(jeu)) return;
+  const info = getHistoireJeu(jeu, getNiveauCourant());
+  if (!info) return;
+  _histoiresVues.add(jeu);
+
+  const stade = getStade(lireEtoiles());
+  const nom = lireNomRenard() || "Foxy";
+  const texte = info.texte.replace(/\[Nom\]/g, nom);
+
+  const overlay = document.createElement("div");
+  overlay.className = "evolution-overlay";
+  overlay.innerHTML = `
+    <div class="evolution-carte histoire-intro-carte">
+      <p class="histoire-intro-emoji">${info.emoji}</p>
+      <p class="evolution-titre">${info.titre}</p>
+      <p class="histoire-intro-texte">${texte}</p>
+      <div class="evolution-renard">${svgRenard(stade, 80)}</div>
+      <button type="button" class="btn-evolution-fermer">Jouer ! 🎮</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  const fermer = () => {
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 0.3s";
+    setTimeout(() => overlay.remove(), 300);
+  };
+  overlay.querySelector(".btn-evolution-fermer").addEventListener("click", fermer);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) fermer(); });
+}
 
 // ── Anti-répétition : historique des questions par jeu (session) ──────────────
 const _histoireQuestions = {};
@@ -379,6 +414,7 @@ export function montrerJeu(nom, lanceurs) {
   resetFeedback();
   _histoireQuestions[nom] = [];
   lancerAvecAntiRepeat(nom, lanceurs);
+  afficherHistoireJeu(nom);
 }
 
 // ── questionSuivante ──────────────────────────────────────────────────────────
