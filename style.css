@@ -1951,6 +1951,7 @@ h1 {
 .dix-cel { border-radius:0.4rem; border:2px solid #ccc; background:#fff; }
 .dix-a { background:#fdcb6e; border-color:#d98600; }
 .dix-b { background:#74b9ff; border-color:#0063c6; }
+.dix-retire { background:#ff7675; border-color:#d63031; opacity:0.55; }
 .dix-legende { font-size:1.7rem; font-weight:700; margin:0.2rem 0 0; }
 .dix-leg-a { color:#d98600; }
 .dix-leg-b { color:#0063c6; }

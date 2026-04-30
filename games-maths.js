@@ -145,6 +145,17 @@ function cadreDixAddition(a, b) {
   return '<div class="cadre-dix-add">' + cells + '</div>';
 }
 
+function cadreDixSoustraction(total, enleve) {
+  const reste = total - enleve;
+  let cells = '';
+  for (let i = 0; i < 10; i++) {
+    if (i < reste) cells += '<div class="dix-cel dix-a"></div>';
+    else if (i < total) cells += '<div class="dix-cel dix-retire"></div>';
+    else cells += '<div class="dix-cel"></div>';
+  }
+  return '<div class="cadre-dix-add">' + cells + '</div>';
+}
+
 // ── lancerAddition ────────────────────────────────────────────────────────────
 export function lancerAddition() {
   elTitre.textContent = "Addition magique";
@@ -357,20 +368,29 @@ export function lancerSoustraction() {
   if (!estCE1() && total <= 10) {
     const biffees = Array(enleve).fill('<span style="opacity:0.25;text-decoration:line-through">🍎</span>');
     const restantes = Array(reste).fill("🍎");
-    elQuestion.innerHTML =
-      "<p>On mange <strong>" + enleve + "</strong> pommes sur <strong>" + total + "</strong>. Combien reste-t-il ?</p>" +
-      '<p class="ligne-emojis">' + [...biffees, ...restantes].join(" ") + "</p>" +
-      '<p class="equation">' + total + " − " + enleve + " = ?</p>";
+    let html = "<p>On mange <strong>" + enleve + "</strong> pommes 🍎. Combien reste-t-il ?</p>";
+    if (diff === 0) {
+      html += cadreDixSoustraction(total, enleve) +
+              '<p class="dix-legende"><span class="dix-leg-a">' + reste + '</span> reste</p>';
+    }
+    html += '<p class="ligne-emojis">' + [...restantes, ...biffees].join(" ") + "</p>" +
+            '<p class="equation">' + total + " − " + enleve + " = ?</p>";
+    elQuestion.innerHTML = html;
   } else if (!estCE1()) {
     elQuestion.innerHTML =
       "<p>Il y a <strong>" + total + "</strong> pommes 🍎</p>" +
       "<p>On en mange <strong>" + enleve + "</strong>. Combien il en reste ?</p>" +
       '<p class="equation">' + total + " − " + enleve + " = ?</p>";
   } else {
-    elQuestion.innerHTML =
+    const dE = Math.floor(enleve / 10);
+    const uE = enleve % 10;
+    let html =
       "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
-      '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.4rem">' + total + " − " + enleve + " = ?</p>" +
-      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pour les grands nombres, pense à la soustraction posée !</p>";
+      '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.4rem">' + total + " − " + enleve + " = ?</p>";
+    if (diff <= 1 && dE > 0 && uE > 0) {
+      html += '<p class="decomp-hint">💡 Enlève d\'abord ' + (dE * 10) + ' → ' + (total - dE * 10) + ', puis enlève ' + uE + '</p>';
+    }
+    elQuestion.innerHTML = html;
   }
   setBonneReponse(reste);
   const props = estCE1()
