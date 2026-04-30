@@ -54,10 +54,10 @@ import {
 
 import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100, lancerDecimaux } from "./games-maths.js";
 import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles, lancerAires } from "./games-formes.js";
-import { lancerHeure, lancerDurees, lancerMesures, lancerMasse } from "./games-temps.js";
+import { lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
-import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison } from "./games-langage.js";
+import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
@@ -100,7 +100,11 @@ const lanceurs = {
   decimaux:       lancerDecimaux,
   fractionsCM:    lancerFractionsCM,
   proportionnalite: lancerProportionnalite,
+  pourcentages:   lancerPourcentages,
   conjugaison:    lancerConjugaison,
+  homophones:     lancerHomophones,
+  synonymes:      lancerSynonymes,
+  calendrier:     lancerCalendrier,
 };
 
 // ── Classe screen ─────────────────────────────────────────────────────────────
