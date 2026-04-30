@@ -30,6 +30,8 @@ import {
   lireMaitrise,
 } from "./app-state.js";
 
+import { track } from "./app-analytics.js";
+
 import {
   ajouterEtoiles,
   svgRenard,
@@ -228,6 +230,7 @@ export function apresReponse(choix, bouton, correct) {
 
   if (choix === correct) {
     comboActuel++;
+    track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
     elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
     elFeedback.className = "feedback ok";
@@ -252,6 +255,7 @@ export function apresReponse(choix, bouton, correct) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
     comboActuel = 0;
     const ko = messagesKo();
     elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
@@ -274,6 +278,7 @@ export function apresReponseTexte(choix, bouton, correct) {
 
   if (choix === correct) {
     comboActuel++;
+    track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
     elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
     elFeedback.className = "feedback ok";
@@ -298,6 +303,7 @@ export function apresReponseTexte(choix, bouton, correct) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
     comboActuel = 0;
     const ko = messagesKo();
     elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];

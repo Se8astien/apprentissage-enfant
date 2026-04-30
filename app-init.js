@@ -60,6 +60,7 @@ import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM
 import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 import { lancerSequence, lancerCode } from "./games-algo.js";
+import { track } from "./app-analytics.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -235,7 +236,10 @@ majEtoilesMaitrise();
 
 // ── Boutons jeux ──────────────────────────────────────────────────────────────
 document.querySelectorAll(".carte-jeu").forEach((btn) => {
-  btn.addEventListener("click", () => montrerJeu(btn.dataset.jeu, lanceurs));
+  btn.addEventListener("click", () => {
+    track("game_start", { game_name: btn.dataset.jeu, niveau: getNiveauCourant(), difficulte: getDifficulte() });
+    montrerJeu(btn.dataset.jeu, lanceurs);
+  });
 });
 
 // ── Navigation ────────────────────────────────────────────────────────────────
