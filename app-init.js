@@ -160,23 +160,41 @@ const streakInit = mettreAJourStreak();
 afficherStreakHeader(streakInit.count);
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
-if (!localStorage.getItem("maths-cp-genre")) {
-  elGenre.hidden = false;
-  elGenre.classList.add("actif");
-} else if (!localStorage.getItem(STORAGE_NIVEAU)) {
-  montrerClasse();
-} else if (!lireNomRenard()) {
-  montrerNommage();
-} else {
-  montrerMenu();
-  afficherMissions();
-  if (elSousTitre) {
-    const nom = lireNomRenard();
-    elSousTitre.textContent = estGrand()
-      ? `Bon retour, ${nom} !`
-      : `${nom} t'attendait ! 🦊`;
-    setTimeout(() => majGenre(), 3500);
+function demarrerApp() {
+  if (!localStorage.getItem("maths-cp-genre")) {
+    elGenre.hidden = false;
+    elGenre.classList.add("actif");
+  } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
+    montrerClasse();
+  } else if (!lireNomRenard()) {
+    montrerNommage();
+  } else {
+    montrerMenu();
+    afficherMissions();
+    if (elSousTitre) {
+      const nom = lireNomRenard();
+      elSousTitre.textContent = estGrand()
+        ? `Bon retour, ${nom} !`
+        : `${nom} t'attendait ! 🦊`;
+      setTimeout(() => majGenre(), 3500);
+    }
   }
+}
+
+const ecranLanding = document.getElementById("ecran-landing");
+if (ecranLanding && !localStorage.getItem("landing-seen")) {
+  ecranLanding.hidden = false;
+  ecranLanding.classList.add("actif");
+  const lancerDepuisLanding = () => {
+    localStorage.setItem("landing-seen", "1");
+    ecranLanding.hidden = true;
+    ecranLanding.classList.remove("actif");
+    demarrerApp();
+  };
+  document.getElementById("btn-landing-cta").addEventListener("click", lancerDepuisLanding);
+  document.getElementById("btn-landing-cta-2").addEventListener("click", lancerDepuisLanding);
+} else {
+  demarrerApp();
 }
 
 // ── Formulaire de nommage ─────────────────────────────────────────────────────

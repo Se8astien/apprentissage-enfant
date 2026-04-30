@@ -96,6 +96,9 @@
   }
   </script>
 
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+
   <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5EDQ2KCS8X"></script>
   <script>
@@ -141,7 +144,59 @@
       </div>
     </section>
 
-    <section id="ecran-genre" class="ecran actif" aria-label="Qui joue ?">
+    <section id="ecran-landing" class="ecran" hidden aria-label="Bienvenue">
+      <div class="landing-hero">
+        <div class="landing-fox" aria-hidden="true">🦊</div>
+        <h2 class="landing-titre">Apprends en t'amusant !</h2>
+        <p class="landing-sous-titre">Jeux éducatifs <strong>inspirés Montessori</strong><br>pour les enfants du CP au CM2</p>
+        <button type="button" class="btn-landing-cta" id="btn-landing-cta">Jouer gratuitement 🎉</button>
+        <p class="landing-gratuit">100% gratuit · Sans inscription</p>
+      </div>
+
+      <div class="landing-features">
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🎓</span>
+          <div>
+            <strong>Méthode Montessori</strong>
+            <p>Apprentissage par l'expérience, à son rythme</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🎮</span>
+          <div>
+            <strong>40+ mini-jeux</strong>
+            <p>Maths, lecture, grammaire, géométrie, anglais</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🏫</span>
+          <div>
+            <strong>CP · CE1 · CE2 · CM1 · CM2</strong>
+            <p>Adapté automatiquement au niveau de l'enfant</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🏆</span>
+          <div>
+            <strong>Badges &amp; missions</strong>
+            <p>Un compagnon renard pour motiver chaque jour</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-matieres" aria-label="Matières disponibles">
+        <span>🔢 Maths</span>
+        <span>📚 Lecture</span>
+        <span>✍️ Grammaire</span>
+        <span>📐 Géométrie</span>
+        <span>🇬🇧 Anglais</span>
+        <span>⏰ Mesures</span>
+      </div>
+
+      <button type="button" class="btn-landing-cta" id="btn-landing-cta-2">Commencer maintenant 🚀</button>
+    </section>
+
+    <section id="ecran-genre" class="ecran" hidden aria-label="Qui joue ?">
       <div class="genre-conteneur">
         <div class="genre-mascotte" id="mascotte-genre" aria-hidden="true"></div>
         <div class="genre-btns">
