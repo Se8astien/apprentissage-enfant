@@ -214,7 +214,7 @@ btnNiveaux.forEach(btn => {
 const { liste: profilsListe, actifId: profilActifId } = initProfils();
 const sessionStartTs = Date.now();
 let sessionClosed = false;
-elTotal.textContent = lireEtoiles();
+if (elTotal) elTotal.textContent = lireEtoiles();
 majGenre();
 mettreAJourJauges();
 mettreAJourRenardHeader();
@@ -278,11 +278,15 @@ function lancerDepuisSelecteur() {
 }
 
 function afficherSelecteurProfils(liste, actifId) {
-  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-  const ecran   = document.getElementById("ecran-profils");
-  const grille  = document.getElementById("profils-grille");
+  const ecran = document.getElementById("ecran-profils");
+  const grille = document.getElementById("profils-grille");
   const btnAjout = document.getElementById("btn-ajouter-profil");
-  if (!ecran) return;
+  if (!ecran || !grille) {
+    sessionStorage.setItem("skip-selector", "1");
+    lancerDepuisSelecteur();
+    return;
+  }
+  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
   ecran.hidden = false;
   ecran.classList.add("actif");
 

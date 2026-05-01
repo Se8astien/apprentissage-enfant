@@ -1,4 +1,4 @@
-const CACHE = "apprentissage-v4";
+const CACHE = "apprentissage-v5";
 const ASSETS = [
   "/",
   "/index.html",
@@ -29,6 +29,7 @@ const ASSETS = [
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
 });
 
 self.addEventListener("message", e => {

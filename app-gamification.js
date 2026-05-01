@@ -106,7 +106,15 @@ export function lireMissionsJour() {
     const raw = localStorage.getItem(MISSIONS_STORAGE_KEY);
     if (raw) {
       const data = JSON.parse(raw);
-      if (data.date === dateAujourdhui()) return data;
+      if (
+        data &&
+        typeof data === "object" &&
+        data.date === dateAujourdhui() &&
+        Array.isArray(data.missions) &&
+        data.missions.length > 0
+      ) {
+        return data;
+      }
     }
   } catch { /* ignore */ }
   return _genererMissionsJour();
@@ -138,6 +146,7 @@ function _sauverMissionsJour(data) {
 export function progresserMission(type, data) {
   const store = lireMissionsJour();
   const nouvCompletes = [];
+  if (!Array.isArray(store.missions)) return nouvCompletes;
 
   store.missions.forEach(m => {
     if (m.complete) return;
@@ -172,7 +181,8 @@ export function afficherMissions() {
   const widget = document.getElementById("missions-widget");
   if (!widget) return;
   const store = lireMissionsJour();
-  widget.innerHTML = store.missions.map(m => {
+  const missions = Array.isArray(store.missions) ? store.missions : [];
+  widget.innerHTML = missions.map(m => {
     const pct = Math.min(100, Math.round((m.progres / m.cible) * 100));
     return `
       <div class="mission-item${m.complete ? " complete" : ""}">
@@ -251,7 +261,8 @@ function _compterJeuxMaitrises() {
 function _lireTotalMissionsCompletees() {
   const total = parseInt(localStorage.getItem(MISSIONS_TOTAL_KEY) || "0", 10);
   const store = lireMissionsJour();
-  const completeesCeJour = store.missions.filter(m => m.complete).length;
+  const missions = Array.isArray(store.missions) ? store.missions : [];
+  const completeesCeJour = missions.filter(m => m.complete).length;
   return total + completeesCeJour;
 }
 
