@@ -228,9 +228,7 @@ try {
   mettreAJourRenardHeader();
   streakInit = mettreAJourStreak();
   afficherStreakHeader(streakInit.count);
-} catch (err) {
-  console.error("[App] init renard/streak ignorée", err);
-}
+} catch { /* ignore */ }
 syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
@@ -265,9 +263,7 @@ function garantirUnEcranVisible() {
   if (ok) return;
   try {
     demarrerApp();
-  } catch (err) {
-    console.error("[App] demarrerApp", err);
-  }
+  } catch { /* ignore */ }
   ok = false;
   document.querySelectorAll(".ecran.actif").forEach((el) => {
     if (!el.hidden) ok = true;
@@ -286,8 +282,7 @@ function garantirUnEcranVisible() {
       montrerMenu();
       afficherMissions();
     }
-  } catch (err2) {
-    console.error("[App] secours écran", err2);
+  } catch {
     const menu = document.getElementById("ecran-menu");
     const g = document.getElementById("ecran-genre");
     if (menu) revelerEcran(menu);
@@ -378,21 +373,12 @@ function afficherSelecteurProfils(liste, actifId) {
   }
 }
 
-try {
-  if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
-    afficherSelecteurProfils(profilsListe, profilActifId);
-  } else {
-    sessionStorage.removeItem("skip-selector");
-    lancerDepuisSelecteur();
-  }
-} catch (err) {
-  console.error("[App] boot profils / landing", err);
+if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
+  afficherSelecteurProfils(profilsListe, profilActifId);
+} else {
+  sessionStorage.removeItem("skip-selector");
+  lancerDepuisSelecteur();
 }
-
-queueMicrotask(() => {
-  const a = document.querySelector(".ecran.actif");
-  if (a && !a.hidden) document.body.dataset.appInit = "1";
-});
 
 setTimeout(garantirUnEcranVisible, 0);
 setTimeout(garantirUnEcranVisible, 600);

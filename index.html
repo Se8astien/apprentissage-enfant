@@ -110,9 +110,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <style id="ecrans-critique">
-    .ecran.actif { display: block !important; }
-  </style>
 </head>
 <body>
   <div class="app">
@@ -529,80 +526,6 @@
       permettent d'<strong>apprendre en s'amusant</strong>, à son propre rythme, sur tablette ou ordinateur.
     </p>
   </footer>
-  <script>
-    (function () {
-      function ecranVisible() {
-        var a = document.querySelector(".ecran.actif");
-        if (!a || a.hidden) return false;
-        try {
-          return window.getComputedStyle(a).display !== "none";
-        } catch (e) {
-          return true;
-        }
-      }
-      function reveler(id) {
-        var el = document.getElementById(id);
-        if (!el) return false;
-        el.removeAttribute("hidden");
-        el.hidden = false;
-        el.classList.add("actif");
-        return true;
-      }
-      function toutCacher() {
-        document.querySelectorAll(".ecran").forEach(function (e) {
-          e.hidden = true;
-          e.classList.remove("actif");
-        });
-      }
-      window.__secoursEcrans = function () {
-        if (ecranVisible()) return;
-        try {
-          toutCacher();
-          if (!localStorage.getItem("landing-seen")) {
-            reveler("ecran-landing");
-            return;
-          }
-          if (!localStorage.getItem("maths-cp-genre")) {
-            reveler("ecran-genre");
-            return;
-          }
-          if (!localStorage.getItem("maths-cp-niveau")) {
-            reveler("ecran-classe");
-            return;
-          }
-          if (!(localStorage.getItem("renard-nom") || "").trim()) {
-            reveler("ecran-nommage");
-            return;
-          }
-          reveler("ecran-menu");
-        } catch (e2) {
-          console.error("[App] secours écrans", e2);
-          reveler("ecran-landing");
-        }
-      };
-      function tick() {
-        if (ecranVisible()) {
-          document.body.dataset.appInit = "1";
-          return;
-        }
-        window.__secoursEcrans();
-      }
-      function scheduleFallback() {
-        setTimeout(tick, 80);
-        setTimeout(tick, 900);
-      }
-      if (document.readyState === "complete") {
-        scheduleFallback();
-      } else {
-        window.addEventListener("load", scheduleFallback);
-      }
-    })();
-  </script>
-  <script type="module">
-    import("./app-init.js").catch(function (err) {
-      console.error("[App] Chargement impossible (réseau, file://, ou erreur JS)", err);
-      if (typeof window.__secoursEcrans === "function") window.__secoursEcrans();
-    });
-  </script>
+  <script type="module" src="app-init.js"></script>
 </body>
 </html>
