@@ -221,11 +221,12 @@ const { liste: profilsListe, actifId: profilActifId } = initProfils();
 const sessionStartTs = Date.now();
 let sessionClosed = false;
 if (elTotal) elTotal.textContent = lireEtoiles();
+let streakInit = { count: 0, lastVisit: "" };
 try {
   majGenre();
   mettreAJourJauges();
   mettreAJourRenardHeader();
-  const streakInit = mettreAJourStreak();
+  streakInit = mettreAJourStreak();
   afficherStreakHeader(streakInit.count);
 } catch (err) {
   console.error("[App] init renard/streak ignorée", err);
@@ -510,10 +511,13 @@ document.querySelectorAll(".btn-genre").forEach((btn) => {
 const btnChangerGenre = document.getElementById("btn-changer-genre");
 if (btnChangerGenre) {
   btnChangerGenre.addEventListener("click", () => {
-    elMenu.hidden = true;
-    elMenu.classList.remove("actif");
-    elGenre.hidden = false;
-    elGenre.classList.add("actif");
+    const menu = elMenu || document.getElementById("ecran-menu");
+    const genre = elGenre || document.getElementById("ecran-genre");
+    if (!menu || !genre) return;
+    menu.hidden = true;
+    menu.classList.remove("actif");
+    genre.hidden = false;
+    genre.classList.add("actif");
   });
 }
 
