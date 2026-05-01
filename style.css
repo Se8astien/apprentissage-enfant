@@ -676,7 +676,7 @@ h1 {
 }
 
 #ecran-genre.actif {
-  display: flex;
+  display: flex !important;
 }
 
 .genre-conteneur {

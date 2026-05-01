@@ -110,7 +110,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <style>.ecran.actif{display:block!important}</style>
+  <style>
+    .ecran.actif { display: block !important; }
+    #ecran-genre.ecran.actif {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #ecran-genre.ecran.actif .genre-conteneur { position: relative; z-index: 2; }
+    #ecran-genre.ecran.actif .btn-genre { position: relative; z-index: 3; cursor: pointer; }
+    #ecran-landing.ecran.actif { display: flex !important; flex-direction: column; }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -586,8 +597,26 @@
         if (cta1) cta1.addEventListener("click", suiteApresLandingSiBesoin);
         if (cta2) cta2.addEventListener("click", suiteApresLandingSiBesoin);
       }
+      function brancherGenreSecours() {
+        var btns = document.querySelectorAll(".btn-genre");
+        for (var j = 0; j < btns.length; j++) {
+          btns[j].addEventListener("click", function () {
+            var g = this.getAttribute("data-genre");
+            if (!g) return;
+            try { localStorage.setItem("maths-cp-genre", g); } catch (eG) {}
+            try {
+              if (!localStorage.getItem("maths-cp-niveau")) montrerId("ecran-classe");
+              else if (!(localStorage.getItem("renard-nom") || "").trim()) montrerId("ecran-nommage");
+              else montrerId("ecran-menu");
+            } catch (eH) {
+              montrerId("ecran-classe");
+            }
+          });
+        }
+      }
       function arm() {
         brancherLandingSecours();
+        brancherGenreSecours();
         reparerVue();
         setTimeout(reparerVue, 800);
         setTimeout(reparerVue, 2200);
