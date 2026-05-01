@@ -564,9 +564,9 @@ export function lancerSoustraction() {
     }
     elQuestion.innerHTML = html;
     setBonneReponse(reste);
-    const minCE2s = Math.max(0, reste - 80);
-    const maxCE2s = Math.min(998, reste + 80);
-    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCE2s, maxCE2s);
+    const minPropCE2s = Math.max(0, reste - 80);
+    const maxPropCE2s = Math.min(998, reste + 80);
+    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minPropCE2s, maxPropCE2s);
     activerIndiceGraduel("Regarde combien on enlève en tout.", "Tu peux vérifier avec reste + enlevé = total.");
     afficherChoix(props, (val, btn) => reponseAvecSuivi("soustraction", val, btn, getBonneReponse()));
     return;

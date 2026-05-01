@@ -1,13 +1,11 @@
 // app-init.js — point d'entrée : init état, routage écrans, listeners
 
 import {
-  elGenre,
   elTotal,
   elSousTitre,
   btnRetour,
   elSuivant,
   sauverNiveau,
-  sauverGenre,
   lireNomRenard,
   sauverNomRenard,
   lireEtoiles,
@@ -16,9 +14,7 @@ import {
   getNiveauCourant,
   getJeuCourant,
   estGrand,
-  STORAGE_NIVEAU,
   getDifficulte,
-  setDifficulte,
   lireMaitrise,
   confetti,
   escapeHtml,
@@ -282,53 +278,16 @@ setTimeout(() => {
   if (!document.querySelector(".ecran.actif:not([hidden])")) routerVersEtape();
 }, 800);
 
-// ── Listeners onboarding ─────────────────────────────────────────────────────
-document.querySelectorAll(".btn-genre").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const genre = btn.dataset.genre || (btn.id === "btn-fille" ? "fille" : btn.id === "btn-garcon" ? "garcon" : null);
-    if (!genre) return;
-    sauverGenre(genre);
-    majGenre();
-    routerVersEtape();
-  });
-});
-
-document.querySelectorAll(".btn-classe").forEach(btn => {
-  btn.addEventListener("click", () => {
-    sauverNiveau(btn.dataset.niveau);
-    document.querySelectorAll(".btn-classe").forEach(b => b.classList.toggle("selectionne", b === btn));
-    const diffChoix = document.getElementById("diff-choix");
-    if (diffChoix) {
-      diffChoix.hidden = false;
-      diffChoix.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  });
-});
-
-document.querySelectorAll(".btn-diff").forEach(btn => {
-  btn.addEventListener("click", () => {
-    setDifficulte(parseInt(btn.dataset.diff, 10));
-    routerVersEtape();
-  });
-});
-
-document.querySelectorAll(".niveau-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    sauverNiveau(btn.dataset.niveau);
-    entrerMenu();
-  });
-});
-
-const formNommage = document.getElementById("nommage-form");
-if (formNommage) {
-  formNommage.addEventListener("submit", (e) => {
-    e.preventDefault();
+// Onboarding (genre/classe/diff/nommage/niveau header) entièrement géré par le mini script inline.
+// Le module ajoute uniquement l'intro d'histoire après le nommage.
+const formNommageMod = document.getElementById("nommage-form");
+if (formNommageMod) {
+  formNommageMod.addEventListener("submit", () => {
     const inp = document.getElementById("input-nom-renard");
     const nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
     sauverNomRenard(nom);
     mettreAJourRenardHeader();
-    entrerMenu();
-    afficherIntroHistoire(nom);
+    setTimeout(() => afficherIntroHistoire(nom), 0);
   });
 }
 
@@ -394,17 +353,7 @@ if (btnRetour) btnRetour.addEventListener("click", () => {
 });
 if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
-// ── Boutons header / menu ────────────────────────────────────────────────────
-const btnChangerGenre = document.getElementById("btn-changer-genre");
-if (btnChangerGenre) {
-  btnChangerGenre.addEventListener("click", () => {
-    const g = elGenre || document.getElementById("ecran-genre");
-    if (g) revelerSeulEcran(g);
-  });
-}
-
-const btnChangerClasse = document.getElementById("btn-changer-classe");
-if (btnChangerClasse) btnChangerClasse.addEventListener("click", montrerClasse);
+// Changer de genre/classe gérés par le mini script inline.
 
 const btnMaison = document.getElementById("btn-maison");
 if (btnMaison) btnMaison.addEventListener("click", () => montrerMaison(entrerMenu));
@@ -505,20 +454,7 @@ if (btnRetourBadges) btnRetourBadges.addEventListener("click", entrerMenu);
   }
 }
 
-// ── Partage ───────────────────────────────────────────────────────────────────
-function partager() {
-  const data = {
-    title: "Apprentissage Magique — Jeux Montessori",
-    text: "🦊 Des jeux Montessori gratuits pour apprendre en s'amusant, du CP au CM2 !",
-    url: "https://apprentissage-magique.fr",
-  };
-  if (navigator.share) navigator.share(data).catch(() => {});
-  else window.open("https://wa.me/?text=" + encodeURIComponent(data.text + " " + data.url), "_blank", "noopener");
-}
-const btnLandingPartager = document.getElementById("btn-landing-partager");
-if (btnLandingPartager) btnLandingPartager.addEventListener("click", partager);
-const btnPartagerMenu = document.getElementById("btn-partager");
-if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
+// Partage géré par le mini script inline (fonctionne même sans modules ES).
 
 // ── Profils header ────────────────────────────────────────────────────────────
 const btnProfilsHeader = document.getElementById("btn-profils-header");
@@ -529,50 +465,27 @@ if (btnProfilsHeader) {
   });
 }
 
-// ── RGPD — consentement cookies ──────────────────────────────────────────────
+// RGPD : boutons gérés par mini script inline. Le module se contente de synchroniser
+// l'analytics (chargement GA + flag consent) avec le choix déjà persisté.
 {
-  const banner = document.getElementById("banner-rgpd");
-  if (banner) {
-    const consentSauve = localStorage.getItem("rgpd-consent");
-    if (consentSauve) {
-      banner.hidden = true;
-      setAnalyticsConsent(consentSauve);
-      if (consentSauve === "accepte") chargerAnalytics();
-    } else {
-      banner.hidden = false;
-    }
-    const btnAccept = document.getElementById("btn-rgpd-accepter");
-    const btnRefuse = document.getElementById("btn-rgpd-refuser");
-    if (btnAccept) btnAccept.addEventListener("click", () => {
-      setAnalyticsConsent("accepte");
-      chargerAnalytics();
-      banner.hidden = true;
-    });
-    if (btnRefuse) btnRefuse.addEventListener("click", () => {
-      setAnalyticsConsent("refuse");
-      banner.hidden = true;
-    });
+  const consentSauve = localStorage.getItem("rgpd-consent");
+  if (consentSauve) {
+    setAnalyticsConsent(consentSauve);
+    if (consentSauve === "accepte") chargerAnalytics();
   }
-}
-
-// ── Mode nuit ─────────────────────────────────────────────────────────────────
-const btnTheme = document.getElementById("btn-theme");
-if (btnTheme) {
-  btnTheme.textContent = localStorage.getItem("theme-nuit") === "1" ? "☀️" : "🌙";
-  btnTheme.addEventListener("click", () => {
-    const nuit = localStorage.getItem("theme-nuit") !== "1";
-    localStorage.setItem("theme-nuit", nuit ? "1" : "0");
-    document.documentElement.setAttribute("data-theme", nuit ? "nuit" : "");
-    btnTheme.textContent = nuit ? "☀️" : "🌙";
+  window.addEventListener("storage", (ev) => {
+    if (ev.key !== "rgpd-consent" || !ev.newValue) return;
+    setAnalyticsConsent(ev.newValue);
+    if (ev.newValue === "accepte") chargerAnalytics();
   });
 }
 
-// ── Sons ──────────────────────────────────────────────────────────────────────
-const btnSons = document.getElementById("btn-sons");
-if (btnSons) {
-  btnSons.textContent = sonsActifs() ? "🔊" : "🔇";
-  btnSons.addEventListener("click", () => {
-    btnSons.textContent = toggleSons() ? "🔊" : "🔇";
+// Sons : bouton géré par inline (toggle localStorage "sons-actifs") ; module aligne app-sons.
+const btnSonsMod = document.getElementById("btn-sons");
+if (btnSonsMod) {
+  btnSonsMod.addEventListener("click", () => {
+    const veutOn = localStorage.getItem("sons-actifs") !== "0";
+    if (sonsActifs() !== veutOn) toggleSons();
   });
 }
 
@@ -678,3 +591,5 @@ window.addEventListener("beforeunload", trackSessionEnd);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") trackSessionEnd();
 });
+
+window.__amModuleReady = true;
