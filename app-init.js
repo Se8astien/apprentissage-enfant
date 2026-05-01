@@ -98,6 +98,11 @@ function chargerAnalytics() {
   window.gtag("config", GA_ID);
 }
 
+window.__AMS_apresAcceptRgpd = () => {
+  setAnalyticsConsent("accepte");
+  chargerAnalytics();
+};
+
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
   compte:         lancerCompte,
@@ -283,31 +288,63 @@ function ecranOuvertEtVisible() {
   return ok;
 }
 
+function dernierRecoursScreens() {
+  try {
+    if (doitAfficherLanding()) {
+      const land = document.getElementById("ecran-landing");
+      if (land) {
+        revelerSeulEcran(land);
+        return;
+      }
+    }
+    const etape = etapePourStockageCourant();
+    if (etape === "genre") {
+      const g = document.getElementById("ecran-genre");
+      if (g) revelerSeulEcran(g);
+      return;
+    }
+    if (etape === "classe") {
+      montrerClasse();
+      if (ecranOuvertEtVisible()) return;
+      const ec = document.getElementById("ecran-classe");
+      if (ec) revelerSeulEcran(ec);
+      return;
+    }
+    if (etape === "nommage") {
+      try {
+        montrerNommage();
+      } catch {
+        const n = document.getElementById("ecran-nommage");
+        if (n) revelerSeulEcran(n);
+      }
+      return;
+    }
+    montrerMenu();
+    afficherMissions();
+  } catch {
+    const land = document.getElementById("ecran-landing");
+    if (land) revelerSeulEcran(land);
+  }
+}
+
 function garantirUnEcranVisible() {
   try {
     if (harmoniserLandingSiStockageDejaVu()) demarrerApp();
-  } catch { /* ignore */ }
+  } catch {
+    dernierRecoursScreens();
+  }
   try {
     if (nombreEcransVisiblesSansHidden() > 1) demarrerApp();
   } catch { /* ignore */ }
   if (ecranOuvertEtVisible()) return;
   try {
     demarrerApp();
-  } catch { /* ignore */ }
+  } catch {
+    dernierRecoursScreens();
+  }
   if (ecranOuvertEtVisible()) return;
   try {
-    const etape = etapePourStockageCourant();
-    if (etape === "genre") {
-      const g = document.getElementById("ecran-genre");
-      if (g) revelerSeulEcran(g);
-    } else if (etape === "classe") {
-      montrerClasse();
-    } else if (etape === "nommage") {
-      montrerNommage();
-    } else {
-      montrerMenu();
-      afficherMissions();
-    }
+    dernierRecoursScreens();
   } catch {
     const menu = document.getElementById("ecran-menu");
     const g = document.getElementById("ecran-genre");
@@ -316,7 +353,10 @@ function garantirUnEcranVisible() {
     else if (g) revelerSeulEcran(g);
     else if (landing) revelerSeulEcran(landing);
   }
+  if (!ecranOuvertEtVisible()) dernierRecoursScreens();
 }
+
+window.__appGarantirVue = garantirUnEcranVisible;
 
 function screenCourant() {
   const elActif = document.querySelector(".ecran.actif");
@@ -693,6 +733,15 @@ if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
   if (!banner) return;
 
   const consentSauve = localStorage.getItem("rgpd-consent");
+  if (window.__AMS_RGPD_BOOT === "1") {
+    banner.hidden = !!consentSauve;
+    if (consentSauve) {
+      setAnalyticsConsent(consentSauve);
+      if (consentSauve === "accepte") chargerAnalytics();
+    }
+    return;
+  }
+
   if (!consentSauve) {
     banner.hidden = false;
   } else {
