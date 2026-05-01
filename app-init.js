@@ -1,8 +1,7 @@
-// app-init.js — lancers map, event listeners, startup (entry point)
+// app-init.js — point d'entrée : init état, routage écrans, listeners
 
 import {
   elGenre,
-  elMenu,
   elTotal,
   elSousTitre,
   btnRetour,
@@ -14,28 +13,26 @@ import {
   lireEtoiles,
   majGenre,
   mettreAJourJauges,
-  setBadgeVisible,
   getNiveauCourant,
   getJeuCourant,
   estGrand,
   STORAGE_NIVEAU,
   getDifficulte,
   setDifficulte,
-  getDiffLabel,
   lireMaitrise,
   confetti,
   escapeHtml,
   NIVEAUX_LABELS,
   piegerFocus,
   revelerSeulEcran,
+  syncPrefsDepuisStockage,
 } from "./app-state.js";
 
 import {
-  doitAfficherLanding,
-  fermerLandingDansDOM,
+  etapeCourante,
+  landingDejaVu,
   marquerLandingVu,
-  harmoniserLandingSiStockageDejaVu,
-  etapePourStockageCourant,
+  montrerEcranParId,
 } from "./app-route.js";
 
 import {
@@ -53,7 +50,6 @@ import {
   montrerMenu,
   montrerJeu,
   questionSuivante,
-  resetFeedback,
   getWrongQuestions,
   clearWrongQuestions,
   entrerRevision,
@@ -80,94 +76,51 @@ import { toggleSons, sonsActifs } from "./app-sons.js";
 import { initProfils, getProfils, basculerProfil, creerProfil, syncProfilActif } from "./app-profils.js";
 import { montrerParams } from "./app-params.js";
 
+// ── Analytics setup ──────────────────────────────────────────────────────────
 window.dataLayer = window.dataLayer || [];
 window.gtag = window.gtag || function gtag(){ window.dataLayer.push(arguments); };
 window.gtag("consent", "default", { analytics_storage: "denied", ad_storage: "denied", wait_for_update: 500 });
 
 const GA_ID = "G-5EDQ2KCS8X";
 let analyticsCharge = false;
-
 function chargerAnalytics() {
   if (analyticsCharge || document.querySelector(`script[src*="${GA_ID}"]`)) return;
   analyticsCharge = true;
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-  document.head.appendChild(script);
+  const s = document.createElement("script");
+  s.async = true;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+  document.head.appendChild(s);
   window.gtag("js", new Date());
   window.gtag("config", GA_ID);
 }
 
-window.__AMS_apresAcceptRgpd = () => {
-  setAnalyticsConsent("accepte");
-  chargerAnalytics();
-};
-
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
-  compte:         lancerCompte,
-  addition:       lancerAddition,
-  soustraction:   lancerSoustraction,
-  compare:        lancerCompare,
-  suite:          lancerSuite,
-  doubles:        lancerDoubles,
-  heure:          lancerHeure,
-  pairimpair:     lancerPairImpair,
-  dizaines:       lancerDizaines,
-  formes:         lancerFormes,
-  monnaiecp:      lancerMonnaieCp,
-  moitie:         lancerMoitie,
-  multiplication: lancerMultiplication,
-  division:       lancerDivision,
-  fractions:      lancerFractions,
-  mesures:        lancerMesures,
-  monnaiece1:     lancerMonnaieCe1,
-  symetrie:       lancerSymetrie,
-  syllabes:       lancerSyllabes,
-  lecture:        lancerLecture,
-  anglais:        lancerAnglaisMots,
-  traduction:     lancerTraduction,
-  durees:         lancerDurees,
-  probleme:       lancerProbleme,
-  masse:          lancerMasse,
-  perimetre:      lancerPerimetre,
-  angles:         lancerAngles,
-  perlesDorees:   lancerPerlesDorees,
-  planche100:     lancerPlanche100,
-  sons:           lancerSons,
-  grammaire:      lancerGrammaire,
-  lecturePhrase:  lancerLecturePhrase,
-  phraseMobile:   lancerPhraseMobile,
-  lectureTexte:   lancerLectureTexte,
-  aires:          lancerAires,
-  decimaux:       lancerDecimaux,
-  fractionsCM:    lancerFractionsCM,
-  proportionnalite: lancerProportionnalite,
-  pourcentages:   lancerPourcentages,
-  conjugaison:          lancerConjugaison,
-  homophones:           lancerHomophones,
-  synonymes:            lancerSynonymes,
-  calendrier:           lancerCalendrier,
-  allemand:             lancerAllemandMots,
-  traductionAllemand:   lancerTraductionAllemand,
-  espagnol:             lancerEspagnolMots,
-  traductionEspagnol:   lancerTraductionEspagnol,
-  italien:              lancerItalienMots,
-  traductionItalien:    lancerTraductionItalien,
-  portugais:            lancerPortugaisMots,
-  traductionPortugais:  lancerTraductionPortugais,
-  sequence:             lancerSequence,
-  code:                 lancerCode,
+  compte: lancerCompte, addition: lancerAddition, soustraction: lancerSoustraction,
+  compare: lancerCompare, suite: lancerSuite, doubles: lancerDoubles,
+  heure: lancerHeure, pairimpair: lancerPairImpair, dizaines: lancerDizaines,
+  formes: lancerFormes, monnaiecp: lancerMonnaieCp, moitie: lancerMoitie,
+  multiplication: lancerMultiplication, division: lancerDivision, fractions: lancerFractions,
+  mesures: lancerMesures, monnaiece1: lancerMonnaieCe1, symetrie: lancerSymetrie,
+  syllabes: lancerSyllabes, lecture: lancerLecture, anglais: lancerAnglaisMots,
+  traduction: lancerTraduction, durees: lancerDurees, probleme: lancerProbleme,
+  masse: lancerMasse, perimetre: lancerPerimetre, angles: lancerAngles,
+  perlesDorees: lancerPerlesDorees, planche100: lancerPlanche100, sons: lancerSons,
+  grammaire: lancerGrammaire, lecturePhrase: lancerLecturePhrase, phraseMobile: lancerPhraseMobile,
+  lectureTexte: lancerLectureTexte, aires: lancerAires, decimaux: lancerDecimaux,
+  fractionsCM: lancerFractionsCM, proportionnalite: lancerProportionnalite, pourcentages: lancerPourcentages,
+  conjugaison: lancerConjugaison, homophones: lancerHomophones, synonymes: lancerSynonymes,
+  calendrier: lancerCalendrier, allemand: lancerAllemandMots, traductionAllemand: lancerTraductionAllemand,
+  espagnol: lancerEspagnolMots, traductionEspagnol: lancerTraductionEspagnol,
+  italien: lancerItalienMots, traductionItalien: lancerTraductionItalien,
+  portugais: lancerPortugaisMots, traductionPortugais: lancerTraductionPortugais,
+  sequence: lancerSequence, code: lancerCode,
 };
 
-// ── Classe screen ─────────────────────────────────────────────────────────────
-const ecranClasse = document.getElementById("ecran-classe");
-const btnClasse = document.querySelectorAll(".btn-classe");
-const btnNiveaux = document.querySelectorAll(".niveau-btn");
-
+// ── Helpers d'écrans ──────────────────────────────────────────────────────────
 function syncNiveauButtons() {
   const niveau = getNiveauCourant();
-  btnNiveaux.forEach(btn => {
+  document.querySelectorAll(".niveau-btn").forEach(btn => {
     const actif = btn.dataset.niveau === niveau;
     btn.classList.toggle("actif", actif);
     btn.setAttribute("aria-pressed", actif ? "true" : "false");
@@ -175,241 +128,83 @@ function syncNiveauButtons() {
 }
 
 function montrerClasse() {
-  if (!ecranClasse) return;
-  revelerSeulEcran(ecranClasse);
+  if (!montrerEcranParId("ecran-classe")) return;
   const mascot = document.getElementById("classe-mascotte");
   if (mascot) mascot.innerHTML = svgRenard(getStade(lireEtoiles()), 80, {});
   const diffChoix = document.getElementById("diff-choix");
   if (diffChoix) diffChoix.hidden = true;
-  btnClasse.forEach(b => b.classList.remove("selectionne"));
+  document.querySelectorAll(".btn-classe").forEach(b => b.classList.remove("selectionne"));
 }
 
-function passerAuMenu() {
-  if (!lireNomRenard()) {
-    montrerNommage();
-  } else {
-    majGenre();
-    syncNiveauButtons();
-    montrerMenu();
-    afficherMissions();
-  }
-}
-
-btnClasse.forEach(btn => {
-  btn.addEventListener("click", () => {
-    sauverNiveau(btn.dataset.niveau);
-    btnClasse.forEach(b => b.classList.toggle("selectionne", b === btn));
-    const diffChoix = document.getElementById("diff-choix");
-    if (diffChoix) {
-      diffChoix.hidden = false;
-      diffChoix.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  });
-});
-
-document.querySelectorAll(".btn-diff").forEach(btn => {
-  btn.addEventListener("click", () => {
-    setDifficulte(parseInt(btn.dataset.diff, 10));
-    passerAuMenu();
-  });
-});
-
-btnNiveaux.forEach(btn => {
-  btn.addEventListener("click", () => {
-    sauverNiveau(btn.dataset.niveau);
-    syncNiveauButtons();
-    montrerMenu();
-    afficherMissions();
-  });
-});
-
-// ── Initialisation ────────────────────────────────────────────────────────────
-const { liste: profilsListe, actifId: profilActifId } = initProfils();
-const sessionStartTs = Date.now();
-let sessionClosed = false;
-if (elTotal) elTotal.textContent = lireEtoiles();
-let streakInit = { count: 0, lastVisit: "" };
-try {
+function entrerMenu() {
+  syncPrefsDepuisStockage();
   majGenre();
-  mettreAJourJauges();
-  mettreAJourRenardHeader();
-  streakInit = mettreAJourStreak();
-  afficherStreakHeader(streakInit.count);
-} catch { /* ignore */ }
-syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
+  syncNiveauButtons();
+  montrerMenu();
+  afficherMissions();
+}
 
-// ── Démarrage ─────────────────────────────────────────────────────────────────
-function demarrerApp() {
-  const etape = etapePourStockageCourant();
+// ── Routeur central : 1 point qui décide quel écran montrer ──────────────────
+function routerVersEtape() {
+  syncPrefsDepuisStockage();
+  const etape = etapeCourante();
   if (etape === "genre") {
-    const g = elGenre || document.getElementById("ecran-genre");
-    if (!g) return;
-    revelerSeulEcran(g);
-  } else if (etape === "classe") {
+    montrerEcranParId("ecran-genre");
+    return;
+  }
+  if (etape === "classe") {
     montrerClasse();
-  } else if (etape === "nommage") {
+    return;
+  }
+  if (etape === "nommage") {
     montrerNommage();
-  } else {
-    montrerMenu();
-    afficherMissions();
-    if (elSousTitre) {
-      const nom = lireNomRenard();
-      elSousTitre.textContent = estGrand()
-        ? `Bon retour, ${nom} !`
-        : `${nom} t'attendait ! 🦊`;
-      setTimeout(() => majGenre(), 3500);
-    }
+    return;
+  }
+  entrerMenu();
+  if (elSousTitre) {
+    const nom = lireNomRenard();
+    elSousTitre.textContent = estGrand()
+      ? `Bon retour, ${nom} !`
+      : `${nom} t'attendait ! 🦊`;
+    setTimeout(() => majGenre(), 3500);
   }
 }
 
-function nombreEcransVisiblesSansHidden() {
-  let n = 0;
-  document.querySelectorAll(".ecran").forEach((el) => {
-    if (el.hidden) return;
-    try {
-      const st = getComputedStyle(el);
-      if (st.display !== "none" && st.visibility !== "hidden") n++;
-    } catch {
-      n++;
-    }
-  });
-  return n;
-}
-
-function ecranOuvertEtVisible() {
-  let ok = false;
-  document.querySelectorAll(".ecran.actif").forEach((el) => {
-    if (el.hidden) return;
-    try {
-      const st = getComputedStyle(el);
-      if (st.display !== "none" && st.visibility !== "hidden") ok = true;
-    } catch { ok = true; }
-  });
-  return ok;
-}
-
-function dernierRecoursScreens() {
-  try {
-    if (doitAfficherLanding()) {
-      const land = document.getElementById("ecran-landing");
-      if (land) {
-        revelerSeulEcran(land);
-        return;
-      }
-    }
-    const etape = etapePourStockageCourant();
-    if (etape === "genre") {
-      const g = document.getElementById("ecran-genre");
-      if (g) revelerSeulEcran(g);
-      return;
-    }
-    if (etape === "classe") {
-      montrerClasse();
-      if (ecranOuvertEtVisible()) return;
-      const ec = document.getElementById("ecran-classe");
-      if (ec) revelerSeulEcran(ec);
-      return;
-    }
-    if (etape === "nommage") {
-      try {
-        montrerNommage();
-      } catch {
-        const n = document.getElementById("ecran-nommage");
-        if (n) revelerSeulEcran(n);
-      }
-      return;
-    }
-    montrerMenu();
-    afficherMissions();
-  } catch {
-    const land = document.getElementById("ecran-landing");
-    if (land) revelerSeulEcran(land);
-  }
-}
-
-function garantirUnEcranVisible() {
-  try {
-    if (harmoniserLandingSiStockageDejaVu()) demarrerApp();
-  } catch {
-    dernierRecoursScreens();
-  }
-  try {
-    if (nombreEcransVisiblesSansHidden() > 1) demarrerApp();
-  } catch { /* ignore */ }
-  if (ecranOuvertEtVisible()) return;
-  try {
-    demarrerApp();
-  } catch {
-    dernierRecoursScreens();
-  }
-  if (ecranOuvertEtVisible()) return;
-  try {
-    dernierRecoursScreens();
-  } catch {
-    const menu = document.getElementById("ecran-menu");
-    const g = document.getElementById("ecran-genre");
-    const landing = document.getElementById("ecran-landing");
-    if (menu) revelerSeulEcran(menu);
-    else if (g) revelerSeulEcran(g);
-    else if (landing) revelerSeulEcran(landing);
-  }
-  if (!ecranOuvertEtVisible()) dernierRecoursScreens();
-}
-
-window.__appGarantirVue = garantirUnEcranVisible;
-
-function screenCourant() {
-  const elActif = document.querySelector(".ecran.actif");
-  return elActif ? (elActif.id || "unknown") : "unknown";
-}
-
-function trackSessionEnd() {
-  if (sessionClosed) return;
-  sessionClosed = true;
-  track("session_end", {
-    duration_s: Math.round((Date.now() - sessionStartTs) / 1000),
-    last_screen: screenCourant(),
-    game_name: getJeuCourant() || "",
-  });
-}
-
-function lancerDepuisSelecteur() {
+function montrerLandingPuisRouter() {
   const ecranLanding = document.getElementById("ecran-landing");
-  if (ecranLanding && doitAfficherLanding()) {
-    revelerSeulEcran(ecranLanding);
-    const go = () => {
-      marquerLandingVu();
-      fermerLandingDansDOM();
-      demarrerApp();
-    };
-    const cta1 = document.getElementById("btn-landing-cta");
-    const cta2 = document.getElementById("btn-landing-cta-2");
-    if (cta1) cta1.addEventListener("click", go);
-    if (cta2) cta2.addEventListener("click", go);
-    if (!cta1 && !cta2) go();
-  } else {
-    demarrerApp();
+  if (!ecranLanding || landingDejaVu()) {
+    routerVersEtape();
+    return;
   }
+  revelerSeulEcran(ecranLanding);
+  const passer = () => {
+    marquerLandingVu();
+    routerVersEtape();
+  };
+  const cta1 = document.getElementById("btn-landing-cta");
+  const cta2 = document.getElementById("btn-landing-cta-2");
+  if (cta1) cta1.addEventListener("click", passer);
+  if (cta2) cta2.addEventListener("click", passer);
 }
 
+// ── Sélecteur de profils (multi-comptes) ──────────────────────────────────────
 function afficherSelecteurProfils(liste, actifId) {
   const ecran = document.getElementById("ecran-profils");
   const grille = document.getElementById("profils-grille");
   const btnAjout = document.getElementById("btn-ajouter-profil");
   if (!ecran || !grille) {
     sessionStorage.setItem("skip-selector", "1");
-    lancerDepuisSelecteur();
+    montrerLandingPuisRouter();
     return;
   }
   revelerSeulEcran(ecran);
 
-  const niveauLabel = NIVEAUX_LABELS;
   grille.innerHTML = liste.map(p => {
     const stade = getStade(p.etoiles || 0);
     return `<button type="button" class="profil-carte${p.id === actifId ? " actif" : ""}" data-id="${p.id}">
       <div class="profil-fox">${svgRenard(stade, 68, {})}</div>
       <span class="profil-nom">${escapeHtml(p.nom || "Renard")}</span>
-      <span class="profil-niveau">${niveauLabel[p.niveau || "cp"] || "🌱 CP"}</span>
+      <span class="profil-niveau">${NIVEAUX_LABELS[p.niveau || "cp"] || "🌱 CP"}</span>
       <span class="profil-etoiles">⭐ ${p.etoiles || 0}</span>
     </button>`;
   }).join("");
@@ -421,9 +216,7 @@ function afficherSelecteurProfils(liste, actifId) {
       const id = btn.dataset.id;
       if (id === actifId) {
         sessionStorage.setItem("skip-selector", "1");
-        ecran.hidden = true;
-        ecran.classList.remove("actif");
-        lancerDepuisSelecteur();
+        montrerLandingPuisRouter();
       } else {
         basculerProfil(id);
       }
@@ -438,37 +231,73 @@ function afficherSelecteurProfils(liste, actifId) {
   }
 }
 
-if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
-  afficherSelecteurProfils(profilsListe, profilActifId);
-} else {
-  sessionStorage.removeItem("skip-selector");
-  lancerDepuisSelecteur();
+// ── Initialisation état + premier écran ──────────────────────────────────────
+const { liste: profilsListe, actifId: profilActifId } = initProfils();
+const sessionStartTs = Date.now();
+let sessionClosed = false;
+if (elTotal) elTotal.textContent = lireEtoiles();
+let streakInit = { count: 0, lastVisit: "" };
+try {
+  majGenre();
+  mettreAJourJauges();
+  mettreAJourRenardHeader();
+  streakInit = mettreAJourStreak();
+  afficherStreakHeader(streakInit.count);
+} catch { /* ignore */ }
+syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
+
+function premierEcran() {
+  if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
+    afficherSelecteurProfils(profilsListe, profilActifId);
+  } else {
+    sessionStorage.removeItem("skip-selector");
+    montrerLandingPuisRouter();
+  }
 }
+premierEcran();
 
-setTimeout(garantirUnEcranVisible, 0);
-setTimeout(garantirUnEcranVisible, 450);
-setTimeout(garantirUnEcranVisible, 1200);
+// Filet de sécurité unique : si pour une raison X aucun écran n'est visible, route à nouveau
+setTimeout(() => {
+  if (!document.querySelector(".ecran.actif:not([hidden])")) routerVersEtape();
+}, 800);
 
-track("session_start", {
-  niveau: getNiveauCourant(),
-  difficulte: getDifficulte(),
-  profil_count: profilsListe.length,
-});
-flushAnalyticsQueue();
-window.addEventListener("beforeunload", trackSessionEnd);
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") trackSessionEnd();
-});
-
-const btnProfilsHeader = document.getElementById("btn-profils-header");
-if (btnProfilsHeader) {
-  if (profilsListe.length >= 2) btnProfilsHeader.hidden = false;
-  btnProfilsHeader.addEventListener("click", () => {
-    afficherSelecteurProfils(getProfils(), profilActifId);
+// ── Listeners onboarding ─────────────────────────────────────────────────────
+document.querySelectorAll(".btn-genre").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const genre = btn.dataset.genre || (btn.id === "btn-fille" ? "fille" : btn.id === "btn-garcon" ? "garcon" : null);
+    if (!genre) return;
+    sauverGenre(genre);
+    majGenre();
+    routerVersEtape();
   });
-}
+});
 
-// ── Formulaire de nommage ─────────────────────────────────────────────────────
+document.querySelectorAll(".btn-classe").forEach(btn => {
+  btn.addEventListener("click", () => {
+    sauverNiveau(btn.dataset.niveau);
+    document.querySelectorAll(".btn-classe").forEach(b => b.classList.toggle("selectionne", b === btn));
+    const diffChoix = document.getElementById("diff-choix");
+    if (diffChoix) {
+      diffChoix.hidden = false;
+      diffChoix.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  });
+});
+
+document.querySelectorAll(".btn-diff").forEach(btn => {
+  btn.addEventListener("click", () => {
+    setDifficulte(parseInt(btn.dataset.diff, 10));
+    routerVersEtape();
+  });
+});
+
+document.querySelectorAll(".niveau-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    sauverNiveau(btn.dataset.niveau);
+    entrerMenu();
+  });
+});
+
 const formNommage = document.getElementById("nommage-form");
 if (formNommage) {
   formNommage.addEventListener("submit", (e) => {
@@ -477,14 +306,12 @@ if (formNommage) {
     const nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
     sauverNomRenard(nom);
     mettreAJourRenardHeader();
-    syncNiveauButtons();
-    montrerMenu();
-    afficherMissions();
+    entrerMenu();
     afficherIntroHistoire(nom);
   });
 }
 
-// ── Étoiles de maîtrise ───────────────────────────────────────────────────────
+// ── Boutons jeux ──────────────────────────────────────────────────────────────
 function majEtoilesMaitrise() {
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
     const jeu = btn.dataset.jeu;
@@ -497,8 +324,7 @@ function majEtoilesMaitrise() {
 }
 majEtoilesMaitrise();
 
-// ── Boutons jeux ──────────────────────────────────────────────────────────────
-document.querySelectorAll(".carte-jeu").forEach((btn) => {
+document.querySelectorAll(".carte-jeu").forEach(btn => {
   btn.addEventListener("click", () => {
     const jeu = btn.dataset.jeu;
     if (!jeu || typeof lanceurs[jeu] !== "function") return;
@@ -507,7 +333,7 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
   });
 });
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// ── Navigation jeu ────────────────────────────────────────────────────────────
 if (btnRetour) btnRetour.addEventListener("click", () => {
   const jeu = getJeuCourant();
   const wrongs = getWrongQuestions(jeu);
@@ -539,82 +365,53 @@ if (btnRetour) btnRetour.addEventListener("click", () => {
       track("revision_declined", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: wrongs.length });
       clearWrongQuestions(jeu);
       overlay.remove();
-      montrerMenu();
-      afficherMissions();
+      entrerMenu();
     });
   } else {
-    montrerMenu();
-    afficherMissions();
+    entrerMenu();
   }
 });
 if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
-// ── Sélection du genre ────────────────────────────────────────────────────────
-document.querySelectorAll(".btn-genre").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const genre = btn.dataset.genre || (btn.id === "btn-fille" ? "fille" : btn.id === "btn-garcon" ? "garcon" : null);
-    if (!genre) return;
-    sauverGenre(genre);
-    majGenre();
-    if (!localStorage.getItem(STORAGE_NIVEAU)) {
-      montrerClasse();
-    } else if (!lireNomRenard()) {
-      montrerNommage();
-    } else {
-      montrerMenu();
-      afficherMissions();
-    }
-  });
-});
-
-// ── Changer de profil ─────────────────────────────────────────────────────────
+// ── Boutons header / menu ────────────────────────────────────────────────────
 const btnChangerGenre = document.getElementById("btn-changer-genre");
 if (btnChangerGenre) {
   btnChangerGenre.addEventListener("click", () => {
-    const genre = elGenre || document.getElementById("ecran-genre");
-    if (!genre) return;
-    revelerSeulEcran(genre);
+    const g = elGenre || document.getElementById("ecran-genre");
+    if (g) revelerSeulEcran(g);
   });
 }
 
-// ── Changer de classe ─────────────────────────────────────────────────────────
 const btnChangerClasse = document.getElementById("btn-changer-classe");
 if (btnChangerClasse) btnChangerClasse.addEventListener("click", montrerClasse);
 
-// ── Ma Maison ─────────────────────────────────────────────────────────────────
 const btnMaison = document.getElementById("btn-maison");
-if (btnMaison) btnMaison.addEventListener("click", () => montrerMaison(montrerMenu));
+if (btnMaison) btnMaison.addEventListener("click", () => montrerMaison(entrerMenu));
 
 const btnRetourMaison = document.getElementById("btn-retour-maison");
-if (btnRetourMaison) btnRetourMaison.addEventListener("click", () => { montrerMenu(); afficherMissions(); });
+if (btnRetourMaison) btnRetourMaison.addEventListener("click", entrerMenu);
 
-// ── Dressing ──────────────────────────────────────────────────────────────────
 const btnDressing = document.getElementById("btn-dressing");
 if (btnDressing) btnDressing.addEventListener("click", montrerDressing);
 
 const btnRetourDressing = document.getElementById("btn-retour-dressing");
-if (btnRetourDressing)   btnRetourDressing.addEventListener("click", () => {
-    montrerMaison(montrerMenu);
-  });
+if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => montrerMaison(entrerMenu));
 
-// ── Modal : passer à la classe suivante ──────────────────────────────────────
+// ── Modal classe suivante ────────────────────────────────────────────────────
 const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: "cm1", cm1: "cm2", cm2: null };
 let focusAvantModalClasse = null;
-
 function fermerModalClasse({ retourFocus = true } = {}) {
   const modal = document.getElementById("modal-classe-suivante");
   if (modal) modal.hidden = true;
   if (retourFocus && focusAvantModalClasse) focusAvantModalClasse.focus();
   focusAvantModalClasse = null;
 }
-
 window.addEventListener("classe-suivante:ouverte", () => {
   const modal = document.getElementById("modal-classe-suivante");
   if (!modal) return;
   focusAvantModalClasse = document.activeElement;
   piegerFocus(modal);
 });
-
 const modalOui = document.getElementById("modal-oui");
 if (modalOui) {
   modalOui.addEventListener("click", () => {
@@ -623,23 +420,16 @@ if (modalOui) {
     if (suivant) {
       sauverNiveau(suivant);
       confetti();
-      const badgeId = suivant;
-      if (debloquerBadge(badgeId)) {
-        const b = BADGES.find(x => x.id === badgeId);
+      if (debloquerBadge(suivant)) {
+        const b = BADGES.find(x => x.id === suivant);
         if (b) afficherNotifBadge(b);
       }
     }
-    montrerMenu();
-    afficherMissions();
+    entrerMenu();
   });
 }
-
 const modalNon = document.getElementById("modal-non");
-if (modalNon) {
-  modalNon.addEventListener("click", () => {
-    fermerModalClasse();
-  });
-}
+if (modalNon) modalNon.addEventListener("click", () => fermerModalClasse());
 
 // ── Badges screen ─────────────────────────────────────────────────────────────
 const btnBadges = document.getElementById("btn-badges");
@@ -651,8 +441,8 @@ if (btnBadges) {
     if (!ecranBadges) return;
     revelerSeulEcran(ecranBadges);
     const obtenus = lireBadges();
-    compteur.textContent = `${obtenus.length} / ${BADGES.length} trophées`;
-    grille.innerHTML = BADGES.map(b => `
+    if (compteur) compteur.textContent = `${obtenus.length} / ${BADGES.length} trophées`;
+    if (grille) grille.innerHTML = BADGES.map(b => `
       <div class="badge-carte ${obtenus.includes(b.id) ? "obtenu" : "verrouille"}">
         <span class="badge-emoji">${obtenus.includes(b.id) ? b.emoji : "🔒"}</span>
         <div class="badge-nom">${b.nom}</div>
@@ -660,32 +450,23 @@ if (btnBadges) {
       </div>`).join("");
   });
 }
-
 const btnRetourBadges = document.getElementById("btn-retour-badges");
-if (btnRetourBadges) {
-  btnRetourBadges.addEventListener("click", () => {
-    montrerMenu();
-    afficherMissions();
-  });
-}
+if (btnRetourBadges) btnRetourBadges.addEventListener("click", entrerMenu);
 
-// ── Streak badges check at startup ───────────────────────────────────────────
+// ── Streak / "de retour" badges ──────────────────────────────────────────────
 {
   const streakCount = streakInit.count || 0;
-  const streakBadges = [
-    { min: 3,  id: "streak3" },
-    { min: 7,  id: "streak7" },
+  [
+    { min: 3, id: "streak3" },
+    { min: 7, id: "streak7" },
     { min: 30, id: "streak30" },
-  ];
-  streakBadges.forEach(({ min, id }) => {
+  ].forEach(({ min, id }) => {
     if (streakCount >= min && debloquerBadge(id)) {
       const b = BADGES.find(x => x.id === id);
       if (b) afficherNotifBadge(b);
     }
   });
 }
-
-// ── Badge "de retour" après 2 jours d'absence ─────────────────────────────────
 {
   const rawStreak = localStorage.getItem("renard-streak");
   if (rawStreak) {
@@ -693,8 +474,7 @@ if (btnRetourBadges) {
       const s = JSON.parse(rawStreak);
       if (s.lastVisit) {
         const last = new Date(s.lastVisit);
-        const now  = new Date();
-        const diffDays = Math.floor((now - last) / 86400000);
+        const diffDays = Math.floor((Date.now() - last) / 86400000);
         if (diffDays >= 2 && debloquerBadge("retour")) {
           const b = BADGES.find(x => x.id === "retour");
           if (b) afficherNotifBadge(b);
@@ -709,62 +489,50 @@ function partager() {
   const data = {
     title: "Apprentissage Magique — Jeux Montessori",
     text: "🦊 Des jeux Montessori gratuits pour apprendre en s'amusant, du CP au CM2 !",
-    url: "https://apprentissage-magique.fr"
+    url: "https://apprentissage-magique.fr",
   };
-  if (navigator.share) {
-    navigator.share(data).catch(() => {});
-  } else {
-    window.open(
-      "https://wa.me/?text=" + encodeURIComponent(data.text + " " + data.url),
-      "_blank", "noopener"
-    );
-  }
+  if (navigator.share) navigator.share(data).catch(() => {});
+  else window.open("https://wa.me/?text=" + encodeURIComponent(data.text + " " + data.url), "_blank", "noopener");
 }
-
 const btnLandingPartager = document.getElementById("btn-landing-partager");
 if (btnLandingPartager) btnLandingPartager.addEventListener("click", partager);
-
 const btnPartagerMenu = document.getElementById("btn-partager");
 if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
 
-// ── RGPD — consentement cookies ───────────────────────────────────────────────
-(function () {
-  const banner = document.getElementById("banner-rgpd");
-  if (!banner) return;
+// ── Profils header ────────────────────────────────────────────────────────────
+const btnProfilsHeader = document.getElementById("btn-profils-header");
+if (btnProfilsHeader) {
+  if (profilsListe.length >= 2) btnProfilsHeader.hidden = false;
+  btnProfilsHeader.addEventListener("click", () => {
+    afficherSelecteurProfils(getProfils(), profilActifId);
+  });
+}
 
-  const consentSauve = localStorage.getItem("rgpd-consent");
-  if (window.__AMS_RGPD_BOOT === "1") {
-    banner.hidden = !!consentSauve;
+// ── RGPD — consentement cookies ──────────────────────────────────────────────
+{
+  const banner = document.getElementById("banner-rgpd");
+  if (banner) {
+    const consentSauve = localStorage.getItem("rgpd-consent");
     if (consentSauve) {
+      banner.hidden = true;
       setAnalyticsConsent(consentSauve);
       if (consentSauve === "accepte") chargerAnalytics();
+    } else {
+      banner.hidden = false;
     }
-    return;
-  }
-
-  if (!consentSauve) {
-    banner.hidden = false;
-  } else {
-    setAnalyticsConsent(consentSauve);
-    if (consentSauve === "accepte") chargerAnalytics();
-  }
-
-  const btnAccept = document.getElementById("btn-rgpd-accepter");
-  const btnRefuse = document.getElementById("btn-rgpd-refuser");
-  if (btnAccept) {
-    btnAccept.addEventListener("click", () => {
+    const btnAccept = document.getElementById("btn-rgpd-accepter");
+    const btnRefuse = document.getElementById("btn-rgpd-refuser");
+    if (btnAccept) btnAccept.addEventListener("click", () => {
       setAnalyticsConsent("accepte");
       chargerAnalytics();
       banner.hidden = true;
     });
-  }
-  if (btnRefuse) {
-    btnRefuse.addEventListener("click", () => {
+    if (btnRefuse) btnRefuse.addEventListener("click", () => {
       setAnalyticsConsent("refuse");
       banner.hidden = true;
     });
   }
-})();
+}
 
 // ── Mode nuit ─────────────────────────────────────────────────────────────────
 const btnTheme = document.getElementById("btn-theme");
@@ -778,14 +546,27 @@ if (btnTheme) {
   });
 }
 
-// ── Certificat ────────────────────────────────────────────────────────────────
+// ── Sons ──────────────────────────────────────────────────────────────────────
+const btnSons = document.getElementById("btn-sons");
+if (btnSons) {
+  btnSons.textContent = sonsActifs() ? "🔊" : "🔇";
+  btnSons.addEventListener("click", () => {
+    btnSons.textContent = toggleSons() ? "🔊" : "🔇";
+  });
+}
+
+// ── Paramètres parents ────────────────────────────────────────────────────────
+const btnParams = document.getElementById("btn-params");
+if (btnParams) btnParams.addEventListener("click", () => montrerParams(entrerMenu));
+
+// ── Certificat imprimable ────────────────────────────────────────────────────
 function imprimerCertificat() {
-  const nom    = lireNomRenard() || "???";
+  const nom = lireNomRenard() || "???";
   const niveau = { cp: "CP", ce1: "CE1", ce2: "CE2", cm1: "CM1", cm2: "CM2" }[getNiveauCourant()] || "CP";
   const etoiles = lireEtoiles();
   const badgesObtenus = lireBadges();
   const nbJeux = Object.keys(lanceurs).filter(j => lireMaitrise(j).some(Boolean)).length;
-  const date   = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const date = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   const badgesHtml = badgesObtenus.slice(0, 15).map(id => {
     const b = BADGES.find(x => x.id === id);
     return b ? `<span title="${b.nom}">${b.emoji}</span>` : "";
@@ -817,27 +598,8 @@ function imprimerCertificat() {
   window.print();
   el.remove();
 }
-
 const btnCertificat = document.getElementById("btn-certificat");
 if (btnCertificat) btnCertificat.addEventListener("click", imprimerCertificat);
-
-// ── Sons ──────────────────────────────────────────────────────────────────────
-const btnSons = document.getElementById("btn-sons");
-if (btnSons) {
-  btnSons.textContent = sonsActifs() ? "🔊" : "🔇";
-  btnSons.addEventListener("click", () => {
-    const on = toggleSons();
-    btnSons.textContent = on ? "🔊" : "🔇";
-  });
-}
-
-// ── Paramètres parents ────────────────────────────────────────────────────────
-const btnParams = document.getElementById("btn-params");
-if (btnParams) {
-  btnParams.addEventListener("click", () => {
-    montrerParams(() => { montrerMenu(); afficherMissions(); });
-  });
-}
 
 // ── Raccourcis clavier ────────────────────────────────────────────────────────
 document.addEventListener("keydown", (e) => {
@@ -863,10 +625,35 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+// ── Service worker cleanup (legacy) ───────────────────────────────────────────
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations().then((regs) => {
-    regs.forEach((r) => r.unregister());
-  }).catch(() => {});
+  navigator.serviceWorker.getRegistrations()
+    .then(regs => regs.forEach(r => r.unregister()))
+    .catch(() => {});
 }
 
-setTimeout(garantirUnEcranVisible, 250);
+// ── Analytics : début / fin de session ───────────────────────────────────────
+function screenCourant() {
+  const elActif = document.querySelector(".ecran.actif");
+  return elActif ? (elActif.id || "unknown") : "unknown";
+}
+function trackSessionEnd() {
+  if (sessionClosed) return;
+  sessionClosed = true;
+  track("session_end", {
+    duration_s: Math.round((Date.now() - sessionStartTs) / 1000),
+    last_screen: screenCourant(),
+    game_name: getJeuCourant() || "",
+  });
+}
+
+track("session_start", {
+  niveau: getNiveauCourant(),
+  difficulte: getDifficulte(),
+  profil_count: profilsListe.length,
+});
+flushAnalyticsQueue();
+window.addEventListener("beforeunload", trackSessionEnd);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") trackSessionEnd();
+});

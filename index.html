@@ -572,7 +572,12 @@
       permettent d'<strong>apprendre en s'amusant</strong>, à son propre rythme, sur tablette ou ordinateur.
     </p>
   </footer>
-  <script defer src="app-boot.js"></script>
+  <script>
+    (function () {
+      var b = document.getElementById("banner-rgpd");
+      if (b && !localStorage.getItem("rgpd-consent")) b.hidden = false;
+    })();
+  </script>
   <script type="module" src="app-init.js"></script>
 </body>
 </html>
