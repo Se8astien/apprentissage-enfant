@@ -407,13 +407,22 @@ export function lancerAddition() {
 
 // ── lancerSoustraction ────────────────────────────────────────────────────────
 export function lancerSoustraction() {
-  elTitre.textContent = "Les pommes";
   const diff = getDifficulte();
   let total;
   let enleve;
   let reste;
 
+  const THEMES = [
+    { emoji: '🍎', mots: 'pommes' },
+    { emoji: '🍬', mots: 'bonbons' },
+    { emoji: '⭐', mots: 'étoiles' },
+    { emoji: '🎈', mots: 'ballons' },
+    { emoji: '🐣', mots: 'poussins' },
+  ];
+  const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+
   if (estCM2()) {
+    elTitre.textContent = "Grands calculs";
     const maxCM2s = [9999, 49999, 99999][diff];
     total = 1000 + Math.floor(Math.random() * maxCM2s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
@@ -421,7 +430,7 @@ export function lancerSoustraction() {
     elQuestion.innerHTML =
       "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
       '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
-      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Soustraction posée</p>";
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Essaie la soustraction posée ✏️</p>";
     setBonneReponse(reste);
     const props = propositionsAvecBonne(reste, Math.max(0, reste - 5000), Math.min(99998, reste + 5000), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
@@ -429,6 +438,7 @@ export function lancerSoustraction() {
   }
 
   if (estCM1()) {
+    elTitre.textContent = "Calcul mental";
     const maxCM1s = [999, 4999, 9999][diff];
     total = 100 + Math.floor(Math.random() * maxCM1s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
@@ -444,14 +454,27 @@ export function lancerSoustraction() {
   }
 
   if (estCE2()) {
+    elTitre.textContent = "Je calcule";
     const maxCE2s = [300, 600, 999][diff];
     total = 100 + Math.floor(Math.random() * maxCE2s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
-    elQuestion.innerHTML =
-      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
-      '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
-      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
+    const CONTEXTES_CE2 = [
+      "La bibliothèque a <strong>" + total + "</strong> livres. On en range <strong>" + enleve + "</strong> dans des caisses. Combien en reste-t-il sur les étagères ?",
+      "La boulangerie avait <strong>" + total + "</strong> croissants. Elle en a vendu <strong>" + enleve + "</strong>. Combien en reste-t-il ?",
+      "Un train transporte <strong>" + total + "</strong> voyageurs. À l'arrêt, <strong>" + enleve + "</strong> descendent. Combien restent dans le train ?",
+    ];
+    let html;
+    if (diff === 0) {
+      const ctx = CONTEXTES_CE2[Math.floor(Math.random() * CONTEXTES_CE2.length)];
+      html = "<p>" + ctx + "</p>" +
+             '<p class="equation" style="font-size:2rem;margin-top:0.5rem">' + total + " − " + enleve + " = ?</p>";
+    } else {
+      html = "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
+             '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
+             "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
+    }
+    elQuestion.innerHTML = html;
     setBonneReponse(reste);
     const props = propositionsAvecBonne(reste, Math.max(0, reste - 80), Math.min(998, reste + 80), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
@@ -469,28 +492,32 @@ export function lancerSoustraction() {
   reste = total - enleve;
 
   if (!estCE1() && total <= 10) {
-    const biffees = Array(enleve).fill('<span style="opacity:0.25;text-decoration:line-through">🍎</span>');
-    const restantes = Array(reste).fill("🍎");
-    let html = "<p>On mange <strong>" + enleve + "</strong> pommes 🍎. Combien reste-t-il ?</p>";
+    elTitre.textContent = "Les " + theme.mots;
+    const biffees = Array(enleve).fill('<span style="opacity:0.25;text-decoration:line-through">' + theme.emoji + '</span>');
+    const restantes = Array(reste).fill(theme.emoji);
+    let html = "<p>On enlève <strong>" + enleve + "</strong> " + theme.mots + " " + theme.emoji + ". Combien reste-t-il ?</p>";
     if (diff === 0) {
-      html += cadreDixSoustraction(total, enleve) +
-              '<p class="dix-legende"><span class="dix-leg-a">' + reste + '</span> reste</p>';
+      html += cadreDixSoustraction(total, enleve);
     }
     html += '<p class="ligne-emojis">' + [...restantes, ...biffees].join(" ") + "</p>" +
             '<p class="equation">' + total + " − " + enleve + " = ?</p>";
     elQuestion.innerHTML = html;
   } else if (!estCE1()) {
+    elTitre.textContent = "Les " + theme.mots;
     elQuestion.innerHTML =
-      "<p>Il y a <strong>" + total + "</strong> pommes 🍎</p>" +
-      "<p>On en mange <strong>" + enleve + "</strong>. Combien il en reste ?</p>" +
+      "<p>Il y a <strong>" + total + "</strong> " + theme.mots + " " + theme.emoji + "</p>" +
+      "<p>On en enlève <strong>" + enleve + "</strong>. Combien en reste-t-il ?</p>" +
       '<p class="equation">' + total + " − " + enleve + " = ?</p>";
   } else {
+    elTitre.textContent = "Calcul en tête";
     const dE = Math.floor(enleve / 10);
     const uE = enleve % 10;
     let html =
       "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
       '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.4rem">' + total + " − " + enleve + " = ?</p>";
-    if (diff <= 1 && dE > 0 && uE > 0) {
+    if (diff <= 1 && uE === 0 && dE > 0) {
+      html += '<p class="decomp-hint">💡 C\'est ' + dE + ' dizaine' + (dE > 1 ? 's' : '') + ' à enlever !</p>';
+    } else if (diff <= 1 && dE > 0 && uE > 0) {
       html += '<p class="decomp-hint">💡 Enlève d\'abord ' + (dE * 10) + ' → ' + (total - dE * 10) + ', puis enlève ' + uE + '</p>';
     }
     elQuestion.innerHTML = html;
