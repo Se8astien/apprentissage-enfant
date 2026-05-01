@@ -32,6 +32,76 @@ function afficherChoixTexte(options, bonne) {
   });
 }
 
+const SUIVI_MAITRISE = {
+  addition: { fenetre: [], notifie: false },
+  soustraction: { fenetre: [], notifie: false },
+};
+
+function suivreMaitrise(jeu, correct) {
+  const s = SUIVI_MAITRISE[jeu];
+  if (!s) return;
+  s.fenetre.push(!!correct);
+  if (s.fenetre.length > 10) s.fenetre.shift();
+  if (s.notifie || s.fenetre.length < 10) return;
+  const bonnes = s.fenetre.filter(Boolean).length;
+  const finSolide = s.fenetre.slice(-3).every(Boolean);
+  if (bonnes >= 8 && finSolide) {
+    s.notifie = true;
+    const app = document.querySelector(".app");
+    if (!app) return;
+    const toast = document.createElement("div");
+    toast.className = "toast-progression";
+    toast.innerHTML = "<span>🏅 Défi maîtrise réussi !</span><strong>8/10 et super fin de série</strong>";
+    app.appendChild(toast);
+    setTimeout(() => toast.remove(), 3200);
+  }
+}
+
+function activerIndiceGraduel(indice1, indice2) {
+  const old = document.getElementById("indice-graduel");
+  if (old) old.remove();
+  const box = document.createElement("div");
+  box.id = "indice-graduel";
+  box.style.marginTop = "0.5rem";
+  box.innerHTML = '<button type="button" class="btn-choix" style="font-size:0.95rem;padding:0.5rem 0.8rem;min-height:44px">💡 Indice</button><p style="margin:0.35rem 0 0;font-size:0.85rem;color:#5c5c5c"></p>';
+  const btn = box.querySelector("button");
+  const txt = box.querySelector("p");
+  let niveau = 0;
+  btn.addEventListener("click", () => {
+    niveau++;
+    if (niveau === 1) txt.textContent = indice1;
+    else txt.textContent = indice2;
+  });
+  elQuestion.appendChild(box);
+}
+
+function reponseAvecSuivi(jeu, val, btn, bonne, isText = false) {
+  const correct = isText ? String(val) === String(bonne) : Number(val) === Number(bonne);
+  suivreMaitrise(jeu, correct);
+  if (isText) apresReponseTexte(val, btn, bonne);
+  else apresReponse(val, btn, bonne);
+}
+
+function propositionsAdditionIntelligentes(a, b, bonne, min, max) {
+  const base = [bonne + 1, bonne - 1, bonne + 10, bonne - 10, Math.abs(a - b), a + b - 2];
+  const uniques = [...new Set(base)].filter((n) => Number.isFinite(n) && n >= min && n <= max && n !== bonne);
+  while (uniques.length < 3) {
+    const c = min + Math.floor(Math.random() * (max - min + 1));
+    if (c !== bonne && !uniques.includes(c)) uniques.push(c);
+  }
+  return melanger([bonne, ...uniques.slice(0, 3)]);
+}
+
+function propositionsSoustractionIntelligentes(total, enleve, bonne, min, max) {
+  const base = [bonne + 1, bonne - 1, total + enleve, Math.abs(enleve - total), total - enleve + 10, total - enleve - 10];
+  const uniques = [...new Set(base)].filter((n) => Number.isFinite(n) && n >= min && n <= max && n !== bonne);
+  while (uniques.length < 3) {
+    const c = min + Math.floor(Math.random() * (max - min + 1));
+    if (c !== bonne && !uniques.includes(c)) uniques.push(c);
+  }
+  return melanger([bonne, ...uniques.slice(0, 3)]);
+}
+
 // ── lancerCompte ──────────────────────────────────────────────────────────────
 const COMPTE_SETS = [
   { emojis: ["🐱","🐶","🐰","🐻","🦊","🐸","🐥","🐧","🦋","🐝"], label: "animaux" },
@@ -279,8 +349,11 @@ export function lancerAddition() {
         '<p class="equation" style="font-size:2.2rem;font-weight:700">' + b + " + ? = " + total + "</p>";
       elQuestion.innerHTML = html;
       setBonneReponse(a);
-      const propsM = propositionsAvecBonne(a, Math.max(1, a - 500), Math.min(9999, a + 500), 3);
-      afficherChoix(propsM, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+      const minM = Math.max(1, a - 500);
+      const maxM = Math.min(9999, a + 500);
+      const propsM = propositionsAdditionIntelligentes(b, a, a, minM, maxM);
+      activerIndiceGraduel("Cherche le nombre qui complète l'égalité.", "Fais total − premier nombre.");
+      afficherChoix(propsM, (val, btn) => reponseAvecSuivi("addition", val, btn, getBonneReponse()));
       return;
     }
     a = 1 + Math.floor(Math.random() * (total - 1));
@@ -291,8 +364,11 @@ export function lancerAddition() {
       "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à l'addition posée</p>";
     elQuestion.innerHTML = html;
     setBonneReponse(total);
-    const props = propositionsAvecBonne(total, Math.max(100, total - 500), Math.min(9999, total + 500), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    const minCM1 = Math.max(100, total - 500);
+    const maxCM1 = Math.min(9999, total + 500);
+    const props = propositionsAdditionIntelligentes(a, b, total, minCM1, maxCM1);
+    activerIndiceGraduel("Aligne unités, dizaines, centaines.", "Calcule d'abord unités puis dizaines.");
+    afficherChoix(props, (val, btn) => reponseAvecSuivi("addition", val, btn, getBonneReponse()));
     return;
   }
 
@@ -307,8 +383,11 @@ export function lancerAddition() {
       "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à l'addition posée pour les grands nombres</p>";
     elQuestion.innerHTML = html;
     setBonneReponse(total);
-    const props = propositionsAvecBonne(total, Math.max(100, total - 80), Math.min(999, total + 80), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    const minCE2 = Math.max(100, total - 80);
+    const maxCE2 = Math.min(999, total + 80);
+    const props = propositionsAdditionIntelligentes(a, b, total, minCE2, maxCE2);
+    activerIndiceGraduel("Commence par les unités.", "Pose l'addition en colonne pour éviter les oublis.");
+    afficherChoix(props, (val, btn) => reponseAvecSuivi("addition", val, btn, getBonneReponse()));
     return;
   }
 
@@ -343,7 +422,8 @@ export function lancerAddition() {
     const props = propositionsAvecBonne(total, Math.max(2, total - 6), Math.min(20, total + 6), 3);
     elQuestion.innerHTML = html;
     setBonneReponse(total);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    activerIndiceGraduel("Compte tout doucement les objets.", "Additionne d'abord le plus grand nombre puis ajoute le reste.");
+    afficherChoix(props, (val, btn) => reponseAvecSuivi("addition", val, btn, getBonneReponse()));
     return;
   }
 
@@ -366,7 +446,8 @@ export function lancerAddition() {
     }
     elQuestion.innerHTML = html;
     const propsC = propositionsAvecBonne(complement, Math.max(1, complement - 4), Math.min(9, complement + 4), 3);
-    afficherChoix(propsC, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    activerIndiceGraduel("Pense au nombre juste avant la prochaine dizaine.", "Fais prochaine dizaine − nombre de départ.");
+    afficherChoix(propsC, (val, btn) => reponseAvecSuivi("addition", val, btn, getBonneReponse()));
     return;
   }
 
@@ -401,8 +482,9 @@ export function lancerAddition() {
   setBonneReponse(total);
   const pmin = Math.max(2, total - 15);
   const pmax = Math.min(95, total + 15);
-  const props = propositionsAvecBonne(total, pmin, pmax, 3);
-  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+  const props = propositionsAdditionIntelligentes(a, b, total, pmin, pmax);
+  activerIndiceGraduel("Sépare dizaines et unités.", "Additionne les unités puis les dizaines.");
+  afficherChoix(props, (val, btn) => reponseAvecSuivi("addition", val, btn, getBonneReponse()));
 }
 
 // ── lancerSoustraction ────────────────────────────────────────────────────────
@@ -432,8 +514,11 @@ export function lancerSoustraction() {
       '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
       "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Essaie la soustraction posée ✏️</p>";
     setBonneReponse(reste);
-    const props = propositionsAvecBonne(reste, Math.max(0, reste - 5000), Math.min(99998, reste + 5000), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    const minCM2s = Math.max(0, reste - 5000);
+    const maxCM2s = Math.min(99998, reste + 5000);
+    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCM2s, maxCM2s);
+    activerIndiceGraduel("Soustrais colonne par colonne.", "Pose l'opération et vérifie avec une addition inverse.");
+    afficherChoix(props, (val, btn) => reponseAvecSuivi("soustraction", val, btn, getBonneReponse()));
     return;
   }
 
@@ -448,8 +533,11 @@ export function lancerSoustraction() {
       '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
       "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
     setBonneReponse(reste);
-    const props = propositionsAvecBonne(reste, Math.max(0, reste - 500), Math.min(9998, reste + 500), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    const minCM1s = Math.max(0, reste - 500);
+    const maxCM1s = Math.min(9998, reste + 500);
+    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCM1s, maxCM1s);
+    activerIndiceGraduel("Commence par les unités.", "Si besoin, emprunte une dizaine.");
+    afficherChoix(props, (val, btn) => reponseAvecSuivi("soustraction", val, btn, getBonneReponse()));
     return;
   }
 
@@ -476,8 +564,11 @@ export function lancerSoustraction() {
     }
     elQuestion.innerHTML = html;
     setBonneReponse(reste);
-    const props = propositionsAvecBonne(reste, Math.max(0, reste - 80), Math.min(998, reste + 80), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    const minCE2s = Math.max(0, reste - 80);
+    const maxCE2s = Math.min(998, reste + 80);
+    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCE2s, maxCE2s);
+    activerIndiceGraduel("Regarde combien on enlève en tout.", "Tu peux vérifier avec reste + enlevé = total.");
+    afficherChoix(props, (val, btn) => reponseAvecSuivi("soustraction", val, btn, getBonneReponse()));
     return;
   }
 
@@ -523,10 +614,11 @@ export function lancerSoustraction() {
     elQuestion.innerHTML = html;
   }
   setBonneReponse(reste);
-  const props = estCE1()
-    ? propositionsAvecBonne(reste, Math.max(0, reste - 15), Math.min(89, reste + 15), 3)
-    : propositionsAvecBonne(reste, 0, Math.min(20, total), 3);
-  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+  const minFinal = estCE1() ? Math.max(0, reste - 15) : 0;
+  const maxFinal = estCE1() ? Math.min(89, reste + 15) : Math.min(20, total);
+  const props = propositionsSoustractionIntelligentes(total, enleve, reste, minFinal, maxFinal);
+  activerIndiceGraduel("Enlève d'abord les dizaines si c'est plus simple.", "Vérifie : résultat + nombre enlevé = total.");
+  afficherChoix(props, (val, btn) => reponseAvecSuivi("soustraction", val, btn, getBonneReponse()));
 }
 
 // ── lancerCompare ─────────────────────────────────────────────────────────────
