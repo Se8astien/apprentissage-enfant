@@ -31,6 +31,14 @@ import {
 } from "./app-state.js";
 
 import {
+  doitAfficherLanding,
+  fermerLandingDansDOM,
+  marquerLandingVu,
+  harmoniserLandingSiStockageDejaVu,
+  etapePourStockageCourant,
+} from "./app-route.js";
+
+import {
   mettreAJourRenardHeader,
   montrerNommage,
   mettreAJourStreak,
@@ -227,13 +235,14 @@ syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
 function demarrerApp() {
-  if (!localStorage.getItem("maths-cp-genre")) {
+  const etape = etapePourStockageCourant();
+  if (etape === "genre") {
     const g = elGenre || document.getElementById("ecran-genre");
     if (!g) return;
     revelerSeulEcran(g);
-  } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
+  } else if (etape === "classe") {
     montrerClasse();
-  } else if (!lireNomRenard()) {
+  } else if (etape === "nommage") {
     montrerNommage();
   } else {
     montrerMenu();
@@ -246,6 +255,20 @@ function demarrerApp() {
       setTimeout(() => majGenre(), 3500);
     }
   }
+}
+
+function nombreEcransVisiblesSansHidden() {
+  let n = 0;
+  document.querySelectorAll(".ecran").forEach((el) => {
+    if (el.hidden) return;
+    try {
+      const st = getComputedStyle(el);
+      if (st.display !== "none" && st.visibility !== "hidden") n++;
+    } catch {
+      n++;
+    }
+  });
+  return n;
 }
 
 function ecranOuvertEtVisible() {
@@ -261,18 +284,25 @@ function ecranOuvertEtVisible() {
 }
 
 function garantirUnEcranVisible() {
+  try {
+    if (harmoniserLandingSiStockageDejaVu()) demarrerApp();
+  } catch { /* ignore */ }
+  try {
+    if (nombreEcransVisiblesSansHidden() > 1) demarrerApp();
+  } catch { /* ignore */ }
   if (ecranOuvertEtVisible()) return;
   try {
     demarrerApp();
   } catch { /* ignore */ }
   if (ecranOuvertEtVisible()) return;
   try {
-    if (!localStorage.getItem("maths-cp-genre")) {
+    const etape = etapePourStockageCourant();
+    if (etape === "genre") {
       const g = document.getElementById("ecran-genre");
       if (g) revelerSeulEcran(g);
-    } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
+    } else if (etape === "classe") {
       montrerClasse();
-    } else if (!lireNomRenard()) {
+    } else if (etape === "nommage") {
       montrerNommage();
     } else {
       montrerMenu();
@@ -305,12 +335,11 @@ function trackSessionEnd() {
 
 function lancerDepuisSelecteur() {
   const ecranLanding = document.getElementById("ecran-landing");
-  if (ecranLanding && !localStorage.getItem("landing-seen")) {
+  if (ecranLanding && doitAfficherLanding()) {
     revelerSeulEcran(ecranLanding);
     const go = () => {
-      localStorage.setItem("landing-seen", "1");
-      ecranLanding.hidden = true;
-      ecranLanding.classList.remove("actif");
+      marquerLandingVu();
+      fermerLandingDansDOM();
       demarrerApp();
     };
     const cta1 = document.getElementById("btn-landing-cta");
@@ -386,12 +415,6 @@ track("session_start", {
   profil_count: profilsListe.length,
 });
 flushAnalyticsQueue();
-window.addEventListener("apprentissage:menu", () => {
-  try {
-    montrerMenu();
-    afficherMissions();
-  } catch { /* ignore */ }
-});
 window.addEventListener("beforeunload", trackSessionEnd);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") trackSessionEnd();
@@ -413,9 +436,6 @@ if (formNommage) {
     const inp = document.getElementById("input-nom-renard");
     const nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
     sauverNomRenard(nom);
-    const elNommage = document.getElementById("ecran-nommage");
-    elNommage.classList.remove("actif");
-    elNommage.hidden = true;
     mettreAJourRenardHeader();
     syncNiveauButtons();
     montrerMenu();

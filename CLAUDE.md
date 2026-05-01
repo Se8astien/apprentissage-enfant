@@ -23,9 +23,10 @@ Application web éducative pour enfants du CP au CM2 (6–11 ans). Jeux de maths
 index.html           ~200 lignes  — HTML statique, écrans cachés/visibles via JS
 style.css           ~1400 lignes  — styles, catégories jeux, animations
 app-state.js         ~290 lignes  — état partagé, constantes, helpers purs
+app-route.js          ~45 lignes  — ordre d’écrans onboarding + landing (localStorage)
 app-renard.js        ~360 lignes  — compagnon renard (accessoires, dressing, streak)
 app-nav.js           ~215 lignes  — navigation, combo, apresReponse
-app-init.js          ~185 lignes  — point d'entrée, map lanceurs, event listeners
+app-init.js          ~800 lignes  — point d’entrée, map lanceurs, event listeners
 app-gamification.js  ~270 lignes  — badges (27), missions du jour, stats de jeu
 games-maths.js      ~1120 lignes  — 12 jeux mathématiques (CP→CM2)
 games-formes.js      ~750 lignes  — 5 jeux géométrie/formes (CP→CM2)
