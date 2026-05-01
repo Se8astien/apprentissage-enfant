@@ -2003,6 +2003,78 @@ h1 {
 .btn-rgpd-accepter { background:var(--primaire); color:#fff; }
 .btn-rgpd-accepter:hover { background:var(--primaire-fonce); }
 
-/* ── Bouton sons ──────────────────────────────────────────────────────────────── */
+/* ── Boutons header (sons, thème, profils) ────────────────────────────────────── */
 .btn-sons { background:none; border:none; font-size:1.2rem; cursor:pointer; padding:0.3rem 0.4rem; border-radius:0.6rem; transition:background 0.15s; flex-shrink:0; line-height:1; }
 .btn-sons:hover { background:rgba(108,92,231,0.1); }
+
+/* ── Mode nuit ────────────────────────────────────────────────────────────────── */
+[data-theme="nuit"] { color-scheme: dark; }
+[data-theme="nuit"],
+[data-theme="nuit"] body { background: #0f0f1e; color: #dfe6e9; }
+[data-theme="nuit"] { --fond:#0f0f1e; --primaire:#a29bfe; --primaire-fonce:#6c5ce7; --texte:#dfe6e9; --ombre:rgba(0,0,0,0.55); --accent:#00cec9; }
+[data-theme="nuit"] .top,
+[data-theme="nuit"] .carte-jeu,
+[data-theme="nuit"] .mission-item,
+[data-theme="nuit"] .badge-carte,
+[data-theme="nuit"] .landing-feature,
+[data-theme="nuit"] .modal-contenu,
+[data-theme="nuit"] .evolution-carte,
+[data-theme="nuit"] .toast-progression,
+[data-theme="nuit"] .badge-notif-carte,
+[data-theme="nuit"] .maison-banner,
+[data-theme="nuit"] .maison-barre-fond,
+[data-theme="nuit"] .tama-scene { background: #1e1e3f !important; color: #dfe6e9; }
+[data-theme="nuit"] .btn-choix { background: #2a2a55; color: #dfe6e9; border-color: #4a4a88; }
+[data-theme="nuit"] .btn-choix.bonne { background: #00b894; color: white; }
+[data-theme="nuit"] .btn-choix.mauvaise { background: #e17055; color: white; }
+[data-theme="nuit"] .maison-etoiles { background: #2a2a55; border-color: #4a4a88; }
+[data-theme="nuit"] .classe-info-barre { background: #1e1e3f; }
+[data-theme="nuit"] .seo-footer { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); }
+[data-theme="nuit"] .niveau-barre,
+[data-theme="nuit"] .niveau-switch { background: #1e1e3f; }
+[data-theme="nuit"] .profil-carte { background: #1e1e3f; border-color: #3a3a6a; }
+[data-theme="nuit"] .profil-carte.actif { border-color: var(--primaire); }
+[data-theme="nuit"] .profil-nom { color: #dfe6e9; }
+[data-theme="nuit"] .feedback.ok,
+[data-theme="nuit"] .feedback.non { color: inherit; }
+
+/* ── Sélecteur de profils ─────────────────────────────────────────────────────── */
+#ecran-profils { display:flex; flex-direction:column; align-items:center; padding:2rem 1rem 3rem; gap:1.5rem; min-height:100dvh; }
+.profils-hero { text-align:center; }
+.profils-fox { font-size:3.5rem; margin-bottom:0.5rem; animation:bounce 2s ease-in-out infinite; }
+.profils-titre { font-size:1.8rem; font-weight:800; color:var(--primaire); margin:0; }
+.profils-grille { display:grid; grid-template-columns:repeat(2,1fr); gap:0.9rem; width:100%; max-width:380px; }
+.profil-carte { background:white; border:3px solid #e0e0e0; border-radius:1.4rem; padding:1.1rem 0.7rem 0.9rem; display:flex; flex-direction:column; align-items:center; gap:0.35rem; cursor:pointer; font-family:inherit; transition:border-color 0.15s, transform 0.12s, box-shadow 0.15s; }
+.profil-carte:hover { transform:translateY(-3px); box-shadow:0 6px 20px var(--ombre); }
+.profil-carte.actif { border-color:var(--primaire); box-shadow:0 0 0 3px rgba(108,92,231,0.22); }
+.profil-fox { line-height:0; }
+.profil-nom { font-size:1rem; font-weight:700; color:var(--texte); text-align:center; }
+.profil-niveau { font-size:0.78rem; font-weight:600; color:var(--accent); }
+.profil-etoiles { font-size:0.78rem; color:#888; }
+.btn-ajouter-profil { background:none; border:2px dashed var(--primaire); color:var(--primaire); border-radius:1.2rem; padding:0.75rem 2rem; font-size:0.95rem; font-weight:700; font-family:inherit; cursor:pointer; width:100%; max-width:380px; transition:background 0.15s; }
+.btn-ajouter-profil:hover { background:rgba(108,92,231,0.06); }
+
+/* ── Certificat imprimable ────────────────────────────────────────────────────── */
+#zone-certificat { display:none; }
+@media print {
+  body > * { display:none !important; }
+  #zone-certificat { display:block !important; }
+}
+.certificat { font-family:"Fredoka","Segoe UI",sans-serif; max-width:600px; margin:2rem auto; padding:2.5rem; border:4px solid #6c5ce7; border-radius:1.5rem; text-align:center; }
+.cert-header { margin-bottom:1.5rem; }
+.cert-fox { font-size:3rem; display:block; }
+.cert-titre { font-size:1.8rem; font-weight:800; color:#6c5ce7; margin:0.3rem 0 0.1rem; }
+.cert-sous-titre { font-size:0.9rem; color:#888; margin:0; }
+.cert-corps { margin-bottom:1.5rem; }
+.cert-decerne { font-size:0.9rem; color:#888; margin:0 0 0.2rem; }
+.cert-nom { font-size:2.4rem; font-weight:800; color:#2d3436; margin:0 0 0.3rem; }
+.cert-classe { font-size:1rem; color:#6c5ce7; margin:0 0 1.4rem; }
+.cert-stats { display:flex; justify-content:center; gap:2rem; margin-bottom:1.2rem; }
+.cert-stat { display:flex; flex-direction:column; align-items:center; gap:0.2rem; }
+.cert-stat-nb { font-size:2.2rem; font-weight:800; color:#6c5ce7; line-height:1; }
+.cert-stat-label { font-size:0.78rem; color:#888; }
+.cert-badges { font-size:1.8rem; letter-spacing:0.1em; margin-bottom:0.8rem; }
+.cert-footer { border-top:2px solid #eee; padding-top:0.8rem; }
+.cert-footer p { font-size:0.75rem; color:#aaa; margin:0.2rem 0; }
+.btn-certificat { display:block; margin:0.5rem auto 0; background:none; border:2px solid var(--primaire); color:var(--primaire); border-radius:1.5rem; padding:0.55rem 1.5rem; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.15s, color 0.15s; }
+.btn-certificat:hover { background:var(--primaire); color:white; }

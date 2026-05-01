@@ -100,6 +100,7 @@
   <link rel="apple-touch-icon" href="favicon.svg" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#ff8c42" />
+  <script>if(localStorage.getItem("theme-nuit")==="1")document.documentElement.setAttribute("data-theme","nuit");</script>
 
   <!-- Google Analytics 4 — Consent Mode v2 (bloqué par défaut) -->
   <script>
@@ -127,7 +128,9 @@
         <p class="sous-titre" id="sous-titre">Jeux Montessori pour apprendre en s'amusant !</p>
       </div>
       <div class="header-droite">
+        <button type="button" id="btn-theme" class="btn-sons" aria-label="Mode nuit">🌙</button>
         <button type="button" id="btn-sons" class="btn-sons" aria-label="Sons on/off">🔊</button>
+        <button type="button" id="btn-profils-header" class="btn-sons" aria-label="Changer de profil" hidden>👥</button>
         <div class="streak-header" id="streak-header"></div>
         <div class="score-global" title="Étoiles gagnées">
           <span class="score-icone">⭐</span>
@@ -148,6 +151,15 @@
         </form>
         <p class="nommage-hint">Maximum 12 lettres</p>
       </div>
+    </section>
+
+    <section id="ecran-profils" class="ecran" hidden aria-label="Qui joue ?">
+      <div class="profils-hero">
+        <div class="profils-fox">🦊</div>
+        <h2 class="profils-titre">Qui joue ?</h2>
+      </div>
+      <div id="profils-grille" class="profils-grille"></div>
+      <button type="button" id="btn-ajouter-profil" class="btn-ajouter-profil">➕ Ajouter un enfant</button>
     </section>
 
     <section id="ecran-landing" class="ecran" hidden aria-label="Bienvenue">
@@ -198,6 +210,7 @@
         <span>📐 Géométrie</span>
         <span>🇬🇧 Anglais</span>
         <span>🇪🇸 Espagnol</span>
+        <span>🇮🇹 Italien</span>
         <span>⏰ Mesures</span>
       </div>
 
@@ -358,6 +371,8 @@
         <button type="button" class="carte-jeu" data-jeu="traductionAllemand" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction DE</span><span class="desc-jeu">Français → Allemand</span></button>
         <button type="button" class="carte-jeu" data-jeu="espagnol"          data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇪🇸</span><span class="nom-jeu">Español</span><span class="desc-jeu">¿Cómo se dice?</span></button>
         <button type="button" class="carte-jeu" data-jeu="traductionEspagnol" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction ES</span><span class="desc-jeu">Français → Espagnol</span></button>
+        <button type="button" class="carte-jeu" data-jeu="italien"           data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇮🇹</span><span class="nom-jeu">Italiano</span><span class="desc-jeu">Come si dice?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="traductionItalien"  data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction IT</span><span class="desc-jeu">Français → Italien</span></button>
 
         <h3 class="grille-section">🎓 CM1 &amp; CM2</h3>
         <button type="button" class="carte-jeu" data-jeu="aires"             data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">📐</span><span class="nom-jeu">Aires</span><span class="desc-jeu">Surface des figures</span></button>
@@ -437,6 +452,7 @@
           </button>
         </div>
         <button type="button" class="btn-dressing" id="btn-dressing">👗 Dressing</button>
+        <button type="button" class="btn-certificat" id="btn-certificat">🎓 Mon Bulletin</button>
       </div>
     </section>
 

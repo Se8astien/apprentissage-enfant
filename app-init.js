@@ -57,11 +57,12 @@ import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerA
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol } from "./games-langage.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol, lancerItalienMots, lancerTraductionItalien } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 import { lancerSequence, lancerCode } from "./games-algo.js";
 import { track } from "./app-analytics.js";
 import { toggleSons, sonsActifs } from "./app-sons.js";
+import { initProfils, getProfils, basculerProfil, creerProfil, syncProfilActif } from "./app-profils.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -112,6 +113,8 @@ const lanceurs = {
   traductionAllemand:   lancerTraductionAllemand,
   espagnol:             lancerEspagnolMots,
   traductionEspagnol:   lancerTraductionEspagnol,
+  italien:              lancerItalienMots,
+  traductionItalien:    lancerTraductionItalien,
   sequence:             lancerSequence,
   code:                 lancerCode,
 };
@@ -161,12 +164,14 @@ document.querySelectorAll(".btn-diff").forEach(btn => {
 });
 
 // ── Initialisation ────────────────────────────────────────────────────────────
+const { liste: profilsListe, actifId: profilActifId } = initProfils();
 elTotal.textContent = lireEtoiles();
 majGenre();
 mettreAJourJauges();
 mettreAJourRenardHeader();
 const streakInit = mettreAJourStreak();
 afficherStreakHeader(streakInit.count);
+syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
 function demarrerApp() {
@@ -190,20 +195,81 @@ function demarrerApp() {
   }
 }
 
-const ecranLanding = document.getElementById("ecran-landing");
-if (ecranLanding && !localStorage.getItem("landing-seen")) {
-  ecranLanding.hidden = false;
-  ecranLanding.classList.add("actif");
-  const lancerDepuisLanding = () => {
-    localStorage.setItem("landing-seen", "1");
-    ecranLanding.hidden = true;
-    ecranLanding.classList.remove("actif");
+function lancerDepuisSelecteur() {
+  const ecranLanding = document.getElementById("ecran-landing");
+  if (ecranLanding && !localStorage.getItem("landing-seen")) {
+    ecranLanding.hidden = false;
+    ecranLanding.classList.add("actif");
+    const go = () => {
+      localStorage.setItem("landing-seen", "1");
+      ecranLanding.hidden = true;
+      ecranLanding.classList.remove("actif");
+      demarrerApp();
+    };
+    document.getElementById("btn-landing-cta").addEventListener("click", go);
+    document.getElementById("btn-landing-cta-2").addEventListener("click", go);
+  } else {
     demarrerApp();
-  };
-  document.getElementById("btn-landing-cta").addEventListener("click", lancerDepuisLanding);
-  document.getElementById("btn-landing-cta-2").addEventListener("click", lancerDepuisLanding);
+  }
+}
+
+function afficherSelecteurProfils(liste, actifId) {
+  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+  const ecran   = document.getElementById("ecran-profils");
+  const grille  = document.getElementById("profils-grille");
+  const btnAjout = document.getElementById("btn-ajouter-profil");
+  if (!ecran) return;
+  ecran.hidden = false;
+  ecran.classList.add("actif");
+
+  const niveauLabel = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2", cm1: "🌟 CM1", cm2: "🏆 CM2" };
+  grille.innerHTML = liste.map(p => {
+    const stade = getStade(p.etoiles || 0);
+    return `<button type="button" class="profil-carte${p.id === actifId ? " actif" : ""}" data-id="${p.id}">
+      <div class="profil-fox">${svgRenard(stade, 68, {})}</div>
+      <span class="profil-nom">${p.nom || "Renard"}</span>
+      <span class="profil-niveau">${niveauLabel[p.niveau || "cp"] || "🌱 CP"}</span>
+      <span class="profil-etoiles">⭐ ${p.etoiles || 0}</span>
+    </button>`;
+  }).join("");
+
+  if (btnAjout) btnAjout.hidden = liste.length >= 4;
+
+  grille.querySelectorAll(".profil-carte").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      if (id === actifId) {
+        sessionStorage.setItem("skip-selector", "1");
+        ecran.hidden = true;
+        ecran.classList.remove("actif");
+        lancerDepuisSelecteur();
+      } else {
+        basculerProfil(id);
+      }
+    });
+  });
+
+  if (btnAjout) {
+    btnAjout.addEventListener("click", () => {
+      const id = creerProfil();
+      if (id) basculerProfil(id);
+    });
+  }
+}
+
+if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
+  afficherSelecteurProfils(profilsListe, profilActifId);
 } else {
-  demarrerApp();
+  sessionStorage.removeItem("skip-selector");
+  lancerDepuisSelecteur();
+}
+
+const btnProfilsHeader = document.getElementById("btn-profils-header");
+if (btnProfilsHeader) {
+  if (profilsListe.length >= 2) btnProfilsHeader.hidden = false;
+  btnProfilsHeader.addEventListener("click", () => {
+    afficherSelecteurProfils(getProfils(), profilActifId);
+  });
 }
 
 // ── Formulaire de nommage ─────────────────────────────────────────────────────
@@ -451,6 +517,61 @@ if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
     banner.hidden = true;
   });
 })();
+
+// ── Mode nuit ─────────────────────────────────────────────────────────────────
+const btnTheme = document.getElementById("btn-theme");
+if (btnTheme) {
+  btnTheme.textContent = localStorage.getItem("theme-nuit") === "1" ? "☀️" : "🌙";
+  btnTheme.addEventListener("click", () => {
+    const nuit = localStorage.getItem("theme-nuit") !== "1";
+    localStorage.setItem("theme-nuit", nuit ? "1" : "0");
+    document.documentElement.setAttribute("data-theme", nuit ? "nuit" : "");
+    btnTheme.textContent = nuit ? "☀️" : "🌙";
+  });
+}
+
+// ── Certificat ────────────────────────────────────────────────────────────────
+function imprimerCertificat() {
+  const nom    = lireNomRenard() || "???";
+  const niveau = { cp: "CP", ce1: "CE1", ce2: "CE2", cm1: "CM1", cm2: "CM2" }[getNiveauCourant()] || "CP";
+  const etoiles = lireEtoiles();
+  const badgesObtenus = lireBadges();
+  const nbJeux = Object.keys(lanceurs).filter(j => lireMaitrise(j).some(Boolean)).length;
+  const date   = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const badgesHtml = badgesObtenus.slice(0, 15).map(id => {
+    const b = BADGES.find(x => x.id === id);
+    return b ? `<span title="${b.nom}">${b.emoji}</span>` : "";
+  }).join("");
+
+  const el = document.createElement("div");
+  el.id = "zone-certificat";
+  el.innerHTML = `
+    <div class="certificat">
+      <div class="cert-header">
+        <span class="cert-fox">🦊</span>
+        <h1 class="cert-titre">Apprentissage Magique</h1>
+        <p class="cert-sous-titre">Certificat de progression</p>
+      </div>
+      <div class="cert-corps">
+        <p class="cert-decerne">Décerné à</p>
+        <h2 class="cert-nom">${nom}</h2>
+        <p class="cert-classe">Classe de <strong>${niveau}</strong></p>
+        <div class="cert-stats">
+          <div class="cert-stat"><span class="cert-stat-nb">${etoiles}</span><span class="cert-stat-label">⭐ étoiles</span></div>
+          <div class="cert-stat"><span class="cert-stat-nb">${badgesObtenus.length}</span><span class="cert-stat-label">🏅 badges</span></div>
+          <div class="cert-stat"><span class="cert-stat-nb">${nbJeux}</span><span class="cert-stat-label">🎮 jeux maîtrisés</span></div>
+        </div>
+        ${badgesHtml ? `<div class="cert-badges">${badgesHtml}</div>` : ""}
+      </div>
+      <div class="cert-footer"><p>Le ${date}</p><p>apprentissage-magique.fr</p></div>
+    </div>`;
+  document.body.appendChild(el);
+  window.print();
+  el.remove();
+}
+
+const btnCertificat = document.getElementById("btn-certificat");
+if (btnCertificat) btnCertificat.addEventListener("click", imprimerCertificat);
 
 // ── Sons ──────────────────────────────────────────────────────────────────────
 const btnSons = document.getElementById("btn-sons");
