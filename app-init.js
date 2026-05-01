@@ -57,10 +57,11 @@ import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerA
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand } from "./games-langage.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 import { lancerSequence, lancerCode } from "./games-algo.js";
 import { track } from "./app-analytics.js";
+import { toggleSons, sonsActifs } from "./app-sons.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -109,6 +110,8 @@ const lanceurs = {
   calendrier:           lancerCalendrier,
   allemand:             lancerAllemandMots,
   traductionAllemand:   lancerTraductionAllemand,
+  espagnol:             lancerEspagnolMots,
+  traductionEspagnol:   lancerTraductionEspagnol,
   sequence:             lancerSequence,
   code:                 lancerCode,
 };
@@ -448,3 +451,18 @@ if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
     banner.hidden = true;
   });
 })();
+
+// ── Sons ──────────────────────────────────────────────────────────────────────
+const btnSons = document.getElementById("btn-sons");
+if (btnSons) {
+  btnSons.textContent = sonsActifs() ? "🔊" : "🔇";
+  btnSons.addEventListener("click", () => {
+    const on = toggleSons();
+    btnSons.textContent = on ? "🔊" : "🔇";
+  });
+}
+
+// ── Service Worker (PWA) ──────────────────────────────────────────────────────
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}

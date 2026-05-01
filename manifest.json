@@ -1,0 +1,19 @@
+{
+  "name": "Apprentissage Magique",
+  "short_name": "Appr. Magique",
+  "description": "Jeux Montessori gratuits pour enfants du CP au CM2 — maths, lecture, langues",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff8f0",
+  "theme_color": "#ff8c42",
+  "lang": "fr",
+  "categories": ["education", "kids"],
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

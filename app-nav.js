@@ -31,6 +31,7 @@ import {
 } from "./app-state.js";
 
 import { track } from "./app-analytics.js";
+import { sonBonne, sonMauvaise, sonCombo } from "./app-sons.js";
 
 import {
   ajouterEtoiles,
@@ -189,6 +190,7 @@ function declencherCombo(nb, onFermer) {
     </div>`;
   document.body.appendChild(overlay);
   confetti();
+  sonCombo();
   if (nb >= 5) {
     progresserMission("combo5");
     afficherMissions();
@@ -237,6 +239,7 @@ export function apresReponse(choix, bouton, correct) {
     ajouterEtoiles(1);
     sauverFaim(lireFaim() + 5);
     confetti();
+    sonBonne();
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
     progresserMission("bonnes");
@@ -256,6 +259,7 @@ export function apresReponse(choix, bouton, correct) {
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
     track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    sonMauvaise();
     comboActuel = 0;
     const ko = messagesKo();
     elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
@@ -285,6 +289,7 @@ export function apresReponseTexte(choix, bouton, correct) {
     ajouterEtoiles(1);
     sauverFaim(lireFaim() + 5);
     confetti();
+    sonBonne();
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
     progresserMission("bonnes");
@@ -304,6 +309,7 @@ export function apresReponseTexte(choix, bouton, correct) {
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
     track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    sonMauvaise();
     comboActuel = 0;
     const ko = messagesKo();
     elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];

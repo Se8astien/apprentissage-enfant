@@ -2002,3 +2002,7 @@ h1 {
 .btn-rgpd-refuser:hover { background:rgba(255,255,255,0.22); }
 .btn-rgpd-accepter { background:var(--primaire); color:#fff; }
 .btn-rgpd-accepter:hover { background:var(--primaire-fonce); }
+
+/* ── Bouton sons ──────────────────────────────────────────────────────────────── */
+.btn-sons { background:none; border:none; font-size:1.2rem; cursor:pointer; padding:0.3rem 0.4rem; border-radius:0.6rem; transition:background 0.15s; flex-shrink:0; line-height:1; }
+.btn-sons:hover { background:rgba(108,92,231,0.1); }
