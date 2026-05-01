@@ -373,8 +373,8 @@ export function lancerAddition() {
   }
 
   if (estCE2()) {
-    const maxCE2 = [300, 600, 999][diff];
-    total = 100 + Math.floor(Math.random() * maxCE2);
+    const maxCE21 = [300, 600, 999][diff];
+    total = 100 + Math.floor(Math.random() * maxCE21);
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
     html =
