@@ -12,6 +12,8 @@ const EVENT_SCHEMA = {
   question_wrong: ["game_name", "niveau", "timeout"],
   combo_reached: ["game_name", "niveau", "combo"],
   difficulty_up: ["game_name", "niveau", "from", "to"],
+  mini_rattrapage_start: ["game_name", "niveau", "from", "to", "questions"],
+  mini_rattrapage_end: ["game_name", "niveau", "restored_to"],
 };
 
 function consentGranted() {

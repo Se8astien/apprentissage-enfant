@@ -65,6 +65,8 @@ export { confetti } from "./app-state.js";
 let comboActuel = 0;
 let erreursSerie = 0;
 let fatigueActivee = false;
+let rattrapageRestant = 0;
+let rattrapageDiffOriginale = null;
 
 // ── Mode chrono ───────────────────────────────────────────────────────────────
 let _chronoTimer = null;
@@ -123,6 +125,8 @@ export function entrerRevision(jeu, questions) {
   _modeRevision = { jeu, questions: qs, index: 0 };
   setJeuCourant(jeu);
   comboActuel = 0;
+  rattrapageRestant = 0;
+  rattrapageDiffOriginale = null;
   elMenu.hidden = true; elMenu.classList.remove("actif");
   elJeu.hidden = false; elJeu.classList.add("actif");
   setBadgeVisible(true);
@@ -291,6 +295,42 @@ function tenterModeFatigue() {
   setTimeout(() => toast.remove(), 2800);
 }
 
+function activerMiniRattrapage() {
+  const jeu = getJeuCourant();
+  if (!jeu || rattrapageRestant > 0) return;
+  rattrapageRestant = 2;
+  const diff = getDifficulteJeu(jeu);
+  let to = diff;
+  if (!fatigueActivee && diff > 0) {
+    rattrapageDiffOriginale = diff;
+    to = diff - 1;
+    setDifficulteJeu(jeu, to);
+  } else {
+    rattrapageDiffOriginale = null;
+  }
+  track("mini_rattrapage_start", {
+    game_name: jeu,
+    niveau: getNiveauCourant(),
+    from: diff,
+    to,
+    questions: 2,
+  });
+}
+
+function finaliserMiniRattrapage() {
+  const jeu = getJeuCourant();
+  if (!jeu || rattrapageRestant > 0) return;
+  if (rattrapageDiffOriginale !== null) {
+    setDifficulteJeu(jeu, rattrapageDiffOriginale);
+  }
+  track("mini_rattrapage_end", {
+    game_name: jeu,
+    niveau: getNiveauCourant(),
+    restored_to: rattrapageDiffOriginale !== null ? rattrapageDiffOriginale : getDifficulteJeu(jeu),
+  });
+  rattrapageDiffOriginale = null;
+}
+
 // ── Reaction renard ───────────────────────────────────────────────────────────
 function declencherReactionRenard(correct) {
   const el = document.getElementById("renard-reaction");
@@ -414,8 +454,16 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     const message = erreursSerie >= 2 ? `${base} ${rappelErreur(getJeuCourant())}` : base;
     elFeedback.textContent = `✗ ${message}`;
     elFeedback.className = "feedback non";
+    if (erreursSerie === 2) {
+      activerMiniRattrapage();
+      elFeedback.textContent += " Mini entraînement : 2 questions faciles 💡";
+    }
     declencherReactionRenard(false);
     tenterModeFatigue();
+  }
+  if (rattrapageRestant > 0) {
+    rattrapageRestant--;
+    finaliserMiniRattrapage();
   }
   elSuivant.hidden = false;
 }
@@ -490,6 +538,8 @@ function filtrerJeuxParNiveau() {
 export function montrerMenu() {
   stopChrono();
   _modeRevision = null;
+  rattrapageRestant = 0;
+  rattrapageDiffOriginale = null;
   setJeuCourant(null);
   setBadgeVisible(false);
   elGenre.hidden = true;
@@ -540,6 +590,8 @@ export function montrerJeu(nom, lanceurs) {
   comboActuel = 0;
   erreursSerie = 0;
   fatigueActivee = false;
+  rattrapageRestant = 0;
+  rattrapageDiffOriginale = null;
   elMenu.hidden = true;
   elMenu.classList.remove("actif");
   elJeu.hidden = false;

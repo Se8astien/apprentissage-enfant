@@ -77,6 +77,7 @@ function creerSettingsHtml() {
   const stats  = lireStats();
   const resume = lireResumeParent(stats);
   const reco = lireRecommandations(stats);
+  const recoDetail = lireRecommandationsDetaillees(stats);
   const lignes = Object.entries(stats)
     .filter(([, s]) => s.total > 0)
     .map(([jeu, s]) => `<li><strong>${jeu}</strong> : ${Math.round(s.bonnes / s.total * 100)}% (${s.bonnes}/${s.total})</li>`)
@@ -90,6 +91,12 @@ function creerSettingsHtml() {
       <li><strong>Réussite moyenne</strong> : ${resume.reussite}%</li>
       <li><strong>Top jeux</strong> : ${resume.topJeux}</li>
       <li><strong>À renforcer</strong> : ${reco.join(", ")}</li>
+    </ul>
+  </details>
+  <details class="params-section" open>
+    <summary>🎯 Conseils concrets</summary>
+    <ul class="params-stats">
+      ${recoDetail.map((txt) => `<li>${txt}</li>`).join("")}
     </ul>
   </details>
   <details class="params-section">
@@ -142,6 +149,20 @@ function lireRecommandations(stats) {
     .slice(0, 3)
     .map((x) => x.jeu);
   return entries.length ? entries : ["Continuer les jeux variés"];
+}
+
+function lireRecommandationsDetaillees(stats) {
+  const entries = Object.entries(stats)
+    .filter(([, s]) => s.total >= 8)
+    .map(([jeu, s]) => ({ jeu, taux: Math.round((s.bonnes / s.total) * 100), total: s.total }))
+    .sort((a, b) => a.taux - b.taux)
+    .slice(0, 3);
+  if (!entries.length) return ["Continuez à varier les jeux pour identifier les besoins."];
+  return entries.map(({ jeu, taux, total }) => {
+    if (taux < 55) return `<strong>${jeu}</strong> (${taux}% sur ${total} questions) : faire 5 min par jour en mode débutant cette semaine.`;
+    if (taux < 70) return `<strong>${jeu}</strong> (${taux}% sur ${total} questions) : faire 3 mini sessions de révision ciblée.`;
+    return `<strong>${jeu}</strong> (${taux}% sur ${total} questions) : consolider avec 1 session courte tous les 2 jours.`;
+  });
 }
 
 function brancherSettings(overlay, onFermer) {
