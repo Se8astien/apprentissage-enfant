@@ -24,6 +24,9 @@ import {
   getDiffLabel,
   lireMaitrise,
   confetti,
+  escapeHtml,
+  NIVEAUX_LABELS,
+  piegerFocus,
 } from "./app-state.js";
 
 import {
@@ -228,12 +231,12 @@ function afficherSelecteurProfils(liste, actifId) {
   ecran.hidden = false;
   ecran.classList.add("actif");
 
-  const niveauLabel = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2", cm1: "🌟 CM1", cm2: "🏆 CM2" };
+  const niveauLabel = NIVEAUX_LABELS;
   grille.innerHTML = liste.map(p => {
     const stade = getStade(p.etoiles || 0);
     return `<button type="button" class="profil-carte${p.id === actifId ? " actif" : ""}" data-id="${p.id}">
       <div class="profil-fox">${svgRenard(stade, 68, {})}</div>
-      <span class="profil-nom">${p.nom || "Renard"}</span>
+      <span class="profil-nom">${escapeHtml(p.nom || "Renard")}</span>
       <span class="profil-niveau">${niveauLabel[p.niveau || "cp"] || "🌱 CP"}</span>
       <span class="profil-etoiles">⭐ ${p.etoiles || 0}</span>
     </button>`;
@@ -333,6 +336,7 @@ btnRetour.addEventListener("click", () => {
         <button type="button" class="btn-revision-non" id="revision-non">Non merci</button>
       </div>`;
     document.body.appendChild(overlay);
+    piegerFocus(overlay);
     document.getElementById("revision-oui").addEventListener("click", () => {
       overlay.remove();
       entrerRevision(jeu, wrongs);

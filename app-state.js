@@ -18,6 +18,10 @@ export const RENARD_STREAK_KEY  = "renard-streak";
 export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2", CM1: "cm1", CM2: "cm2" };
 export const GENRE  = { FILLE: "fille", GARCON: "garcon" };
 
+export const NIVEAUX_LABELS = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2", cm1: "🌟 CM1", cm2: "🏆 CM2" };
+export const DIFFICULTE_LABELS = ["🌱 Débutant", "⚡ Normal", "🔥 Expert"];
+export const DIFFICULTE_ICONES = ["🌱", "⚡", "🔥"];
+
 export const ANIMAUX = ["🐱", "🐶", "🐰", "🐻", "🦊", "🐸", "🐥", "🐧", "🦋", "🐝"];
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
@@ -124,8 +128,7 @@ export function incrementDifficulte() {
 }
 
 export function getDiffLabel() {
-  const d = getDifficulte();
-  return ["🌱 Débutant", "⚡ Normal", "🔥 Expert"][d];
+  return DIFFICULTE_LABELS[getDifficulte()];
 }
 
 export function setBadgeVisible(visible) {
@@ -197,13 +200,13 @@ export function lireNomRenard() {
 export function sauverNomRenard(nom) {
   localStorage.setItem(RENARD_NOM_KEY, nom);
   if (!localStorage.getItem(RENARD_NAISSANCE_KEY)) {
-    localStorage.setItem(RENARD_NAISSANCE_KEY, new Date().toISOString().slice(0, 10));
+    localStorage.setItem(RENARD_NAISSANCE_KEY, localDate());
   }
 }
 
 export function peutFaireCalin() {
   const d = localStorage.getItem(RENARD_CALIN_DATE_KEY);
-  return d !== new Date().toISOString().slice(0, 10);
+  return d !== localDate();
 }
 
 export function lireAccessoires() {
@@ -234,6 +237,48 @@ export function lireStreak() {
 }
 
 export function sauverStreak(s) { localStorage.setItem(RENARD_STREAK_KEY, JSON.stringify(s)); }
+
+// ── Accessibilité : gestion du focus dans les overlays ────────────────────────
+export function piegerFocus(overlay) {
+  const focusables = () => [...overlay.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")];
+  const trapHandler = (e) => {
+    if (e.key !== "Tab") return;
+    const els = focusables();
+    if (!els.length) return;
+    const first = els[0];
+    const last  = els[els.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+    }
+  };
+  overlay.addEventListener("keydown", trapHandler);
+  const premier = focusables()[0];
+  if (premier) setTimeout(() => premier.focus(), 50);
+  return trapHandler;
+}
+
+// ── Sanitisation HTML ─────────────────────────────────────────────────────────
+export function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// ── Date locale (évite les bugs de timezone UTC vs local) ────────────────────
+export function localDate() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function localDateHier() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 // ── Pure helpers ──────────────────────────────────────────────────────────────
 export function melanger(arr) {
@@ -297,6 +342,7 @@ export function marquerMaitrise(jeu, diff) {
 // ── Confetti ──────────────────────────────────────────────────────────────────
 export function confetti() {
   const root = document.getElementById("confetti");
+  root.innerHTML = "";
   const sym = ["⭐", "✨", "🌟", "💫", "🎉"];
   for (let i = 0; i < 18; i++) {
     const s = document.createElement("span");

@@ -2150,3 +2150,13 @@ details[open] > summary::before { content: "▼ "; }
 [data-theme="nuit"] .params-section { border-color: #3a3a6a; }
 [data-theme="nuit"] .params-section > summary { background: #1a1a35; }
 [data-theme="nuit"] .btn-params-menu { background: #1e1e3f; border-color: var(--primaire); }
+
+/* ── Accessibilité : mouvement réduit ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .confetti span { display: none; }
+}

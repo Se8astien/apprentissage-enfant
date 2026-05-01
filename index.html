@@ -468,15 +468,15 @@
       <div class="dressing-grille" id="dressing-grille"></div>
     </section>
 
-    <section id="ecran-jeu" class="ecran" hidden>
-      <button type="button" class="btn-retour" id="btn-retour">← Menu</button>
+    <section id="ecran-jeu" class="ecran" hidden aria-label="Jeu en cours">
+      <button type="button" class="btn-retour" id="btn-retour" aria-label="Retour au menu">← Menu</button>
       <div class="diff-badge" id="diff-badge" hidden></div>
       <h2 id="jeu-titre" class="jeu-titre"></h2>
-      <div id="chrono" class="chrono" hidden></div>
-      <div id="zone-question" class="zone-question"></div>
-      <div id="zone-choix" class="zone-choix"></div>
+      <div id="chrono" class="chrono" hidden aria-live="polite" aria-label="Temps restant"></div>
+      <div id="zone-question" class="zone-question" aria-live="polite" aria-atomic="true"></div>
+      <div id="zone-choix" class="zone-choix" role="group" aria-label="Choix de réponse"></div>
       <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
-      <button type="button" class="btn-suivant" id="btn-suivant" hidden>Question suivante →</button>
+      <button type="button" class="btn-suivant" id="btn-suivant" hidden aria-label="Question suivante">Question suivante →</button>
     </section>
 
     <div id="modal-classe-suivante" class="modal-overlay" hidden role="dialog" aria-modal="true">

@@ -27,6 +27,10 @@ import {
   majGenre,
   confetti,
   estGrand,
+  localDate,
+  localDateHier,
+  escapeHtml,
+  piegerFocus,
 } from "./app-state.js";
 
 // Re-export peutFaireCalin so other modules don't need to import app-state directly
@@ -191,16 +195,18 @@ function declencherEvolution(stade) {
       <div class="histoire-chapitre">
         <p class="histoire-chapitre-emoji">${getChapitreParStade(stade).emoji}</p>
         <p class="histoire-chapitre-titre">${getChapitreParStade(stade).titre}</p>
-        <p class="histoire-chapitre-texte">${getChapitreParStade(stade).texte.replace(/\[Nom\]/g, lireNomRenard() || "Foxy")}</p>
+        <p class="histoire-chapitre-texte">${getChapitreParStade(stade).texte.replace(/\[Nom\]/g, escapeHtml(lireNomRenard() || "Foxy"))}</p>
       </div>
       <button type="button" class="btn-evolution-fermer">${estGrand() ? "Continuer" : "Super ! 🎉"}</button>
     </div>`;
   document.body.appendChild(overlay);
+  piegerFocus(overlay);
+  const prevFocusEvol = document.activeElement;
   setTimeout(() => confetti(), 400);
   overlay.querySelector(".btn-evolution-fermer").addEventListener("click", () => {
     overlay.style.opacity = "0";
     overlay.style.transition = "opacity 0.3s";
-    setTimeout(() => overlay.remove(), 300);
+    setTimeout(() => { overlay.remove(); if (prevFocusEvol) prevFocusEvol.focus(); }, 300);
   });
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) overlay.querySelector(".btn-evolution-fermer").click();
@@ -218,11 +224,11 @@ export function ajouterEtoiles(n) {
 
 // ── Streak ────────────────────────────────────────────────────────────────────
 export function mettreAJourStreak() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDate();
   const s = lireStreak();
   if (s.lastVisit === today) return s;
 
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const yesterday = localDateHier();
   const newCount = s.lastVisit === yesterday ? s.count + 1 : 1;
   const streakData = { count: newCount, lastVisit: today };
   sauverStreak(streakData);
@@ -370,7 +376,7 @@ export function montrerMaison(montrerMenuFn) {
   btnCalin.onclick = () => {
     if (!peutFaireCalin()) return;
     flotterEmoji("❤️", btnCalin);
-    localStorage.setItem(RENARD_CALIN_DATE_KEY, new Date().toISOString().slice(0, 10));
+    localStorage.setItem(RENARD_CALIN_DATE_KEY, localDate());
     sauverBonheur(lireBonheur() + 20);
     mettreAJourRenardHeader();
     montrerMaison(montrerMenuFn);
