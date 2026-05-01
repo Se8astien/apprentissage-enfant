@@ -263,6 +263,7 @@ h1 {
 .classe-info-barre {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
   background: white;
@@ -286,6 +287,46 @@ h1 {
   font-size: 1rem;
   padding: 0;
   line-height: 1;
+}
+
+.niveau-barre {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.niveau-switch {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  background: white;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px var(--ombre);
+}
+
+.niveau-btn {
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texte);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-height: 2.45rem;
+  padding: 0.45rem 0.75rem;
+}
+
+.niveau-btn.actif {
+  background: var(--primaire);
+  color: white;
+}
+
+.niveau-btn:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ── Diff badge (in-game) ──────────────────────────────────────────────── */

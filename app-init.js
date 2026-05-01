@@ -71,6 +71,24 @@ import { toggleSons, sonsActifs } from "./app-sons.js";
 import { initProfils, getProfils, basculerProfil, creerProfil, syncProfilActif } from "./app-profils.js";
 import { montrerParams } from "./app-params.js";
 
+window.dataLayer = window.dataLayer || [];
+window.gtag = window.gtag || function gtag(){ window.dataLayer.push(arguments); };
+window.gtag("consent", "default", { analytics_storage: "denied", ad_storage: "denied", wait_for_update: 500 });
+
+const GA_ID = "G-5EDQ2KCS8X";
+let analyticsCharge = false;
+
+function chargerAnalytics() {
+  if (analyticsCharge || document.querySelector(`script[src*="${GA_ID}"]`)) return;
+  analyticsCharge = true;
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+  document.head.appendChild(script);
+  window.gtag("js", new Date());
+  window.gtag("config", GA_ID);
+}
+
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
   compte:         lancerCompte,
@@ -131,6 +149,16 @@ const lanceurs = {
 // ── Classe screen ─────────────────────────────────────────────────────────────
 const ecranClasse = document.getElementById("ecran-classe");
 const btnClasse = document.querySelectorAll(".btn-classe");
+const btnNiveaux = document.querySelectorAll(".niveau-btn");
+
+function syncNiveauButtons() {
+  const niveau = getNiveauCourant();
+  btnNiveaux.forEach(btn => {
+    const actif = btn.dataset.niveau === niveau;
+    btn.classList.toggle("actif", actif);
+    btn.setAttribute("aria-pressed", actif ? "true" : "false");
+  });
+}
 
 function montrerClasse() {
   document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
@@ -148,6 +176,7 @@ function passerAuMenu() {
     montrerNommage();
   } else {
     majGenre();
+    syncNiveauButtons();
     montrerMenu();
     afficherMissions();
   }
@@ -169,6 +198,15 @@ document.querySelectorAll(".btn-diff").forEach(btn => {
   btn.addEventListener("click", () => {
     setDifficulte(parseInt(btn.dataset.diff, 10));
     passerAuMenu();
+  });
+});
+
+btnNiveaux.forEach(btn => {
+  btn.addEventListener("click", () => {
+    sauverNiveau(btn.dataset.niveau);
+    syncNiveauButtons();
+    montrerMenu();
+    afficherMissions();
   });
 });
 
@@ -293,6 +331,7 @@ if (formNommage) {
     elNommage.classList.remove("actif");
     elNommage.hidden = true;
     mettreAJourRenardHeader();
+    syncNiveauButtons();
     montrerMenu();
     afficherMissions();
     afficherIntroHistoire(nom);
@@ -407,13 +446,27 @@ if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => {
 
 // ── Modal : passer à la classe suivante ──────────────────────────────────────
 const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: "cm1", cm1: "cm2", cm2: null };
+let focusAvantModalClasse = null;
+
+function fermerModalClasse({ retourFocus = true } = {}) {
+  const modal = document.getElementById("modal-classe-suivante");
+  if (modal) modal.hidden = true;
+  if (retourFocus && focusAvantModalClasse) focusAvantModalClasse.focus();
+  focusAvantModalClasse = null;
+}
+
+window.addEventListener("classe-suivante:ouverte", () => {
+  const modal = document.getElementById("modal-classe-suivante");
+  if (!modal) return;
+  focusAvantModalClasse = document.activeElement;
+  piegerFocus(modal);
+});
 
 const modalOui = document.getElementById("modal-oui");
 if (modalOui) {
   modalOui.addEventListener("click", () => {
     const suivant = CLASSE_SUIVANTE[getNiveauCourant()];
-    const modal = document.getElementById("modal-classe-suivante");
-    if (modal) modal.hidden = true;
+    fermerModalClasse({ retourFocus: false });
     if (suivant) {
       sauverNiveau(suivant);
       confetti();
@@ -431,8 +484,7 @@ if (modalOui) {
 const modalNon = document.getElementById("modal-non");
 if (modalNon) {
   modalNon.addEventListener("click", () => {
-    const modal = document.getElementById("modal-classe-suivante");
-    if (modal) modal.hidden = true;
+    fermerModalClasse();
   });
 }
 
@@ -530,11 +582,12 @@ if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
   if (!banner) return;
 
   function appliquerConsent(valeur) {
-    if (typeof gtag === "function") {
-      gtag("consent", "update", {
+    if (typeof window.gtag === "function") {
+      window.gtag("consent", "update", {
         analytics_storage: valeur === "accepte" ? "granted" : "denied"
       });
     }
+    if (valeur === "accepte") chargerAnalytics();
   }
 
   const consentSauve = localStorage.getItem(CLE);
@@ -634,9 +687,12 @@ if (btnParams) {
 document.addEventListener("keydown", (e) => {
   if (e.target.matches("input, textarea, select")) return;
   if (e.key === " " || e.key === "Enter") {
-    e.preventDefault();
     const btnSuiv = document.getElementById("btn-suivant");
-    if (btnSuiv && !btnSuiv.hidden) { btnSuiv.click(); return; }
+    if (btnSuiv && !btnSuiv.hidden) {
+      e.preventDefault();
+      btnSuiv.click();
+      return;
+    }
   }
   if (["1", "2", "3", "4"].includes(e.key)) {
     const btns = [...document.querySelectorAll("#zone-choix .btn-choix:not(:disabled)")];
@@ -645,7 +701,7 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === "Escape") {
     const modal = document.getElementById("modal-classe-suivante");
-    if (modal && !modal.hidden) { modal.hidden = true; return; }
+    if (modal && !modal.hidden) { fermerModalClasse(); return; }
     const btnRet = document.getElementById("btn-retour");
     if (btnRet && !document.getElementById("ecran-jeu")?.hidden) btnRet.click();
   }

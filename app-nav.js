@@ -419,7 +419,11 @@ function proposerClasseSuivante() {
   if (!suivantNom) { confetti(); return; }
   const modal = document.getElementById("modal-classe-suivante");
   const nomEl = document.getElementById("modal-classe-nom");
-  if (modal && nomEl) { nomEl.textContent = suivantNom; modal.hidden = false; }
+  if (modal && nomEl) {
+    nomEl.textContent = suivantNom;
+    modal.hidden = false;
+    window.dispatchEvent(new CustomEvent("classe-suivante:ouverte"));
+  }
 }
 
 // ── Filtrage jeux par niveau (programme EN) ───────────────────────────────────
@@ -466,6 +470,11 @@ export function montrerMenu() {
   // Update classe/difficulte info bar
   const classeLabel = document.getElementById("classe-info-label");
   if (classeLabel) classeLabel.textContent = NIVEAUX_LABELS[getNiveauCourant()] || "";
+  document.querySelectorAll(".niveau-btn").forEach(btn => {
+    const actif = btn.dataset.niveau === getNiveauCourant();
+    btn.classList.toggle("actif", actif);
+    btn.setAttribute("aria-pressed", actif ? "true" : "false");
+  });
   filtrerJeuxParNiveau();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
     const jeu = btn.dataset.jeu;
