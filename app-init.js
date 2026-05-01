@@ -144,6 +144,15 @@ function entrerMenu() {
   afficherMissions();
 }
 
+window.__amRecharger = () => {
+  try {
+    syncPrefsDepuisStockage();
+    majGenre();
+    syncNiveauButtons();
+    afficherMissions();
+  } catch { /* ignore */ }
+};
+
 // ── Routeur central : 1 point qui décide quel écran montrer ──────────────────
 function routerVersEtape() {
   syncPrefsDepuisStockage();
@@ -249,9 +258,21 @@ syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
 function premierEcran() {
   if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
     afficherSelecteurProfils(profilsListe, profilActifId);
-  } else {
-    sessionStorage.removeItem("skip-selector");
-    montrerLandingPuisRouter();
+    return;
+  }
+  sessionStorage.removeItem("skip-selector");
+  // L'écran initial est déjà révélé par le mini script inline du HTML.
+  // On ne fait que rafraîchir l'affichage menu si on est sur le menu (étoiles, missions).
+  syncPrefsDepuisStockage();
+  if (etapeCourante() === "menu" && document.getElementById("ecran-menu")?.classList.contains("actif")) {
+    entrerMenu();
+    if (elSousTitre) {
+      const nom = lireNomRenard();
+      elSousTitre.textContent = estGrand()
+        ? `Bon retour, ${nom} !`
+        : `${nom} t'attendait ! 🦊`;
+      setTimeout(() => majGenre(), 3500);
+    }
   }
 }
 premierEcran();

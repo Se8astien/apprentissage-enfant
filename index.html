@@ -574,8 +574,141 @@
   </footer>
   <script>
     (function () {
-      var b = document.getElementById("banner-rgpd");
-      if (b && !localStorage.getItem("rgpd-consent")) b.hidden = false;
+      function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+      function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function montrerEcran(id) {
+        var el = document.getElementById(id);
+        if (!el) return false;
+        var nodes = document.querySelectorAll(".ecran");
+        for (var i = 0; i < nodes.length; i++) {
+          nodes[i].hidden = true;
+          nodes[i].classList.remove("actif");
+        }
+        el.removeAttribute("hidden");
+        el.hidden = false;
+        el.classList.add("actif");
+        return true;
+      }
+      function ecranSelonEtat() {
+        var landingVu = get("landing-seen") === "1";
+        var genre = get("maths-cp-genre");
+        var niveau = get("maths-cp-niveau");
+        var nom = (get("renard-nom") || "").trim();
+        if (!landingVu) return "ecran-landing";
+        if (!genre) return "ecran-genre";
+        if (!niveau) return "ecran-classe";
+        if (!nom) return "ecran-nommage";
+        return "ecran-menu";
+      }
+      function passerAuSuivant() { montrerEcran(ecranSelonEtat()); }
+
+      try {
+        var b = document.getElementById("banner-rgpd");
+        if (b && !get("rgpd-consent")) b.hidden = false;
+      } catch (e0) {}
+
+      montrerEcran(ecranSelonEtat());
+
+      function once(el, evt, fn) {
+        if (!el || el.dataset.amBound === "1") return;
+        el.dataset.amBound = "1";
+        el.addEventListener(evt, fn);
+      }
+
+      // Landing CTA
+      ["btn-landing-cta", "btn-landing-cta-2"].forEach(function (id) {
+        once(document.getElementById(id), "click", function () {
+          set("landing-seen", "1");
+          passerAuSuivant();
+        });
+      });
+
+      // Genre
+      var btns = document.querySelectorAll(".btn-genre");
+      for (var i = 0; i < btns.length; i++) {
+        (function (btn) {
+          once(btn, "click", function () {
+            var g = btn.getAttribute("data-genre");
+            if (!g) return;
+            set("maths-cp-genre", g);
+            passerAuSuivant();
+          });
+        })(btns[i]);
+      }
+
+      // Classe
+      var bClasse = document.querySelectorAll(".btn-classe");
+      for (var j = 0; j < bClasse.length; j++) {
+        (function (btn) {
+          once(btn, "click", function () {
+            var nv = btn.getAttribute("data-niveau");
+            if (!nv) return;
+            var prev = get("maths-cp-niveau");
+            set("maths-cp-niveau", nv);
+            if (prev !== nv) set("apprentissage-difficulte", "0");
+            for (var k = 0; k < bClasse.length; k++) {
+              bClasse[k].classList.toggle("selectionne", bClasse[k] === btn);
+            }
+            var d = document.getElementById("diff-choix");
+            if (d) {
+              d.hidden = false;
+              try { d.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e1) {}
+            }
+          });
+        })(bClasse[j]);
+      }
+
+      // Difficulté
+      var bDiff = document.querySelectorAll(".btn-diff");
+      for (var m = 0; m < bDiff.length; m++) {
+        (function (btn) {
+          once(btn, "click", function () {
+            var d = parseInt(btn.getAttribute("data-diff") || "1", 10);
+            if (isNaN(d)) d = 1;
+            d = Math.max(0, Math.min(2, d));
+            set("apprentissage-difficulte", String(d));
+            passerAuSuivant();
+          });
+        })(bDiff[m]);
+      }
+
+      // Niveau (header menu)
+      var bNiv = document.querySelectorAll(".niveau-btn");
+      for (var n = 0; n < bNiv.length; n++) {
+        (function (btn) {
+          once(btn, "click", function () {
+            var nv = btn.getAttribute("data-niveau");
+            if (!nv) return;
+            var prev = get("maths-cp-niveau");
+            set("maths-cp-niveau", nv);
+            if (prev !== nv) set("apprentissage-difficulte", "0");
+            for (var k = 0; k < bNiv.length; k++) {
+              var on = bNiv[k] === btn;
+              bNiv[k].classList.toggle("actif", on);
+              bNiv[k].setAttribute("aria-pressed", on ? "true" : "false");
+            }
+            if (typeof window.__amRecharger === "function") {
+              try { window.__amRecharger(); } catch (eR) {}
+            }
+          });
+        })(bNiv[n]);
+      }
+
+      // Form nommage
+      var f = document.getElementById("nommage-form");
+      if (f && f.dataset.amBound !== "1") {
+        f.dataset.amBound = "1";
+        f.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var inp = document.getElementById("input-nom-renard");
+          var nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
+          set("renard-nom", nom);
+          passerAuSuivant();
+          if (typeof window.__amRecharger === "function") {
+            try { window.__amRecharger(); } catch (eR2) {}
+          }
+        });
+      }
     })();
   </script>
   <script type="module" src="app-init.js"></script>
