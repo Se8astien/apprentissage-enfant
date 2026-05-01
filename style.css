@@ -134,9 +134,9 @@ h1 {
 }
 
 .ecran.actif {
-  display: block;
+  display: block !important;
   position: relative;
-  animation: entree 0.35s ease-out;
+  animation: entree 0.35s ease-out, ecranEntree 0.22s ease;
 }
 
 @keyframes entree {
@@ -2127,9 +2127,7 @@ h1 {
 .btn-certificat { display:block; margin:0.5rem auto 0; background:none; border:2px solid var(--primaire); color:var(--primaire); border-radius:1.5rem; padding:0.55rem 1.5rem; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.15s, color 0.15s; }
 .btn-certificat:hover { background:var(--primaire); color:white; }
 
-/* ── Transitions d'écrans ─────────────────────────────────────────────────────── */
 @keyframes ecranEntree { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-.ecran.actif { animation: ecranEntree 0.22s ease; }
 
 /* ── Mode chrono ──────────────────────────────────────────────────────────────── */
 .chrono {

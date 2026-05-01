@@ -238,6 +238,13 @@ export function lireStreak() {
 
 export function sauverStreak(s) { localStorage.setItem(RENARD_STREAK_KEY, JSON.stringify(s)); }
 
+export function revelerEcran(el) {
+  if (!el) return;
+  el.removeAttribute("hidden");
+  el.hidden = false;
+  el.classList.add("actif");
+}
+
 // ── Accessibilité : gestion du focus dans les overlays ────────────────────────
 export function piegerFocus(overlay) {
   const focusables = () => [...overlay.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")];

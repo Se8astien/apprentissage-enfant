@@ -31,6 +31,7 @@ import {
   localDateHier,
   escapeHtml,
   piegerFocus,
+  revelerEcran,
 } from "./app-state.js";
 
 // Re-export peutFaireCalin so other modules don't need to import app-state directly
@@ -165,8 +166,7 @@ export function montrerNommage() {
   const g = elGenre || document.getElementById("ecran-genre");
   if (!elNommage) return;
   if (g) { g.hidden = true; g.classList.remove("actif"); }
-  elNommage.hidden = false;
-  elNommage.classList.add("actif");
+  revelerEcran(elNommage);
   const foxDiv = document.getElementById("nommage-fox");
   if (foxDiv) foxDiv.innerHTML = svgRenard(0, 110);
   const titre = document.getElementById("nommage-titre");
@@ -308,8 +308,7 @@ export function montrerMaison(montrerMenuFn) {
   if (!elMaison) return;
   elMenu.hidden = true;
   elMenu.classList.remove("actif");
-  elMaison.hidden = false;
-  elMaison.classList.add("actif");
+  revelerEcran(elMaison);
 
   const etoiles = lireEtoiles();
   const stade   = getStade(etoiles);
@@ -403,8 +402,7 @@ export function montrerDressing() {
   if (!elDressing) return;
   elMaison.hidden = true;
   elMaison.classList.remove("actif");
-  elDressing.hidden = false;
-  elDressing.classList.add("actif");
+  revelerEcran(elDressing);
 
   const stade    = getStade(lireEtoiles());
   const nom      = lireNomRenard() || "Foxy";

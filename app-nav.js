@@ -33,6 +33,7 @@ import {
   DIFFICULTE_ICONES,
   DIFFICULTE_LABELS,
   piegerFocus,
+  revelerEcran,
 } from "./app-state.js";
 
 import { track } from "./app-analytics.js";
@@ -136,21 +137,25 @@ let _modeRevision = null;
 export function getWrongQuestions(jeu) { return _wrongByGame[jeu] || []; }
 export function clearWrongQuestions(jeu) { delete _wrongByGame[jeu]; }
 
-export function entrerRevision(jeu, questions) {
+export function entrerRevision(nomJeu, questions) {
   const qs = [...questions];
-  clearWrongQuestions(jeu);
-  _modeRevision = { jeu, questions: qs, index: 0 };
-  setJeuCourant(jeu);
+  clearWrongQuestions(nomJeu);
+  _modeRevision = { jeu: nomJeu, questions: qs, index: 0 };
+  setJeuCourant(nomJeu);
   comboActuel = 0;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
-  elMenu.hidden = true; elMenu.classList.remove("actif");
-  elJeu.hidden = false; elJeu.classList.add("actif");
+  const menu = elMenu || document.getElementById("ecran-menu");
+  const jeuEl = elJeu || document.getElementById("ecran-jeu");
+  if (!menu || !jeuEl) return;
+  menu.hidden = true;
+  menu.classList.remove("actif");
+  revelerEcran(jeuEl);
   setBadgeVisible(true);
   resetFeedback();
   const titre = document.getElementById("jeu-titre");
   if (titre) {
-    const carte = document.querySelector(`.carte-jeu[data-jeu="${jeu}"]`);
+    const carte = document.querySelector(`.carte-jeu[data-jeu="${nomJeu}"]`);
     const cat = carte?.dataset.cat;
     const theme = cat && LIBELLE_THEME_JEU[cat] ? ` · ${LIBELLE_THEME_JEU[cat]}` : "";
     titre.textContent = `🔁 Révision${theme}`;
@@ -576,8 +581,7 @@ export function montrerMenu() {
   if (elClasse) { elClasse.hidden = true; elClasse.classList.remove("actif"); }
   const modal = document.getElementById("modal-classe-suivante");
   if (modal) modal.hidden = true;
-  menu.hidden = false;
-  menu.classList.add("actif");
+  revelerEcran(menu);
   majGenre();
   mettreAJourMaisonBanner();
   // Update classe/difficulte info bar
@@ -621,8 +625,7 @@ export function montrerJeu(nom, lanceurs) {
   rattrapageDiffOriginale = null;
   menu.hidden = true;
   menu.classList.remove("actif");
-  jeu.hidden = false;
-  jeu.classList.add("actif");
+  revelerEcran(jeu);
   setBadgeVisible(true);
   const diffBadge = document.getElementById("diff-badge");
   if (diffBadge) { diffBadge.hidden = false; diffBadge.textContent = getDiffLabel(); }

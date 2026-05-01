@@ -27,6 +27,7 @@ import {
   escapeHtml,
   NIVEAUX_LABELS,
   piegerFocus,
+  revelerEcran,
 } from "./app-state.js";
 
 import {
@@ -168,8 +169,7 @@ function syncNiveauButtons() {
 function montrerClasse() {
   if (!ecranClasse) return;
   document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-  ecranClasse.hidden = false;
-  ecranClasse.classList.add("actif");
+  revelerEcran(ecranClasse);
   const mascot = document.getElementById("classe-mascotte");
   if (mascot) mascot.innerHTML = svgRenard(getStade(lireEtoiles()), 80, {});
   const diffChoix = document.getElementById("diff-choix");
@@ -239,8 +239,7 @@ function demarrerApp() {
     const g = elGenre || document.getElementById("ecran-genre");
     if (!g) return;
     document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-    g.hidden = false;
-    g.classList.add("actif");
+    revelerEcran(g);
   } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
     montrerClasse();
   } else if (!lireNomRenard()) {
@@ -278,7 +277,7 @@ function garantirUnEcranVisible() {
   try {
     if (!localStorage.getItem("maths-cp-genre")) {
       const g = document.getElementById("ecran-genre");
-      if (g) { g.hidden = false; g.classList.add("actif"); }
+      if (g) revelerEcran(g);
     } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
       montrerClasse();
     } else if (!lireNomRenard()) {
@@ -291,8 +290,8 @@ function garantirUnEcranVisible() {
     console.error("[App] secours écran", err2);
     const menu = document.getElementById("ecran-menu");
     const g = document.getElementById("ecran-genre");
-    if (menu) { menu.hidden = false; menu.classList.add("actif"); }
-    else if (g) { g.hidden = false; g.classList.add("actif"); }
+    if (menu) revelerEcran(menu);
+    else if (g) revelerEcran(g);
   }
 }
 
@@ -314,8 +313,7 @@ function trackSessionEnd() {
 function lancerDepuisSelecteur() {
   const ecranLanding = document.getElementById("ecran-landing");
   if (ecranLanding && !localStorage.getItem("landing-seen")) {
-    ecranLanding.hidden = false;
-    ecranLanding.classList.add("actif");
+    revelerEcran(ecranLanding);
     const go = () => {
       localStorage.setItem("landing-seen", "1");
       ecranLanding.hidden = true;
@@ -342,8 +340,7 @@ function afficherSelecteurProfils(liste, actifId) {
     return;
   }
   document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-  ecran.hidden = false;
-  ecran.classList.add("actif");
+  revelerEcran(ecran);
 
   const niveauLabel = NIVEAUX_LABELS;
   grille.innerHTML = liste.map(p => {
@@ -516,8 +513,7 @@ if (btnChangerGenre) {
     if (!menu || !genre) return;
     menu.hidden = true;
     menu.classList.remove("actif");
-    genre.hidden = false;
-    genre.classList.add("actif");
+    revelerEcran(genre);
   });
 }
 
@@ -597,8 +593,7 @@ if (btnBadges) {
     const grille = document.getElementById("badges-grille");
     const compteur = document.getElementById("badges-compteur");
     document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-    ecranBadges.hidden = false;
-    ecranBadges.classList.add("actif");
+    revelerEcran(ecranBadges);
     const obtenus = lireBadges();
     compteur.textContent = `${obtenus.length} / ${BADGES.length} trophées`;
     grille.innerHTML = BADGES.map(b => `
