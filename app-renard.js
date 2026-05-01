@@ -8,8 +8,6 @@ import {
   RENARD_CALIN_DATE_KEY,
   elTotal,
   elSousTitre,
-  elMenu,
-  elGenre,
   lireEtoiles,
   _ajouterEtoilesBase,
   lireFaim,
@@ -31,7 +29,7 @@ import {
   localDateHier,
   escapeHtml,
   piegerFocus,
-  revelerEcran,
+  revelerSeulEcran,
 } from "./app-state.js";
 
 // Re-export peutFaireCalin so other modules don't need to import app-state directly
@@ -163,10 +161,8 @@ export function mettreAJourMaisonBanner() {
 // ── Nommage screen ────────────────────────────────────────────────────────────
 export function montrerNommage() {
   const elNommage = document.getElementById("ecran-nommage");
-  const g = elGenre || document.getElementById("ecran-genre");
   if (!elNommage) return;
-  if (g) { g.hidden = true; g.classList.remove("actif"); }
-  revelerEcran(elNommage);
+  revelerSeulEcran(elNommage);
   const foxDiv = document.getElementById("nommage-fox");
   if (foxDiv) foxDiv.innerHTML = svgRenard(0, 110);
   const titre = document.getElementById("nommage-titre");
@@ -306,9 +302,7 @@ function flotterEmoji(emoji, bouton) {
 export function montrerMaison(montrerMenuFn) {
   const elMaison = document.getElementById("ecran-maison");
   if (!elMaison) return;
-  elMenu.hidden = true;
-  elMenu.classList.remove("actif");
-  revelerEcran(elMaison);
+  revelerSeulEcran(elMaison);
 
   const etoiles = lireEtoiles();
   const stade   = getStade(etoiles);
@@ -384,11 +378,7 @@ export function montrerMaison(montrerMenuFn) {
 
   const btnJouer = document.getElementById("btn-jouer-tama");
   if (btnJouer) {
-    btnJouer.onclick = () => {
-      elMaison.hidden = true;
-      elMaison.classList.remove("actif");
-      montrerMenuFn();
-    };
+    btnJouer.onclick = () => { montrerMenuFn(); };
   }
 
   const conteneur = elMaison.querySelector(".maison-conteneur");
@@ -398,11 +388,8 @@ export function montrerMaison(montrerMenuFn) {
 // ── Dressing screen ───────────────────────────────────────────────────────────
 export function montrerDressing() {
   const elDressing = document.getElementById("ecran-dressing");
-  const elMaison   = document.getElementById("ecran-maison");
   if (!elDressing) return;
-  elMaison.hidden = true;
-  elMaison.classList.remove("actif");
-  revelerEcran(elDressing);
+  revelerSeulEcran(elDressing);
 
   const stade    = getStade(lireEtoiles());
   const nom      = lireNomRenard() || "Foxy";

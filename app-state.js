@@ -245,6 +245,19 @@ export function revelerEcran(el) {
   el.classList.add("actif");
 }
 
+export function toutCacherEcrans() {
+  document.querySelectorAll(".ecran").forEach((e) => {
+    e.hidden = true;
+    e.classList.remove("actif");
+  });
+}
+
+export function revelerSeulEcran(el) {
+  if (!el) return;
+  toutCacherEcrans();
+  revelerEcran(el);
+}
+
 // ── Accessibilité : gestion du focus dans les overlays ────────────────────────
 export function piegerFocus(overlay) {
   const focusables = () => [...overlay.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")];

@@ -511,6 +511,55 @@
       permettent d'<strong>apprendre en s'amusant</strong>, à son propre rythme, sur tablette ou ordinateur.
     </p>
   </footer>
-  <script type="module" src="app-init.js"></script>
+  <script type="module">
+    import("./app-init.js").catch(function () {});
+  </script>
+  <script>
+    (function () {
+      function ecranVu() {
+        try {
+          var actifs = document.querySelectorAll(".ecran.actif");
+          for (var i = 0; i < actifs.length; i++) {
+            var el = actifs[i];
+            if (el.hidden) continue;
+            var st = window.getComputedStyle(el);
+            if (st.display !== "none" && st.visibility !== "hidden") return true;
+          }
+        } catch (e) {}
+        return false;
+      }
+      function montrerId(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var nodes = document.querySelectorAll(".ecran");
+        for (var i = 0; i < nodes.length; i++) {
+          nodes[i].hidden = true;
+          nodes[i].classList.remove("actif");
+        }
+        el.removeAttribute("hidden");
+        el.hidden = false;
+        el.classList.add("actif");
+      }
+      function reparerVue() {
+        if (ecranVu()) return;
+        try {
+          if (!localStorage.getItem("landing-seen")) montrerId("ecran-landing");
+          else if (!localStorage.getItem("maths-cp-genre")) montrerId("ecran-genre");
+          else if (!localStorage.getItem("maths-cp-niveau")) montrerId("ecran-classe");
+          else if (!(localStorage.getItem("renard-nom") || "").trim()) montrerId("ecran-nommage");
+          else montrerId("ecran-menu");
+        } catch (e) {
+          montrerId("ecran-landing");
+        }
+      }
+      function arm() {
+        reparerVue();
+        setTimeout(reparerVue, 800);
+        setTimeout(reparerVue, 2200);
+      }
+      if (document.readyState === "complete") arm();
+      else window.addEventListener("load", arm);
+    })();
+  </script>
 </body>
 </html>

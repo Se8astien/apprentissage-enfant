@@ -27,7 +27,7 @@ import {
   escapeHtml,
   NIVEAUX_LABELS,
   piegerFocus,
-  revelerEcran,
+  revelerSeulEcran,
 } from "./app-state.js";
 
 import {
@@ -163,8 +163,7 @@ function syncNiveauButtons() {
 
 function montrerClasse() {
   if (!ecranClasse) return;
-  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-  revelerEcran(ecranClasse);
+  revelerSeulEcran(ecranClasse);
   const mascot = document.getElementById("classe-mascotte");
   if (mascot) mascot.innerHTML = svgRenard(getStade(lireEtoiles()), 80, {});
   const diffChoix = document.getElementById("diff-choix");
@@ -231,8 +230,7 @@ function demarrerApp() {
   if (!localStorage.getItem("maths-cp-genre")) {
     const g = elGenre || document.getElementById("ecran-genre");
     if (!g) return;
-    document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-    revelerEcran(g);
+    revelerSeulEcran(g);
   } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
     montrerClasse();
   } else if (!lireNomRenard()) {
@@ -250,25 +248,28 @@ function demarrerApp() {
   }
 }
 
-function garantirUnEcranVisible() {
+function ecranOuvertEtVisible() {
   let ok = false;
   document.querySelectorAll(".ecran.actif").forEach((el) => {
-    if (!el.hidden) ok = true;
+    if (el.hidden) return;
+    try {
+      const st = getComputedStyle(el);
+      if (st.display !== "none" && st.visibility !== "hidden") ok = true;
+    } catch { ok = true; }
   });
-  if (ok) return;
+  return ok;
+}
+
+function garantirUnEcranVisible() {
+  if (ecranOuvertEtVisible()) return;
   try {
     demarrerApp();
   } catch { /* ignore */ }
-  ok = false;
-  document.querySelectorAll(".ecran.actif").forEach((el) => {
-    if (!el.hidden) ok = true;
-  });
-  if (ok) return;
-  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+  if (ecranOuvertEtVisible()) return;
   try {
     if (!localStorage.getItem("maths-cp-genre")) {
       const g = document.getElementById("ecran-genre");
-      if (g) revelerEcran(g);
+      if (g) revelerSeulEcran(g);
     } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
       montrerClasse();
     } else if (!lireNomRenard()) {
@@ -280,8 +281,10 @@ function garantirUnEcranVisible() {
   } catch {
     const menu = document.getElementById("ecran-menu");
     const g = document.getElementById("ecran-genre");
-    if (menu) revelerEcran(menu);
-    else if (g) revelerEcran(g);
+    const landing = document.getElementById("ecran-landing");
+    if (menu) revelerSeulEcran(menu);
+    else if (g) revelerSeulEcran(g);
+    else if (landing) revelerSeulEcran(landing);
   }
 }
 
@@ -303,8 +306,7 @@ function trackSessionEnd() {
 function lancerDepuisSelecteur() {
   const ecranLanding = document.getElementById("ecran-landing");
   if (ecranLanding && !localStorage.getItem("landing-seen")) {
-    document.querySelectorAll(".ecran").forEach((e) => { e.hidden = true; e.classList.remove("actif"); });
-    revelerEcran(ecranLanding);
+    revelerSeulEcran(ecranLanding);
     const go = () => {
       localStorage.setItem("landing-seen", "1");
       ecranLanding.hidden = true;
@@ -330,8 +332,7 @@ function afficherSelecteurProfils(liste, actifId) {
     lancerDepuisSelecteur();
     return;
   }
-  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-  revelerEcran(ecran);
+  revelerSeulEcran(ecran);
 
   const niveauLabel = NIVEAUX_LABELS;
   grille.innerHTML = liste.map(p => {
@@ -376,7 +377,8 @@ if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
 }
 
 setTimeout(garantirUnEcranVisible, 0);
-setTimeout(garantirUnEcranVisible, 600);
+setTimeout(garantirUnEcranVisible, 450);
+setTimeout(garantirUnEcranVisible, 1200);
 
 track("session_start", {
   niveau: getNiveauCourant(),
@@ -499,12 +501,9 @@ document.querySelectorAll(".btn-genre").forEach((btn) => {
 const btnChangerGenre = document.getElementById("btn-changer-genre");
 if (btnChangerGenre) {
   btnChangerGenre.addEventListener("click", () => {
-    const menu = elMenu || document.getElementById("ecran-menu");
     const genre = elGenre || document.getElementById("ecran-genre");
-    if (!menu || !genre) return;
-    menu.hidden = true;
-    menu.classList.remove("actif");
-    revelerEcran(genre);
+    if (!genre) return;
+    revelerSeulEcran(genre);
   });
 }
 
@@ -524,13 +523,9 @@ const btnDressing = document.getElementById("btn-dressing");
 if (btnDressing) btnDressing.addEventListener("click", montrerDressing);
 
 const btnRetourDressing = document.getElementById("btn-retour-dressing");
-if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => {
-  const elDressing = document.getElementById("ecran-dressing");
-  const elMaison   = document.getElementById("ecran-maison");
-  elDressing.hidden = true;
-  elDressing.classList.remove("actif");
-  montrerMaison(montrerMenu);
-});
+if (btnRetourDressing)   btnRetourDressing.addEventListener("click", () => {
+    montrerMaison(montrerMenu);
+  });
 
 // ── Modal : passer à la classe suivante ──────────────────────────────────────
 const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: "cm1", cm1: "cm2", cm2: null };
@@ -583,8 +578,8 @@ if (btnBadges) {
     const ecranBadges = document.getElementById("ecran-badges");
     const grille = document.getElementById("badges-grille");
     const compteur = document.getElementById("badges-compteur");
-    document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-    revelerEcran(ecranBadges);
+    if (!ecranBadges) return;
+    revelerSeulEcran(ecranBadges);
     const obtenus = lireBadges();
     compteur.textContent = `${obtenus.length} / ${BADGES.length} trophées`;
     grille.innerHTML = BADGES.map(b => `

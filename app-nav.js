@@ -33,7 +33,7 @@ import {
   DIFFICULTE_ICONES,
   DIFFICULTE_LABELS,
   piegerFocus,
-  revelerEcran,
+  revelerSeulEcran,
 } from "./app-state.js";
 
 import { track } from "./app-analytics.js";
@@ -145,12 +145,8 @@ export function entrerRevision(nomJeu, questions) {
   comboActuel = 0;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
-  const menu = elMenu || document.getElementById("ecran-menu");
   const jeuEl = elJeu || document.getElementById("ecran-jeu");
-  if (!menu || !jeuEl) return;
-  menu.hidden = true;
-  menu.classList.remove("actif");
-  revelerEcran(jeuEl);
+  if (!jeuEl) return;
   setBadgeVisible(true);
   resetFeedback();
   const titre = document.getElementById("jeu-titre");
@@ -160,6 +156,7 @@ export function entrerRevision(nomJeu, questions) {
     const theme = cat && LIBELLE_THEME_JEU[cat] ? ` · ${LIBELLE_THEME_JEU[cat]}` : "";
     titre.textContent = `🔁 Révision${theme}`;
   }
+  revelerSeulEcran(jeuEl);
   _afficherRevision();
 }
 
@@ -563,8 +560,6 @@ function filtrerJeuxParNiveau() {
 
 // ── montrerMenu ───────────────────────────────────────────────────────────────
 export function montrerMenu() {
-  const genre = elGenre || document.getElementById("ecran-genre");
-  const jeu = elJeu || document.getElementById("ecran-jeu");
   const menu = elMenu || document.getElementById("ecran-menu");
   if (!menu) return;
   stopChrono();
@@ -573,15 +568,9 @@ export function montrerMenu() {
   rattrapageDiffOriginale = null;
   setJeuCourant(null);
   setBadgeVisible(false);
-  if (genre) { genre.hidden = true; genre.classList.remove("actif"); }
-  if (jeu) { jeu.hidden = true; jeu.classList.remove("actif"); }
-  const elMaison = document.getElementById("ecran-maison");
-  if (elMaison) { elMaison.hidden = true; elMaison.classList.remove("actif"); }
-  const elClasse = document.getElementById("ecran-classe");
-  if (elClasse) { elClasse.hidden = true; elClasse.classList.remove("actif"); }
   const modal = document.getElementById("modal-classe-suivante");
   if (modal) modal.hidden = true;
-  revelerEcran(menu);
+  revelerSeulEcran(menu);
   majGenre();
   mettreAJourMaisonBanner();
   // Update classe/difficulte info bar
@@ -614,18 +603,15 @@ export function montrerMenu() {
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────
 export function montrerJeu(nom, lanceurs) {
-  const menu = elMenu || document.getElementById("ecran-menu");
   const jeu = elJeu || document.getElementById("ecran-jeu");
-  if (!menu || !jeu) return;
+  if (!jeu) return;
   setJeuCourant(nom);
   comboActuel = 0;
   erreursSerie = 0;
   fatigueActivee = false;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
-  menu.hidden = true;
-  menu.classList.remove("actif");
-  revelerEcran(jeu);
+  revelerSeulEcran(jeu);
   setBadgeVisible(true);
   const diffBadge = document.getElementById("diff-badge");
   if (diffBadge) { diffBadge.hidden = false; diffBadge.textContent = getDiffLabel(); }
