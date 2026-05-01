@@ -484,7 +484,9 @@ if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceu
 // ── Sélection du genre ────────────────────────────────────────────────────────
 document.querySelectorAll(".btn-genre").forEach((btn) => {
   btn.addEventListener("click", () => {
-    sauverGenre(btn.dataset.genre);
+    const genre = btn.dataset.genre || (btn.id === "btn-fille" ? "fille" : btn.id === "btn-garcon" ? "garcon" : null);
+    if (!genre) return;
+    sauverGenre(genre);
     majGenre();
     if (!localStorage.getItem(STORAGE_NIVEAU)) {
       montrerClasse();
