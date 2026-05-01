@@ -110,6 +110,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>.ecran.actif{display:block!important}</style>
 </head>
 <body>
   <div class="app">
@@ -501,22 +502,6 @@
       <button type="button" id="btn-rgpd-accepter" class="btn-rgpd btn-rgpd-accepter">Accepter</button>
     </div>
   </div>
-
-  <div id="alerte-file-protocol" class="alerte-file-protocol" hidden role="alert">
-    <strong>Mode fichier (file://)</strong>
-    <p>Double-cliquer sur index.html ne suffit souvent pas : le navigateur refuse partiellement les modules JavaScript.</p>
-    <p>Dans le dossier du projet, lance dans le Terminal :</p>
-    <pre class="alerte-file-cmd">python3 -m http.server 8080</pre>
-    <p>Puis ouvre <strong>http://localhost:8080</strong> dans Chrome.</p>
-  </div>
-  <script>
-    (function () {
-      if (location.protocol === "file:") {
-        const el = document.getElementById("alerte-file-protocol");
-        if (el) el.hidden = false;
-      }
-    })();
-  </script>
 
   <footer class="seo-footer">
     <p>

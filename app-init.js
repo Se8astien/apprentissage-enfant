@@ -76,11 +76,6 @@ window.dataLayer = window.dataLayer || [];
 window.gtag = window.gtag || function gtag(){ window.dataLayer.push(arguments); };
 window.gtag("consent", "default", { analytics_storage: "denied", ad_storage: "denied", wait_for_update: 500 });
 
-{
-  const w = document.getElementById("alerte-file-protocol");
-  if (w) w.hidden = true;
-}
-
 const GA_ID = "G-5EDQ2KCS8X";
 let analyticsCharge = false;
 
