@@ -33,26 +33,52 @@ function afficherChoixTexte(options, bonne) {
 }
 
 // ── lancerCompte ──────────────────────────────────────────────────────────────
+const COMPTE_SETS = [
+  { emojis: ["🐱","🐶","🐰","🐻","🦊","🐸","🐥","🐧","🦋","🐝"], label: "animaux" },
+  { emojis: ["🍎","🍊","🍋","🍇","🍓","🍑","🍒","🥝","🍌","🍉"], label: "fruits" },
+  { emojis: ["🎈","🎁","🎀","⭐","🎮","🧸","🎯","🎪","🪀","🎨"], label: "objets" },
+  { emojis: ["🍕","🍦","🎂","🍩","🍪","🍫","🧁","🍰","🍬","🍭"], label: "gourmandises" },
+];
+
+function pickSet() {
+  return COMPTE_SETS[Math.floor(Math.random() * COMPTE_SETS.length)];
+}
+
+function pick2Emojis(emojis) {
+  const iA = Math.floor(Math.random() * emojis.length);
+  let iB = Math.floor(Math.random() * emojis.length);
+  if (iB === iA) iB = (iA + 1) % emojis.length;
+  return [emojis[iA], emojis[iB]];
+}
+
+function pick3Emojis(emojis) {
+  const idxs = [];
+  while (idxs.length < 3) {
+    const i = Math.floor(Math.random() * emojis.length);
+    if (!idxs.includes(i)) idxs.push(i);
+  }
+  return idxs.map(i => emojis[i]);
+}
+
 export function lancerCompte() {
   elTitre.textContent = "Compte-moi ça !";
   const diff = getDifficulte();
 
   if (estCE2()) {
+    const set = pickSet();
     const [minPer, maxPer] = [[2, 5], [3, 8], [4, 11]][diff];
-    const idxs = [];
-    while (idxs.length < 3) {
-      const i = Math.floor(Math.random() * ANIMAUX.length);
-      if (!idxs.includes(i)) idxs.push(i);
-    }
-    const [eA, eB, eC] = idxs.map(i => ANIMAUX[i]);
+    const [eA, eB, eC] = pick3Emojis(set.emojis);
     const rand3 = () => minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
     const nA = rand3(), nB = rand3(), nC = rand3();
     const lA = Array(nA).fill(eA).join(" ");
     const lB = Array(nB).fill(eB).join(" ");
     const lC = Array(nC).fill(eC).join(" ");
     const total3 = nA + nB + nC;
-    const typeDiff3 = diff >= 1 && Math.random() < 0.40;
-    if (typeDiff3) {
+
+    // 3 types de questions en rotation selon difficulté
+    const typeQ = diff === 0 ? 0 : Math.floor(Math.random() * 3);
+    if (typeQ === 1) {
+      // Combien de plus ?
       const maxN = Math.max(nA, nB, nC);
       const minN = Math.min(nA, nB, nC);
       const diff3 = maxN - minN;
@@ -66,10 +92,23 @@ export function lancerCompte() {
         `<p class="ligne-emojis petit">${lC}</p>`;
       const props = propositionsAvecBonne(diff3, Math.max(0, diff3 - 5), Math.min(12, diff3 + 5), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else if (typeQ === 2) {
+      // Combien de cet emoji précisément ?
+      const cibleEmoji = [eA, eB, eC][Math.floor(Math.random() * 3)];
+      const cibleN = cibleEmoji === eA ? nA : (cibleEmoji === eB ? nB : nC);
+      setBonneReponse(cibleN);
+      elQuestion.innerHTML =
+        `<p>Combien de <strong>${cibleEmoji}</strong> vois-tu en tout ?</p>` +
+        `<p class="ligne-emojis petit">${lA}</p>` +
+        `<p class="ligne-emojis petit">${lB}</p>` +
+        `<p class="ligne-emojis petit">${lC}</p>`;
+      const props = propositionsAvecBonne(cibleN, Math.max(1, cibleN - 4), Math.min(15, cibleN + 4), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else {
+      // Total
       setBonneReponse(total3);
       elQuestion.innerHTML =
-        `<p>Combien d'animaux <strong>en tout</strong> ?</p>` +
+        `<p>Combien de ${set.label} <strong>en tout</strong> ?</p>` +
         `<p class="ligne-emojis petit">${lA}</p>` +
         `<p class="ligne-emojis petit">${lB}</p>` +
         `<p class="ligne-emojis petit">${lC}</p>`;
@@ -80,18 +119,17 @@ export function lancerCompte() {
   }
 
   if (estCE1()) {
+    const set = pickSet();
     const [minPer, maxPer] = [[2, 5], [3, 8], [4, 12]][diff];
-    const idxA = Math.floor(Math.random() * ANIMAUX.length);
-    let idxB = Math.floor(Math.random() * ANIMAUX.length);
-    if (idxB === idxA) idxB = (idxA + 1) % ANIMAUX.length;
-    const emojiA = ANIMAUX[idxA];
-    const emojiB = ANIMAUX[idxB];
+    const [emojiA, emojiB] = pick2Emojis(set.emojis);
     const nA = minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
     const nB = minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
     const ligneA = Array(nA).fill(emojiA).join(" ");
     const ligneB = Array(nB).fill(emojiB).join(" ");
-    const typeDiff = diff >= 1 && Math.random() < 0.4 && nA !== nB;
-    if (typeDiff) {
+
+    // 3 types de questions : total / de plus / lequel en a le moins ?
+    const typeQ = diff === 0 ? 0 : Math.floor(Math.random() * 3);
+    if (typeQ === 1 && nA !== nB) {
       const difference = Math.abs(nA - nB);
       const plusGrand = nA > nB ? emojiA : emojiB;
       const plusPetit = nA > nB ? emojiB : emojiA;
@@ -102,11 +140,29 @@ export function lancerCompte() {
         `<p class="ligne-emojis petit">${ligneB}</p>`;
       const props = propositionsAvecBonne(difference, Math.max(0, difference - 4), Math.min(12, difference + 4), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else if (typeQ === 2 && nA !== nB) {
+      // Lequel en a le moins ? — réponse = l'emoji avec le moins
+      const moinsDe = nA < nB ? emojiA : emojiB;
+      setBonneReponse(moinsDe);
+      elQuestion.innerHTML =
+        `<p>Lequel en a <strong>le moins</strong> ?</p>` +
+        `<p class="ligne-emojis petit">${ligneA}</p>` +
+        `<p class="ligne-emojis petit">${ligneB}</p>`;
+      elChoix.innerHTML = "";
+      [emojiA, emojiB].forEach(em => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-choix";
+        btn.style.fontSize = "2rem";
+        btn.textContent = em;
+        btn.addEventListener("click", () => apresReponse(em, btn, moinsDe));
+        elChoix.appendChild(btn);
+      });
     } else {
       const total = nA + nB;
       setBonneReponse(total);
       elQuestion.innerHTML =
-        `<p>Combien d'animaux <strong>en tout</strong> ?</p>` +
+        `<p>Combien de ${set.label} <strong>en tout</strong> ?</p>` +
         `<p class="ligne-emojis petit">${ligneA}</p>` +
         `<p class="ligne-emojis petit">${ligneB}</p>`;
       const props = propositionsAvecBonne(total, Math.max(4, total - 5), Math.min(28, total + 5), 3);
@@ -116,18 +172,25 @@ export function lancerCompte() {
   }
 
   // CP : difficulté progressive
+  const set = pickSet();
   const [minN, maxN] = [[1, 5], [3, 10], [6, 15]][diff];
   const n = minN + Math.floor(Math.random() * (maxN - minN + 1));
-  const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
+  const emoji = set.emojis[Math.floor(Math.random() * set.emojis.length)];
 
-  // Débutant : regrouper en rangées de 5 pour faciliter le comptage
   let lignesHtml;
   if (diff === 0) {
+    // Débutant : rangées de 5 avec numérotation cumulée pour aider le dénombrement
     const rows = [];
     let rem = n;
+    let cumul = 0;
     while (rem > 0) {
       const take = Math.min(5, rem);
-      rows.push(`<p class="ligne-emojis">${Array(take).fill(emoji).join(" ")}</p>`);
+      cumul += take;
+      rows.push(
+        `<p class="ligne-emojis" style="display:flex;align-items:center;gap:0.4rem;justify-content:center">` +
+        `${Array(take).fill(emoji).join(" ")}` +
+        `<span style="font-size:0.85rem;color:#888;min-width:1.8rem">→ ${cumul}</span></p>`
+      );
       rem -= take;
     }
     lignesHtml = rows.join("");
@@ -135,7 +198,7 @@ export function lancerCompte() {
     lignesHtml = `<p class="ligne-emojis${n > 8 ? " petit" : ""}">${Array(n).fill(emoji).join(" ")}</p>`;
   }
 
-  elQuestion.innerHTML = `<p>Combien d'animaux tu vois ?</p>${lignesHtml}`;
+  elQuestion.innerHTML = `<p>Combien de ${set.label} tu vois ?</p>${lignesHtml}`;
   setBonneReponse(n);
   const props = propositionsAvecBonne(n, Math.max(1, n - 3), Math.min(maxN + 3, n + 3), 3);
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));

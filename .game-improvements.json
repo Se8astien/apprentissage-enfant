@@ -1,0 +1,32 @@
+{
+  "description": "Suivi des améliorations de jeux — un jeu par exécution, dans l'ordre CP→CM2",
+  "ordre": [
+    "compte", "addition", "soustraction", "compare", "suite", "doubles", "moitie",
+    "dizaines", "pairimpair", "perlesDorees", "planche100",
+    "formes", "fractions", "symetrie", "perimetre", "angles",
+    "calendrier", "heure", "durees", "mesures", "masse",
+    "monnaiecp", "monnaiece1",
+    "multiplication", "division", "probleme",
+    "sons", "syllabes", "lecture", "lecturePhrase", "phraseMobile",
+    "lectureTexte", "grammaire", "homophones", "synonymes", "conjugaison",
+    "anglais", "traduction", "allemand", "traductionAllemand",
+    "espagnol", "traductionEspagnol", "italien", "traductionItalien",
+    "portugais", "traductionPortugais",
+    "aires", "decimaux", "fractionsCM", "proportionnalite", "pourcentages",
+    "sequence", "code"
+  ],
+  "dernierJeuAmeliore": "compte",
+  "historique": [
+    {
+      "jeu": "compte",
+      "date": "2026-05-01",
+      "ameliorations": [
+        "4 sets d'objets en rotation (animaux, fruits, objets, gourmandises)",
+        "CP diff 0 : numérotation cumulée par rangée pour aider le dénombrement",
+        "CE1 : question 'Lequel en a le moins ?' avec boutons emoji",
+        "CE2 : question 'Combien de X exactement ?' pour le dénombrement ciblé",
+        "Label de catégorie dans les questions (animaux/fruits/...)"
+      ]
+    }
+  ]
+}
