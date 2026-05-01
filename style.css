@@ -698,6 +698,23 @@ h1 {
   align-items: center;
 }
 
+#ecran-menu.actif {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.maison-banner-fox-place span {
+  font-size: 2.1rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+.btn-changer-genre-libelle {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .genre-conteneur {
   display: flex;
   flex-direction: column;
@@ -857,6 +874,7 @@ h1 {
 .btn-changer-genre {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   border: 2px solid var(--ombre);
   background: white;

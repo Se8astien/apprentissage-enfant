@@ -72,6 +72,11 @@ export function sauverNiveau(n) {
   if (prev !== n) setDifficulte(0);
 }
 
+export function syncPrefsDepuisStockage() {
+  niveauCourant = lireNiveau();
+  genreCourant = lireGenre();
+}
+
 export function estCE1() { return niveauCourant === NIVEAU.CE1; }
 export function estCE2() { return niveauCourant === NIVEAU.CE2; }
 export function estCM1() { return niveauCourant === NIVEAU.CM1; }

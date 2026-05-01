@@ -151,6 +151,25 @@
       z-index: 2;
       cursor: pointer;
     }
+
+    #ecran-menu.ecran.actif {
+      display: flex !important;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    #ecran-menu.ecran.actif .classe-info-barre,
+    #ecran-menu.ecran.actif .maison-banner,
+    #ecran-menu.ecran.actif .niveau-barre,
+    #ecran-menu.ecran.actif .grille-jeux,
+    #ecran-menu.ecran.actif .missions-section,
+    #ecran-menu.ecran.actif .btn-changer-genre {
+      position: relative;
+      z-index: 2;
+    }
+    #ecran-menu.ecran.actif .carte-jeu {
+      position: relative;
+      z-index: 3;
+    }
   </style>
 </head>
 <body>
@@ -331,13 +350,13 @@
 
       <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
       <button type="button" class="maison-banner" id="btn-maison" aria-label="Ma Maison">
-        <div class="maison-banner-fox" id="maison-banner-fox" aria-hidden="true"></div>
+        <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
         <div class="maison-banner-infos">
-          <span class="maison-banner-nom" id="maison-banner-nom"></span>
-          <span class="maison-banner-sub" id="maison-banner-sub"></span>
+          <span class="maison-banner-nom" id="maison-banner-nom">Ta maison</span>
+          <span class="maison-banner-sub" id="maison-banner-sub">Vois ton renard et tes étoiles ✨</span>
         </div>
         <div class="maison-banner-droite">
-          <span class="maison-banner-stars" id="maison-banner-stars"></span>
+          <span class="maison-banner-stars" id="maison-banner-stars">⭐ 0</span>
           <span class="maison-banner-fleche" aria-hidden="true">›</span>
         </div>
       </button>
@@ -437,6 +456,7 @@
 
       <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
         <span id="icone-genre-actuel">👧</span>
+        <span class="btn-changer-genre-libelle">Profil</span>
       </button>
     </main>
 
@@ -578,6 +598,13 @@
         el.removeAttribute("hidden");
         el.hidden = false;
         el.classList.add("actif");
+        if (id === "ecran-menu") {
+          setTimeout(function () {
+            try {
+              window.dispatchEvent(new CustomEvent("apprentissage:menu"));
+            } catch (eMenu) {}
+          }, 0);
+        }
       }
       function quitterLandingEtContinuer() {
         var l = document.getElementById("ecran-landing");

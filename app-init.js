@@ -386,6 +386,12 @@ track("session_start", {
   profil_count: profilsListe.length,
 });
 flushAnalyticsQueue();
+window.addEventListener("apprentissage:menu", () => {
+  try {
+    montrerMenu();
+    afficherMissions();
+  } catch { /* ignore */ }
+});
 window.addEventListener("beforeunload", trackSessionEnd);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") trackSessionEnd();
@@ -434,8 +440,10 @@ majEtoilesMaitrise();
 // ── Boutons jeux ──────────────────────────────────────────────────────────────
 document.querySelectorAll(".carte-jeu").forEach((btn) => {
   btn.addEventListener("click", () => {
-    track("game_start", { game_name: btn.dataset.jeu, niveau: getNiveauCourant(), difficulte: getDifficulte() });
-    montrerJeu(btn.dataset.jeu, lanceurs);
+    const jeu = btn.dataset.jeu;
+    if (!jeu || typeof lanceurs[jeu] !== "function") return;
+    track("game_start", { game_name: jeu, niveau: getNiveauCourant(), difficulte: getDifficulte() });
+    montrerJeu(jeu, lanceurs);
   });
 });
 

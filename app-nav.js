@@ -34,6 +34,7 @@ import {
   DIFFICULTE_LABELS,
   piegerFocus,
   revelerSeulEcran,
+  syncPrefsDepuisStockage,
 } from "./app-state.js";
 
 import { track } from "./app-analytics.js";
@@ -413,9 +414,11 @@ function declencherCombo(nb, onFermer) {
 
 // ── Reset feedback ────────────────────────────────────────────────────────────
 export function resetFeedback() {
-  elFeedback.textContent = "";
-  elFeedback.className = "feedback";
-  elSuivant.hidden = true;
+  if (elFeedback) {
+    elFeedback.textContent = "";
+    elFeedback.className = "feedback";
+  }
+  if (elSuivant) elSuivant.hidden = true;
   setRepondu(false);
 }
 
@@ -562,6 +565,8 @@ function filtrerJeuxParNiveau() {
 export function montrerMenu() {
   const menu = elMenu || document.getElementById("ecran-menu");
   if (!menu) return;
+  syncPrefsDepuisStockage();
+  resetFeedback();
   stopChrono();
   _modeRevision = null;
   rattrapageRestant = 0;
@@ -604,7 +609,7 @@ export function montrerMenu() {
 // ── montrerJeu ────────────────────────────────────────────────────────────────
 export function montrerJeu(nom, lanceurs) {
   const jeu = elJeu || document.getElementById("ecran-jeu");
-  if (!jeu) return;
+  if (!jeu || !nom || !lanceurs || typeof lanceurs[nom] !== "function") return;
   setJeuCourant(nom);
   comboActuel = 0;
   erreursSerie = 0;
