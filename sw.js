@@ -1,4 +1,4 @@
-const CACHE = "apprentissage-v2";
+const CACHE = "apprentissage-v3";
 const ASSETS = [
   "/",
   "/index.html",
@@ -23,6 +23,7 @@ const ASSETS = [
   "/icon-512.svg",
   "/manifest.json",
   "/app-profils.js",
+  "/app-params.js",
   "/politique-confidentialite.html",
 ];
 

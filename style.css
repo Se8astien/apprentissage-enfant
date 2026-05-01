@@ -2078,3 +2078,75 @@ h1 {
 .cert-footer p { font-size:0.75rem; color:#aaa; margin:0.2rem 0; }
 .btn-certificat { display:block; margin:0.5rem auto 0; background:none; border:2px solid var(--primaire); color:var(--primaire); border-radius:1.5rem; padding:0.55rem 1.5rem; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.15s, color 0.15s; }
 .btn-certificat:hover { background:var(--primaire); color:white; }
+
+/* ── Transitions d'écrans ─────────────────────────────────────────────────────── */
+@keyframes ecranEntree { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.ecran.actif { animation: ecranEntree 0.22s ease; }
+
+/* ── Mode chrono ──────────────────────────────────────────────────────────────── */
+.chrono {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 0.6rem;
+  background: linear-gradient(135deg, var(--primaire), #a29bfe);
+  color: white;
+  border-radius: 999px;
+  padding: 0.28rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  transition: background 0.3s;
+}
+.chrono-urgent {
+  background: linear-gradient(135deg, #e17055, #d63031) !important;
+  animation: chronoPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes chronoPulse { from { transform: scale(1); } to { transform: scale(1.08); } }
+
+/* ── Mode révision ────────────────────────────────────────────────────────────── */
+.btn-revision-non {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-family: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  margin-top: 0.2rem;
+  padding: 0.3rem;
+}
+.btn-revision-non:hover { color: var(--texte); }
+
+/* ── Paramètres parents ───────────────────────────────────────────────────────── */
+.btn-params-menu { background:white; border:2px solid var(--primaire); color:var(--primaire); border-radius:999px; padding:0.4rem 1rem; font-family:inherit; font-weight:700; font-size:0.85rem; cursor:pointer; transition:background 0.15s, color 0.15s; }
+.btn-params-menu:hover { background:var(--primaire); color:white; }
+.params-overlay .evolution-carte { padding: 1.5rem 1.2rem; }
+.params-carte { max-width: 400px; width: 94%; max-height: 82vh; overflow-y: auto; gap: 0.5rem; }
+.params-content { align-items: stretch; }
+.params-titre { font-size: 1.25rem; font-weight: 800; color: var(--primaire); margin: 0 0 0.6rem; text-align: center; }
+.params-section { border: 1px solid #eee; border-radius: 0.8rem; overflow: hidden; }
+.params-section > summary { font-size: 0.92rem; font-weight: 700; cursor: pointer; padding: 0.6rem 0.9rem; list-style: none; background: #fafafa; }
+.params-section > summary::-webkit-details-marker { display: none; }
+.params-section > summary::before { content: "▶ "; font-size: 0.65rem; opacity: 0.6; }
+details[open] > summary::before { content: "▼ "; }
+.params-section > *:not(summary) { padding: 0.5rem 0.9rem 0.7rem; }
+.params-stats { list-style: none; padding: 0; margin: 0; font-size: 0.8rem; line-height: 2; }
+.params-hint { font-size: 0.76rem; color: #888; margin: 0 0 0.4rem; }
+.params-toggle { display: flex; align-items: center; gap: 0.55rem; font-size: 0.84rem; padding: 0.22rem 0; cursor: pointer; }
+.params-check { width: 1rem; height: 1rem; cursor: pointer; flex-shrink: 0; }
+.params-actions { display: flex; flex-direction: column; gap: 0.45rem; }
+.btn-params-action { background: none; border: 2px solid #dfe6e9; border-radius: 999px; padding: 0.45rem 1rem; font-family: inherit; font-size: 0.84rem; cursor: pointer; color: #636e72; transition: border-color 0.15s, color 0.15s; text-align: left; }
+.btn-params-action:hover { border-color: var(--primaire); color: var(--primaire); }
+.btn-params-reset { border-color: #e17055 !important; color: #e17055 !important; }
+.btn-params-fermer { background: var(--primaire); color: white; border: none; border-radius: 999px; padding: 0.65rem 2rem; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; align-self: center; }
+.pin-dots { font-size: 2rem; letter-spacing: 0.35em; color: var(--primaire); margin: 0.4rem 0 0.2rem; text-align: center; }
+.pin-msg { font-size: 0.8rem; color: #e17055; min-height: 1.1em; margin: 0 0 0.4rem; text-align: center; }
+.pin-grille { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; width: 100%; max-width: 230px; }
+.btn-pin-num, .btn-pin-del { background: #f2f2f2; border: none; border-radius: 0.75rem; padding: 0.72rem; font-size: 1.15rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.1s; }
+.btn-pin-num:hover, .btn-pin-del:hover { background: #e0e0e0; }
+.btn-pin-valider { background: var(--primaire); color: white; border: none; border-radius: 0.75rem; padding: 0.72rem; font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer; }
+.btn-pin-fermer { background: none; border: 2px solid #dfe6e9; border-radius: 999px; padding: 0.45rem 1.4rem; font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; color: #999; margin-top: 0.4rem; }
+[data-theme="nuit"] .btn-pin-num,
+[data-theme="nuit"] .btn-pin-del { background: #2a2a55; color: #dfe6e9; }
+[data-theme="nuit"] .params-section { border-color: #3a3a6a; }
+[data-theme="nuit"] .params-section > summary { background: #1a1a35; }
+[data-theme="nuit"] .btn-params-menu { background: #1e1e3f; border-color: var(--primaire); }

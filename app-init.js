@@ -42,6 +42,9 @@ import {
   montrerJeu,
   questionSuivante,
   resetFeedback,
+  getWrongQuestions,
+  clearWrongQuestions,
+  entrerRevision,
 } from "./app-nav.js";
 
 import {
@@ -57,12 +60,13 @@ import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerA
 import { lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier } from "./games-temps.js";
 import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
 import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol, lancerItalienMots, lancerTraductionItalien } from "./games-langage.js";
+import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol, lancerItalienMots, lancerTraductionItalien, lancerPortugaisMots, lancerTraductionPortugais } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 import { lancerSequence, lancerCode } from "./games-algo.js";
 import { track } from "./app-analytics.js";
 import { toggleSons, sonsActifs } from "./app-sons.js";
 import { initProfils, getProfils, basculerProfil, creerProfil, syncProfilActif } from "./app-profils.js";
+import { montrerParams } from "./app-params.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -115,6 +119,8 @@ const lanceurs = {
   traductionEspagnol:   lancerTraductionEspagnol,
   italien:              lancerItalienMots,
   traductionItalien:    lancerTraductionItalien,
+  portugais:            lancerPortugaisMots,
+  traductionPortugais:  lancerTraductionPortugais,
   sequence:             lancerSequence,
   code:                 lancerCode,
 };
@@ -312,7 +318,36 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
 });
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-btnRetour.addEventListener("click", () => { montrerMenu(); afficherMissions(); });
+btnRetour.addEventListener("click", () => {
+  const jeu = getJeuCourant();
+  const wrongs = getWrongQuestions(jeu);
+  if (jeu && wrongs.length > 0) {
+    const overlay = document.createElement("div");
+    overlay.className = "evolution-overlay";
+    overlay.innerHTML = `
+      <div class="evolution-carte">
+        <p style="font-size:2rem;margin:0">🔁</p>
+        <p class="evolution-titre">Tu as eu ${wrongs.length} erreur${wrongs.length > 1 ? "s" : ""} !</p>
+        <p class="evolution-msg">Veux-tu revoir ces questions ?</p>
+        <button type="button" class="btn-evolution-fermer" id="revision-oui">Oui, revoir ! 💪</button>
+        <button type="button" class="btn-revision-non" id="revision-non">Non merci</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    document.getElementById("revision-oui").addEventListener("click", () => {
+      overlay.remove();
+      entrerRevision(jeu, wrongs);
+    });
+    document.getElementById("revision-non").addEventListener("click", () => {
+      clearWrongQuestions(jeu);
+      overlay.remove();
+      montrerMenu();
+      afficherMissions();
+    });
+  } else {
+    montrerMenu();
+    afficherMissions();
+  }
+});
 elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
 // ── Sélection du genre ────────────────────────────────────────────────────────
@@ -582,6 +617,35 @@ if (btnSons) {
     btnSons.textContent = on ? "🔊" : "🔇";
   });
 }
+
+// ── Paramètres parents ────────────────────────────────────────────────────────
+const btnParams = document.getElementById("btn-params");
+if (btnParams) {
+  btnParams.addEventListener("click", () => {
+    montrerParams(() => { montrerMenu(); afficherMissions(); });
+  });
+}
+
+// ── Raccourcis clavier ────────────────────────────────────────────────────────
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input, textarea, select")) return;
+  if (e.key === " " || e.key === "Enter") {
+    e.preventDefault();
+    const btnSuiv = document.getElementById("btn-suivant");
+    if (btnSuiv && !btnSuiv.hidden) { btnSuiv.click(); return; }
+  }
+  if (["1", "2", "3", "4"].includes(e.key)) {
+    const btns = [...document.querySelectorAll("#zone-choix .btn-choix:not(:disabled)")];
+    const idx = parseInt(e.key, 10) - 1;
+    if (btns[idx]) btns[idx].click();
+  }
+  if (e.key === "Escape") {
+    const modal = document.getElementById("modal-classe-suivante");
+    if (modal && !modal.hidden) { modal.hidden = true; return; }
+    const btnRet = document.getElementById("btn-retour");
+    if (btnRet && !document.getElementById("ecran-jeu")?.hidden) btnRet.click();
+  }
+});
 
 // ── Service Worker (PWA) ──────────────────────────────────────────────────────
 if ("serviceWorker" in navigator) {

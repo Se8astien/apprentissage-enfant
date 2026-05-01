@@ -211,6 +211,7 @@
         <span>🇬🇧 Anglais</span>
         <span>🇪🇸 Espagnol</span>
         <span>🇮🇹 Italien</span>
+        <span>🇵🇹 Portugais</span>
         <span>⏰ Mesures</span>
       </div>
 
@@ -288,6 +289,7 @@
         <span id="classe-info-label"></span>
         <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer de classe">✏️</button>
         <button type="button" id="btn-badges" class="btn-badges-menu">🏅 Trophées</button>
+        <button type="button" id="btn-params" class="btn-params-menu">⚙️ Parents</button>
         <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager">📤</button>
       </div>
 
@@ -373,6 +375,8 @@
         <button type="button" class="carte-jeu" data-jeu="traductionEspagnol" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction ES</span><span class="desc-jeu">Français → Espagnol</span></button>
         <button type="button" class="carte-jeu" data-jeu="italien"           data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇮🇹</span><span class="nom-jeu">Italiano</span><span class="desc-jeu">Come si dice?</span></button>
         <button type="button" class="carte-jeu" data-jeu="traductionItalien"  data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction IT</span><span class="desc-jeu">Français → Italien</span></button>
+        <button type="button" class="carte-jeu" data-jeu="portugais"          data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇵🇹</span><span class="nom-jeu">Português</span><span class="desc-jeu">Como se diz?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="traductionPortugais" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction PT</span><span class="desc-jeu">Français → Portugais</span></button>
 
         <h3 class="grille-section">🎓 CM1 &amp; CM2</h3>
         <button type="button" class="carte-jeu" data-jeu="aires"             data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">📐</span><span class="nom-jeu">Aires</span><span class="desc-jeu">Surface des figures</span></button>
@@ -468,6 +472,7 @@
       <button type="button" class="btn-retour" id="btn-retour">← Menu</button>
       <div class="diff-badge" id="diff-badge" hidden></div>
       <h2 id="jeu-titre" class="jeu-titre"></h2>
+      <div id="chrono" class="chrono" hidden></div>
       <div id="zone-question" class="zone-question"></div>
       <div id="zone-choix" class="zone-choix"></div>
       <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
