@@ -2046,12 +2046,6 @@ h1 {
 .btn-rgpd-accepter { background:var(--primaire); color:#fff; }
 .btn-rgpd-accepter:hover { background:var(--primaire-fonce); }
 
-/* ── Bandeau mise à jour PWA ─────────────────────────────────────────────────── */
-.banner-maj-sw { position:fixed; top:0; left:0; right:0; z-index:10000; background:#2d3436; color:#fff; padding:0.75rem 1rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.65rem; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.2); font-size:0.82rem; }
-.banner-maj-sw-texte { margin:0; line-height:1.45; text-align:center; flex:1; min-width:12rem; }
-.btn-maj-sw { border:none; border-radius:1.5rem; padding:0.45rem 1.15rem; font-size:0.82rem; font-weight:700; font-family:inherit; cursor:pointer; background:var(--primaire); color:#fff; flex-shrink:0; }
-.btn-maj-sw:hover { background:var(--primaire-fonce); }
-
 /* ── Boutons header (sons, thème, profils) ────────────────────────────────────── */
 .btn-sons { background:none; border:none; font-size:1.2rem; cursor:pointer; padding:0.3rem 0.4rem; border-radius:0.6rem; transition:background 0.15s; flex-shrink:0; line-height:1; }
 .btn-sons:hover { background:rgba(108,92,231,0.1); }
