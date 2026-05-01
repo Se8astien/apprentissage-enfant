@@ -538,7 +538,37 @@
         el.hidden = false;
         el.classList.add("actif");
       }
+      function quitterLandingEtContinuer() {
+        var l = document.getElementById("ecran-landing");
+        try { localStorage.setItem("landing-seen", "1"); } catch (e2) {}
+        if (l) {
+          l.classList.remove("actif");
+          l.hidden = true;
+        }
+        try {
+          if (!localStorage.getItem("maths-cp-genre")) montrerId("ecran-genre");
+          else if (!localStorage.getItem("maths-cp-niveau")) montrerId("ecran-classe");
+          else if (!(localStorage.getItem("renard-nom") || "").trim()) montrerId("ecran-nommage");
+          else montrerId("ecran-menu");
+        } catch (e3) {
+          montrerId("ecran-genre");
+        }
+      }
+      function landingEncoreActif() {
+        var l = document.getElementById("ecran-landing");
+        return !!(l && l.classList.contains("actif") && !l.hidden);
+      }
+      function suiteApresLandingSiBesoin() {
+        if (!landingEncoreActif()) return;
+        quitterLandingEtContinuer();
+      }
       function reparerVue() {
+        try {
+          if (localStorage.getItem("landing-seen") === "1" && landingEncoreActif()) {
+            quitterLandingEtContinuer();
+            return;
+          }
+        } catch (e0) {}
         if (ecranVu()) return;
         try {
           if (!localStorage.getItem("landing-seen")) montrerId("ecran-landing");
@@ -551,14 +581,10 @@
         }
       }
       function brancherLandingSecours() {
-        var go = function () {
-          try { localStorage.setItem("landing-seen", "1"); } catch (e) {}
-          reparerVue();
-        };
         var cta1 = document.getElementById("btn-landing-cta");
         var cta2 = document.getElementById("btn-landing-cta-2");
-        if (cta1) cta1.addEventListener("click", go);
-        if (cta2) cta2.addEventListener("click", go);
+        if (cta1) cta1.addEventListener("click", suiteApresLandingSiBesoin);
+        if (cta2) cta2.addEventListener("click", suiteApresLandingSiBesoin);
       }
       function arm() {
         brancherLandingSecours();
