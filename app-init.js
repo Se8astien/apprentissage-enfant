@@ -313,6 +313,7 @@ function trackSessionEnd() {
 function lancerDepuisSelecteur() {
   const ecranLanding = document.getElementById("ecran-landing");
   if (ecranLanding && !localStorage.getItem("landing-seen")) {
+    document.querySelectorAll(".ecran").forEach((e) => { e.hidden = true; e.classList.remove("actif"); });
     revelerEcran(ecranLanding);
     const go = () => {
       localStorage.setItem("landing-seen", "1");
@@ -377,12 +378,21 @@ function afficherSelecteurProfils(liste, actifId) {
   }
 }
 
-if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
-  afficherSelecteurProfils(profilsListe, profilActifId);
-} else {
-  sessionStorage.removeItem("skip-selector");
-  lancerDepuisSelecteur();
+try {
+  if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
+    afficherSelecteurProfils(profilsListe, profilActifId);
+  } else {
+    sessionStorage.removeItem("skip-selector");
+    lancerDepuisSelecteur();
+  }
+} catch (err) {
+  console.error("[App] boot profils / landing", err);
 }
+
+queueMicrotask(() => {
+  const a = document.querySelector(".ecran.actif");
+  if (a && !a.hidden) document.body.dataset.appInit = "1";
+});
 
 setTimeout(garantirUnEcranVisible, 0);
 setTimeout(garantirUnEcranVisible, 600);
