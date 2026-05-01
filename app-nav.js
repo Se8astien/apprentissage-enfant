@@ -558,24 +558,26 @@ function filtrerJeuxParNiveau() {
 
 // ── montrerMenu ───────────────────────────────────────────────────────────────
 export function montrerMenu() {
+  const genre = elGenre || document.getElementById("ecran-genre");
+  const jeu = elJeu || document.getElementById("ecran-jeu");
+  const menu = elMenu || document.getElementById("ecran-menu");
+  if (!menu) return;
   stopChrono();
   _modeRevision = null;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
   setJeuCourant(null);
   setBadgeVisible(false);
-  elGenre.hidden = true;
-  elGenre.classList.remove("actif");
-  elJeu.hidden = true;
-  elJeu.classList.remove("actif");
+  if (genre) { genre.hidden = true; genre.classList.remove("actif"); }
+  if (jeu) { jeu.hidden = true; jeu.classList.remove("actif"); }
   const elMaison = document.getElementById("ecran-maison");
   if (elMaison) { elMaison.hidden = true; elMaison.classList.remove("actif"); }
   const elClasse = document.getElementById("ecran-classe");
   if (elClasse) { elClasse.hidden = true; elClasse.classList.remove("actif"); }
   const modal = document.getElementById("modal-classe-suivante");
   if (modal) modal.hidden = true;
-  elMenu.hidden = false;
-  elMenu.classList.add("actif");
+  menu.hidden = false;
+  menu.classList.add("actif");
   majGenre();
   mettreAJourMaisonBanner();
   // Update classe/difficulte info bar
@@ -608,16 +610,19 @@ export function montrerMenu() {
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────
 export function montrerJeu(nom, lanceurs) {
+  const menu = elMenu || document.getElementById("ecran-menu");
+  const jeu = elJeu || document.getElementById("ecran-jeu");
+  if (!menu || !jeu) return;
   setJeuCourant(nom);
   comboActuel = 0;
   erreursSerie = 0;
   fatigueActivee = false;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
-  elMenu.hidden = true;
-  elMenu.classList.remove("actif");
-  elJeu.hidden = false;
-  elJeu.classList.add("actif");
+  menu.hidden = true;
+  menu.classList.remove("actif");
+  jeu.hidden = false;
+  jeu.classList.add("actif");
   setBadgeVisible(true);
   const diffBadge = document.getElementById("diff-badge");
   if (diffBadge) { diffBadge.hidden = false; diffBadge.textContent = getDiffLabel(); }

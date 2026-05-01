@@ -161,6 +161,7 @@ function syncNiveauButtons() {
 }
 
 function montrerClasse() {
+  if (!ecranClasse) return;
   document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
   ecranClasse.hidden = false;
   ecranClasse.classList.add("actif");
@@ -215,18 +216,25 @@ const { liste: profilsListe, actifId: profilActifId } = initProfils();
 const sessionStartTs = Date.now();
 let sessionClosed = false;
 if (elTotal) elTotal.textContent = lireEtoiles();
-majGenre();
-mettreAJourJauges();
-mettreAJourRenardHeader();
-const streakInit = mettreAJourStreak();
-afficherStreakHeader(streakInit.count);
+try {
+  majGenre();
+  mettreAJourJauges();
+  mettreAJourRenardHeader();
+  const streakInit = mettreAJourStreak();
+  afficherStreakHeader(streakInit.count);
+} catch (err) {
+  console.error("[App] init renard/streak ignorée", err);
+}
 syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
 function demarrerApp() {
   if (!localStorage.getItem("maths-cp-genre")) {
-    elGenre.hidden = false;
-    elGenre.classList.add("actif");
+    const g = elGenre || document.getElementById("ecran-genre");
+    if (!g) return;
+    document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+    g.hidden = false;
+    g.classList.add("actif");
   } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
     montrerClasse();
   } else if (!lireNomRenard()) {
@@ -241,6 +249,44 @@ function demarrerApp() {
         : `${nom} t'attendait ! 🦊`;
       setTimeout(() => majGenre(), 3500);
     }
+  }
+}
+
+function garantirUnEcranVisible() {
+  let ok = false;
+  document.querySelectorAll(".ecran.actif").forEach((el) => {
+    if (!el.hidden) ok = true;
+  });
+  if (ok) return;
+  try {
+    demarrerApp();
+  } catch (err) {
+    console.error("[App] demarrerApp", err);
+  }
+  ok = false;
+  document.querySelectorAll(".ecran.actif").forEach((el) => {
+    if (!el.hidden) ok = true;
+  });
+  if (ok) return;
+  document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+  try {
+    if (!localStorage.getItem("maths-cp-genre")) {
+      const g = document.getElementById("ecran-genre");
+      if (g) { g.hidden = false; g.classList.add("actif"); }
+    } else if (!localStorage.getItem(STORAGE_NIVEAU)) {
+      montrerClasse();
+    } else if (!lireNomRenard()) {
+      montrerNommage();
+    } else {
+      montrerMenu();
+      afficherMissions();
+    }
+  } catch (err2) {
+    console.error("[App] secours écran", err2);
+    const menu = document.getElementById("ecran-menu");
+    const g = document.getElementById("ecran-genre");
+    if (menu) { menu.hidden = false; menu.classList.add("actif"); }
+    else if (g) { g.hidden = false; g.classList.add("actif"); }
   }
 }
 
@@ -335,6 +381,9 @@ if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
   lancerDepuisSelecteur();
 }
 
+setTimeout(garantirUnEcranVisible, 0);
+setTimeout(garantirUnEcranVisible, 600);
+
 track("session_start", {
   niveau: getNiveauCourant(),
   difficulte: getDifficulte(),
@@ -395,7 +444,7 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
 });
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-btnRetour.addEventListener("click", () => {
+if (btnRetour) btnRetour.addEventListener("click", () => {
   const jeu = getJeuCourant();
   const wrongs = getWrongQuestions(jeu);
   track("game_exit", {
@@ -434,7 +483,7 @@ btnRetour.addEventListener("click", () => {
     afficherMissions();
   }
 });
-elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
+if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
 // ── Sélection du genre ────────────────────────────────────────────────────────
 document.querySelectorAll(".btn-genre").forEach((btn) => {
@@ -784,17 +833,4 @@ if ("serviceWorker" in navigator) {
   }, 3600000);
 }
 
-setTimeout(() => {
-  if (!document.querySelector(".ecran.actif")) {
-    try {
-      demarrerApp();
-    } catch {
-      const ecranGenre = document.getElementById("ecran-genre");
-      if (ecranGenre) {
-        document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
-        ecranGenre.hidden = false;
-        ecranGenre.classList.add("actif");
-      }
-    }
-  }
-}, 250);
+setTimeout(garantirUnEcranVisible, 250);

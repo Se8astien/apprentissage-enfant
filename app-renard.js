@@ -162,8 +162,9 @@ export function mettreAJourMaisonBanner() {
 // ── Nommage screen ────────────────────────────────────────────────────────────
 export function montrerNommage() {
   const elNommage = document.getElementById("ecran-nommage");
-  elGenre.hidden = true;
-  elGenre.classList.remove("actif");
+  const g = elGenre || document.getElementById("ecran-genre");
+  if (!elNommage) return;
+  if (g) { g.hidden = true; g.classList.remove("actif"); }
   elNommage.hidden = false;
   elNommage.classList.add("actif");
   const foxDiv = document.getElementById("nommage-fox");
