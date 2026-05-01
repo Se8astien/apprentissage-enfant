@@ -66,7 +66,7 @@ import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM
 import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol, lancerItalienMots, lancerTraductionItalien, lancerPortugaisMots, lancerTraductionPortugais } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 import { lancerSequence, lancerCode } from "./games-algo.js";
-import { track } from "./app-analytics.js";
+import { track, setAnalyticsConsent, flushAnalyticsQueue } from "./app-analytics.js";
 import { toggleSons, sonsActifs } from "./app-sons.js";
 import { initProfils, getProfils, basculerProfil, creerProfil, syncProfilActif } from "./app-profils.js";
 import { montrerParams } from "./app-params.js";
@@ -212,6 +212,8 @@ btnNiveaux.forEach(btn => {
 
 // ── Initialisation ────────────────────────────────────────────────────────────
 const { liste: profilsListe, actifId: profilActifId } = initProfils();
+const sessionStartTs = Date.now();
+let sessionClosed = false;
 elTotal.textContent = lireEtoiles();
 majGenre();
 mettreAJourJauges();
@@ -240,6 +242,21 @@ function demarrerApp() {
       setTimeout(() => majGenre(), 3500);
     }
   }
+}
+
+function screenCourant() {
+  const elActif = document.querySelector(".ecran.actif");
+  return elActif ? (elActif.id || "unknown") : "unknown";
+}
+
+function trackSessionEnd() {
+  if (sessionClosed) return;
+  sessionClosed = true;
+  track("session_end", {
+    duration_s: Math.round((Date.now() - sessionStartTs) / 1000),
+    last_screen: screenCourant(),
+    game_name: getJeuCourant() || "",
+  });
 }
 
 function lancerDepuisSelecteur() {
@@ -311,6 +328,17 @@ if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
   lancerDepuisSelecteur();
 }
 
+track("session_start", {
+  niveau: getNiveauCourant(),
+  difficulte: getDifficulte(),
+  profil_count: profilsListe.length,
+});
+flushAnalyticsQueue();
+window.addEventListener("beforeunload", trackSessionEnd);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") trackSessionEnd();
+});
+
 const btnProfilsHeader = document.getElementById("btn-profils-header");
 if (btnProfilsHeader) {
   if (profilsListe.length >= 2) btnProfilsHeader.hidden = false;
@@ -363,6 +391,12 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
 btnRetour.addEventListener("click", () => {
   const jeu = getJeuCourant();
   const wrongs = getWrongQuestions(jeu);
+  track("game_exit", {
+    game_name: jeu || "",
+    niveau: getNiveauCourant(),
+    wrong_count: wrongs.length,
+    revision_prompted: wrongs.length > 0,
+  });
   if (jeu && wrongs.length > 0) {
     const overlay = document.createElement("div");
     overlay.className = "evolution-overlay";
@@ -377,10 +411,12 @@ btnRetour.addEventListener("click", () => {
     document.body.appendChild(overlay);
     piegerFocus(overlay);
     document.getElementById("revision-oui").addEventListener("click", () => {
+      track("revision_started", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: wrongs.length });
       overlay.remove();
       entrerRevision(jeu, wrongs);
     });
     document.getElementById("revision-non").addEventListener("click", () => {
+      track("revision_declined", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: wrongs.length });
       clearWrongQuestions(jeu);
       overlay.remove();
       montrerMenu();
@@ -577,35 +613,25 @@ if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
 
 // ── RGPD — consentement cookies ───────────────────────────────────────────────
 (function () {
-  const CLE = "rgpd-consent";
   const banner = document.getElementById("banner-rgpd");
   if (!banner) return;
 
-  function appliquerConsent(valeur) {
-    if (typeof window.gtag === "function") {
-      window.gtag("consent", "update", {
-        analytics_storage: valeur === "accepte" ? "granted" : "denied"
-      });
-    }
-    if (valeur === "accepte") chargerAnalytics();
-  }
-
-  const consentSauve = localStorage.getItem(CLE);
+  const consentSauve = localStorage.getItem("rgpd-consent");
   if (!consentSauve) {
     banner.hidden = false;
   } else {
-    appliquerConsent(consentSauve);
+    setAnalyticsConsent(consentSauve);
+    if (consentSauve === "accepte") chargerAnalytics();
   }
 
   document.getElementById("btn-rgpd-accepter").addEventListener("click", () => {
-    localStorage.setItem(CLE, "accepte");
-    appliquerConsent("accepte");
+    setAnalyticsConsent("accepte");
+    chargerAnalytics();
     banner.hidden = true;
   });
 
   document.getElementById("btn-rgpd-refuser").addEventListener("click", () => {
-    localStorage.setItem(CLE, "refuse");
-    appliquerConsent("refuse");
+    setAnalyticsConsent("refuse");
     banner.hidden = true;
   });
 })();

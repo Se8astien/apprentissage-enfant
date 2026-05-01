@@ -63,6 +63,8 @@ export { confetti } from "./app-state.js";
 
 // ── Module-level combo counter (only used in nav) ─────────────────────────────
 let comboActuel = 0;
+let erreursSerie = 0;
+let fatigueActivee = false;
 
 // ── Mode chrono ───────────────────────────────────────────────────────────────
 let _chronoTimer = null;
@@ -102,7 +104,7 @@ function chronoExpire() {
   track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant(), timeout: true });
   sonMauvaise();
   comboActuel = 0;
-  elFeedback.textContent = "⏰ Temps écoulé !";
+  elFeedback.textContent = "⏰ Temps écoulé ! Indice : relis doucement la question 👀";
   elFeedback.className = "feedback non";
   declencherReactionRenard(false);
   elSuivant.hidden = false;
@@ -259,6 +261,36 @@ function messagesKo() {
   ];
 }
 
+function rappelErreur(jeu) {
+  const aides = {
+    addition: "Astuce : commence par les unités 🔢",
+    soustraction: "Astuce : retire petit à petit ✋",
+    multiplication: "Astuce : pense en paquets égaux 📦",
+    division: "Astuce : partage en groupes égaux 🍪",
+    fractions: "Astuce : compare les parts du même tout 🍕",
+    decimaux: "Astuce : regarde bien la virgule ,",
+    lecture: "Astuce : lis lentement chaque mot 📖",
+    grammaire: "Astuce : repère d'abord le verbe 🧠",
+  };
+  return aides[jeu] || "Astuce : prends ton temps et relis 👀";
+}
+
+function tenterModeFatigue() {
+  const jeu = getJeuCourant();
+  if (!jeu || fatigueActivee || erreursSerie < 3) return;
+  const diff = getDifficulteJeu(jeu);
+  if (diff <= 0) return;
+  setDifficulteJeu(jeu, diff - 1);
+  fatigueActivee = true;
+  const app = document.querySelector(".app");
+  if (!app) return;
+  const toast = document.createElement("div");
+  toast.className = "toast-progression";
+  toast.innerHTML = "<span>💛 Pause douceur activée</span><strong>Niveau allégé</strong>";
+  app.appendChild(toast);
+  setTimeout(() => toast.remove(), 2800);
+}
+
 // ── Reaction renard ───────────────────────────────────────────────────────────
 function declencherReactionRenard(correct) {
   const el = document.getElementById("renard-reaction");
@@ -294,6 +326,7 @@ function declencherCombo(nb, onFermer) {
   const prevFocusCombo = document.activeElement;
   confetti();
   sonCombo();
+  track("combo_reached", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: nb });
   if (nb >= 5) {
     progresserMission("combo5");
     afficherMissions();
@@ -339,6 +372,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
 
   if (choix === correct) {
     comboActuel++;
+    erreursSerie = 0;
     track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
     elFeedback.textContent = "✓ " + ok[Math.floor(Math.random() * ok.length)];
@@ -365,6 +399,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    erreursSerie++;
     if (!_modeRevision) {
       const _jeu = getJeuCourant();
       if (!_wrongByGame[_jeu]) _wrongByGame[_jeu] = [];
@@ -375,9 +410,12 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     sonMauvaise();
     comboActuel = 0;
     const ko = messagesKo();
-    elFeedback.textContent = "✗ " + ko[Math.floor(Math.random() * ko.length)];
+    const base = ko[Math.floor(Math.random() * ko.length)];
+    const message = erreursSerie >= 2 ? `${base} ${rappelErreur(getJeuCourant())}` : base;
+    elFeedback.textContent = `✗ ${message}`;
     elFeedback.className = "feedback non";
     declencherReactionRenard(false);
+    tenterModeFatigue();
   }
   elSuivant.hidden = false;
 }
@@ -396,6 +434,7 @@ function gererProgressionDifficulte() {
   const diff = getDifficulteJeu(jeu);
   if (diff < 2) {
     setDifficulteJeu(jeu, diff + 1);
+    track("difficulty_up", { game_name: jeu, niveau: getNiveauCourant(), from: diff, to: diff + 1 });
     afficherToastDifficulte();
     const badge = document.getElementById("diff-badge");
     if (badge) { badge.hidden = false; badge.textContent = getDiffLabel(); badge.classList.add("diff-pulse"); setTimeout(() => badge.classList.remove("diff-pulse"), 1200); }
@@ -409,7 +448,7 @@ function afficherToastDifficulte() {
   if (!app) return;
   const toast = document.createElement("div");
   toast.className = "toast-progression";
-  toast.innerHTML = `<span>🎉 Niveau augmenté !</span><strong>${getDiffLabel()}</strong>`;
+  toast.innerHTML = `<span>🎉 Tu passes en mode Ninja !</span><strong>${getDiffLabel()}</strong>`;
   app.appendChild(toast);
   setTimeout(() => toast.remove(), 3200);
 }
@@ -499,6 +538,8 @@ export function montrerMenu() {
 export function montrerJeu(nom, lanceurs) {
   setJeuCourant(nom);
   comboActuel = 0;
+  erreursSerie = 0;
+  fatigueActivee = false;
   elMenu.hidden = true;
   elMenu.classList.remove("actif");
   elJeu.hidden = false;

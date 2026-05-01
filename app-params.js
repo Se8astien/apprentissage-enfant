@@ -75,12 +75,23 @@ function brancherPin(overlay, pinExistant, onFermer) {
 
 function creerSettingsHtml() {
   const stats  = lireStats();
+  const resume = lireResumeParent(stats);
+  const reco = lireRecommandations(stats);
   const lignes = Object.entries(stats)
     .filter(([, s]) => s.total > 0)
     .map(([jeu, s]) => `<li><strong>${jeu}</strong> : ${Math.round(s.bonnes / s.total * 100)}% (${s.bonnes}/${s.total})</li>`)
     .join("") || "<li>Aucune partie jouée.</li>";
   return `<div class="evolution-carte params-carte params-content">
   <h2 class="params-titre">⚙️ Espace parents</h2>
+  <details class="params-section" open>
+    <summary>🧭 Résumé rapide</summary>
+    <ul class="params-stats">
+      <li><strong>Temps de jeu estimé</strong> : ${resume.temps} min</li>
+      <li><strong>Réussite moyenne</strong> : ${resume.reussite}%</li>
+      <li><strong>Top jeux</strong> : ${resume.topJeux}</li>
+      <li><strong>À renforcer</strong> : ${reco.join(", ")}</li>
+    </ul>
+  </details>
   <details class="params-section">
     <summary>📊 Statistiques par jeu</summary>
     <ul class="params-stats">${lignes}</ul>
@@ -104,6 +115,33 @@ function creerSettingsHtml() {
 function lireStats() {
   try { return JSON.parse(localStorage.getItem("stats-questions")) || {}; }
   catch { return {}; }
+}
+
+function lireResumeParent(stats) {
+  const entries = Object.entries(stats).filter(([, s]) => s.total > 0);
+  if (entries.length === 0) return { temps: 0, reussite: 0, topJeux: "Aucun" };
+  const totalQ = entries.reduce((acc, [, s]) => acc + s.total, 0);
+  const totalBonnes = entries.reduce((acc, [, s]) => acc + s.bonnes, 0);
+  const topJeux = entries
+    .sort((a, b) => (b[1].total || 0) - (a[1].total || 0))
+    .slice(0, 3)
+    .map(([jeu]) => jeu)
+    .join(", ");
+  return {
+    temps: Math.round(totalQ * 0.5),
+    reussite: Math.round((totalBonnes / totalQ) * 100),
+    topJeux: topJeux || "Aucun",
+  };
+}
+
+function lireRecommandations(stats) {
+  const entries = Object.entries(stats)
+    .filter(([, s]) => s.total >= 8)
+    .map(([jeu, s]) => ({ jeu, taux: Math.round((s.bonnes / s.total) * 100) }))
+    .sort((a, b) => a.taux - b.taux)
+    .slice(0, 3)
+    .map((x) => x.jeu);
+  return entries.length ? entries : ["Continuer les jeux variés"];
 }
 
 function brancherSettings(overlay, onFermer) {
