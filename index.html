@@ -121,6 +121,36 @@
     #ecran-genre.ecran.actif .genre-conteneur { position: relative; z-index: 2; }
     #ecran-genre.ecran.actif .btn-genre { position: relative; z-index: 3; cursor: pointer; }
     #ecran-landing.ecran.actif { display: flex !important; flex-direction: column; }
+
+    #ecran-classe.ecran.actif {
+      display: flex !important;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    #ecran-classe.ecran.actif .classe-conteneur { position: relative; z-index: 2; width: 100%; }
+    #ecran-classe.ecran.actif .btn-classe,
+    #ecran-classe.ecran.actif .btn-diff { position: relative; z-index: 3; cursor: pointer; }
+
+    #ecran-nommage.ecran.actif {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #ecran-nommage.ecran.actif .nommage-conteneur { position: relative; z-index: 2; }
+    #ecran-nommage.ecran.actif .btn-nommage { position: relative; z-index: 3; cursor: pointer; }
+
+    #ecran-profils.ecran.actif {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+    }
+    #ecran-profils.ecran.actif .profils-grille,
+    #ecran-profils.ecran.actif .btn-ajouter-profil {
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -614,9 +644,95 @@
           });
         }
       }
+      function brancherClasseSecours() {
+        var clasBtns = document.querySelectorAll(".btn-classe");
+        for (var ci = 0; ci < clasBtns.length; ci++) {
+          clasBtns[ci].addEventListener("click", function () {
+            var nv = this.getAttribute("data-niveau");
+            if (!nv) return;
+            try {
+              var prev = localStorage.getItem("maths-cp-niveau");
+              localStorage.setItem("maths-cp-niveau", nv);
+              if (prev !== nv) localStorage.setItem("apprentissage-difficulte", "0");
+            } catch (eC0) {}
+            var allCl = document.querySelectorAll(".btn-classe");
+            for (var ck = 0; ck < allCl.length; ck++) {
+              allCl[ck].classList.toggle("selectionne", allCl[ck] === this);
+            }
+            var diffEl = document.getElementById("diff-choix");
+            if (diffEl) {
+              diffEl.hidden = false;
+              try {
+                diffEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              } catch (eScr) {}
+            }
+          });
+        }
+      }
+      function brancherDiffSecours() {
+        var db = document.querySelectorAll(".btn-diff");
+        for (var di = 0; di < db.length; di++) {
+          db[di].addEventListener("click", function () {
+            var d = this.getAttribute("data-diff");
+            if (d === null || d === "") return;
+            var dn = parseInt(d, 10);
+            if (isNaN(dn)) dn = 1;
+            dn = Math.max(0, Math.min(2, dn));
+            try {
+              localStorage.setItem("apprentissage-difficulte", String(dn));
+            } catch (eD0) {}
+            try {
+              if (!(localStorage.getItem("renard-nom") || "").trim())
+                montrerId("ecran-nommage");
+              else montrerId("ecran-menu");
+            } catch (eNav) {
+              montrerId("ecran-nommage");
+            }
+          });
+        }
+      }
+      function brancherNommageSecours() {
+        var f = document.getElementById("nommage-form");
+        if (!f) return;
+        f.addEventListener("submit", function (ev) {
+          ev.preventDefault();
+          var inp = document.getElementById("input-nom-renard");
+          var nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
+          try {
+            localStorage.setItem("renard-nom", nom);
+          } catch (eN0) {}
+          montrerId("ecran-menu");
+        });
+      }
+      function brancherNiveauxSecours() {
+        var nbs = document.querySelectorAll(".niveau-btn");
+        if (!nbs.length) return;
+        for (var ni = 0; ni < nbs.length; ni++) {
+          nbs[ni].addEventListener("click", function () {
+            var nv = this.getAttribute("data-niveau");
+            if (!nv) return;
+            try {
+              var prev = localStorage.getItem("maths-cp-niveau");
+              localStorage.setItem("maths-cp-niveau", nv);
+              if (prev !== nv) localStorage.setItem("apprentissage-difficulte", "0");
+            } catch (eNv0) {}
+            var tall = document.querySelectorAll(".niveau-btn");
+            for (var nk = 0; nk < tall.length; nk++) {
+              var on = tall[nk] === this;
+              tall[nk].classList.toggle("actif", on);
+              tall[nk].setAttribute("aria-pressed", on ? "true" : "false");
+            }
+            montrerId("ecran-menu");
+          });
+        }
+      }
       function arm() {
         brancherLandingSecours();
         brancherGenreSecours();
+        brancherClasseSecours();
+        brancherDiffSecours();
+        brancherNommageSecours();
+        brancherNiveauxSecours();
         reparerVue();
         setTimeout(reparerVue, 800);
         setTimeout(reparerVue, 2200);
