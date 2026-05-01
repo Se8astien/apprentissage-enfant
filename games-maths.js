@@ -339,8 +339,8 @@ export function lancerAddition() {
   }
 
   if (estCM1()) {
-    const maxCM1 = [999, 4999, 9999][diff];
-    total = 100 + Math.floor(Math.random() * maxCM1);
+    const borneMaxTotCM1 = [999, 4999, 9999][diff];
+    total = 100 + Math.floor(Math.random() * borneMaxTotCM1);
     if (diff > 0 && Math.random() < 0.25) {
       b = 1 + Math.floor(Math.random() * (total - 1));
       a = total - b;
@@ -505,8 +505,8 @@ export function lancerSoustraction() {
 
   if (estCM2()) {
     elTitre.textContent = "Grands calculs";
-    const maxCM2s = [9999, 49999, 99999][diff];
-    total = 1000 + Math.floor(Math.random() * maxCM2s);
+    const borneMaxTotCM2s = [9999, 49999, 99999][diff];
+    total = 1000 + Math.floor(Math.random() * borneMaxTotCM2s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
     elQuestion.innerHTML =
@@ -515,8 +515,8 @@ export function lancerSoustraction() {
       "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Essaie la soustraction posée ✏️</p>";
     setBonneReponse(reste);
     const minCM2s = Math.max(0, reste - 5000);
-    const maxCM2s = Math.min(99998, reste + 5000);
-    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCM2s, maxCM2s);
+    const maxPropCM2s = Math.min(99998, reste + 5000);
+    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCM2s, maxPropCM2s);
     activerIndiceGraduel("Soustrais colonne par colonne.", "Pose l'opération et vérifie avec une addition inverse.");
     afficherChoix(props, (val, btn) => reponseAvecSuivi("soustraction", val, btn, getBonneReponse()));
     return;
@@ -524,8 +524,8 @@ export function lancerSoustraction() {
 
   if (estCM1()) {
     elTitre.textContent = "Calcul mental";
-    const maxCM1s = [999, 4999, 9999][diff];
-    total = 100 + Math.floor(Math.random() * maxCM1s);
+    const borneMaxTotCM1s = [999, 4999, 9999][diff];
+    total = 100 + Math.floor(Math.random() * borneMaxTotCM1s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
     elQuestion.innerHTML =
@@ -534,8 +534,8 @@ export function lancerSoustraction() {
       "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
     setBonneReponse(reste);
     const minCM1s = Math.max(0, reste - 500);
-    const maxCM1s = Math.min(9998, reste + 500);
-    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCM1s, maxCM1s);
+    const maxPropCM1s = Math.min(9998, reste + 500);
+    const props = propositionsSoustractionIntelligentes(total, enleve, reste, minCM1s, maxPropCM1s);
     activerIndiceGraduel("Commence par les unités.", "Si besoin, emprunte une dizaine.");
     afficherChoix(props, (val, btn) => reponseAvecSuivi("soustraction", val, btn, getBonneReponse()));
     return;
