@@ -735,5 +735,39 @@ document.addEventListener("keydown", (e) => {
 
 // ── Service Worker (PWA) ──────────────────────────────────────────────────────
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js").catch(() => {});
+  let rechargeApresMaJSw = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (rechargeApresMaJSw) window.location.reload();
+  });
+
+  navigator.serviceWorker.register("/sw.js").then((reg) => {
+    const bandeauMaj = () => {
+      if (document.getElementById("banner-maj-sw")) return;
+      const bar = document.createElement("div");
+      bar.id = "banner-maj-sw";
+      bar.className = "banner-maj-sw";
+      bar.setAttribute("role", "status");
+      bar.innerHTML = `<p class="banner-maj-sw-texte">Une nouvelle version est prête. Mets à jour pour avoir les derniers jeux ✨</p><button type="button" class="btn-maj-sw">Mettre à jour</button>`;
+      document.body.appendChild(bar);
+      bar.querySelector(".btn-maj-sw").addEventListener("click", () => {
+        const w = reg.waiting;
+        if (!w) return;
+        rechargeApresMaJSw = true;
+        w.postMessage("SKIP_WAITING");
+      });
+    };
+
+    if (reg.waiting) bandeauMaj();
+    reg.addEventListener("updatefound", () => {
+      const nw = reg.installing;
+      if (!nw) return;
+      nw.addEventListener("statechange", () => {
+        if (nw.state === "installed" && navigator.serviceWorker.controller) bandeauMaj();
+      });
+    });
+  }).catch(() => {});
+
+  setInterval(() => {
+    navigator.serviceWorker.getRegistration().then((r) => r?.update()).catch(() => {});
+  }, 3600000);
 }

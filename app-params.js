@@ -1,5 +1,7 @@
 // app-params.js — Espace parents PIN-protégé
 
+import { effacerDonneesProfilCourant } from "./app-profils.js";
+
 const PIN_CLE     = "parent-pin";
 const MASQUES_CLE = "jeux-masques";
 
@@ -112,6 +114,7 @@ function creerSettingsHtml() {
     <summary>🔑 Sécurité &amp; reset</summary>
     <div class="params-actions">
       <button type="button" class="btn-params-action btn-params-reset">🗑️ Remettre les étoiles à zéro</button>
+      <button type="button" class="btn-params-action btn-params-effacer">🧹 Effacer la progression (ce profil)</button>
       <button type="button" class="btn-params-action btn-params-pin">🔑 Changer le code parent</button>
     </div>
   </details>
@@ -195,6 +198,19 @@ function brancherSettings(overlay, onFermer) {
         overlay.remove();
         if (onFermer) onFermer();
       }
+    });
+  }
+
+  const btnEffacer = overlay.querySelector(".btn-params-effacer");
+  if (btnEffacer) {
+    btnEffacer.addEventListener("click", () => {
+      if (!confirm(
+        "Effacer toute la progression de ce profil (étoiles, badges, stats, missions, maîtrise, file analytics locale) ?\n" +
+          "Les réglages (thème, sons, consentement, code parent, jeux masqués) seront conservés."
+      )) return;
+      effacerDonneesProfilCourant();
+      overlay.remove();
+      location.reload();
     });
   }
 

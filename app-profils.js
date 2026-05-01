@@ -1,5 +1,12 @@
 // app-profils.js — jusqu'à 4 profils d'enfants par appareil
 
+import {
+  STORAGE_KEY,
+  STORAGE_NIVEAU,
+  STORAGE_GENRE,
+  RENARD_NOM_KEY,
+} from "./app-state.js";
+
 const CLE_LISTE = "profils-liste";
 const CLE_ACTIF = "profil-actif-id";
 const EXCLUS = new Set([
@@ -103,6 +110,58 @@ export function syncProfilActif(etoiles, nom, niveau) {
   if (etoiles !== undefined) p.etoiles = etoiles;
   if (niveau)           p.niveau = niveau;
   sauverListe(liste);
+}
+
+const WIPE_GLOBAL_KEEP = new Set([
+  ...EXCLUS,
+  "parent-pin",
+  "jeux-masques",
+]);
+
+export function effacerDonneesProfilCourant() {
+  const niveau = localStorage.getItem(STORAGE_NIVEAU);
+  const genre = localStorage.getItem(STORAGE_GENRE);
+  const nomRenard = localStorage.getItem(RENARD_NOM_KEY);
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || WIPE_GLOBAL_KEEP.has(k) || k.startsWith("snap-")) continue;
+    keysToRemove.push(k);
+  }
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+
+  localStorage.setItem(STORAGE_KEY, "0");
+  if (niveau) localStorage.setItem(STORAGE_NIVEAU, niveau);
+  if (genre) localStorage.setItem(STORAGE_GENRE, genre);
+  if (nomRenard) localStorage.setItem(RENARD_NOM_KEY, nomRenard);
+  localStorage.setItem("badges-obtenus", "[]");
+  localStorage.setItem("stats-questions", "{}");
+  localStorage.setItem("stats-global-questions", "0");
+  localStorage.setItem("jeux-joues", "[]");
+  localStorage.setItem("missions-total-completees", "0");
+  localStorage.setItem("apprentissage-difficulte", "0");
+  localStorage.setItem("renard-faim", "80");
+  localStorage.setItem("renard-bonheur", "80");
+  localStorage.removeItem("renard-faim-ts");
+  localStorage.removeItem("renard-bonheur-ts");
+  localStorage.setItem("renard-streak", JSON.stringify({ count: 0, lastVisit: "" }));
+  localStorage.setItem("renard-accessoires", "[]");
+  localStorage.setItem("renard-tenue", "{}");
+  localStorage.removeItem("renard-naissance");
+  localStorage.removeItem("renard-calin-date");
+
+  const id = getProfilActifId();
+  if (id) {
+    sauverSnapshot(id);
+    const liste = getProfils();
+    const p = liste.find(x => x.id === id);
+    if (p) {
+      p.etoiles = 0;
+      if (niveau) p.niveau = niveau;
+      if (nomRenard) p.nom = nomRenard;
+      sauverListe(liste);
+    }
+  }
 }
 
 export function initProfils() {

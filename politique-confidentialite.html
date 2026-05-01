@@ -21,7 +21,7 @@
   <a href="/" class="retour">← Retour au jeu</a>
 
   <h1>Politique de confidentialité</h1>
-  <p><em>Dernière mise à jour : 30 avril 2026</em></p>
+  <p><em>Dernière mise à jour : 1<sup>er</sup> mai 2026</em></p>
 
   <p>
     Apprentissage Magique (<strong>apprentissage-magique.fr</strong>) est un site éducatif gratuit
@@ -35,11 +35,12 @@
     contactez-nous à : <a href="mailto:sebastien_mansion@hotmail.com">sebastien_mansion@hotmail.com</a>
   </p>
 
-  <h2>2. Données stockées localement (sans consentement requis)</h2>
+  <h2>2. Données stockées localement (sans transfert automatique)</h2>
   <p>
     Ces données sont enregistrées uniquement dans votre navigateur
-    (<code>localStorage</code>). Elles ne sont <strong>jamais transmises</strong> à nos serveurs
-    ni à des tiers.
+    (<code>localStorage</code> et un peu de <code>sessionStorage</code> pour afficher ou masquer certains écrans).
+    Elles ne sont <strong>pas enregistrées sur nos serveurs</strong>.
+    Une partie peut être envoyée à Google Analytics uniquement si vous acceptez explicitement les cookies audience (voir section 3).
   </p>
   <table>
     <thead><tr><th>Donnée</th><th>Utilité</th><th>Durée</th></tr></thead>
@@ -53,11 +54,39 @@
   </table>
   <p>Aucune de ces données ne permet d'identifier personnellement un enfant.</p>
 
+  <h3>Jusqu’à quatre profils sur l’appareil</h3>
+  <p>
+    Vous pouvez créer jusqu’à quatre profils d’apprentissage. Pour chaque profil,
+    une copie de sauvegarde est stockée localement sous la forme
+    « snapshot » (<code>localStorage</code>, clés préfixées <code>snap-</code>).
+    Ces snapshots servent uniquement à reprendre les progrès d’un autre profil après un changement
+    sans envoi réseau.
+  </p>
+
+  <h3>Contrôle parental : effacer la progression</h3>
+  <p>
+    Dans l’<strong>Espace parents</strong> (code défini par le parent), le bouton
+    « Effacer la progression (ce profil) » réinitialise la progression du profil actif
+    : étoiles, badges, statistiques, missions du jour cumulées, maîtrise par jeu,
+    difficultés par jeu, accessoires et jauges du renard sur cet appareil, ainsi que la petite file locale
+    d’événements de mesure (voir ci-dessous). Sont conservés notamment :
+    niveau et genre choisis pour adapter les jeux, prénom du renard pour la personnalisation,
+    préférences générales (thème clair ou sombre, sons, consentement RGPD affichés dans l’application),
+    code parent et liste des jeux masqués.
+  </p>
+
   <h2>3. Cookies de mesure d'audience (avec consentement)</h2>
   <p>
     Avec votre accord, nous utilisons <strong>Google Analytics 4</strong> (Google LLC) pour
-    mesurer l'audience du site (nombre de visiteurs, durée des sessions, pages consultées).
-    Ces données sont anonymisées et ne permettent pas d'identifier un individu.
+    mesurer l’audience du site (par exemple événements de session, jeux utilisés ou réponses générales
+    agrégées, sans contenu personnel saisi dans les réponses aux exercices).
+    Le chargement du script GA4 est <strong>différé tant que vous n’avez pas accepté</strong> :
+    jusqu’à l’acceptation, le navigateur utilise le consentement défaut (« pas de stockage analytics » conforme au mode Consent Mode de Google).
+  </p>
+  <p>
+    Si vous acceptez puis que la connexion est instable ou absente momentanément, de petits événements
+    peuvent être mis en attente uniquement dans le navigateur (clé <code>analytics-queue</code>),
+    puis envoyés lorsque vous êtes de nouveau connecté avec le même consentement.
   </p>
   <table>
     <thead><tr><th>Service</th><th>Finalité</th><th>Durée de conservation</th></tr></thead>
@@ -89,7 +118,7 @@
   <ul>
     <li><strong>Accès</strong> : consulter les données vous concernant</li>
     <li><strong>Rectification</strong> : corriger des données inexactes</li>
-    <li><strong>Effacement</strong> : supprimer vos données (videz le localStorage de votre navigateur)</li>
+    <li><strong>Effacement</strong> : utilisez « Effacer la progression (ce profil) » dans l’espace parents, ou videz les données du site dans les réglages du navigateur pour un effacement complet sur l’appareil</li>
     <li><strong>Opposition</strong> : refuser le traitement analytics via le bandeau de consentement</li>
     <li><strong>Réclamation</strong> : saisir la CNIL sur <a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a></li>
   </ul>

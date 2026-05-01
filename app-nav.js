@@ -68,23 +68,40 @@ let fatigueActivee = false;
 let rattrapageRestant = 0;
 let rattrapageDiffOriginale = null;
 
+const LIBELLE_THEME_JEU = {
+  maths: "Nombres",
+  formes: "Formes",
+  temps: "Temps & mesures",
+  argent: "Euros",
+  avance: "Calcul",
+  langage: "Langage",
+  cm: "Niveau CM",
+  algo: "Logique",
+};
+
 // ── Mode chrono ───────────────────────────────────────────────────────────────
 let _chronoTimer = null;
 
+function secondesChrono() {
+  if (!estGrand()) return 0;
+  return Math.min(56, 30 + Math.min(4, erreursSerie) * 7);
+}
+
 function startChrono() {
-  if (!estGrand()) return;
+  const secs = secondesChrono();
+  if (secs <= 0) return;
   stopChrono();
   const el = document.getElementById("chrono");
   if (!el) return;
-  let secs = 30;
   el.hidden = false;
-  el.textContent = `⏱ ${secs}s`;
+  let reste = secs;
+  el.textContent = `⏱ ${reste}s`;
   el.className = "chrono";
   _chronoTimer = setInterval(() => {
-    secs--;
-    if (secs <= 0) { clearInterval(_chronoTimer); _chronoTimer = null; chronoExpire(); return; }
-    el.textContent = `⏱ ${secs}s`;
-    if (secs <= 10) el.className = "chrono chrono-urgent";
+    reste--;
+    if (reste <= 0) { clearInterval(_chronoTimer); _chronoTimer = null; chronoExpire(); return; }
+    el.textContent = `⏱ ${reste}s`;
+    if (reste <= 10) el.className = "chrono chrono-urgent";
   }, 1000);
 }
 
@@ -132,7 +149,12 @@ export function entrerRevision(jeu, questions) {
   setBadgeVisible(true);
   resetFeedback();
   const titre = document.getElementById("jeu-titre");
-  if (titre) titre.textContent = "🔁 Révision";
+  if (titre) {
+    const carte = document.querySelector(`.carte-jeu[data-jeu="${jeu}"]`);
+    const cat = carte?.dataset.cat;
+    const theme = cat && LIBELLE_THEME_JEU[cat] ? ` · ${LIBELLE_THEME_JEU[cat]}` : "";
+    titre.textContent = `🔁 Révision${theme}`;
+  }
   _afficherRevision();
 }
 

@@ -85,7 +85,8 @@ function _afficherProchaineBadge() {
 
 // ── Missions du jour ──────────────────────────────────────────────────────────
 const MISSIONS_STORAGE_KEY = "missions-jour";
-const STATS_QUESTIONS_KEY  = "stats-questions";
+const STATS_PAR_JEU_KEY    = "stats-questions";
+const STATS_GLOBAL_KEY     = "stats-global-questions";
 const JEUX_JOUES_KEY       = "jeux-joues";
 const MISSIONS_TOTAL_KEY   = "missions-total-completees";
 
@@ -186,12 +187,27 @@ export function afficherMissions() {
 }
 
 export function lireStatsQuestions() {
-  return parseInt(localStorage.getItem(STATS_QUESTIONS_KEY) || "0", 10);
+  let g = parseInt(localStorage.getItem(STATS_GLOBAL_KEY) || "0", 10);
+  if (!Number.isFinite(g)) g = 0;
+  if (g > 0) return g;
+
+  try {
+    const raw = localStorage.getItem(STATS_PAR_JEU_KEY);
+    if (raw && /^\d+$/.test(raw.trim())) {
+      const n = parseInt(raw, 10);
+      if (Number.isFinite(n) && n > 0) {
+        localStorage.setItem(STATS_GLOBAL_KEY, String(n));
+      }
+      return Number.isFinite(n) ? n : 0;
+    }
+  } catch { /* ignore */ }
+
+  return g;
 }
 
 export function incrementStats(bonneReponse, jeuId) {
   const total = lireStatsQuestions() + 1;
-  localStorage.setItem(STATS_QUESTIONS_KEY, String(total));
+  localStorage.setItem(STATS_GLOBAL_KEY, String(total));
 
   if (jeuId) {
     try {
@@ -200,6 +216,15 @@ export function incrementStats(bonneReponse, jeuId) {
         joues.push(jeuId);
         localStorage.setItem(JEUX_JOUES_KEY, JSON.stringify(joues));
       }
+    } catch { /* ignore */ }
+
+    try {
+      const raw = localStorage.getItem(STATS_PAR_JEU_KEY);
+      const perJeu = raw && !/^\d+$/.test(raw.trim()) ? JSON.parse(raw) : {};
+      if (!perJeu[jeuId]) perJeu[jeuId] = { bonnes: 0, total: 0 };
+      perJeu[jeuId].total++;
+      if (bonneReponse) perJeu[jeuId].bonnes++;
+      localStorage.setItem(STATS_PAR_JEU_KEY, JSON.stringify(perJeu));
     } catch { /* ignore */ }
   }
 }
