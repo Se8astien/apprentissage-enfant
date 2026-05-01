@@ -501,6 +501,8 @@ h1 {
   border: none;
   border-radius: 1rem;
   padding: 1rem;
+  min-height: 48px;
+  min-width: 48px;
   font-family: inherit;
   font-size: 1.35rem;
   font-weight: 700;

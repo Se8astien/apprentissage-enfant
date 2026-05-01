@@ -548,13 +548,15 @@ export function lancerCompare() {
         a.toLocaleString("fr-FR") + " &nbsp; ou &nbsp; " + b.toLocaleString("fr-FR") + "</p>";
       afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else if (type === 1) {
-      const entA = 1 + Math.floor(Math.random() * 9);
-      const decA = 1 + Math.floor(Math.random() * 9);
-      const entB = 1 + Math.floor(Math.random() * 9);
-      const decB = 1 + Math.floor(Math.random() * 9);
-      const valA = entA + decA / 10;
-      const valB = entB + decB / 10;
-      if (valA === valB) { lancerCompare(); return; }
+      let entA, decA, entB, decB, valA, valB;
+      do {
+        entA = 1 + Math.floor(Math.random() * 9);
+        decA = 1 + Math.floor(Math.random() * 9);
+        entB = 1 + Math.floor(Math.random() * 9);
+        decB = 1 + Math.floor(Math.random() * 9);
+        valA = entA + decA / 10;
+        valB = entB + decB / 10;
+      } while (valA === valB);
       const strA = entA + "," + decA;
       const strB = entB + "," + decB;
       setBonneReponse(valA > valB ? strA : strB);
@@ -1179,7 +1181,7 @@ export function lancerPerlesDorees() {
     else               { bonne = un;   question = "unités"; maxDigit = 9; }
   } else if (estCE1()) {
     if (diff <= 0) {
-      cent = 1 + Math.floor(Math.random() * 1);
+      cent = 1 + Math.floor(Math.random() * 9);
       diz  = Math.floor(Math.random() * 10);
       un   = Math.floor(Math.random() * 10);
       n = cent * 100 + diz * 10 + un;
