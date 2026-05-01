@@ -30,6 +30,9 @@ import {
   lireMaitrise,
 } from "./app-state.js";
 
+import { track } from "./app-analytics.js";
+import { sonBonne, sonMauvaise, sonCombo } from "./app-sons.js";
+
 import {
   ajouterEtoiles,
   svgRenard,
@@ -55,6 +58,100 @@ export { confetti } from "./app-state.js";
 
 // ── Module-level combo counter (only used in nav) ─────────────────────────────
 let comboActuel = 0;
+
+// ── Mode chrono ───────────────────────────────────────────────────────────────
+let _chronoTimer = null;
+
+function startChrono() {
+  if (!estGrand()) return;
+  stopChrono();
+  const el = document.getElementById("chrono");
+  if (!el) return;
+  let secs = 30;
+  el.hidden = false;
+  el.textContent = `⏱ ${secs}s`;
+  el.className = "chrono";
+  _chronoTimer = setInterval(() => {
+    secs--;
+    if (secs <= 0) { clearInterval(_chronoTimer); _chronoTimer = null; chronoExpire(); return; }
+    el.textContent = `⏱ ${secs}s`;
+    if (secs <= 10) el.className = "chrono chrono-urgent";
+  }, 1000);
+}
+
+function stopChrono() {
+  if (_chronoTimer) { clearInterval(_chronoTimer); _chronoTimer = null; }
+  const el = document.getElementById("chrono");
+  if (el) el.hidden = true;
+}
+
+function chronoExpire() {
+  if (getRepondu()) return;
+  setRepondu(true);
+  stopChrono();
+  elChoix.querySelectorAll(".btn-choix").forEach(btn => {
+    btn.disabled = true;
+    if (Number(btn.dataset.valeur) === getBonneReponse() || btn.dataset.valeur === String(getBonneReponse()))
+      btn.classList.add("bonne");
+  });
+  track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant(), timeout: true });
+  sonMauvaise();
+  comboActuel = 0;
+  elFeedback.textContent = "Temps écoulé !";
+  elFeedback.className = "feedback non";
+  declencherReactionRenard(false);
+  elSuivant.hidden = false;
+}
+
+// ── Mode révision ─────────────────────────────────────────────────────────────
+const _wrongByGame = {};
+let _modeRevision = null;
+
+export function getWrongQuestions(jeu) { return _wrongByGame[jeu] || []; }
+export function clearWrongQuestions(jeu) { delete _wrongByGame[jeu]; }
+
+export function entrerRevision(jeu, questions) {
+  const qs = [...questions];
+  clearWrongQuestions(jeu);
+  _modeRevision = { jeu, questions: qs, index: 0 };
+  setJeuCourant(jeu);
+  comboActuel = 0;
+  elMenu.hidden = true; elMenu.classList.remove("actif");
+  elJeu.hidden = false; elJeu.classList.add("actif");
+  setBadgeVisible(true);
+  resetFeedback();
+  const titre = document.getElementById("jeu-titre");
+  if (titre) titre.textContent = "🔁 Révision";
+  _afficherRevision();
+}
+
+function _afficherRevision() {
+  if (!_modeRevision || _modeRevision.index >= _modeRevision.questions.length) {
+    _modeRevision = null;
+    montrerMenu();
+    afficherMissions();
+    return;
+  }
+  const q = _modeRevision.questions[_modeRevision.index];
+  const zq = document.getElementById("zone-question");
+  if (zq) zq.innerHTML = q.html;
+  elChoix.innerHTML = "";
+  setBonneReponse(q.bonne);
+  q.options.forEach((texte, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.textContent = texte;
+    if (q.isText) {
+      b.dataset.valeur = texte;
+      b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));
+    } else {
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    }
+    elChoix.appendChild(b);
+  });
+}
 
 // ── Histoires jeu : vues une fois par session ─────────────────────────────────
 const _histoiresVues = new Set();
@@ -187,6 +284,7 @@ function declencherCombo(nb, onFermer) {
     </div>`;
   document.body.appendChild(overlay);
   confetti();
+  sonCombo();
   if (nb >= 5) {
     progresserMission("combo5");
     afficherMissions();
@@ -218,6 +316,7 @@ export function resetFeedback() {
 export function apresReponse(choix, bouton, correct) {
   if (getRepondu()) return;
   setRepondu(true);
+  stopChrono();
   const boutons = elChoix.querySelectorAll(".btn-choix");
   boutons.forEach((btn) => {
     btn.disabled = true;
@@ -228,12 +327,14 @@ export function apresReponse(choix, bouton, correct) {
 
   if (choix === correct) {
     comboActuel++;
+    track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
     elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
     elFeedback.className = "feedback ok";
     ajouterEtoiles(1);
     sauverFaim(lireFaim() + 5);
     confetti();
+    sonBonne();
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
     progresserMission("bonnes");
@@ -252,6 +353,14 @@ export function apresReponse(choix, bouton, correct) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    if (!_modeRevision) {
+      const _jeu = getJeuCourant();
+      if (!_wrongByGame[_jeu]) _wrongByGame[_jeu] = [];
+      const _zq = document.getElementById("zone-question");
+      _wrongByGame[_jeu].push({ html: _zq ? _zq.innerHTML : "", bonne: correct, isText: false, options: [...elChoix.querySelectorAll(".btn-choix")].map(b => b.textContent.trim()) });
+    }
+    track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    sonMauvaise();
     comboActuel = 0;
     const ko = messagesKo();
     elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
@@ -265,6 +374,7 @@ export function apresReponse(choix, bouton, correct) {
 export function apresReponseTexte(choix, bouton, correct) {
   if (getRepondu()) return;
   setRepondu(true);
+  stopChrono();
   const boutons = elChoix.querySelectorAll(".btn-choix");
   boutons.forEach((btn) => {
     btn.disabled = true;
@@ -274,12 +384,14 @@ export function apresReponseTexte(choix, bouton, correct) {
 
   if (choix === correct) {
     comboActuel++;
+    track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
     elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
     elFeedback.className = "feedback ok";
     ajouterEtoiles(1);
     sauverFaim(lireFaim() + 5);
     confetti();
+    sonBonne();
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
     progresserMission("bonnes");
@@ -298,6 +410,14 @@ export function apresReponseTexte(choix, bouton, correct) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    if (!_modeRevision) {
+      const _jeu = getJeuCourant();
+      if (!_wrongByGame[_jeu]) _wrongByGame[_jeu] = [];
+      const _zq = document.getElementById("zone-question");
+      _wrongByGame[_jeu].push({ html: _zq ? _zq.innerHTML : "", bonne: correct, isText: true, options: [...elChoix.querySelectorAll(".btn-choix")].map(b => b.textContent.trim()) });
+    }
+    track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    sonMauvaise();
     comboActuel = 0;
     const ko = messagesKo();
     elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
@@ -342,6 +462,7 @@ function proposerClasseSuivante() {
 // ── Filtrage jeux par niveau (programme EN) ───────────────────────────────────
 function filtrerJeuxParNiveau() {
   const n = getNiveauCourant();
+  const masques = (() => { try { return JSON.parse(localStorage.getItem("jeux-masques")) || []; } catch { return []; } })();
   let sectionCourante = null;
   let sectionVisible = false;
   document.querySelectorAll(".grille-jeux > *").forEach(el => {
@@ -351,7 +472,7 @@ function filtrerJeuxParNiveau() {
       sectionVisible = false;
     } else if (el.classList.contains("carte-jeu")) {
       const niveaux = (el.dataset.niveaux || "cp ce1 ce2 cm1 cm2").split(" ");
-      const visible = niveaux.includes(n);
+      const visible = niveaux.includes(n) && !masques.includes(el.dataset.jeu);
       el.hidden = !visible;
       if (visible) sectionVisible = true;
     }
@@ -361,6 +482,8 @@ function filtrerJeuxParNiveau() {
 
 // ── montrerMenu ───────────────────────────────────────────────────────────────
 export function montrerMenu() {
+  stopChrono();
+  _modeRevision = null;
   setJeuCourant(null);
   setBadgeVisible(false);
   elGenre.hidden = true;
@@ -414,12 +537,21 @@ export function montrerJeu(nom, lanceurs) {
   resetFeedback();
   _histoireQuestions[nom] = [];
   lancerAvecAntiRepeat(nom, lanceurs);
+  startChrono();
   afficherHistoireJeu(nom);
 }
 
 // ── questionSuivante ──────────────────────────────────────────────────────────
 export function questionSuivante(lanceurs) {
   resetFeedback();
+  if (_modeRevision) {
+    _modeRevision.index++;
+    _afficherRevision();
+    return;
+  }
   const jeu = getJeuCourant();
-  if (jeu && lanceurs[jeu]) lancerAvecAntiRepeat(jeu, lanceurs);
+  if (jeu && lanceurs[jeu]) {
+    lancerAvecAntiRepeat(jeu, lanceurs);
+    startChrono();
+  }
 }

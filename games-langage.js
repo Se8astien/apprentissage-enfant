@@ -1,6 +1,7 @@
 // games-langage.js — lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction,
 //                   lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile,
-//                   lancerLectureTexte
+//                   lancerLectureTexte, lancerAllemandMots, lancerTraductionAllemand,
+//                   lancerEspagnolMots, lancerTraductionEspagnol
 
 import {
   elTitre,
@@ -1148,6 +1149,953 @@ export function lancerSynonymes() {
     b.style.fontSize = "1rem";
     b.textContent = mot; b.dataset.valeur = mot;
     b.addEventListener("click", () => apresReponseTexte(mot, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Allemand mots ─────────────────────────────────────────────────────────────
+const ALLEMAND_IMAGES_CP = [
+  { emoji: "🐱", mot: "Katze",   fausses: ["Hund", "Vogel", "Fisch"] },
+  { emoji: "🐶", mot: "Hund",    fausses: ["Katze", "Kuh", "Schwein"] },
+  { emoji: "🏠", mot: "Haus",    fausses: ["Schule", "Auto", "Baum"] },
+  { emoji: "🌳", mot: "Baum",    fausses: ["Blume", "Gras", "Blatt"] },
+  { emoji: "⭐", mot: "Stern",   fausses: ["Mond", "Sonne", "Wolke"] },
+  { emoji: "🌙", mot: "Mond",    fausses: ["Stern", "Sonne", "Himmel"] },
+  { emoji: "🍎", mot: "Apfel",   fausses: ["Orange", "Banane", "Birne"] },
+  { emoji: "🎈", mot: "Ballon",  fausses: ["Ball", "Drachen", "Seife"] },
+  { emoji: "📚", mot: "Buch",    fausses: ["Stift", "Tasche", "Tisch"] },
+  { emoji: "🚗", mot: "Auto",    fausses: ["Bus", "Fahrrad", "Boot"] },
+  { emoji: "🌸", mot: "Blume",   fausses: ["Baum", "Blatt", "Pflanze"] },
+  { emoji: "🐟", mot: "Fisch",   fausses: ["Vogel", "Frosch", "Krabbe"] },
+  { emoji: "☀️", mot: "Sonne",   fausses: ["Mond", "Stern", "Wolke"] },
+  { emoji: "🍰", mot: "Kuchen",  fausses: ["Brot", "Torte", "Keks"] },
+  { emoji: "🐸", mot: "Frosch",  fausses: ["Fisch", "Schlange", "Ente"] },
+];
+
+const ALLEMAND_IMAGES_CE1 = [
+  { emoji: "🦋", mot: "Schmetterling", fausses: ["Libelle", "Marienkäfer", "Biene"] },
+  { emoji: "🐘", mot: "Elefant",       fausses: ["Nilpferd", "Nashorn", "Giraffe"] },
+  { emoji: "🚀", mot: "Rakete",        fausses: ["Flugzeug", "Schiff", "Ballon"] },
+  { emoji: "🌋", mot: "Vulkan",        fausses: ["Berg", "Hügel", "Insel"] },
+  { emoji: "🦊", mot: "Fuchs",         fausses: ["Wolf", "Bär", "Hirsch"] },
+  { emoji: "🌵", mot: "Kaktus",        fausses: ["Palme", "Bambus", "Busch"] },
+  { emoji: "🦜", mot: "Papagei",       fausses: ["Adler", "Eule", "Schwan"] },
+  { emoji: "🍕", mot: "Pizza",         fausses: ["Nudeln", "Burger", "Salat"] },
+  { emoji: "🌈", mot: "Regenbogen",    fausses: ["Gewitter", "Sturm", "Wolke"] },
+  { emoji: "🎸", mot: "Gitarre",       fausses: ["Klavier", "Geige", "Trommel"] },
+  { emoji: "🐙", mot: "Tintenfisch",   fausses: ["Qualle", "Krabbe", "Krebs"] },
+  { emoji: "🦒", mot: "Giraffe",       fausses: ["Zebra", "Elefant", "Kamel"] },
+  { emoji: "👁️", mot: "Auge",         fausses: ["Ohr", "Nase", "Mund"] },
+  { emoji: "👂", mot: "Ohr",           fausses: ["Auge", "Nase", "Hand"] },
+  { emoji: "✏️", mot: "Bleistift",     fausses: ["Stift", "Lineal", "Radiergummi"] },
+  { emoji: "📐", mot: "Lineal",        fausses: ["Bleistift", "Schere", "Buch"] },
+  { emoji: "🎒", mot: "Rucksack",      fausses: ["Tasche", "Koffer", "Beutel"] },
+];
+
+const ALLEMAND_IMAGES_CE2 = [
+  { emoji: "🌍", mot: "Welt",        fausses: ["Land", "Erde", "Globus"] },
+  { emoji: "🏔️", mot: "Berg",        fausses: ["Hügel", "Vulkan", "Fels"] },
+  { emoji: "🌊", mot: "Ozean",       fausses: ["Meer", "See", "Fluss"] },
+  { emoji: "🏙️", mot: "Stadt",       fausses: ["Dorf", "Hauptstadt", "Gebiet"] },
+  { emoji: "✈️", mot: "Flugzeug",    fausses: ["Hubschrauber", "Rakete", "Ballon"] },
+  { emoji: "🌿", mot: "Pflanze",     fausses: ["Baum", "Blume", "Gras"] },
+  { emoji: "🔬", mot: "Mikroskop",   fausses: ["Teleskop", "Fernglas", "Kamera"] },
+  { emoji: "📱", mot: "Telefon",     fausses: ["Computer", "Tablet", "Bildschirm"] },
+  { emoji: "💡", mot: "Licht",       fausses: ["Lampe", "Kerze", "Feuer"] },
+  { emoji: "🚂", mot: "Zug",         fausses: ["U-Bahn", "Straßenbahn", "Taxi"] },
+  { emoji: "🎭", mot: "Theater",     fausses: ["Kino", "Konzert", "Vorstellung"] },
+];
+
+const ALLEMAND_IMAGES_CM1 = [
+  { emoji: "🔭", mot: "Teleskop",     fausses: ["Mikroskop", "Fernglas", "Kamera"] },
+  { emoji: "🗺️", mot: "Karte",        fausses: ["Plan", "Atlas", "Diagramm"] },
+  { emoji: "⚡", mot: "Blitz",        fausses: ["Donner", "Sturm", "Elektrizität"] },
+  { emoji: "🏛️", mot: "Museum",       fausses: ["Bibliothek", "Galerie", "Denkmal"] },
+  { emoji: "🧲", mot: "Magnet",       fausses: ["Batterie", "Draht", "Metall"] },
+  { emoji: "📖", mot: "Wörterbuch",   fausses: ["Enzyklopädie", "Grammatik", "Lehrbuch"] },
+  { emoji: "🧪", mot: "Experiment",   fausses: ["Forschung", "Test", "Studie"] },
+  { emoji: "🌐", mot: "Internet",     fausses: ["Computer", "Netzwerk", "Webseite"] },
+  { emoji: "🧭", mot: "Kompass",      fausses: ["Richtung", "Norden", "Karte"] },
+  { emoji: "🏗️", mot: "Baustelle",   fausses: ["Gebäude", "Fabrik", "Brücke"] },
+  { emoji: "🦠", mot: "Virus",        fausses: ["Bakterium", "Keim", "Krankheit"] },
+];
+
+const ALLEMAND_IMAGES_CM2 = [
+  { emoji: "⚖️", mot: "Gerechtigkeit",  fausses: ["Freiheit", "Gesetz", "Gleichheit"] },
+  { emoji: "🌍", mot: "Umwelt",         fausses: ["Natur", "Klima", "Planet"] },
+  { emoji: "🧬", mot: "Biologie",       fausses: ["Chemie", "Physik", "Wissenschaft"] },
+  { emoji: "🏛️", mot: "Zivilisation",   fausses: ["Kultur", "Reich", "Gesellschaft"] },
+  { emoji: "📊", mot: "Diagramm",       fausses: ["Tabelle", "Grafik", "Schema"] },
+  { emoji: "🔋", mot: "Energie",        fausses: ["Kraft", "Macht", "Brennstoff"] },
+  { emoji: "🤝", mot: "Zusammenarbeit", fausses: ["Abkommen", "Bündnis", "Freundschaft"] },
+  { emoji: "📜", mot: "Verfassung",     fausses: ["Gesetz", "Charta", "Vertrag"] },
+  { emoji: "🔬", mot: "Labor",          fausses: ["Forschung", "Wissenschaft", "Studie"] },
+  { emoji: "💊", mot: "Medizin",        fausses: ["Droge", "Behandlung", "Gesundheit"] },
+  { emoji: "🌾", mot: "Landwirtschaft", fausses: ["Ernte", "Bauernhof", "Anbau"] },
+  { emoji: "🌡️", mot: "Klima",          fausses: ["Wetter", "Temperatur", "Atmosphäre"] },
+];
+
+export function lancerAllemandMots() {
+  elTitre.textContent = "🇩🇪 Deutsch";
+  const liste = estCM2() ? ALLEMAND_IMAGES_CM2 : estCM1() ? ALLEMAND_IMAGES_CM1 : estCE2() ? ALLEMAND_IMAGES_CE2 : estCE1() ? ALLEMAND_IMAGES_CE1 : ALLEMAND_IMAGES_CP;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.95rem;margin-bottom:0.25rem'>Was ist das auf Deutsch?</p>" +
+    `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.mot, ...fausses]);
+  setBonneReponse(options.indexOf(item.mot));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Traduction Français → Allemand ────────────────────────────────────────────
+const TRAD_DE_CP = [
+  { fr: "chat",    de: "Katze",  fausses: ["Hund", "Vogel", "Fisch"] },
+  { fr: "chien",   de: "Hund",   fausses: ["Katze", "Kuh", "Schwein"] },
+  { fr: "rouge",   de: "rot",    fausses: ["blau", "grün", "gelb"] },
+  { fr: "bleu",    de: "blau",   fausses: ["rot", "grün", "rosa"] },
+  { fr: "un",      de: "eins",   fausses: ["zwei", "drei", "vier"] },
+  { fr: "deux",    de: "zwei",   fausses: ["eins", "drei", "fünf"] },
+  { fr: "grand",   de: "groß",   fausses: ["klein", "lang", "alt"] },
+  { fr: "petit",   de: "klein",  fausses: ["groß", "lang", "jung"] },
+  { fr: "maison",  de: "Haus",   fausses: ["Schule", "Park", "Laden"] },
+  { fr: "livre",   de: "Buch",   fausses: ["Stift", "Tasche", "Tisch"] },
+  { fr: "ami",     de: "Freund", fausses: ["Familie", "Lehrer", "Baby"] },
+  { fr: "eau",     de: "Wasser", fausses: ["Milch", "Saft", "Tee"] },
+  { fr: "soleil",  de: "Sonne",  fausses: ["Mond", "Stern", "Wolke"] },
+  { fr: "pomme",   de: "Apfel",  fausses: ["Birne", "Orange", "Traube"] },
+  { fr: "trois",   de: "drei",   fausses: ["eins", "zwei", "vier"] },
+  { fr: "voiture", de: "Auto",   fausses: ["Bus", "Fahrrad", "Boot"] },
+  { fr: "jaune",   de: "gelb",   fausses: ["rot", "blau", "grün"] },
+  { fr: "vert",    de: "grün",   fausses: ["gelb", "blau", "rot"] },
+];
+
+const TRAD_DE_CE1 = [
+  { fr: "école",   de: "Schule",    fausses: ["Haus", "Park", "Kirche"] },
+  { fr: "famille", de: "Familie",   fausses: ["Freund", "Lehrer", "Team"] },
+  { fr: "heureux", de: "glücklich", fausses: ["traurig", "wütend", "müde"] },
+  { fr: "rapide",  de: "schnell",   fausses: ["langsam", "groß", "laut"] },
+  { fr: "beau",    de: "schön",     fausses: ["hässlich", "seltsam", "gewöhnlich"] },
+  { fr: "manger",  de: "essen",     fausses: ["trinken", "schlafen", "laufen"] },
+  { fr: "jouer",   de: "spielen",   fausses: ["essen", "schlafen", "lesen"] },
+  { fr: "courir",  de: "laufen",    fausses: ["springen", "gehen", "schwimmen"] },
+  { fr: "dormir",  de: "schlafen",  fausses: ["essen", "laufen", "träumen"] },
+  { fr: "mer",     de: "Meer",      fausses: ["See", "Fluss", "Teich"] },
+  { fr: "fleur",   de: "Blume",     fausses: ["Baum", "Blatt", "Gras"] },
+  { fr: "tête",    de: "Kopf",      fausses: ["Hand", "Fuß", "Arm"] },
+  { fr: "main",    de: "Hand",      fausses: ["Fuß", "Arm", "Finger"] },
+  { fr: "pied",    de: "Fuß",       fausses: ["Bein", "Hand", "Knie"] },
+  { fr: "nez",     de: "Nase",      fausses: ["Mund", "Ohr", "Auge"] },
+  { fr: "crayon",  de: "Bleistift", fausses: ["Stift", "Lineal", "Radiergummi"] },
+  { fr: "chaud",   de: "heiß",      fausses: ["kalt", "warm", "kühl"] },
+  { fr: "froid",   de: "kalt",      fausses: ["heiß", "warm", "kühl"] },
+];
+
+const TRAD_DE_CE2 = [
+  { fr: "nager",         de: "schwimmen",         fausses: ["laufen", "fliegen", "tauchen"] },
+  { fr: "chanter",       de: "singen",            fausses: ["tanzen", "spielen", "hören"] },
+  { fr: "écrire",        de: "schreiben",         fausses: ["lesen", "zeichnen", "kopieren"] },
+  { fr: "lire",          de: "lesen",             fausses: ["schreiben", "studieren", "lernen"] },
+  { fr: "difficile",     de: "schwierig",         fausses: ["einfach", "simpel", "hart"] },
+  { fr: "facile",        de: "einfach",           fausses: ["schwierig", "hart", "simpel"] },
+  { fr: "important",     de: "wichtig",           fausses: ["nützlich", "notwendig", "ernst"] },
+  { fr: "différent",     de: "verschieden",       fausses: ["ähnlich", "gleich", "identisch"] },
+  { fr: "mathématiques", de: "Mathematik",        fausses: ["Wissenschaft", "Geschichte", "Kunst"] },
+  { fr: "histoire",      de: "Geschichte",        fausses: ["Geographie", "Wissenschaft", "Sprache"] },
+  { fr: "géographie",    de: "Geographie",        fausses: ["Geschichte", "Wissenschaft", "Mathematik"] },
+  { fr: "musique",       de: "Musik",             fausses: ["Kunst", "Tanz", "Drama"] },
+  { fr: "pays",          de: "Land",              fausses: ["Stadt", "Dorf", "Region"] },
+  { fr: "montagne",      de: "Berg",              fausses: ["Hügel", "Vulkan", "Fels"] },
+  { fr: "forêt",         de: "Wald",              fausses: ["Dschungel", "Park", "Garten"] },
+  { fr: "rivière",       de: "Fluss",             fausses: ["See", "Meer", "Bach"] },
+];
+
+const TRAD_DE_CM1 = [
+  { fr: "gouvernement",  de: "Regierung",    fausses: ["Land", "Republik", "Staat"] },
+  { fr: "environnement", de: "Umwelt",       fausses: ["Natur", "Klima", "Planet"] },
+  { fr: "expérience",    de: "Experiment",   fausses: ["Forschung", "Test", "Studie"] },
+  { fr: "découverte",    de: "Entdeckung",   fausses: ["Erfindung", "Ergebnis", "Forschung"] },
+  { fr: "électricité",   de: "Elektrizität", fausses: ["Energie", "Strom", "Kraft"] },
+  { fr: "température",   de: "Temperatur",   fausses: ["Wetter", "Hitze", "Grad"] },
+  { fr: "volcan",        de: "Vulkan",       fausses: ["Berg", "Krater", "Ausbruch"] },
+  { fr: "boussole",      de: "Kompass",      fausses: ["Richtung", "Norden", "Karte"] },
+  { fr: "expédition",    de: "Expedition",   fausses: ["Reise", "Ausflug", "Tour"] },
+  { fr: "laboratoire",   de: "Labor",        fausses: ["Forschung", "Wissenschaft", "Studie"] },
+  { fr: "territoire",    de: "Gebiet",       fausses: ["Land", "Region", "Fläche"] },
+  { fr: "population",    de: "Bevölkerung",  fausses: ["Menschen", "Gesellschaft", "Gemeinschaft"] },
+  { fr: "catastrophe",   de: "Katastrophe",  fausses: ["Unfall", "Krise", "Notfall"] },
+];
+
+const TRAD_DE_CM2 = [
+  { fr: "civilisation",  de: "Zivilisation",   fausses: ["Kultur", "Reich", "Gesellschaft"] },
+  { fr: "constitution",  de: "Verfassung",     fausses: ["Gesetz", "Charta", "Vertrag"] },
+  { fr: "agriculture",   de: "Landwirtschaft", fausses: ["Ernte", "Bauernhof", "Anbau"] },
+  { fr: "coopération",   de: "Zusammenarbeit", fausses: ["Abkommen", "Bündnis", "Freundschaft"] },
+  { fr: "biologie",      de: "Biologie",       fausses: ["Chemie", "Physik", "Wissenschaft"] },
+  { fr: "révolution",    de: "Revolution",     fausses: ["Aufstand", "Wandel", "Bewegung"] },
+  { fr: "démocratie",    de: "Demokratie",     fausses: ["Republik", "Freiheit", "Politik"] },
+  { fr: "atmosphère",    de: "Atmosphäre",     fausses: ["Luft", "Himmel", "Klima"] },
+  { fr: "continent",     de: "Kontinent",      fausses: ["Land", "Insel", "Halbinsel"] },
+  { fr: "patrimoine",    de: "Erbe",           fausses: ["Kultur", "Geschichte", "Tradition"] },
+  { fr: "photosynthèse", de: "Photosynthese",  fausses: ["Biologie", "Wachstum", "Sauerstoff"] },
+  { fr: "énergie",       de: "Energie",        fausses: ["Kraft", "Strom", "Brennstoff"] },
+];
+
+export function lancerTraductionAllemand() {
+  elTitre.textContent = "🇩🇪 Traduction";
+  const diff = getDifficulte();
+  let liste;
+  if (estCM2()) {
+    liste = diff === 0 ? TRAD_DE_CM2.slice(0, 8) : diff === 1 ? TRAD_DE_CM2 : [...TRAD_DE_CM1, ...TRAD_DE_CM2];
+  } else if (estCM1()) {
+    liste = diff === 0 ? TRAD_DE_CM1.slice(0, 8) : diff === 1 ? TRAD_DE_CM1 : [...TRAD_DE_CM1, ...TRAD_DE_CM2.slice(0, 6)];
+  } else if (estCE2()) {
+    liste = diff === 0 ? TRAD_DE_CE2.slice(0, 8) : diff === 1 ? TRAD_DE_CE2 : [...TRAD_DE_CE1, ...TRAD_DE_CE2];
+  } else if (estCE1()) {
+    liste = diff === 0 ? TRAD_DE_CE1.slice(0, 8) : diff === 1 ? TRAD_DE_CE1 : [...TRAD_DE_CE1, ...TRAD_DE_CE2.slice(0, 6)];
+  } else {
+    liste = diff === 0 ? TRAD_DE_CP.slice(0, 8) : diff === 1 ? TRAD_DE_CP : [...TRAD_DE_CP, ...TRAD_DE_CE1.slice(0, 6)];
+  }
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.9rem;margin-bottom:0.4rem'>Comment dit-on en allemand ?</p>" +
+    `<p style="font-size:2.2rem;font-weight:700;color:var(--primaire);margin:0">${item.fr}</p>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.de, ...fausses]);
+  setBonneReponse(options.indexOf(item.de));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Espagnol mots ─────────────────────────────────────────────────────────────
+const ESPAGNOL_IMAGES_CP = [
+  { emoji: "🐱", mot: "gato",     fausses: ["perro", "pájaro", "pez"] },
+  { emoji: "🐶", mot: "perro",    fausses: ["gato", "vaca", "cerdo"] },
+  { emoji: "🏠", mot: "casa",     fausses: ["escuela", "coche", "árbol"] },
+  { emoji: "🌳", mot: "árbol",    fausses: ["flor", "hierba", "hoja"] },
+  { emoji: "⭐", mot: "estrella", fausses: ["luna", "sol", "nube"] },
+  { emoji: "🌙", mot: "luna",     fausses: ["estrella", "sol", "cielo"] },
+  { emoji: "🍎", mot: "manzana",  fausses: ["naranja", "plátano", "pera"] },
+  { emoji: "🎈", mot: "globo",    fausses: ["pelota", "cometa", "jabón"] },
+  { emoji: "📚", mot: "libro",    fausses: ["lápiz", "bolsa", "mesa"] },
+  { emoji: "🚗", mot: "coche",    fausses: ["autobús", "bicicleta", "barco"] },
+  { emoji: "🌸", mot: "flor",     fausses: ["árbol", "hoja", "planta"] },
+  { emoji: "🐟", mot: "pez",      fausses: ["pájaro", "rana", "cangrejo"] },
+  { emoji: "☀️", mot: "sol",      fausses: ["luna", "estrella", "nube"] },
+  { emoji: "🍰", mot: "pastel",   fausses: ["pan", "tarta", "galleta"] },
+  { emoji: "🐸", mot: "rana",     fausses: ["pez", "serpiente", "pato"] },
+];
+
+const ESPAGNOL_IMAGES_CE1 = [
+  { emoji: "🦋", mot: "mariposa",  fausses: ["libélula", "mariquita", "abeja"] },
+  { emoji: "🐘", mot: "elefante",  fausses: ["hipopótamo", "rinoceronte", "jirafa"] },
+  { emoji: "🚀", mot: "cohete",    fausses: ["avión", "barco", "globo"] },
+  { emoji: "🌋", mot: "volcán",    fausses: ["montaña", "colina", "isla"] },
+  { emoji: "🦊", mot: "zorro",     fausses: ["lobo", "oso", "ciervo"] },
+  { emoji: "🌵", mot: "cactus",    fausses: ["palma", "bambú", "arbusto"] },
+  { emoji: "🦜", mot: "loro",      fausses: ["águila", "búho", "cisne"] },
+  { emoji: "🍕", mot: "pizza",     fausses: ["pasta", "hamburguesa", "ensalada"] },
+  { emoji: "🌈", mot: "arcoíris",  fausses: ["tormenta", "nube", "lluvia"] },
+  { emoji: "🎸", mot: "guitarra",  fausses: ["piano", "violín", "tambor"] },
+  { emoji: "🐙", mot: "pulpo",     fausses: ["medusa", "cangrejo", "langosta"] },
+  { emoji: "🦒", mot: "jirafa",    fausses: ["cebra", "elefante", "camello"] },
+  { emoji: "👁️", mot: "ojo",       fausses: ["oreja", "nariz", "boca"] },
+  { emoji: "👂", mot: "oreja",     fausses: ["ojo", "nariz", "mano"] },
+  { emoji: "✏️", mot: "lápiz",    fausses: ["bolígrafo", "regla", "goma"] },
+];
+
+const ESPAGNOL_IMAGES_CE2 = [
+  { emoji: "🌍", mot: "mundo",       fausses: ["país", "tierra", "globo"] },
+  { emoji: "🏔️", mot: "montaña",     fausses: ["colina", "volcán", "roca"] },
+  { emoji: "🌊", mot: "océano",      fausses: ["mar", "lago", "río"] },
+  { emoji: "🏙️", mot: "ciudad",      fausses: ["pueblo", "capital", "región"] },
+  { emoji: "✈️", mot: "avión",       fausses: ["helicóptero", "cohete", "globo"] },
+  { emoji: "🌿", mot: "planta",      fausses: ["árbol", "flor", "hierba"] },
+  { emoji: "🔬", mot: "microscopio", fausses: ["telescopio", "prismático", "cámara"] },
+  { emoji: "📱", mot: "teléfono",    fausses: ["ordenador", "tableta", "pantalla"] },
+  { emoji: "💡", mot: "luz",         fausses: ["lámpara", "vela", "fuego"] },
+  { emoji: "🚂", mot: "tren",        fausses: ["metro", "tranvía", "taxi"] },
+  { emoji: "🎭", mot: "teatro",      fausses: ["cine", "concierto", "espectáculo"] },
+];
+
+const ESPAGNOL_IMAGES_CM1 = [
+  { emoji: "🔭", mot: "telescopio",  fausses: ["microscopio", "prismático", "cámara"] },
+  { emoji: "🗺️", mot: "mapa",        fausses: ["plano", "atlas", "diagrama"] },
+  { emoji: "⚡", mot: "rayo",        fausses: ["trueno", "tormenta", "electricidad"] },
+  { emoji: "🏛️", mot: "museo",       fausses: ["biblioteca", "galería", "monumento"] },
+  { emoji: "🧲", mot: "imán",        fausses: ["batería", "cable", "metal"] },
+  { emoji: "📖", mot: "diccionario", fausses: ["enciclopedia", "gramática", "libro"] },
+  { emoji: "🧪", mot: "experimento", fausses: ["investigación", "prueba", "estudio"] },
+  { emoji: "🌐", mot: "internet",    fausses: ["ordenador", "red", "página web"] },
+  { emoji: "🧭", mot: "brújula",     fausses: ["dirección", "norte", "mapa"] },
+  { emoji: "🦠", mot: "virus",       fausses: ["bacteria", "germen", "enfermedad"] },
+];
+
+const ESPAGNOL_IMAGES_CM2 = [
+  { emoji: "⚖️", mot: "justicia",      fausses: ["libertad", "ley", "igualdad"] },
+  { emoji: "🌍", mot: "medio ambiente",fausses: ["naturaleza", "clima", "planeta"] },
+  { emoji: "🧬", mot: "biología",      fausses: ["química", "física", "ciencia"] },
+  { emoji: "🏛️", mot: "civilización",  fausses: ["cultura", "imperio", "sociedad"] },
+  { emoji: "📊", mot: "diagrama",      fausses: ["tabla", "gráfico", "esquema"] },
+  { emoji: "🔋", mot: "energía",       fausses: ["fuerza", "poder", "combustible"] },
+  { emoji: "🤝", mot: "cooperación",   fausses: ["acuerdo", "alianza", "amistad"] },
+  { emoji: "📜", mot: "constitución",  fausses: ["ley", "carta", "tratado"] },
+  { emoji: "🔬", mot: "laboratorio",   fausses: ["investigación", "ciencia", "estudio"] },
+  { emoji: "💊", mot: "medicina",      fausses: ["droga", "tratamiento", "salud"] },
+  { emoji: "🌾", mot: "agricultura",   fausses: ["cosecha", "granja", "cultivo"] },
+  { emoji: "🌡️", mot: "clima",         fausses: ["tiempo", "temperatura", "atmósfera"] },
+];
+
+export function lancerEspagnolMots() {
+  elTitre.textContent = "🇪🇸 Español";
+  const liste = estCM2() ? ESPAGNOL_IMAGES_CM2 : estCM1() ? ESPAGNOL_IMAGES_CM1 : estCE2() ? ESPAGNOL_IMAGES_CE2 : estCE1() ? ESPAGNOL_IMAGES_CE1 : ESPAGNOL_IMAGES_CP;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.95rem;margin-bottom:0.25rem'>¿Cómo se dice en español?</p>" +
+    `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.mot, ...fausses]);
+  setBonneReponse(options.indexOf(item.mot));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Traduction Français → Espagnol ────────────────────────────────────────────
+const TRAD_ES_CP = [
+  { fr: "chat",    es: "gato",     fausses: ["perro", "pájaro", "pez"] },
+  { fr: "chien",   es: "perro",    fausses: ["gato", "vaca", "cerdo"] },
+  { fr: "rouge",   es: "rojo",     fausses: ["azul", "verde", "amarillo"] },
+  { fr: "bleu",    es: "azul",     fausses: ["rojo", "verde", "rosa"] },
+  { fr: "un",      es: "uno",      fausses: ["dos", "tres", "cuatro"] },
+  { fr: "deux",    es: "dos",      fausses: ["uno", "tres", "cinco"] },
+  { fr: "grand",   es: "grande",   fausses: ["pequeño", "largo", "viejo"] },
+  { fr: "petit",   es: "pequeño",  fausses: ["grande", "largo", "joven"] },
+  { fr: "maison",  es: "casa",     fausses: ["escuela", "parque", "tienda"] },
+  { fr: "livre",   es: "libro",    fausses: ["lápiz", "bolsa", "mesa"] },
+  { fr: "ami",     es: "amigo",    fausses: ["familia", "profesor", "bebé"] },
+  { fr: "eau",     es: "agua",     fausses: ["leche", "zumo", "té"] },
+  { fr: "soleil",  es: "sol",      fausses: ["luna", "estrella", "nube"] },
+  { fr: "pomme",   es: "manzana",  fausses: ["pera", "naranja", "uva"] },
+  { fr: "trois",   es: "tres",     fausses: ["uno", "dos", "cuatro"] },
+  { fr: "voiture", es: "coche",    fausses: ["autobús", "bicicleta", "barco"] },
+  { fr: "jaune",   es: "amarillo", fausses: ["rojo", "azul", "verde"] },
+  { fr: "vert",    es: "verde",    fausses: ["amarillo", "azul", "rojo"] },
+];
+
+const TRAD_ES_CE1 = [
+  { fr: "école",   es: "escuela",  fausses: ["casa", "parque", "iglesia"] },
+  { fr: "famille", es: "familia",  fausses: ["amigo", "profesor", "equipo"] },
+  { fr: "heureux", es: "feliz",    fausses: ["triste", "enfadado", "cansado"] },
+  { fr: "rapide",  es: "rápido",   fausses: ["lento", "grande", "fuerte"] },
+  { fr: "beau",    es: "bonito",   fausses: ["feo", "raro", "normal"] },
+  { fr: "manger",  es: "comer",    fausses: ["beber", "dormir", "correr"] },
+  { fr: "jouer",   es: "jugar",    fausses: ["comer", "dormir", "leer"] },
+  { fr: "courir",  es: "correr",   fausses: ["saltar", "caminar", "nadar"] },
+  { fr: "dormir",  es: "dormir",   fausses: ["comer", "correr", "soñar"] },
+  { fr: "mer",     es: "mar",      fausses: ["lago", "río", "estanque"] },
+  { fr: "fleur",   es: "flor",     fausses: ["árbol", "hoja", "hierba"] },
+  { fr: "tête",    es: "cabeza",   fausses: ["mano", "pie", "brazo"] },
+  { fr: "main",    es: "mano",     fausses: ["pie", "brazo", "dedo"] },
+  { fr: "pied",    es: "pie",      fausses: ["pierna", "mano", "rodilla"] },
+  { fr: "nez",     es: "nariz",    fausses: ["boca", "oreja", "ojo"] },
+  { fr: "crayon",  es: "lápiz",   fausses: ["bolígrafo", "regla", "goma"] },
+  { fr: "chaud",   es: "caliente", fausses: ["frío", "tibio", "fresco"] },
+  { fr: "froid",   es: "frío",     fausses: ["caliente", "tibio", "fresco"] },
+];
+
+const TRAD_ES_CE2 = [
+  { fr: "nager",         es: "nadar",        fausses: ["correr", "volar", "bucear"] },
+  { fr: "chanter",       es: "cantar",       fausses: ["bailar", "jugar", "escuchar"] },
+  { fr: "écrire",        es: "escribir",     fausses: ["leer", "dibujar", "copiar"] },
+  { fr: "lire",          es: "leer",         fausses: ["escribir", "estudiar", "aprender"] },
+  { fr: "difficile",     es: "difícil",      fausses: ["fácil", "simple", "duro"] },
+  { fr: "facile",        es: "fácil",        fausses: ["difícil", "duro", "simple"] },
+  { fr: "important",     es: "importante",   fausses: ["útil", "necesario", "serio"] },
+  { fr: "différent",     es: "diferente",    fausses: ["similar", "igual", "idéntico"] },
+  { fr: "mathématiques", es: "matemáticas",  fausses: ["ciencia", "historia", "arte"] },
+  { fr: "histoire",      es: "historia",     fausses: ["geografía", "ciencia", "lengua"] },
+  { fr: "géographie",    es: "geografía",    fausses: ["historia", "ciencia", "matemáticas"] },
+  { fr: "musique",       es: "música",       fausses: ["arte", "danza", "teatro"] },
+  { fr: "pays",          es: "país",         fausses: ["ciudad", "pueblo", "región"] },
+  { fr: "montagne",      es: "montaña",      fausses: ["colina", "volcán", "roca"] },
+  { fr: "forêt",         es: "bosque",       fausses: ["selva", "parque", "jardín"] },
+  { fr: "rivière",       es: "río",          fausses: ["lago", "mar", "arroyo"] },
+];
+
+const TRAD_ES_CM1 = [
+  { fr: "gouvernement",  es: "gobierno",       fausses: ["país", "república", "estado"] },
+  { fr: "environnement", es: "medio ambiente", fausses: ["naturaleza", "clima", "planeta"] },
+  { fr: "expérience",    es: "experimento",    fausses: ["investigación", "prueba", "estudio"] },
+  { fr: "découverte",    es: "descubrimiento", fausses: ["invención", "resultado", "investigación"] },
+  { fr: "électricité",   es: "electricidad",   fausses: ["energía", "corriente", "fuerza"] },
+  { fr: "température",   es: "temperatura",    fausses: ["tiempo", "calor", "grado"] },
+  { fr: "volcan",        es: "volcán",         fausses: ["montaña", "cráter", "erupción"] },
+  { fr: "boussole",      es: "brújula",        fausses: ["dirección", "norte", "mapa"] },
+  { fr: "expédition",    es: "expedición",     fausses: ["viaje", "excursión", "tour"] },
+  { fr: "laboratoire",   es: "laboratorio",    fausses: ["investigación", "ciencia", "estudio"] },
+  { fr: "territoire",    es: "territorio",     fausses: ["país", "región", "área"] },
+  { fr: "population",    es: "población",      fausses: ["gente", "sociedad", "comunidad"] },
+  { fr: "catastrophe",   es: "catástrofe",     fausses: ["accidente", "crisis", "emergencia"] },
+];
+
+const TRAD_ES_CM2 = [
+  { fr: "civilisation",  es: "civilización",  fausses: ["cultura", "imperio", "sociedad"] },
+  { fr: "constitution",  es: "constitución",  fausses: ["ley", "carta", "tratado"] },
+  { fr: "agriculture",   es: "agricultura",   fausses: ["cosecha", "granja", "cultivo"] },
+  { fr: "coopération",   es: "cooperación",   fausses: ["acuerdo", "alianza", "amistad"] },
+  { fr: "biologie",      es: "biología",      fausses: ["química", "física", "ciencia"] },
+  { fr: "révolution",    es: "revolución",    fausses: ["levantamiento", "cambio", "movimiento"] },
+  { fr: "démocratie",    es: "democracia",    fausses: ["república", "libertad", "política"] },
+  { fr: "atmosphère",    es: "atmósfera",     fausses: ["aire", "cielo", "clima"] },
+  { fr: "continent",     es: "continente",    fausses: ["país", "isla", "península"] },
+  { fr: "patrimoine",    es: "patrimonio",    fausses: ["cultura", "historia", "tradición"] },
+  { fr: "photosynthèse", es: "fotosíntesis",  fausses: ["biología", "crecimiento", "oxígeno"] },
+  { fr: "énergie",       es: "energía",       fausses: ["fuerza", "corriente", "combustible"] },
+];
+
+export function lancerTraductionEspagnol() {
+  elTitre.textContent = "🇪🇸 Traduction";
+  const diff = getDifficulte();
+  let liste;
+  if (estCM2()) {
+    liste = diff === 0 ? TRAD_ES_CM2.slice(0, 8) : diff === 1 ? TRAD_ES_CM2 : [...TRAD_ES_CM1, ...TRAD_ES_CM2];
+  } else if (estCM1()) {
+    liste = diff === 0 ? TRAD_ES_CM1.slice(0, 8) : diff === 1 ? TRAD_ES_CM1 : [...TRAD_ES_CM1, ...TRAD_ES_CM2.slice(0, 6)];
+  } else if (estCE2()) {
+    liste = diff === 0 ? TRAD_ES_CE2.slice(0, 8) : diff === 1 ? TRAD_ES_CE2 : [...TRAD_ES_CE1, ...TRAD_ES_CE2];
+  } else if (estCE1()) {
+    liste = diff === 0 ? TRAD_ES_CE1.slice(0, 8) : diff === 1 ? TRAD_ES_CE1 : [...TRAD_ES_CE1, ...TRAD_ES_CE2.slice(0, 6)];
+  } else {
+    liste = diff === 0 ? TRAD_ES_CP.slice(0, 8) : diff === 1 ? TRAD_ES_CP : [...TRAD_ES_CP, ...TRAD_ES_CE1.slice(0, 6)];
+  }
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.9rem;margin-bottom:0.4rem'>Comment dit-on en espagnol ?</p>" +
+    `<p style="font-size:2.2rem;font-weight:700;color:var(--primaire);margin:0">${item.fr}</p>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.es, ...fausses]);
+  setBonneReponse(options.indexOf(item.es));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Italien mots ──────────────────────────────────────────────────────────────
+const ITALIEN_IMAGES_CP = [
+  { emoji: "🐱", mot: "gatto",      fausses: ["cane", "uccello", "pesce"] },
+  { emoji: "🐶", mot: "cane",       fausses: ["gatto", "mucca", "maiale"] },
+  { emoji: "🏠", mot: "casa",       fausses: ["scuola", "macchina", "albero"] },
+  { emoji: "🌳", mot: "albero",     fausses: ["fiore", "erba", "foglia"] },
+  { emoji: "⭐", mot: "stella",     fausses: ["luna", "sole", "nuvola"] },
+  { emoji: "🌙", mot: "luna",       fausses: ["stella", "sole", "cielo"] },
+  { emoji: "🍎", mot: "mela",       fausses: ["arancia", "banana", "pera"] },
+  { emoji: "🎈", mot: "palloncino", fausses: ["palla", "aquilone", "sapone"] },
+  { emoji: "📚", mot: "libro",      fausses: ["matita", "borsa", "tavolo"] },
+  { emoji: "🚗", mot: "macchina",   fausses: ["autobus", "bicicletta", "barca"] },
+  { emoji: "🌸", mot: "fiore",      fausses: ["albero", "foglia", "pianta"] },
+  { emoji: "🐟", mot: "pesce",      fausses: ["uccello", "rana", "granchio"] },
+  { emoji: "☀️", mot: "sole",       fausses: ["luna", "stella", "nuvola"] },
+  { emoji: "🍰", mot: "torta",      fausses: ["pane", "biscotto", "dolce"] },
+  { emoji: "🐸", mot: "rana",       fausses: ["pesce", "serpente", "anatra"] },
+];
+
+const ITALIEN_IMAGES_CE1 = [
+  { emoji: "🦋", mot: "farfalla",   fausses: ["libellula", "coccinella", "ape"] },
+  { emoji: "🐘", mot: "elefante",   fausses: ["ippopotamo", "rinoceronte", "giraffa"] },
+  { emoji: "🚀", mot: "razzo",      fausses: ["aereo", "nave", "pallone"] },
+  { emoji: "🌋", mot: "vulcano",    fausses: ["montagna", "collina", "isola"] },
+  { emoji: "🦊", mot: "volpe",      fausses: ["lupo", "orso", "cervo"] },
+  { emoji: "🌵", mot: "cactus",     fausses: ["palma", "bambù", "cespuglio"] },
+  { emoji: "🦜", mot: "pappagallo", fausses: ["aquila", "gufo", "cigno"] },
+  { emoji: "🍕", mot: "pizza",      fausses: ["pasta", "hamburger", "insalata"] },
+  { emoji: "🌈", mot: "arcobaleno", fausses: ["temporale", "nuvola", "pioggia"] },
+  { emoji: "🎸", mot: "chitarra",   fausses: ["pianoforte", "violino", "tamburo"] },
+  { emoji: "🐙", mot: "polpo",      fausses: ["medusa", "granchio", "aragosta"] },
+  { emoji: "🦒", mot: "giraffa",    fausses: ["zebra", "elefante", "cammello"] },
+  { emoji: "👁️", mot: "occhio",    fausses: ["orecchio", "naso", "bocca"] },
+  { emoji: "👂", mot: "orecchio",   fausses: ["occhio", "naso", "mano"] },
+  { emoji: "✏️", mot: "matita",    fausses: ["penna", "righello", "gomma"] },
+];
+
+const ITALIEN_IMAGES_CE2 = [
+  { emoji: "🌍", mot: "mondo",        fausses: ["paese", "terra", "globo"] },
+  { emoji: "🏔️", mot: "montagna",     fausses: ["collina", "vulcano", "roccia"] },
+  { emoji: "🌊", mot: "oceano",       fausses: ["mare", "lago", "fiume"] },
+  { emoji: "🏙️", mot: "città",        fausses: ["paese", "capitale", "regione"] },
+  { emoji: "✈️", mot: "aereo",        fausses: ["elicottero", "razzo", "pallone"] },
+  { emoji: "🌿", mot: "pianta",       fausses: ["albero", "fiore", "erba"] },
+  { emoji: "🔬", mot: "microscopio",  fausses: ["telescopio", "binocolo", "camera"] },
+  { emoji: "📱", mot: "telefono",     fausses: ["computer", "tablet", "schermo"] },
+  { emoji: "💡", mot: "luce",         fausses: ["lampada", "candela", "fuoco"] },
+  { emoji: "🚂", mot: "treno",        fausses: ["metro", "tram", "taxi"] },
+  { emoji: "🎭", mot: "teatro",       fausses: ["cinema", "concerto", "spettacolo"] },
+];
+
+const ITALIEN_IMAGES_CM1 = [
+  { emoji: "🔭", mot: "telescopio",   fausses: ["microscopio", "binocolo", "camera"] },
+  { emoji: "🗺️", mot: "mappa",        fausses: ["piano", "atlante", "diagramma"] },
+  { emoji: "⚡", mot: "fulmine",      fausses: ["tuono", "tempesta", "elettricità"] },
+  { emoji: "🏛️", mot: "museo",        fausses: ["biblioteca", "galleria", "monumento"] },
+  { emoji: "🧲", mot: "calamita",     fausses: ["batteria", "filo", "metallo"] },
+  { emoji: "📖", mot: "dizionario",   fausses: ["enciclopedia", "grammatica", "libro"] },
+  { emoji: "🧪", mot: "esperimento",  fausses: ["ricerca", "prova", "studio"] },
+  { emoji: "🌐", mot: "internet",     fausses: ["computer", "rete", "sito web"] },
+  { emoji: "🧭", mot: "bussola",      fausses: ["direzione", "nord", "mappa"] },
+  { emoji: "🦠", mot: "virus",        fausses: ["batterio", "germe", "malattia"] },
+];
+
+const ITALIEN_IMAGES_CM2 = [
+  { emoji: "⚖️", mot: "giustizia",    fausses: ["libertà", "legge", "uguaglianza"] },
+  { emoji: "🌍", mot: "ambiente",     fausses: ["natura", "clima", "pianeta"] },
+  { emoji: "🧬", mot: "biologia",     fausses: ["chimica", "fisica", "scienza"] },
+  { emoji: "🏛️", mot: "civiltà",      fausses: ["cultura", "impero", "società"] },
+  { emoji: "📊", mot: "diagramma",    fausses: ["tabella", "grafico", "schema"] },
+  { emoji: "🔋", mot: "energia",      fausses: ["forza", "potere", "combustibile"] },
+  { emoji: "🤝", mot: "cooperazione", fausses: ["accordo", "alleanza", "amicizia"] },
+  { emoji: "📜", mot: "costituzione", fausses: ["legge", "carta", "trattato"] },
+  { emoji: "🔬", mot: "laboratorio",  fausses: ["ricerca", "scienza", "studio"] },
+  { emoji: "💊", mot: "medicina",     fausses: ["droga", "trattamento", "salute"] },
+  { emoji: "🌾", mot: "agricoltura",  fausses: ["raccolto", "fattoria", "coltura"] },
+  { emoji: "🌡️", mot: "clima",        fausses: ["tempo", "temperatura", "atmosfera"] },
+];
+
+export function lancerItalienMots() {
+  elTitre.textContent = "🇮🇹 Italiano";
+  const liste = estCM2() ? ITALIEN_IMAGES_CM2 : estCM1() ? ITALIEN_IMAGES_CM1 : estCE2() ? ITALIEN_IMAGES_CE2 : estCE1() ? ITALIEN_IMAGES_CE1 : ITALIEN_IMAGES_CP;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.95rem;margin-bottom:0.25rem'>Come si dice in italiano?</p>" +
+    `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.mot, ...fausses]);
+  setBonneReponse(options.indexOf(item.mot));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Traduction Français → Italien ─────────────────────────────────────────────
+const TRAD_IT_CP = [
+  { fr: "chat",    it: "gatto",      fausses: ["cane", "uccello", "pesce"] },
+  { fr: "chien",   it: "cane",       fausses: ["gatto", "mucca", "maiale"] },
+  { fr: "rouge",   it: "rosso",      fausses: ["blu", "verde", "giallo"] },
+  { fr: "bleu",    it: "blu",        fausses: ["rosso", "verde", "rosa"] },
+  { fr: "un",      it: "uno",        fausses: ["due", "tre", "quattro"] },
+  { fr: "deux",    it: "due",        fausses: ["uno", "tre", "cinque"] },
+  { fr: "grand",   it: "grande",     fausses: ["piccolo", "lungo", "vecchio"] },
+  { fr: "petit",   it: "piccolo",    fausses: ["grande", "lungo", "giovane"] },
+  { fr: "maison",  it: "casa",       fausses: ["scuola", "parco", "negozio"] },
+  { fr: "livre",   it: "libro",      fausses: ["matita", "borsa", "tavolo"] },
+  { fr: "ami",     it: "amico",      fausses: ["famiglia", "professore", "bambino"] },
+  { fr: "eau",     it: "acqua",      fausses: ["latte", "succo", "tè"] },
+  { fr: "soleil",  it: "sole",       fausses: ["luna", "stella", "nuvola"] },
+  { fr: "pomme",   it: "mela",       fausses: ["pera", "arancia", "uva"] },
+  { fr: "trois",   it: "tre",        fausses: ["uno", "due", "quattro"] },
+  { fr: "voiture", it: "macchina",   fausses: ["autobus", "bicicletta", "barca"] },
+  { fr: "jaune",   it: "giallo",     fausses: ["rosso", "blu", "verde"] },
+  { fr: "vert",    it: "verde",      fausses: ["giallo", "blu", "rosso"] },
+];
+
+const TRAD_IT_CE1 = [
+  { fr: "école",   it: "scuola",     fausses: ["casa", "parco", "chiesa"] },
+  { fr: "famille", it: "famiglia",   fausses: ["amico", "professore", "squadra"] },
+  { fr: "heureux", it: "felice",     fausses: ["triste", "arrabbiato", "stanco"] },
+  { fr: "rapide",  it: "veloce",     fausses: ["lento", "grande", "forte"] },
+  { fr: "beau",    it: "bello",      fausses: ["brutto", "strano", "normale"] },
+  { fr: "manger",  it: "mangiare",   fausses: ["bere", "dormire", "correre"] },
+  { fr: "jouer",   it: "giocare",    fausses: ["mangiare", "dormire", "leggere"] },
+  { fr: "courir",  it: "correre",    fausses: ["saltare", "camminare", "nuotare"] },
+  { fr: "dormir",  it: "dormire",    fausses: ["mangiare", "correre", "sognare"] },
+  { fr: "mer",     it: "mare",       fausses: ["lago", "fiume", "stagno"] },
+  { fr: "fleur",   it: "fiore",      fausses: ["albero", "foglia", "erba"] },
+  { fr: "tête",    it: "testa",      fausses: ["mano", "piede", "braccio"] },
+  { fr: "main",    it: "mano",       fausses: ["piede", "braccio", "dito"] },
+  { fr: "pied",    it: "piede",      fausses: ["gamba", "mano", "ginocchio"] },
+  { fr: "nez",     it: "naso",       fausses: ["bocca", "orecchio", "occhio"] },
+  { fr: "crayon",  it: "matita",    fausses: ["penna", "righello", "gomma"] },
+  { fr: "chaud",   it: "caldo",      fausses: ["freddo", "tiepido", "fresco"] },
+  { fr: "froid",   it: "freddo",     fausses: ["caldo", "tiepido", "fresco"] },
+];
+
+const TRAD_IT_CE2 = [
+  { fr: "nager",         it: "nuotare",      fausses: ["correre", "volare", "tuffarsi"] },
+  { fr: "chanter",       it: "cantare",      fausses: ["ballare", "giocare", "ascoltare"] },
+  { fr: "écrire",        it: "scrivere",     fausses: ["leggere", "disegnare", "copiare"] },
+  { fr: "lire",          it: "leggere",      fausses: ["scrivere", "studiare", "imparare"] },
+  { fr: "difficile",     it: "difficile",    fausses: ["facile", "semplice", "duro"] },
+  { fr: "facile",        it: "facile",       fausses: ["difficile", "duro", "semplice"] },
+  { fr: "important",     it: "importante",   fausses: ["utile", "necessario", "serio"] },
+  { fr: "différent",     it: "diverso",      fausses: ["simile", "uguale", "identico"] },
+  { fr: "mathématiques", it: "matematica",   fausses: ["scienza", "storia", "arte"] },
+  { fr: "histoire",      it: "storia",       fausses: ["geografia", "scienza", "lingua"] },
+  { fr: "géographie",    it: "geografia",    fausses: ["storia", "scienza", "matematica"] },
+  { fr: "musique",       it: "musica",       fausses: ["arte", "danza", "teatro"] },
+  { fr: "pays",          it: "paese",        fausses: ["città", "villaggio", "regione"] },
+  { fr: "montagne",      it: "montagna",     fausses: ["collina", "vulcano", "roccia"] },
+  { fr: "forêt",         it: "foresta",      fausses: ["giungla", "parco", "giardino"] },
+  { fr: "rivière",       it: "fiume",        fausses: ["lago", "mare", "torrente"] },
+];
+
+const TRAD_IT_CM1 = [
+  { fr: "gouvernement",  it: "governo",       fausses: ["paese", "repubblica", "stato"] },
+  { fr: "environnement", it: "ambiente",      fausses: ["natura", "clima", "pianeta"] },
+  { fr: "expérience",    it: "esperimento",   fausses: ["ricerca", "prova", "studio"] },
+  { fr: "découverte",    it: "scoperta",      fausses: ["invenzione", "risultato", "ricerca"] },
+  { fr: "électricité",   it: "elettricità",   fausses: ["energia", "corrente", "forza"] },
+  { fr: "température",   it: "temperatura",   fausses: ["tempo", "calore", "grado"] },
+  { fr: "volcan",        it: "vulcano",       fausses: ["montagna", "cratere", "eruzione"] },
+  { fr: "boussole",      it: "bussola",       fausses: ["direzione", "nord", "mappa"] },
+  { fr: "expédition",    it: "spedizione",    fausses: ["viaggio", "gita", "tour"] },
+  { fr: "laboratoire",   it: "laboratorio",   fausses: ["ricerca", "scienza", "studio"] },
+  { fr: "territoire",    it: "territorio",    fausses: ["paese", "regione", "area"] },
+  { fr: "population",    it: "popolazione",   fausses: ["gente", "società", "comunità"] },
+  { fr: "catastrophe",   it: "catastrofe",    fausses: ["incidente", "crisi", "emergenza"] },
+];
+
+const TRAD_IT_CM2 = [
+  { fr: "civilisation",  it: "civiltà",       fausses: ["cultura", "impero", "società"] },
+  { fr: "constitution",  it: "costituzione",  fausses: ["legge", "carta", "trattato"] },
+  { fr: "agriculture",   it: "agricoltura",   fausses: ["raccolto", "fattoria", "coltura"] },
+  { fr: "coopération",   it: "cooperazione",  fausses: ["accordo", "alleanza", "amicizia"] },
+  { fr: "biologie",      it: "biologia",      fausses: ["chimica", "fisica", "scienza"] },
+  { fr: "révolution",    it: "rivoluzione",   fausses: ["rivolta", "cambiamento", "movimento"] },
+  { fr: "démocratie",    it: "democrazia",    fausses: ["repubblica", "libertà", "politica"] },
+  { fr: "atmosphère",    it: "atmosfera",     fausses: ["aria", "cielo", "clima"] },
+  { fr: "continent",     it: "continente",    fausses: ["paese", "isola", "penisola"] },
+  { fr: "patrimoine",    it: "patrimonio",    fausses: ["cultura", "storia", "tradizione"] },
+  { fr: "photosynthèse", it: "fotosintesi",   fausses: ["biologia", "crescita", "ossigeno"] },
+  { fr: "énergie",       it: "energia",       fausses: ["forza", "corrente", "combustibile"] },
+];
+
+export function lancerTraductionItalien() {
+  elTitre.textContent = "🇮🇹 Traduction";
+  const diff = getDifficulte();
+  let liste;
+  if (estCM2()) {
+    liste = diff === 0 ? TRAD_IT_CM2.slice(0, 8) : diff === 1 ? TRAD_IT_CM2 : [...TRAD_IT_CM1, ...TRAD_IT_CM2];
+  } else if (estCM1()) {
+    liste = diff === 0 ? TRAD_IT_CM1.slice(0, 8) : diff === 1 ? TRAD_IT_CM1 : [...TRAD_IT_CM1, ...TRAD_IT_CM2.slice(0, 6)];
+  } else if (estCE2()) {
+    liste = diff === 0 ? TRAD_IT_CE2.slice(0, 8) : diff === 1 ? TRAD_IT_CE2 : [...TRAD_IT_CE1, ...TRAD_IT_CE2];
+  } else if (estCE1()) {
+    liste = diff === 0 ? TRAD_IT_CE1.slice(0, 8) : diff === 1 ? TRAD_IT_CE1 : [...TRAD_IT_CE1, ...TRAD_IT_CE2.slice(0, 6)];
+  } else {
+    liste = diff === 0 ? TRAD_IT_CP.slice(0, 8) : diff === 1 ? TRAD_IT_CP : [...TRAD_IT_CP, ...TRAD_IT_CE1.slice(0, 6)];
+  }
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.9rem;margin-bottom:0.4rem'>Comment dit-on en italien ?</p>" +
+    `<p style="font-size:2.2rem;font-weight:700;color:var(--primaire);margin:0">${item.fr}</p>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.it, ...fausses]);
+  setBonneReponse(options.indexOf(item.it));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Portugais mots ────────────────────────────────────────────────────────────
+const PORTUGAIS_IMAGES_CP = [
+  { emoji: "🐱", mot: "gato",       fausses: ["cachorro", "pássaro", "peixe"] },
+  { emoji: "🐶", mot: "cachorro",   fausses: ["gato", "vaca", "porco"] },
+  { emoji: "🏠", mot: "casa",       fausses: ["escola", "carro", "árvore"] },
+  { emoji: "🌳", mot: "árvore",     fausses: ["flor", "erva", "folha"] },
+  { emoji: "⭐", mot: "estrela",    fausses: ["lua", "sol", "nuvem"] },
+  { emoji: "🌙", mot: "lua",        fausses: ["estrela", "sol", "céu"] },
+  { emoji: "🍎", mot: "maçã",       fausses: ["laranja", "banana", "pera"] },
+  { emoji: "🎈", mot: "balão",      fausses: ["bola", "pipa", "bolha"] },
+  { emoji: "📚", mot: "livro",      fausses: ["lápis", "bolsa", "mesa"] },
+  { emoji: "🚗", mot: "carro",      fausses: ["ônibus", "bicicleta", "barco"] },
+  { emoji: "🌸", mot: "flor",       fausses: ["árvore", "folha", "planta"] },
+  { emoji: "🐟", mot: "peixe",      fausses: ["pássaro", "rã", "caranguejo"] },
+  { emoji: "☀️", mot: "sol",        fausses: ["lua", "estrela", "nuvem"] },
+  { emoji: "🍰", mot: "bolo",       fausses: ["pão", "biscoito", "doce"] },
+  { emoji: "🐸", mot: "rã",         fausses: ["peixe", "cobra", "pato"] },
+];
+
+const PORTUGAIS_IMAGES_CE1 = [
+  { emoji: "🦋", mot: "borboleta",  fausses: ["libélula", "joaninha", "abelha"] },
+  { emoji: "🐘", mot: "elefante",   fausses: ["hipopótamo", "rinoceronte", "girafa"] },
+  { emoji: "🚀", mot: "foguete",    fausses: ["avião", "navio", "balão"] },
+  { emoji: "🌋", mot: "vulcão",     fausses: ["montanha", "colina", "ilha"] },
+  { emoji: "🦊", mot: "raposa",     fausses: ["lobo", "urso", "veado"] },
+  { emoji: "🌵", mot: "cacto",      fausses: ["palmeira", "bambu", "arbusto"] },
+  { emoji: "🦜", mot: "papagaio",   fausses: ["águia", "coruja", "cisne"] },
+  { emoji: "🍕", mot: "pizza",      fausses: ["macarrão", "hambúrguer", "salada"] },
+  { emoji: "🌈", mot: "arco-íris",  fausses: ["tempestade", "nuvem", "chuva"] },
+  { emoji: "🎸", mot: "guitarra",   fausses: ["piano", "violino", "tambor"] },
+  { emoji: "🐙", mot: "polvo",      fausses: ["medusa", "caranguejo", "lagosta"] },
+  { emoji: "🦒", mot: "girafa",     fausses: ["zebra", "elefante", "camelo"] },
+  { emoji: "👁️", mot: "olho",       fausses: ["orelha", "nariz", "boca"] },
+  { emoji: "👂", mot: "orelha",     fausses: ["olho", "nariz", "mão"] },
+  { emoji: "✏️", mot: "lápis",      fausses: ["caneta", "régua", "borracha"] },
+];
+
+const PORTUGAIS_IMAGES_CE2 = [
+  { emoji: "🌍", mot: "mundo",       fausses: ["país", "terra", "globo"] },
+  { emoji: "🏔️", mot: "montanha",    fausses: ["colina", "vulcão", "rocha"] },
+  { emoji: "🌊", mot: "oceano",      fausses: ["mar", "lago", "rio"] },
+  { emoji: "🏙️", mot: "cidade",      fausses: ["país", "capital", "região"] },
+  { emoji: "✈️", mot: "avião",       fausses: ["helicóptero", "foguete", "balão"] },
+  { emoji: "🌿", mot: "planta",      fausses: ["árvore", "flor", "erva"] },
+  { emoji: "🔬", mot: "microscópio", fausses: ["telescópio", "binóculo", "câmera"] },
+  { emoji: "📱", mot: "telefone",    fausses: ["computador", "tablet", "tela"] },
+  { emoji: "💡", mot: "luz",         fausses: ["lâmpada", "vela", "fogo"] },
+  { emoji: "🚂", mot: "trem",        fausses: ["metrô", "bonde", "táxi"] },
+  { emoji: "🎭", mot: "teatro",      fausses: ["cinema", "concerto", "espetáculo"] },
+];
+
+const PORTUGAIS_IMAGES_CM1 = [
+  { emoji: "🔭", mot: "telescópio",  fausses: ["microscópio", "binóculo", "câmera"] },
+  { emoji: "🗺️", mot: "mapa",        fausses: ["plano", "atlas", "diagrama"] },
+  { emoji: "⚡", mot: "relâmpago",   fausses: ["trovão", "tempestade", "eletricidade"] },
+  { emoji: "🏛️", mot: "museu",       fausses: ["biblioteca", "galeria", "monumento"] },
+  { emoji: "🧲", mot: "ímã",         fausses: ["bateria", "fio", "metal"] },
+  { emoji: "📖", mot: "dicionário",  fausses: ["enciclopédia", "gramática", "livro"] },
+  { emoji: "🧪", mot: "experimento", fausses: ["pesquisa", "prova", "estudo"] },
+  { emoji: "🌐", mot: "internet",    fausses: ["computador", "rede", "site"] },
+  { emoji: "🧭", mot: "bússola",     fausses: ["direção", "norte", "mapa"] },
+  { emoji: "🦠", mot: "vírus",       fausses: ["bactéria", "germe", "doença"] },
+];
+
+const PORTUGAIS_IMAGES_CM2 = [
+  { emoji: "⚖️", mot: "justiça",      fausses: ["liberdade", "lei", "igualdade"] },
+  { emoji: "🌍", mot: "ambiente",     fausses: ["natureza", "clima", "planeta"] },
+  { emoji: "🧬", mot: "biologia",     fausses: ["química", "física", "ciência"] },
+  { emoji: "🏛️", mot: "civilização",  fausses: ["cultura", "império", "sociedade"] },
+  { emoji: "📊", mot: "diagrama",     fausses: ["tabela", "gráfico", "esquema"] },
+  { emoji: "🔋", mot: "energia",      fausses: ["força", "poder", "combustível"] },
+  { emoji: "🤝", mot: "cooperação",   fausses: ["acordo", "aliança", "amizade"] },
+  { emoji: "📜", mot: "constituição", fausses: ["lei", "carta", "tratado"] },
+  { emoji: "🔬", mot: "laboratório",  fausses: ["pesquisa", "ciência", "estudo"] },
+  { emoji: "💊", mot: "medicina",     fausses: ["droga", "tratamento", "saúde"] },
+  { emoji: "🌾", mot: "agricultura",  fausses: ["colheita", "fazenda", "cultivo"] },
+  { emoji: "🌡️", mot: "clima",        fausses: ["tempo", "temperatura", "atmosfera"] },
+];
+
+export function lancerPortugaisMots() {
+  elTitre.textContent = "🇵🇹 Português";
+  const liste = estCM2() ? PORTUGAIS_IMAGES_CM2 : estCM1() ? PORTUGAIS_IMAGES_CM1 : estCE2() ? PORTUGAIS_IMAGES_CE2 : estCE1() ? PORTUGAIS_IMAGES_CE1 : PORTUGAIS_IMAGES_CP;
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.95rem;margin-bottom:0.25rem'>Como se diz em português?</p>" +
+    `<span style="font-size:4.5rem;line-height:1.2;display:block">${item.emoji}</span>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.mot, ...fausses]);
+  setBonneReponse(options.indexOf(item.mot));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Traduction Français → Portugais ───────────────────────────────────────────
+const TRAD_PT_CP = [
+  { fr: "chat",    pt: "gato",     fausses: ["cachorro", "pássaro", "peixe"] },
+  { fr: "chien",   pt: "cachorro", fausses: ["gato", "vaca", "porco"] },
+  { fr: "rouge",   pt: "vermelho", fausses: ["azul", "verde", "amarelo"] },
+  { fr: "bleu",    pt: "azul",     fausses: ["vermelho", "verde", "rosa"] },
+  { fr: "un",      pt: "um",       fausses: ["dois", "três", "quatro"] },
+  { fr: "deux",    pt: "dois",     fausses: ["um", "três", "cinco"] },
+  { fr: "grand",   pt: "grande",   fausses: ["pequeno", "longo", "velho"] },
+  { fr: "petit",   pt: "pequeno",  fausses: ["grande", "longo", "jovem"] },
+  { fr: "maison",  pt: "casa",     fausses: ["escola", "parque", "loja"] },
+  { fr: "livre",   pt: "livro",    fausses: ["lápis", "bolsa", "mesa"] },
+  { fr: "ami",     pt: "amigo",    fausses: ["família", "professor", "bebê"] },
+  { fr: "eau",     pt: "água",     fausses: ["leite", "suco", "chá"] },
+  { fr: "soleil",  pt: "sol",      fausses: ["lua", "estrela", "nuvem"] },
+  { fr: "pomme",   pt: "maçã",     fausses: ["pera", "laranja", "uva"] },
+  { fr: "trois",   pt: "três",     fausses: ["um", "dois", "quatro"] },
+  { fr: "voiture", pt: "carro",    fausses: ["ônibus", "bicicleta", "barco"] },
+  { fr: "jaune",   pt: "amarelo",  fausses: ["vermelho", "azul", "verde"] },
+  { fr: "vert",    pt: "verde",    fausses: ["amarelo", "azul", "vermelho"] },
+];
+
+const TRAD_PT_CE1 = [
+  { fr: "école",   pt: "escola",   fausses: ["casa", "parque", "igreja"] },
+  { fr: "famille", pt: "família",  fausses: ["amigo", "professor", "equipe"] },
+  { fr: "heureux", pt: "feliz",    fausses: ["triste", "zangado", "cansado"] },
+  { fr: "rapide",  pt: "rápido",   fausses: ["lento", "grande", "forte"] },
+  { fr: "beau",    pt: "bonito",   fausses: ["feio", "estranho", "normal"] },
+  { fr: "manger",  pt: "comer",    fausses: ["beber", "dormir", "correr"] },
+  { fr: "jouer",   pt: "jogar",    fausses: ["comer", "dormir", "ler"] },
+  { fr: "courir",  pt: "correr",   fausses: ["pular", "caminhar", "nadar"] },
+  { fr: "dormir",  pt: "dormir",   fausses: ["comer", "correr", "sonhar"] },
+  { fr: "mer",     pt: "mar",      fausses: ["lago", "rio", "lagoa"] },
+  { fr: "fleur",   pt: "flor",     fausses: ["árvore", "folha", "erva"] },
+  { fr: "tête",    pt: "cabeça",   fausses: ["mão", "pé", "braço"] },
+  { fr: "main",    pt: "mão",      fausses: ["pé", "braço", "dedo"] },
+  { fr: "pied",    pt: "pé",       fausses: ["perna", "mão", "joelho"] },
+  { fr: "nez",     pt: "nariz",    fausses: ["boca", "orelha", "olho"] },
+  { fr: "crayon",  pt: "lápis",    fausses: ["caneta", "régua", "borracha"] },
+  { fr: "chaud",   pt: "quente",   fausses: ["frio", "morno", "fresco"] },
+  { fr: "froid",   pt: "frio",     fausses: ["quente", "morno", "fresco"] },
+];
+
+const TRAD_PT_CE2 = [
+  { fr: "nager",         pt: "nadar",        fausses: ["correr", "voar", "mergulhar"] },
+  { fr: "chanter",       pt: "cantar",       fausses: ["dançar", "jogar", "escutar"] },
+  { fr: "écrire",        pt: "escrever",     fausses: ["ler", "desenhar", "copiar"] },
+  { fr: "lire",          pt: "ler",          fausses: ["escrever", "estudar", "aprender"] },
+  { fr: "difficile",     pt: "difícil",      fausses: ["fácil", "simples", "duro"] },
+  { fr: "facile",        pt: "fácil",        fausses: ["difícil", "duro", "simples"] },
+  { fr: "important",     pt: "importante",   fausses: ["útil", "necessário", "sério"] },
+  { fr: "différent",     pt: "diferente",    fausses: ["similar", "igual", "idêntico"] },
+  { fr: "mathématiques", pt: "matemática",   fausses: ["ciência", "história", "arte"] },
+  { fr: "histoire",      pt: "história",     fausses: ["geografia", "ciência", "língua"] },
+  { fr: "géographie",    pt: "geografia",    fausses: ["história", "ciência", "matemática"] },
+  { fr: "musique",       pt: "música",       fausses: ["arte", "dança", "teatro"] },
+  { fr: "pays",          pt: "país",         fausses: ["cidade", "vila", "região"] },
+  { fr: "montagne",      pt: "montanha",     fausses: ["colina", "vulcão", "rocha"] },
+  { fr: "forêt",         pt: "floresta",     fausses: ["selva", "parque", "jardim"] },
+  { fr: "rivière",       pt: "rio",          fausses: ["lago", "mar", "riacho"] },
+];
+
+const TRAD_PT_CM1 = [
+  { fr: "gouvernement",  pt: "governo",       fausses: ["país", "república", "estado"] },
+  { fr: "environnement", pt: "meio ambiente", fausses: ["natureza", "clima", "planeta"] },
+  { fr: "expérience",    pt: "experiência",   fausses: ["pesquisa", "prova", "estudo"] },
+  { fr: "découverte",    pt: "descoberta",    fausses: ["invenção", "resultado", "pesquisa"] },
+  { fr: "électricité",   pt: "eletricidade",  fausses: ["energia", "corrente", "força"] },
+  { fr: "température",   pt: "temperatura",   fausses: ["tempo", "calor", "grau"] },
+  { fr: "volcan",        pt: "vulcão",        fausses: ["montanha", "cratera", "erupção"] },
+  { fr: "boussole",      pt: "bússola",       fausses: ["direção", "norte", "mapa"] },
+  { fr: "expédition",    pt: "expedição",     fausses: ["viagem", "excursão", "tour"] },
+  { fr: "laboratoire",   pt: "laboratório",   fausses: ["pesquisa", "ciência", "estudo"] },
+  { fr: "territoire",    pt: "território",    fausses: ["país", "região", "área"] },
+  { fr: "population",    pt: "população",     fausses: ["pessoas", "sociedade", "comunidade"] },
+  { fr: "catastrophe",   pt: "catástrofe",    fausses: ["acidente", "crise", "emergência"] },
+];
+
+const TRAD_PT_CM2 = [
+  { fr: "civilisation",  pt: "civilização",   fausses: ["cultura", "império", "sociedade"] },
+  { fr: "constitution",  pt: "constituição",  fausses: ["lei", "carta", "tratado"] },
+  { fr: "agriculture",   pt: "agricultura",   fausses: ["colheita", "fazenda", "cultivo"] },
+  { fr: "coopération",   pt: "cooperação",    fausses: ["acordo", "aliança", "amizade"] },
+  { fr: "biologie",      pt: "biologia",      fausses: ["química", "física", "ciência"] },
+  { fr: "révolution",    pt: "revolução",     fausses: ["levante", "mudança", "movimento"] },
+  { fr: "démocratie",    pt: "democracia",    fausses: ["república", "liberdade", "política"] },
+  { fr: "atmosphère",    pt: "atmosfera",     fausses: ["ar", "céu", "clima"] },
+  { fr: "continent",     pt: "continente",    fausses: ["país", "ilha", "península"] },
+  { fr: "patrimoine",    pt: "patrimônio",    fausses: ["cultura", "história", "tradição"] },
+  { fr: "photosynthèse", pt: "fotossíntese",  fausses: ["biologia", "crescimento", "oxigênio"] },
+  { fr: "énergie",       pt: "energia",       fausses: ["força", "corrente", "combustível"] },
+];
+
+export function lancerTraductionPortugais() {
+  elTitre.textContent = "🇵🇹 Traduction";
+  const diff = getDifficulte();
+  let liste;
+  if (estCM2()) {
+    liste = diff === 0 ? TRAD_PT_CM2.slice(0, 8) : diff === 1 ? TRAD_PT_CM2 : [...TRAD_PT_CM1, ...TRAD_PT_CM2];
+  } else if (estCM1()) {
+    liste = diff === 0 ? TRAD_PT_CM1.slice(0, 8) : diff === 1 ? TRAD_PT_CM1 : [...TRAD_PT_CM1, ...TRAD_PT_CM2.slice(0, 6)];
+  } else if (estCE2()) {
+    liste = diff === 0 ? TRAD_PT_CE2.slice(0, 8) : diff === 1 ? TRAD_PT_CE2 : [...TRAD_PT_CE1, ...TRAD_PT_CE2];
+  } else if (estCE1()) {
+    liste = diff === 0 ? TRAD_PT_CE1.slice(0, 8) : diff === 1 ? TRAD_PT_CE1 : [...TRAD_PT_CE1, ...TRAD_PT_CE2.slice(0, 6)];
+  } else {
+    liste = diff === 0 ? TRAD_PT_CP.slice(0, 8) : diff === 1 ? TRAD_PT_CP : [...TRAD_PT_CP, ...TRAD_PT_CE1.slice(0, 6)];
+  }
+  const item = liste[Math.floor(Math.random() * liste.length)];
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.9rem;margin-bottom:0.4rem'>Comment dit-on en portugais ?</p>" +
+    `<p style="font-size:2.2rem;font-weight:700;color:var(--primaire);margin:0">${item.fr}</p>`;
+
+  const fausses = melanger(item.fausses).slice(0, 3);
+  const options = melanger([item.pt, ...fausses]);
+  setBonneReponse(options.indexOf(item.pt));
+
+  elChoix.innerHTML = "";
+  options.forEach((mot, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = mot;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
     elChoix.appendChild(b);
   });
 }

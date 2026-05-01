@@ -10,9 +10,11 @@
   <meta name="keywords" content="montessori enfants, jeux éducatifs montessori, apprendre en jouant enfants, jeux maths primaire gratuits, méthode montessori jeux, apprentissage CP CE1 CE2 CM1 CM2, jeux éducatifs 6 ans 7 ans 8 ans 9 ans 10 ans 11 ans, perles dorées montessori, planche des cent" />
   <meta name="author" content="Apprentissage Magique" />
   <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://apprentissage-magique.fr/" />
 
   <!-- Open Graph (partage réseaux sociaux) -->
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://apprentissage-magique.fr/" />
   <meta property="og:title" content="Jeux Montessori — Apprendre en s'amusant pour enfants" />
   <meta property="og:description" content="40 mini-jeux éducatifs Montessori gratuits pour les enfants du CP au CM2 (6–11 ans). Maths, lecture, grammaire, géométrie. Gratuit, sans inscription." />
   <meta property="og:locale" content="fr_FR" />
@@ -94,11 +96,20 @@
   }
   </script>
 
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5EDQ2KCS8X"></script>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff8c42" />
+  <script>if(localStorage.getItem("theme-nuit")==="1")document.documentElement.setAttribute("data-theme","nuit");</script>
+
+  <!-- Google Analytics 4 — Consent Mode v2 (bloqué par défaut) -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied', wait_for_update: 500 });
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5EDQ2KCS8X"></script>
+  <script>
     gtag('js', new Date());
     gtag('config', 'G-5EDQ2KCS8X');
   </script>
@@ -117,6 +128,9 @@
         <p class="sous-titre" id="sous-titre">Jeux Montessori pour apprendre en s'amusant !</p>
       </div>
       <div class="header-droite">
+        <button type="button" id="btn-theme" class="btn-sons" aria-label="Mode nuit">🌙</button>
+        <button type="button" id="btn-sons" class="btn-sons" aria-label="Sons on/off">🔊</button>
+        <button type="button" id="btn-profils-header" class="btn-sons" aria-label="Changer de profil" hidden>👥</button>
         <div class="streak-header" id="streak-header"></div>
         <div class="score-global" title="Étoiles gagnées">
           <span class="score-icone">⭐</span>
@@ -139,7 +153,72 @@
       </div>
     </section>
 
-    <section id="ecran-genre" class="ecran actif" aria-label="Qui joue ?">
+    <section id="ecran-profils" class="ecran" hidden aria-label="Qui joue ?">
+      <div class="profils-hero">
+        <div class="profils-fox">🦊</div>
+        <h2 class="profils-titre">Qui joue ?</h2>
+      </div>
+      <div id="profils-grille" class="profils-grille"></div>
+      <button type="button" id="btn-ajouter-profil" class="btn-ajouter-profil">➕ Ajouter un enfant</button>
+    </section>
+
+    <section id="ecran-landing" class="ecran" hidden aria-label="Bienvenue">
+      <div class="landing-hero">
+        <div class="landing-fox" aria-hidden="true">🦊</div>
+        <h2 class="landing-titre">Apprends en t'amusant !</h2>
+        <p class="landing-sous-titre">Jeux éducatifs <strong>inspirés Montessori</strong><br>pour les enfants du CP au CM2</p>
+        <button type="button" class="btn-landing-cta" id="btn-landing-cta">Jouer gratuitement 🎉</button>
+        <p class="landing-gratuit">100% gratuit · Sans inscription</p>
+        <button type="button" class="btn-landing-partager" id="btn-landing-partager">📤 Partager à un ami</button>
+      </div>
+
+      <div class="landing-features">
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🎓</span>
+          <div>
+            <strong>Méthode Montessori</strong>
+            <p>Apprentissage par l'expérience, à son rythme</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🎮</span>
+          <div>
+            <strong>40+ mini-jeux</strong>
+            <p>Maths, lecture, grammaire, géométrie, anglais</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🏫</span>
+          <div>
+            <strong>CP · CE1 · CE2 · CM1 · CM2</strong>
+            <p>Adapté automatiquement au niveau de l'enfant</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feat-icon" aria-hidden="true">🏆</span>
+          <div>
+            <strong>Badges &amp; missions</strong>
+            <p>Un compagnon renard pour motiver chaque jour</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-matieres" aria-label="Matières disponibles">
+        <span>🔢 Maths</span>
+        <span>📚 Lecture</span>
+        <span>✍️ Grammaire</span>
+        <span>📐 Géométrie</span>
+        <span>🇬🇧 Anglais</span>
+        <span>🇪🇸 Espagnol</span>
+        <span>🇮🇹 Italien</span>
+        <span>🇵🇹 Portugais</span>
+        <span>⏰ Mesures</span>
+      </div>
+
+      <button type="button" class="btn-landing-cta" id="btn-landing-cta-2">Commencer maintenant 🚀</button>
+    </section>
+
+    <section id="ecran-genre" class="ecran" hidden aria-label="Qui joue ?">
       <div class="genre-conteneur">
         <div class="genre-mascotte" id="mascotte-genre" aria-hidden="true"></div>
         <div class="genre-btns">
@@ -210,6 +289,8 @@
         <span id="classe-info-label"></span>
         <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer de classe">✏️</button>
         <button type="button" id="btn-badges" class="btn-badges-menu">🏅 Trophées</button>
+        <button type="button" id="btn-params" class="btn-params-menu">⚙️ Parents</button>
+        <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager">📤</button>
       </div>
 
       <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
@@ -288,6 +369,14 @@
         <button type="button" class="carte-jeu" data-jeu="conjugaison"   data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">✍️</span><span class="nom-jeu">Conjugaison</span><span class="desc-jeu">Temps et personnes</span></button>
         <button type="button" class="carte-jeu" data-jeu="anglais"       data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇬🇧</span><span class="nom-jeu">English</span><span class="desc-jeu">What is this?</span></button>
         <button type="button" class="carte-jeu" data-jeu="traduction"    data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction</span><span class="desc-jeu">Français → Anglais</span></button>
+        <button type="button" class="carte-jeu" data-jeu="allemand"      data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇩🇪</span><span class="nom-jeu">Deutsch</span><span class="desc-jeu">Was ist das?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="traductionAllemand" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction DE</span><span class="desc-jeu">Français → Allemand</span></button>
+        <button type="button" class="carte-jeu" data-jeu="espagnol"          data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇪🇸</span><span class="nom-jeu">Español</span><span class="desc-jeu">¿Cómo se dice?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="traductionEspagnol" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction ES</span><span class="desc-jeu">Français → Espagnol</span></button>
+        <button type="button" class="carte-jeu" data-jeu="italien"           data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇮🇹</span><span class="nom-jeu">Italiano</span><span class="desc-jeu">Come si dice?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="traductionItalien"  data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction IT</span><span class="desc-jeu">Français → Italien</span></button>
+        <button type="button" class="carte-jeu" data-jeu="portugais"          data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇵🇹</span><span class="nom-jeu">Português</span><span class="desc-jeu">Como se diz?</span></button>
+        <button type="button" class="carte-jeu" data-jeu="traductionPortugais" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction PT</span><span class="desc-jeu">Français → Portugais</span></button>
 
         <h3 class="grille-section">🎓 CM1 &amp; CM2</h3>
         <button type="button" class="carte-jeu" data-jeu="aires"             data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">📐</span><span class="nom-jeu">Aires</span><span class="desc-jeu">Surface des figures</span></button>
@@ -295,6 +384,10 @@
         <button type="button" class="carte-jeu" data-jeu="fractionsCM"       data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">½</span><span class="nom-jeu">Fractions CM</span><span class="desc-jeu">Calcul sur fractions</span></button>
         <button type="button" class="carte-jeu" data-jeu="proportionnalite"  data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">Proportionnalité</span><span class="desc-jeu">Règle de trois</span></button>
         <button type="button" class="carte-jeu" data-jeu="pourcentages"      data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">%</span><span class="nom-jeu">Pourcentages</span><span class="desc-jeu">50%, 25%, 10%</span></button>
+
+        <h3 class="grille-section">🤖 Algorithmie &amp; Code</h3>
+        <button type="button" class="carte-jeu" data-jeu="sequence"   data-cat="algo" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🤖</span><span class="nom-jeu">Algorithmes</span><span class="desc-jeu">Suis les instructions</span></button>
+        <button type="button" class="carte-jeu" data-jeu="code"       data-cat="algo" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">💻</span><span class="nom-jeu">Code</span><span class="desc-jeu">Variables, boucles, conditions</span></button>
 
       </div>
 
@@ -363,6 +456,7 @@
           </button>
         </div>
         <button type="button" class="btn-dressing" id="btn-dressing">👗 Dressing</button>
+        <button type="button" class="btn-certificat" id="btn-certificat">🎓 Mon Bulletin</button>
       </div>
     </section>
 
@@ -378,6 +472,7 @@
       <button type="button" class="btn-retour" id="btn-retour">← Menu</button>
       <div class="diff-badge" id="diff-badge" hidden></div>
       <h2 id="jeu-titre" class="jeu-titre"></h2>
+      <div id="chrono" class="chrono" hidden></div>
       <div id="zone-question" class="zone-question"></div>
       <div id="zone-choix" class="zone-choix"></div>
       <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
@@ -400,6 +495,17 @@
     <div id="renard-reaction" class="renard-reaction" aria-hidden="true" hidden></div>
     <div id="confetti" class="confetti" aria-hidden="true"></div>
   </div>
+  <div id="banner-rgpd" class="banner-rgpd" hidden role="dialog" aria-label="Gestion des cookies">
+    <p class="banner-rgpd-texte">
+      🍪 Ce site utilise Google Analytics pour mesurer son audience. Aucune donnée personnelle n'est transmise sans votre accord.
+      <a href="politique-confidentialite.html" class="banner-rgpd-lien">En savoir plus</a>
+    </p>
+    <div class="banner-rgpd-btns">
+      <button type="button" id="btn-rgpd-refuser" class="btn-rgpd btn-rgpd-refuser">Refuser</button>
+      <button type="button" id="btn-rgpd-accepter" class="btn-rgpd btn-rgpd-accepter">Accepter</button>
+    </div>
+  </div>
+
   <footer class="seo-footer">
     <p>
       <strong>Apprentissage Magique</strong> est une application éducative gratuite inspirée de la
