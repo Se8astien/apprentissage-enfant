@@ -270,8 +270,11 @@ function lancerDepuisSelecteur() {
       ecranLanding.classList.remove("actif");
       demarrerApp();
     };
-    document.getElementById("btn-landing-cta").addEventListener("click", go);
-    document.getElementById("btn-landing-cta-2").addEventListener("click", go);
+    const cta1 = document.getElementById("btn-landing-cta");
+    const cta2 = document.getElementById("btn-landing-cta-2");
+    if (cta1) cta1.addEventListener("click", go);
+    if (cta2) cta2.addEventListener("click", go);
+    if (!cta1 && !cta2) go();
   } else {
     demarrerApp();
   }
@@ -628,16 +631,21 @@ if (btnPartagerMenu) btnPartagerMenu.addEventListener("click", partager);
     if (consentSauve === "accepte") chargerAnalytics();
   }
 
-  document.getElementById("btn-rgpd-accepter").addEventListener("click", () => {
-    setAnalyticsConsent("accepte");
-    chargerAnalytics();
-    banner.hidden = true;
-  });
-
-  document.getElementById("btn-rgpd-refuser").addEventListener("click", () => {
-    setAnalyticsConsent("refuse");
-    banner.hidden = true;
-  });
+  const btnAccept = document.getElementById("btn-rgpd-accepter");
+  const btnRefuse = document.getElementById("btn-rgpd-refuser");
+  if (btnAccept) {
+    btnAccept.addEventListener("click", () => {
+      setAnalyticsConsent("accepte");
+      chargerAnalytics();
+      banner.hidden = true;
+    });
+  }
+  if (btnRefuse) {
+    btnRefuse.addEventListener("click", () => {
+      setAnalyticsConsent("refuse");
+      banner.hidden = true;
+    });
+  }
 })();
 
 // ── Mode nuit ─────────────────────────────────────────────────────────────────
@@ -775,3 +783,18 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.getRegistration().then((r) => r?.update()).catch(() => {});
   }, 3600000);
 }
+
+setTimeout(() => {
+  if (!document.querySelector(".ecran.actif")) {
+    try {
+      demarrerApp();
+    } catch {
+      const ecranGenre = document.getElementById("ecran-genre");
+      if (ecranGenre) {
+        document.querySelectorAll(".ecran").forEach(e => { e.hidden = true; e.classList.remove("actif"); });
+        ecranGenre.hidden = false;
+        ecranGenre.classList.add("actif");
+      }
+    }
+  }
+}, 250);
