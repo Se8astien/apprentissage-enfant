@@ -15,7 +15,7 @@
     "aires", "decimaux", "fractionsCM", "proportionnalite", "pourcentages",
     "sequence", "code"
   ],
-  "dernierJeuAmeliore": "compte",
+  "dernierJeuAmeliore": "addition",
   "historique": [
     {
       "jeu": "compte",
@@ -26,6 +26,17 @@
         "CE1 : question 'Lequel en a le moins ?' avec boutons emoji",
         "CE2 : question 'Combien de X exactement ?' pour le dénombrement ciblé",
         "Label de catégorie dans les questions (animaux/fruits/...)"
+      ]
+    },
+    {
+      "jeu": "addition",
+      "date": "2026-05-01",
+      "ameliorations": [
+        "Correction bug critique : cadreDixAddition et cadreDixSoustraction étaient appelées mais non définies",
+        "CP diff 0 : ten-frame fonctionnel (2 rangées de 5 cases colorées) pour visualiser l'addition",
+        "CE1 : nouveau type de question 'complément à la dizaine' (ex: 27 + ? = 30) — 25% des questions",
+        "CE1 diff 1 : indice affiché montrant la distance à la dizaine suivante",
+        "CM1 : nouveau type de question 'terme manquant' (ex: ? + 234 = 567) — 25% des questions"
       ]
     }
   ]

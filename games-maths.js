@@ -204,6 +204,27 @@ export function lancerCompte() {
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }
 
+// ── Cadres-dix (ten-frames) ───────────────────────────────────────────────────
+function cadreDixAddition(a, b) {
+  let cells = '';
+  for (let i = 0; i < 10; i++) {
+    if (i < a) cells += '<div class="dix-cel dix-a"></div>';
+    else if (i < a + b) cells += '<div class="dix-cel dix-b"></div>';
+    else cells += '<div class="dix-cel"></div>';
+  }
+  return `<div class="cadre-dix-add">${cells}</div>`;
+}
+
+function cadreDixSoustraction(total, enleve) {
+  let cells = '';
+  for (let i = 0; i < 10; i++) {
+    if (i >= total) cells += '<div class="dix-cel"></div>';
+    else if (i >= total - enleve) cells += '<div class="dix-cel dix-retire"></div>';
+    else cells += '<div class="dix-cel dix-a"></div>';
+  }
+  return `<div class="cadre-dix-add">${cells}</div>`;
+}
+
 // ── lancerAddition ────────────────────────────────────────────────────────────
 export function lancerAddition() {
   elTitre.textContent = "Addition magique";
@@ -250,6 +271,18 @@ export function lancerAddition() {
   if (estCM1()) {
     const maxCM1 = [999, 4999, 9999][diff];
     total = 100 + Math.floor(Math.random() * maxCM1);
+    if (diff > 0 && Math.random() < 0.25) {
+      b = 1 + Math.floor(Math.random() * (total - 1));
+      a = total - b;
+      html =
+        "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Trouve le terme manquant :</p>" +
+        '<p class="equation" style="font-size:2.2rem;font-weight:700">' + b + " + ? = " + total + "</p>";
+      elQuestion.innerHTML = html;
+      setBonneReponse(a);
+      const propsM = propositionsAvecBonne(a, Math.max(1, a - 500), Math.min(9999, a + 500), 3);
+      afficherChoix(propsM, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+      return;
+    }
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
     html =
@@ -314,8 +347,30 @@ export function lancerAddition() {
     return;
   }
 
-  // CE1 : addition jusqu'à 79, parfois avec un multiple de 10 (20%)
+  // CE1 : addition jusqu'à 79
   const maxCE1 = [30, 55, 79][diff];
+
+  // 25% chance (diff > 0) : complément à la dizaine — ex: 27 + ? = 30
+  if (diff > 0 && Math.random() < 0.25) {
+    a = 11 + Math.floor(Math.random() * Math.max(1, maxCE1 - 12));
+    if (a % 10 === 0) a++;
+    const prochaineDiv = Math.ceil(a / 10) * 10;
+    const complement = prochaineDiv - a;
+    setBonneReponse(complement);
+    html =
+      "<p>Combien faut-il <strong>ajouter</strong> à <strong>" + a + "</strong> pour arriver à " + prochaineDiv + " ?</p>" +
+      '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.75rem">' +
+      a + " + ? = " + prochaineDiv + "</p>";
+    if (diff === 1) {
+      html += '<p class="decomp-hint">💡 ' + a + " est à " + complement + " de " + prochaineDiv + '</p>';
+    }
+    elQuestion.innerHTML = html;
+    const propsC = propositionsAvecBonne(complement, Math.max(1, complement - 4), Math.min(9, complement + 4), 3);
+    afficherChoix(propsC, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  // Addition standard CE1 — parfois avec un multiple de 10 (20%)
   const useDizaine = Math.random() < 0.20;
   if (useDizaine) {
     const dizaines = [10, 20, 30, 40, 50];
