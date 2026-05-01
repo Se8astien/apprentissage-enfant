@@ -28,7 +28,15 @@ import {
   getDiffLabel,
   marquerMaitrise,
   lireMaitrise,
+  escapeHtml,
+  NIVEAUX_LABELS,
+  DIFFICULTE_ICONES,
+  DIFFICULTE_LABELS,
+  piegerFocus,
 } from "./app-state.js";
+
+import { track } from "./app-analytics.js";
+import { sonBonne, sonMauvaise, sonCombo } from "./app-sons.js";
 
 import {
   ajouterEtoiles,
@@ -48,11 +56,142 @@ import {
   BADGES,
 } from "./app-gamification.js";
 
+import { getHistoireJeu } from "./app-histoire.js";
+
 // Re-export confetti so game files can import it from here if desired
 export { confetti } from "./app-state.js";
 
 // ── Module-level combo counter (only used in nav) ─────────────────────────────
 let comboActuel = 0;
+
+// ── Mode chrono ───────────────────────────────────────────────────────────────
+let _chronoTimer = null;
+
+function startChrono() {
+  if (!estGrand()) return;
+  stopChrono();
+  const el = document.getElementById("chrono");
+  if (!el) return;
+  let secs = 30;
+  el.hidden = false;
+  el.textContent = `⏱ ${secs}s`;
+  el.className = "chrono";
+  _chronoTimer = setInterval(() => {
+    secs--;
+    if (secs <= 0) { clearInterval(_chronoTimer); _chronoTimer = null; chronoExpire(); return; }
+    el.textContent = `⏱ ${secs}s`;
+    if (secs <= 10) el.className = "chrono chrono-urgent";
+  }, 1000);
+}
+
+function stopChrono() {
+  if (_chronoTimer) { clearInterval(_chronoTimer); _chronoTimer = null; }
+  const el = document.getElementById("chrono");
+  if (el) el.hidden = true;
+}
+
+function chronoExpire() {
+  if (getRepondu()) return;
+  setRepondu(true);
+  stopChrono();
+  elChoix.querySelectorAll(".btn-choix").forEach(btn => {
+    btn.disabled = true;
+    if (Number(btn.dataset.valeur) === getBonneReponse() || btn.dataset.valeur === String(getBonneReponse()))
+      btn.classList.add("bonne");
+  });
+  track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant(), timeout: true });
+  sonMauvaise();
+  comboActuel = 0;
+  elFeedback.textContent = "⏰ Temps écoulé !";
+  elFeedback.className = "feedback non";
+  declencherReactionRenard(false);
+  elSuivant.hidden = false;
+}
+
+// ── Mode révision ─────────────────────────────────────────────────────────────
+const _wrongByGame = {};
+let _modeRevision = null;
+
+export function getWrongQuestions(jeu) { return _wrongByGame[jeu] || []; }
+export function clearWrongQuestions(jeu) { delete _wrongByGame[jeu]; }
+
+export function entrerRevision(jeu, questions) {
+  const qs = [...questions];
+  clearWrongQuestions(jeu);
+  _modeRevision = { jeu, questions: qs, index: 0 };
+  setJeuCourant(jeu);
+  comboActuel = 0;
+  elMenu.hidden = true; elMenu.classList.remove("actif");
+  elJeu.hidden = false; elJeu.classList.add("actif");
+  setBadgeVisible(true);
+  resetFeedback();
+  const titre = document.getElementById("jeu-titre");
+  if (titre) titre.textContent = "🔁 Révision";
+  _afficherRevision();
+}
+
+function _afficherRevision() {
+  if (!_modeRevision || _modeRevision.index >= _modeRevision.questions.length) {
+    _modeRevision = null;
+    montrerMenu();
+    afficherMissions();
+    return;
+  }
+  const q = _modeRevision.questions[_modeRevision.index];
+  const zq = document.getElementById("zone-question");
+  if (zq) zq.innerHTML = q.html;
+  elChoix.innerHTML = "";
+  setBonneReponse(q.bonne);
+  q.options.forEach((texte, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.textContent = texte;
+    if (q.isText) {
+      b.dataset.valeur = texte;
+      b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));
+    } else {
+      b.dataset.valeur = String(idx);
+      b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    }
+    elChoix.appendChild(b);
+  });
+}
+
+// ── Histoires jeu : vues une fois par session ─────────────────────────────────
+const _histoiresVues = new Set();
+
+function afficherHistoireJeu(jeu) {
+  if (_histoiresVues.has(jeu)) return;
+  const info = getHistoireJeu(jeu, getNiveauCourant());
+  if (!info) return;
+  _histoiresVues.add(jeu);
+
+  const stade = getStade(lireEtoiles());
+  const nom = lireNomRenard() || "Foxy";
+  const texte = info.texte.replace(/\[Nom\]/g, escapeHtml(nom));
+
+  const overlay = document.createElement("div");
+  overlay.className = "evolution-overlay";
+  overlay.innerHTML = `
+    <div class="evolution-carte histoire-intro-carte">
+      <p class="histoire-intro-emoji">${info.emoji}</p>
+      <p class="evolution-titre">${info.titre}</p>
+      <p class="histoire-intro-texte">${texte}</p>
+      <div class="evolution-renard">${svgRenard(stade, 80)}</div>
+      <button type="button" class="btn-evolution-fermer">Jouer ! 🎮</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  piegerFocus(overlay);
+  const prevFocus = document.activeElement;
+  const fermer = () => {
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 0.3s";
+    setTimeout(() => { overlay.remove(); if (prevFocus) prevFocus.focus(); }, 300);
+  };
+  overlay.querySelector(".btn-evolution-fermer").addEventListener("click", fermer);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) fermer(); });
+}
 
 // ── Anti-répétition : historique des questions par jeu (session) ──────────────
 const _histoireQuestions = {};
@@ -146,12 +285,15 @@ function declencherCombo(nb, onFermer) {
     <div class="evolution-carte combo-carte">
       <div class="evolution-renard">${svgRenard(stade, 100)}</div>
       <p class="combo-flamme">${nb >= 10 ? "🔥🔥 COMBO ×10 ! 🔥🔥" : "🔥 COMBO ×5 !"}</p>
-      <p class="evolution-titre">${nom} est fier de toi !</p>
+      <p class="evolution-titre">${escapeHtml(nom)} est fier de toi !</p>
       <p class="evolution-msg">+${bonus} ⭐ bonus !</p>
       <button type="button" class="btn-evolution-fermer">Super !</button>
     </div>`;
   document.body.appendChild(overlay);
+  piegerFocus(overlay);
+  const prevFocusCombo = document.activeElement;
   confetti();
+  sonCombo();
   if (nb >= 5) {
     progresserMission("combo5");
     afficherMissions();
@@ -165,6 +307,7 @@ function declencherCombo(nb, onFermer) {
   }
   const fermer = () => {
     overlay.remove();
+    if (prevFocusCombo) prevFocusCombo.focus();
     if (onFermer) onFermer();
   };
   overlay.querySelector(".btn-evolution-fermer").addEventListener("click", fermer);
@@ -179,26 +322,31 @@ export function resetFeedback() {
   setRepondu(false);
 }
 
-// ── apresReponse ──────────────────────────────────────────────────────────────
-export function apresReponse(choix, bouton, correct) {
+// ── apresReponse (implémentation commune) ─────────────────────────────────────
+function _apresReponseImpl(choix, bouton, correct, isText) {
   if (getRepondu()) return;
   setRepondu(true);
+  stopChrono();
   const boutons = elChoix.querySelectorAll(".btn-choix");
   boutons.forEach((btn) => {
     btn.disabled = true;
-    const v = Number(btn.dataset.valeur);
-    if (v === correct) btn.classList.add("bonne");
+    const estBonne = isText
+      ? btn.dataset.valeur === String(correct)
+      : Number(btn.dataset.valeur) === correct;
+    if (estBonne) btn.classList.add("bonne");
   });
   if (choix !== correct) bouton.classList.add("mauvaise");
 
   if (choix === correct) {
     comboActuel++;
+    track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
-    elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
+    elFeedback.textContent = "✓ " + ok[Math.floor(Math.random() * ok.length)];
     elFeedback.className = "feedback ok";
     ajouterEtoiles(1);
     sauverFaim(lireFaim() + 5);
     confetti();
+    sonBonne();
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
     progresserMission("bonnes");
@@ -217,59 +365,29 @@ export function apresReponse(choix, bouton, correct) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    if (!_modeRevision) {
+      const _jeu = getJeuCourant();
+      if (!_wrongByGame[_jeu]) _wrongByGame[_jeu] = [];
+      const _zq = document.getElementById("zone-question");
+      _wrongByGame[_jeu].push({ html: _zq ? _zq.innerHTML : "", bonne: correct, isText, options: [...elChoix.querySelectorAll(".btn-choix")].map(b => b.textContent.trim()) });
+    }
+    track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    sonMauvaise();
     comboActuel = 0;
     const ko = messagesKo();
-    elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
+    elFeedback.textContent = "✗ " + ko[Math.floor(Math.random() * ko.length)];
     elFeedback.className = "feedback non";
     declencherReactionRenard(false);
   }
   elSuivant.hidden = false;
 }
 
-// ── apresReponseTexte — for games that use string values (compare symbols) ────
-export function apresReponseTexte(choix, bouton, correct) {
-  if (getRepondu()) return;
-  setRepondu(true);
-  const boutons = elChoix.querySelectorAll(".btn-choix");
-  boutons.forEach((btn) => {
-    btn.disabled = true;
-    if (btn.dataset.valeur === String(correct)) btn.classList.add("bonne");
-  });
-  if (choix !== correct) bouton.classList.add("mauvaise");
+export function apresReponse(choix, bouton, correct) {
+  _apresReponseImpl(choix, bouton, correct, false);
+}
 
-  if (choix === correct) {
-    comboActuel++;
-    const ok = messagesOk();
-    elFeedback.textContent = ok[Math.floor(Math.random() * ok.length)];
-    elFeedback.className = "feedback ok";
-    ajouterEtoiles(1);
-    sauverFaim(lireFaim() + 5);
-    confetti();
-    declencherReactionRenard(true);
-    incrementStats(true, getJeuCourant());
-    progresserMission("bonnes");
-    progresserMission("etoiles");
-    progresserMission("jeux", getJeuCourant());
-    afficherMissions();
-    const newBadges = verifierBadgesStats();
-    newBadges.forEach(id => { const b = BADGES.find(x => x.id === id); if (b) afficherNotifBadge(b); });
-    if (comboActuel % 10 === 0) {
-      declencherCombo(10, () => {
-        marquerMaitrise(getJeuCourant(), getDifficulte());
-        gererProgressionDifficulte();
-        if (getDifficulte() === 2) {
-          if (debloquerBadge("diff_expert")) { const b = BADGES.find(x => x.id === "diff_expert"); if (b) afficherNotifBadge(b); }
-        }
-      });
-    } else if (comboActuel === 5) declencherCombo(5);
-  } else {
-    comboActuel = 0;
-    const ko = messagesKo();
-    elFeedback.textContent = ko[Math.floor(Math.random() * ko.length)];
-    elFeedback.className = "feedback non";
-    declencherReactionRenard(false);
-  }
-  elSuivant.hidden = false;
+export function apresReponseTexte(choix, bouton, correct) {
+  _apresReponseImpl(choix, bouton, correct, true);
 }
 
 // ── Progression de difficulté ─────────────────────────────────────────────────
@@ -307,6 +425,7 @@ function proposerClasseSuivante() {
 // ── Filtrage jeux par niveau (programme EN) ───────────────────────────────────
 function filtrerJeuxParNiveau() {
   const n = getNiveauCourant();
+  const masques = (() => { try { return JSON.parse(localStorage.getItem("jeux-masques")) || []; } catch { return []; } })();
   let sectionCourante = null;
   let sectionVisible = false;
   document.querySelectorAll(".grille-jeux > *").forEach(el => {
@@ -316,7 +435,7 @@ function filtrerJeuxParNiveau() {
       sectionVisible = false;
     } else if (el.classList.contains("carte-jeu")) {
       const niveaux = (el.dataset.niveaux || "cp ce1 ce2 cm1 cm2").split(" ");
-      const visible = niveaux.includes(n);
+      const visible = niveaux.includes(n) && !masques.includes(el.dataset.jeu);
       el.hidden = !visible;
       if (visible) sectionVisible = true;
     }
@@ -326,6 +445,8 @@ function filtrerJeuxParNiveau() {
 
 // ── montrerMenu ───────────────────────────────────────────────────────────────
 export function montrerMenu() {
+  stopChrono();
+  _modeRevision = null;
   setJeuCourant(null);
   setBadgeVisible(false);
   elGenre.hidden = true;
@@ -344,7 +465,7 @@ export function montrerMenu() {
   mettreAJourMaisonBanner();
   // Update classe/difficulte info bar
   const classeLabel = document.getElementById("classe-info-label");
-  if (classeLabel) classeLabel.textContent = { cp: "🌱 CP", ce1: "🚀 CE1", ce2: "⭐ CE2", cm1: "🌟 CM1", cm2: "🏆 CM2" }[getNiveauCourant()] || "";
+  if (classeLabel) classeLabel.textContent = NIVEAUX_LABELS[getNiveauCourant()] || "";
   filtrerJeuxParNiveau();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
     const jeu = btn.dataset.jeu;
@@ -358,8 +479,8 @@ export function montrerMenu() {
     let diffEl = btn.querySelector(".carte-diff-badge");
     if (!diffEl) { diffEl = document.createElement("span"); diffEl.className = "carte-diff-badge"; btn.appendChild(diffEl); }
     const d = getDifficulteJeu(jeu);
-    diffEl.textContent = ["🌱", "⚡", "🔥"][d];
-    diffEl.title = ["Débutant", "Normal", "Expert"][d];
+    diffEl.textContent = DIFFICULTE_ICONES[d];
+    diffEl.title = DIFFICULTE_LABELS[d].replace(/^[^\s]+\s/, "");
 
     btn.classList.toggle("jeu-maitrise", n === 3);
   });
@@ -379,11 +500,21 @@ export function montrerJeu(nom, lanceurs) {
   resetFeedback();
   _histoireQuestions[nom] = [];
   lancerAvecAntiRepeat(nom, lanceurs);
+  startChrono();
+  afficherHistoireJeu(nom);
 }
 
 // ── questionSuivante ──────────────────────────────────────────────────────────
 export function questionSuivante(lanceurs) {
   resetFeedback();
+  if (_modeRevision) {
+    _modeRevision.index++;
+    _afficherRevision();
+    return;
+  }
   const jeu = getJeuCourant();
-  if (jeu && lanceurs[jeu]) lancerAvecAntiRepeat(jeu, lanceurs);
+  if (jeu && lanceurs[jeu]) {
+    lancerAvecAntiRepeat(jeu, lanceurs);
+    startChrono();
+  }
 }

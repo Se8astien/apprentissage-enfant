@@ -1,0 +1,15 @@
+{
+  "ordre": [
+    "compte", "addition", "soustraction", "compare", "suite", "doubles", "moitie",
+    "dizaines", "pairimpair", "perlesDorees", "planche100",
+    "formes", "fractions", "symetrie", "perimetre", "angles",
+    "calendrier", "heure", "durees", "mesures", "masse",
+    "monnaiecp", "monnaiece1",
+    "multiplication", "division", "probleme",
+    "sons", "syllabes", "lecture", "lecturePhrase", "phraseMobile",
+    "lectureTexte", "grammaire", "homophones", "synonymes", "conjugaison",
+    "anglais", "traduction",
+    "aires", "decimaux", "fractionsCM", "proportionnalite", "pourcentages"
+  ],
+  "ameliores": ["compte", "addition", "soustraction"]
+}

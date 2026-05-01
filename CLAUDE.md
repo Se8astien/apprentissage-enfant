@@ -136,4 +136,9 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - **Ne modifier que la branche concernée** sans toucher aux autres niveaux
 - **Pas de commentaires** sauf pour les invariants non-évidents
 - **Pas de bundler** — les modules ES natifs suffisent, tester dans un navigateur récent
-- `git checkout master` pour les livraisons finales
+
+## Livraison
+
+- **Développer et committer directement sur `master`** — pas de branche de feature, pas de PR
+- **Pousser sur `master`** : `git push -u origin master`
+- Merger toute branche de travail sur `master` avant de considérer la tâche terminée

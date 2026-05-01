@@ -33,27 +33,52 @@ function afficherChoixTexte(options, bonne) {
 }
 
 // ── lancerCompte ──────────────────────────────────────────────────────────────
+const COMPTE_SETS = [
+  { emojis: ["🐱","🐶","🐰","🐻","🦊","🐸","🐥","🐧","🦋","🐝"], label: "animaux" },
+  { emojis: ["🍎","🍊","🍋","🍇","🍓","🍑","🍒","🥝","🍌","🍉"], label: "fruits" },
+  { emojis: ["🎈","🎁","🎀","⭐","🎮","🧸","🎯","🎪","🪀","🎨"], label: "objets" },
+  { emojis: ["🍕","🍦","🎂","🍩","🍪","🍫","🧁","🍰","🍬","🍭"], label: "gourmandises" },
+];
+
+function pickSet() {
+  return COMPTE_SETS[Math.floor(Math.random() * COMPTE_SETS.length)];
+}
+
+function pick2Emojis(emojis) {
+  const iA = Math.floor(Math.random() * emojis.length);
+  let iB = Math.floor(Math.random() * emojis.length);
+  if (iB === iA) iB = (iA + 1) % emojis.length;
+  return [emojis[iA], emojis[iB]];
+}
+
+function pick3Emojis(emojis) {
+  const idxs = [];
+  while (idxs.length < 3) {
+    const i = Math.floor(Math.random() * emojis.length);
+    if (!idxs.includes(i)) idxs.push(i);
+  }
+  return idxs.map(i => emojis[i]);
+}
+
 export function lancerCompte() {
   elTitre.textContent = "Compte-moi ça !";
+  const diff = getDifficulte();
 
   if (estCE2()) {
-    // CE2 : trois types d'animaux, 3–10 chacun, 40% différence, 60% total
-    const idxs = [];
-    while (idxs.length < 3) {
-      const i = Math.floor(Math.random() * ANIMAUX.length);
-      if (!idxs.includes(i)) idxs.push(i);
-    }
-    const [eA, eB, eC] = idxs.map(i => ANIMAUX[i]);
-    const nA = 3 + Math.floor(Math.random() * 8);
-    const nB = 3 + Math.floor(Math.random() * 8);
-    const nC = 3 + Math.floor(Math.random() * 8);
-    // cap total at ~30
-    const total3 = nA + nB + nC;
+    const set = pickSet();
+    const [minPer, maxPer] = [[2, 5], [3, 8], [4, 11]][diff];
+    const [eA, eB, eC] = pick3Emojis(set.emojis);
+    const rand3 = () => minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
+    const nA = rand3(), nB = rand3(), nC = rand3();
     const lA = Array(nA).fill(eA).join(" ");
     const lB = Array(nB).fill(eB).join(" ");
     const lC = Array(nC).fill(eC).join(" ");
-    const typeDiff3 = Math.random() < 0.40;
-    if (typeDiff3) {
+    const total3 = nA + nB + nC;
+
+    // 3 types de questions en rotation selon difficulté
+    const typeQ = diff === 0 ? 0 : Math.floor(Math.random() * 3);
+    if (typeQ === 1) {
+      // Combien de plus ?
       const maxN = Math.max(nA, nB, nC);
       const minN = Math.min(nA, nB, nC);
       const diff3 = maxN - minN;
@@ -65,67 +90,139 @@ export function lancerCompte() {
         `<p class="ligne-emojis petit">${lA}</p>` +
         `<p class="ligne-emojis petit">${lB}</p>` +
         `<p class="ligne-emojis petit">${lC}</p>`;
-      const props = propositionsAvecBonne(diff3, Math.max(0, diff3 - 5), Math.min(10, diff3 + 5), 3);
+      const props = propositionsAvecBonne(diff3, Math.max(0, diff3 - 5), Math.min(12, diff3 + 5), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
-    } else {
-      setBonneReponse(total3);
+    } else if (typeQ === 2) {
+      // Combien de cet emoji précisément ?
+      const cibleEmoji = [eA, eB, eC][Math.floor(Math.random() * 3)];
+      const cibleN = cibleEmoji === eA ? nA : (cibleEmoji === eB ? nB : nC);
+      setBonneReponse(cibleN);
       elQuestion.innerHTML =
-        `<p>Combien d'animaux <strong>en tout</strong> ?</p>` +
+        `<p>Combien de <strong>${cibleEmoji}</strong> vois-tu en tout ?</p>` +
         `<p class="ligne-emojis petit">${lA}</p>` +
         `<p class="ligne-emojis petit">${lB}</p>` +
         `<p class="ligne-emojis petit">${lC}</p>`;
-      const props = propositionsAvecBonne(total3, Math.max(9, total3 - 8), Math.min(30, total3 + 8), 3);
+      const props = propositionsAvecBonne(cibleN, Math.max(1, cibleN - 4), Math.min(15, cibleN + 4), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else {
+      // Total
+      setBonneReponse(total3);
+      elQuestion.innerHTML =
+        `<p>Combien de ${set.label} <strong>en tout</strong> ?</p>` +
+        `<p class="ligne-emojis petit">${lA}</p>` +
+        `<p class="ligne-emojis petit">${lB}</p>` +
+        `<p class="ligne-emojis petit">${lC}</p>`;
+      const props = propositionsAvecBonne(total3, Math.max(6, total3 - 8), Math.min(36, total3 + 8), 3);
       afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
     }
     return;
   }
 
-  if (!estCE1()) {
-    const n = 3 + Math.floor(Math.random() * 13);
-    const emoji = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
-    const ligne = Array(n).fill(emoji).join(" ");
-    elQuestion.innerHTML =
-      "<p>Combien d'animaux tu vois ?</p>" +
-      '<p class="ligne-emojis' + (n > 8 ? " petit" : "") + '">' + ligne + "</p>";
-    setBonneReponse(n);
-    const props = propositionsAvecBonne(n, Math.max(1, n - 4), Math.min(18, n + 4), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+  if (estCE1()) {
+    const set = pickSet();
+    const [minPer, maxPer] = [[2, 5], [3, 8], [4, 12]][diff];
+    const [emojiA, emojiB] = pick2Emojis(set.emojis);
+    const nA = minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
+    const nB = minPer + Math.floor(Math.random() * (maxPer - minPer + 1));
+    const ligneA = Array(nA).fill(emojiA).join(" ");
+    const ligneB = Array(nB).fill(emojiB).join(" ");
+
+    // 3 types de questions : total / de plus / lequel en a le moins ?
+    const typeQ = diff === 0 ? 0 : Math.floor(Math.random() * 3);
+    if (typeQ === 1 && nA !== nB) {
+      const difference = Math.abs(nA - nB);
+      const plusGrand = nA > nB ? emojiA : emojiB;
+      const plusPetit = nA > nB ? emojiB : emojiA;
+      setBonneReponse(difference);
+      elQuestion.innerHTML =
+        `<p>Combien de ${plusGrand} <strong>de plus</strong> que de ${plusPetit} ?</p>` +
+        `<p class="ligne-emojis petit">${ligneA}</p>` +
+        `<p class="ligne-emojis petit">${ligneB}</p>`;
+      const props = propositionsAvecBonne(difference, Math.max(0, difference - 4), Math.min(12, difference + 4), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    } else if (typeQ === 2 && nA !== nB) {
+      // Lequel en a le moins ? — réponse = l'emoji avec le moins
+      const moinsDe = nA < nB ? emojiA : emojiB;
+      setBonneReponse(moinsDe);
+      elQuestion.innerHTML =
+        `<p>Lequel en a <strong>le moins</strong> ?</p>` +
+        `<p class="ligne-emojis petit">${ligneA}</p>` +
+        `<p class="ligne-emojis petit">${ligneB}</p>`;
+      elChoix.innerHTML = "";
+      [emojiA, emojiB].forEach(em => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-choix";
+        btn.style.fontSize = "2rem";
+        btn.textContent = em;
+        btn.addEventListener("click", () => apresReponse(em, btn, moinsDe));
+        elChoix.appendChild(btn);
+      });
+    } else {
+      const total = nA + nB;
+      setBonneReponse(total);
+      elQuestion.innerHTML =
+        `<p>Combien de ${set.label} <strong>en tout</strong> ?</p>` +
+        `<p class="ligne-emojis petit">${ligneA}</p>` +
+        `<p class="ligne-emojis petit">${ligneB}</p>`;
+      const props = propositionsAvecBonne(total, Math.max(4, total - 5), Math.min(28, total + 5), 3);
+      afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    }
     return;
   }
 
-  // CE1 : deux types d'animaux, total ou différence
-  const idxA = Math.floor(Math.random() * ANIMAUX.length);
-  let idxB = Math.floor(Math.random() * ANIMAUX.length);
-  if (idxB === idxA) idxB = (idxA + 1) % ANIMAUX.length;
-  const emojiA = ANIMAUX[idxA];
-  const emojiB = ANIMAUX[idxB];
-  const nA = 3 + Math.floor(Math.random() * 9);
-  const nB = 3 + Math.floor(Math.random() * 9);
-  const ligneA = Array(nA).fill(emojiA).join(" ");
-  const ligneB = Array(nB).fill(emojiB).join(" ");
+  // CP : difficulté progressive
+  const set = pickSet();
+  const [minN, maxN] = [[1, 5], [3, 10], [6, 15]][diff];
+  const n = minN + Math.floor(Math.random() * (maxN - minN + 1));
+  const emoji = set.emojis[Math.floor(Math.random() * set.emojis.length)];
 
-  const typeDiff = Math.random() < 0.4 && nA !== nB;
-  if (typeDiff) {
-    const diff = Math.abs(nA - nB);
-    const plusGrand = nA > nB ? emojiA : emojiB;
-    const plusPetit = nA > nB ? emojiB : emojiA;
-    setBonneReponse(diff);
-    elQuestion.innerHTML =
-      `<p>Combien de ${plusGrand} <strong>de plus</strong> que de ${plusPetit} ?</p>` +
-      `<p class="ligne-emojis petit">${ligneA}</p>` +
-      `<p class="ligne-emojis petit">${ligneB}</p>`;
-    const props = propositionsAvecBonne(diff, Math.max(0, diff - 4), Math.min(12, diff + 4), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+  let lignesHtml;
+  if (diff === 0) {
+    // Débutant : rangées de 5 avec numérotation cumulée pour aider le dénombrement
+    const rows = [];
+    let rem = n;
+    let cumul = 0;
+    while (rem > 0) {
+      const take = Math.min(5, rem);
+      cumul += take;
+      rows.push(
+        `<p class="ligne-emojis" style="display:flex;align-items:center;gap:0.4rem;justify-content:center">` +
+        `${Array(take).fill(emoji).join(" ")}` +
+        `<span style="font-size:0.85rem;color:#888;min-width:1.8rem">→ ${cumul}</span></p>`
+      );
+      rem -= take;
+    }
+    lignesHtml = rows.join("");
   } else {
-    const total = nA + nB;
-    setBonneReponse(total);
-    elQuestion.innerHTML =
-      `<p>Combien d'animaux <strong>en tout</strong> ?</p>` +
-      `<p class="ligne-emojis petit">${ligneA}</p>` +
-      `<p class="ligne-emojis petit">${ligneB}</p>`;
-    const props = propositionsAvecBonne(total, Math.max(4, total - 5), Math.min(24, total + 5), 3);
-    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    lignesHtml = `<p class="ligne-emojis${n > 8 ? " petit" : ""}">${Array(n).fill(emoji).join(" ")}</p>`;
   }
+
+  elQuestion.innerHTML = `<p>Combien de ${set.label} tu vois ?</p>${lignesHtml}`;
+  setBonneReponse(n);
+  const props = propositionsAvecBonne(n, Math.max(1, n - 3), Math.min(maxN + 3, n + 3), 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── Cadres-dix (ten-frames) ───────────────────────────────────────────────────
+function cadreDixAddition(a, b) {
+  let cells = '';
+  for (let i = 0; i < 10; i++) {
+    if (i < a) cells += '<div class="dix-cel dix-a"></div>';
+    else if (i < a + b) cells += '<div class="dix-cel dix-b"></div>';
+    else cells += '<div class="dix-cel"></div>';
+  }
+  return `<div class="cadre-dix-add">${cells}</div>`;
+}
+
+function cadreDixSoustraction(total, enleve) {
+  let cells = '';
+  for (let i = 0; i < 10; i++) {
+    if (i >= total) cells += '<div class="dix-cel"></div>';
+    else if (i >= total - enleve) cells += '<div class="dix-cel dix-retire"></div>';
+    else cells += '<div class="dix-cel dix-a"></div>';
+  }
+  return `<div class="cadre-dix-add">${cells}</div>`;
 }
 
 // ── lancerAddition ────────────────────────────────────────────────────────────
@@ -174,6 +271,18 @@ export function lancerAddition() {
   if (estCM1()) {
     const maxCM1 = [999, 4999, 9999][diff];
     total = 100 + Math.floor(Math.random() * maxCM1);
+    if (diff > 0 && Math.random() < 0.25) {
+      b = 1 + Math.floor(Math.random() * (total - 1));
+      a = total - b;
+      html =
+        "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Trouve le terme manquant :</p>" +
+        '<p class="equation" style="font-size:2.2rem;font-weight:700">' + b + " + ? = " + total + "</p>";
+      elQuestion.innerHTML = html;
+      setBonneReponse(a);
+      const propsM = propositionsAvecBonne(a, Math.max(1, a - 500), Math.min(9999, a + 500), 3);
+      afficherChoix(propsM, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+      return;
+    }
     a = 1 + Math.floor(Math.random() * (total - 1));
     b = total - a;
     html =
@@ -208,7 +317,12 @@ export function lancerAddition() {
     a = 1 + Math.floor(Math.random() * maxCP);
     b = 1 + Math.floor(Math.random() * maxCP);
     total = a + b;
-    if (total <= 10) {
+    if (diff === 0 && total <= 10) {
+      html =
+        "<p>Combien <strong>en tout</strong> ?</p>" +
+        cadreDixAddition(a, b) +
+        '<p class="dix-legende"><span class="dix-leg-a">' + a + '</span> + <span class="dix-leg-b">' + b + '</span> = ?</p>';
+    } else if (total <= 10) {
       const e1 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
       let e2 = ANIMAUX[Math.floor(Math.random() * ANIMAUX.length)];
       if (e2 === e1) e2 = ANIMAUX[(ANIMAUX.indexOf(e1) + 1) % ANIMAUX.length];
@@ -233,8 +347,30 @@ export function lancerAddition() {
     return;
   }
 
-  // CE1 : addition jusqu'à 79, parfois avec un multiple de 10 (20%)
+  // CE1 : addition jusqu'à 79
   const maxCE1 = [30, 55, 79][diff];
+
+  // 25% chance (diff > 0) : complément à la dizaine — ex: 27 + ? = 30
+  if (diff > 0 && Math.random() < 0.25) {
+    a = 11 + Math.floor(Math.random() * Math.max(1, maxCE1 - 12));
+    if (a % 10 === 0) a++;
+    const prochaineDiv = Math.ceil(a / 10) * 10;
+    const complement = prochaineDiv - a;
+    setBonneReponse(complement);
+    html =
+      "<p>Combien faut-il <strong>ajouter</strong> à <strong>" + a + "</strong> pour arriver à " + prochaineDiv + " ?</p>" +
+      '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.75rem">' +
+      a + " + ? = " + prochaineDiv + "</p>";
+    if (diff === 1) {
+      html += '<p class="decomp-hint">💡 ' + a + " est à " + complement + " de " + prochaineDiv + '</p>';
+    }
+    elQuestion.innerHTML = html;
+    const propsC = propositionsAvecBonne(complement, Math.max(1, complement - 4), Math.min(9, complement + 4), 3);
+    afficherChoix(propsC, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  // Addition standard CE1 — parfois avec un multiple de 10 (20%)
   const useDizaine = Math.random() < 0.20;
   if (useDizaine) {
     const dizaines = [10, 20, 30, 40, 50];
@@ -252,6 +388,15 @@ export function lancerAddition() {
     '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.75rem">' +
     a + " + " + b + " = ?</p>";
 
+  if (diff <= 1) {
+    const dA = Math.floor(a / 10), uA = a % 10;
+    const dB = Math.floor(b / 10), uB = b % 10;
+    if (dA > 0 || dB > 0) {
+      html += '<p class="decomp-hint">💡 ' + a + ' = ' + (dA * 10) + ' + ' + uA +
+              ' &nbsp;et&nbsp; ' + b + ' = ' + (dB * 10) + ' + ' + uB + '</p>';
+    }
+  }
+
   elQuestion.innerHTML = html;
   setBonneReponse(total);
   const pmin = Math.max(2, total - 15);
@@ -262,13 +407,22 @@ export function lancerAddition() {
 
 // ── lancerSoustraction ────────────────────────────────────────────────────────
 export function lancerSoustraction() {
-  elTitre.textContent = "Les pommes";
   const diff = getDifficulte();
   let total;
   let enleve;
   let reste;
 
+  const THEMES = [
+    { emoji: '🍎', mots: 'pommes' },
+    { emoji: '🍬', mots: 'bonbons' },
+    { emoji: '⭐', mots: 'étoiles' },
+    { emoji: '🎈', mots: 'ballons' },
+    { emoji: '🐣', mots: 'poussins' },
+  ];
+  const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+
   if (estCM2()) {
+    elTitre.textContent = "Grands calculs";
     const maxCM2s = [9999, 49999, 99999][diff];
     total = 1000 + Math.floor(Math.random() * maxCM2s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
@@ -276,7 +430,7 @@ export function lancerSoustraction() {
     elQuestion.innerHTML =
       "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
       '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
-      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Soustraction posée</p>";
+      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Essaie la soustraction posée ✏️</p>";
     setBonneReponse(reste);
     const props = propositionsAvecBonne(reste, Math.max(0, reste - 5000), Math.min(99998, reste + 5000), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
@@ -284,6 +438,7 @@ export function lancerSoustraction() {
   }
 
   if (estCM1()) {
+    elTitre.textContent = "Calcul mental";
     const maxCM1s = [999, 4999, 9999][diff];
     total = 100 + Math.floor(Math.random() * maxCM1s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
@@ -299,14 +454,27 @@ export function lancerSoustraction() {
   }
 
   if (estCE2()) {
+    elTitre.textContent = "Je calcule";
     const maxCE2s = [300, 600, 999][diff];
     total = 100 + Math.floor(Math.random() * maxCE2s);
     enleve = 1 + Math.floor(Math.random() * (total - 1));
     reste = total - enleve;
-    elQuestion.innerHTML =
-      "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
-      '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
-      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
+    const CONTEXTES_CE2 = [
+      "La bibliothèque a <strong>" + total + "</strong> livres. On en range <strong>" + enleve + "</strong> dans des caisses. Combien en reste-t-il sur les étagères ?",
+      "La boulangerie avait <strong>" + total + "</strong> croissants. Elle en a vendu <strong>" + enleve + "</strong>. Combien en reste-t-il ?",
+      "Un train transporte <strong>" + total + "</strong> voyageurs. À l'arrêt, <strong>" + enleve + "</strong> descendent. Combien restent dans le train ?",
+    ];
+    let html;
+    if (diff === 0) {
+      const ctx = CONTEXTES_CE2[Math.floor(Math.random() * CONTEXTES_CE2.length)];
+      html = "<p>" + ctx + "</p>" +
+             '<p class="equation" style="font-size:2rem;margin-top:0.5rem">' + total + " − " + enleve + " = ?</p>";
+    } else {
+      html = "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
+             '<p class="equation" style="font-size:2.2rem;font-weight:700;margin-top:.75rem">' + total + " − " + enleve + " = ?</p>" +
+             "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pense à la soustraction posée</p>";
+    }
+    elQuestion.innerHTML = html;
     setBonneReponse(reste);
     const props = propositionsAvecBonne(reste, Math.max(0, reste - 80), Math.min(998, reste + 80), 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
@@ -324,22 +492,35 @@ export function lancerSoustraction() {
   reste = total - enleve;
 
   if (!estCE1() && total <= 10) {
-    const biffees = Array(enleve).fill('<span style="opacity:0.25;text-decoration:line-through">🍎</span>');
-    const restantes = Array(reste).fill("🍎");
-    elQuestion.innerHTML =
-      "<p>On mange <strong>" + enleve + "</strong> pommes sur <strong>" + total + "</strong>. Combien reste-t-il ?</p>" +
-      '<p class="ligne-emojis">' + [...biffees, ...restantes].join(" ") + "</p>" +
-      '<p class="equation">' + total + " − " + enleve + " = ?</p>";
+    elTitre.textContent = "Les " + theme.mots;
+    const biffees = Array(enleve).fill('<span style="opacity:0.25;text-decoration:line-through">' + theme.emoji + '</span>');
+    const restantes = Array(reste).fill(theme.emoji);
+    let html = "<p>On enlève <strong>" + enleve + "</strong> " + theme.mots + " " + theme.emoji + ". Combien reste-t-il ?</p>";
+    if (diff === 0) {
+      html += cadreDixSoustraction(total, enleve);
+    }
+    html += '<p class="ligne-emojis">' + [...restantes, ...biffees].join(" ") + "</p>" +
+            '<p class="equation">' + total + " − " + enleve + " = ?</p>";
+    elQuestion.innerHTML = html;
   } else if (!estCE1()) {
+    elTitre.textContent = "Les " + theme.mots;
     elQuestion.innerHTML =
-      "<p>Il y a <strong>" + total + "</strong> pommes 🍎</p>" +
-      "<p>On en mange <strong>" + enleve + "</strong>. Combien il en reste ?</p>" +
+      "<p>Il y a <strong>" + total + "</strong> " + theme.mots + " " + theme.emoji + "</p>" +
+      "<p>On en enlève <strong>" + enleve + "</strong>. Combien en reste-t-il ?</p>" +
       '<p class="equation">' + total + " − " + enleve + " = ?</p>";
   } else {
-    elQuestion.innerHTML =
+    elTitre.textContent = "Calcul en tête";
+    const dE = Math.floor(enleve / 10);
+    const uE = enleve % 10;
+    let html =
       "<p style='font-size:0.88rem;margin:0 0 0.35rem'>Calcule cette soustraction :</p>" +
-      '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.4rem">' + total + " − " + enleve + " = ?</p>" +
-      "<p style='font-size:0.78rem;color:#888;margin-top:0.4rem'>💡 Pour les grands nombres, pense à la soustraction posée !</p>";
+      '<p class="equation" style="font-size:2.4rem;font-weight:700;margin-top:.4rem">' + total + " − " + enleve + " = ?</p>";
+    if (diff <= 1 && uE === 0 && dE > 0) {
+      html += '<p class="decomp-hint">💡 C\'est ' + dE + ' dizaine' + (dE > 1 ? 's' : '') + ' à enlever !</p>';
+    } else if (diff <= 1 && dE > 0 && uE > 0) {
+      html += '<p class="decomp-hint">💡 Enlève d\'abord ' + (dE * 10) + ' → ' + (total - dE * 10) + ', puis enlève ' + uE + '</p>';
+    }
+    elQuestion.innerHTML = html;
   }
   setBonneReponse(reste);
   const props = estCE1()
@@ -367,13 +548,15 @@ export function lancerCompare() {
         a.toLocaleString("fr-FR") + " &nbsp; ou &nbsp; " + b.toLocaleString("fr-FR") + "</p>";
       afficherChoix(melanger([a, b]), (val, btn) => apresReponse(val, btn, getBonneReponse()));
     } else if (type === 1) {
-      const entA = 1 + Math.floor(Math.random() * 9);
-      const decA = 1 + Math.floor(Math.random() * 9);
-      const entB = 1 + Math.floor(Math.random() * 9);
-      const decB = 1 + Math.floor(Math.random() * 9);
-      const valA = entA + decA / 10;
-      const valB = entB + decB / 10;
-      if (valA === valB) { lancerCompare(); return; }
+      let entA, decA, entB, decB, valA, valB;
+      do {
+        entA = 1 + Math.floor(Math.random() * 9);
+        decA = 1 + Math.floor(Math.random() * 9);
+        entB = 1 + Math.floor(Math.random() * 9);
+        decB = 1 + Math.floor(Math.random() * 9);
+        valA = entA + decA / 10;
+        valB = entB + decB / 10;
+      } while (valA === valB);
       const strA = entA + "," + decA;
       const strB = entB + "," + decB;
       setBonneReponse(valA > valB ? strA : strB);
@@ -517,7 +700,25 @@ export function lancerSuite() {
   elTitre.textContent = "Numéro manquant";
   const diff = getDifficulte();
   let debut, step;
-  if (estCE2()) {
+  if (estCM2()) {
+    const stepPools = [
+      [500, 1000],
+      [250, 500, 1000, 2000],
+      [100, 250, 500, 1000, 2000, 5000],
+    ];
+    const pool = stepPools[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = step * (1 + Math.floor(Math.random() * 8));
+  } else if (estCM1()) {
+    const stepPools = [
+      [100, 500],
+      [100, 250, 500, 1000],
+      [100, 250, 500, 1000],
+    ];
+    const pool = stepPools[diff];
+    step = pool[Math.floor(Math.random() * pool.length)];
+    debut = step * (1 + Math.floor(Math.random() * 10));
+  } else if (estCE2()) {
     const stepPoolsCE2 = [
       [1, 2, 5, 10],
       [3, 4, 6, 7, 8, 9, 25, 50],
@@ -980,7 +1181,7 @@ export function lancerPerlesDorees() {
     else               { bonne = un;   question = "unités"; maxDigit = 9; }
   } else if (estCE1()) {
     if (diff <= 0) {
-      cent = 1 + Math.floor(Math.random() * 1);
+      cent = 1 + Math.floor(Math.random() * 9);
       diz  = Math.floor(Math.random() * 10);
       un   = Math.floor(Math.random() * 10);
       n = cent * 100 + diz * 10 + un;
