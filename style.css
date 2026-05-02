@@ -712,6 +712,50 @@ h1 {
   color: var(--erreur);
 }
 
+.aide-douce {
+  margin: 0.6rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  background: #fff8e6;
+  border: 2px solid rgba(253, 203, 110, 0.65);
+  box-shadow: 0 6px 18px rgba(253, 203, 110, 0.22);
+  color: var(--texte);
+  text-align: left;
+}
+
+.aide-douce p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.aide-douce p + p {
+  margin-top: 0.35rem;
+}
+
+.aide-douce-titre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #8a5a00;
+}
+
+.aide-douce-indice {
+  font-size: 0.92rem;
+}
+
+.aide-douce-reponse {
+  display: inline-block;
+  padding: 0.28rem 0.55rem;
+  border-radius: 0.7rem;
+  background: rgba(0, 184, 148, 0.12);
+  color: #006b57;
+  font-weight: 700;
+}
+
+.aide-douce-encouragement {
+  font-size: 0.86rem;
+  opacity: 0.82;
+}
+
 .btn-suivant {
   display: block;
   margin: 1rem auto 0;
@@ -2385,6 +2429,9 @@ h1 {
 [data-theme="nuit"] .btn-choix { background: #2a2a55; color: #dfe6e9; border-color: #4a4a88; }
 [data-theme="nuit"] .btn-choix.bonne { background: #00b894; color: white; }
 [data-theme="nuit"] .btn-choix.mauvaise { background: #e17055; color: white; }
+[data-theme="nuit"] .aide-douce { background: #2a2a55; border-color: #6c5ce7; color: #dfe6e9; }
+[data-theme="nuit"] .aide-douce-titre { color: #fdcb6e; }
+[data-theme="nuit"] .aide-douce-reponse { background: rgba(0, 184, 148, 0.18); color: #8ff0dd; }
 [data-theme="nuit"] .maison-etoiles { background: #2a2a55; border-color: #4a4a88; }
 [data-theme="nuit"] .classe-info-barre { background: #1e1e3f; }
 [data-theme="nuit"] .seo-footer { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); }

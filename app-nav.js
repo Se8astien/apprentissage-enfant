@@ -136,6 +136,7 @@ function chronoExpire() {
   comboActuel = 0;
   elFeedback.textContent = "⏰ Temps écoulé ! Indice : relis doucement la question 👀";
   elFeedback.className = "feedback non";
+  afficherAideDouce(getBonneReponse(), { timeout: true });
   declencherReactionRenard(false);
   elSuivant.hidden = false;
 }
@@ -299,18 +300,109 @@ function messagesKo() {
   ];
 }
 
+function libelleBonneReponse(correct) {
+  if (correct == null) return "";
+  return String(correct);
+}
+
+function getAideDouceEl() {
+  return document.getElementById("aide-douce");
+}
+
 function rappelErreur(jeu) {
   const aides = {
+    compte: "Astuce : touche chaque objet une seule fois 🐾",
     addition: "Astuce : commence par les unités 🔢",
     soustraction: "Astuce : retire petit à petit ✋",
+    compare: "Astuce : compte les chiffres, puis compare de gauche à droite ⚖️",
+    suite: "Astuce : cherche de combien on avance à chaque fois 🔢",
+    doubles: "Astuce : c'est le même nombre deux fois 👯",
+    moitie: "Astuce : partage en 2 groupes égaux ✂️",
+    dizaines: "Astuce : une barre vaut 10, un point vaut 1 📊",
+    pairimpair: "Astuce : fais des paires de 2 🟣",
+    perlesDorees: "Astuce : compte centaines, dizaines, puis unités 🟡",
+    planche100: "Astuce : regarde la ligne et la colonne de la planche 🔢",
+    formes: "Astuce : compte les côtés et les sommets 🔷",
     multiplication: "Astuce : pense en paquets égaux 📦",
     division: "Astuce : partage en groupes égaux 🍪",
     fractions: "Astuce : compare les parts du même tout 🍕",
+    fractionsCM: "Astuce : mets les fractions au même dénominateur si besoin 🍕",
+    symetrie: "Astuce : imagine le pli du miroir 🪞",
+    perimetre: "Astuce : additionne tous les côtés du tour 🔲",
+    angles: "Astuce : compare avec un angle droit 📐",
+    calendrier: "Astuce : avance doucement dans les jours ou les mois 📅",
+    heure: "Astuce : regarde d'abord la petite aiguille 🕐",
+    durees: "Astuce : avance par heures, puis par minutes ⏱️",
+    mesures: "Astuce : vérifie l'unité avant de calculer 📏",
+    masse: "Astuce : compare les plateaux de la balance ⚖️",
+    monnaiecp: "Astuce : additionne d'abord les plus grosses pièces 🪙",
+    monnaiece1: "Astuce : compte les euros puis les centimes 💶",
+    probleme: "Astuce : cherche ce qu'on demande avant de calculer 📖",
     decimaux: "Astuce : regarde bien la virgule ,",
+    aires: "Astuce : compte les petits carrés de la surface 📐",
+    proportionnalite: "Astuce : cherche le lien entre les deux lignes ⚖️",
+    pourcentages: "Astuce : 50%, c'est la moitié ; 25%, c'est le quart %",
+    sons: "Astuce : dis le mot tout doucement 🔤",
+    syllabes: "Astuce : tape les syllabes dans tes mains 👏",
     lecture: "Astuce : lis lentement chaque mot 📖",
+    lecturePhrase: "Astuce : regarde l'image puis lis toute la phrase 🖼️",
+    phraseMobile: "Astuce : relis la phrase avec chaque mot possible 📝",
+    lectureTexte: "Astuce : retourne chercher l'information dans le texte 📖",
     grammaire: "Astuce : repère d'abord le verbe 🧠",
+    homophones: "Astuce : remplace le petit mot pour vérifier 📝",
+    synonymes: "Astuce : cherche un mot qui veut dire presque pareil 🔁",
+    conjugaison: "Astuce : repère la personne puis le temps ✍️",
+    anglais: "Astuce : regarde l'image et dis le mot à voix basse 🇬🇧",
+    traduction: "Astuce : pense au mot anglais déjà vu 🔤",
+    allemand: "Astuce : regarde l'image et répète le mot 🇩🇪",
+    traductionAllemand: "Astuce : pense au mot allemand déjà vu 🔤",
+    espagnol: "Astuce : regarde l'image et répète le mot 🇪🇸",
+    traductionEspagnol: "Astuce : pense au mot espagnol déjà vu 🔤",
+    italien: "Astuce : regarde l'image et répète le mot 🇮🇹",
+    traductionItalien: "Astuce : pense au mot italien déjà vu 🔤",
+    portugais: "Astuce : regarde l'image et répète le mot 🇵🇹",
+    traductionPortugais: "Astuce : pense au mot portugais déjà vu 🔤",
+    sequence: "Astuce : suis les étapes dans l'ordre 🤖",
+    code: "Astuce : lis le programme ligne par ligne 💻",
   };
   return aides[jeu] || "Astuce : prends ton temps et relis 👀";
+}
+
+function afficherAideDouce(correct, { timeout = false } = {}) {
+  const el = getAideDouceEl();
+  if (!el) return;
+  const bonne = libelleBonneReponse(correct);
+  el.hidden = false;
+  el.innerHTML = "";
+
+  const titre = document.createElement("p");
+  titre.className = "aide-douce-titre";
+  titre.textContent = timeout
+    ? "Le temps est fini, mais tu peux apprendre."
+    : "Bonne tentative, on apprend avec l'erreur.";
+
+  const indice = document.createElement("p");
+  indice.className = "aide-douce-indice";
+  indice.textContent = rappelErreur(getJeuCourant());
+
+  const reponse = document.createElement("p");
+  reponse.className = "aide-douce-reponse";
+  reponse.textContent = bonne ? `La bonne réponse était : ${bonne}` : "Regarde la réponse en vert.";
+
+  const encouragement = document.createElement("p");
+  encouragement.className = "aide-douce-encouragement";
+  encouragement.textContent = estGrand()
+    ? "Observe la méthode, puis essaie la suivante."
+    : "Respire, regarde bien, puis essaie la suivante avec Foxy.";
+
+  el.append(titre, indice, reponse, encouragement);
+}
+
+function cacherAideDouce() {
+  const el = getAideDouceEl();
+  if (!el) return;
+  el.hidden = true;
+  el.innerHTML = "";
 }
 
 function tenterModeFatigue() {
@@ -427,6 +519,7 @@ export function resetFeedback() {
     elFeedback.textContent = "";
     elFeedback.className = "feedback";
   }
+  cacherAideDouce();
   if (elSuivant) elSuivant.hidden = true;
   setRepondu(false);
 }
@@ -494,6 +587,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       activerMiniRattrapage();
       elFeedback.textContent += " Mini entraînement : 2 questions faciles 💡";
     }
+    afficherAideDouce(correct);
     declencherReactionRenard(false);
     tenterModeFatigue();
   }
