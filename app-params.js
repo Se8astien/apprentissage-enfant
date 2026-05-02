@@ -400,7 +400,7 @@ function creerSettingsHtml() {
   <header class="params-head">
     <p class="params-kicker">Pour les parents</p>
     <h2 class="params-titre params-titre--lg">Espace parents</h2>
-    <p class="params-lead">Suivi, conseils et réglages pour ce profil sur cet appareil.</p>
+    <p class="params-lead">Chaque onglet regroupe une chose précise : l’activité, des pistes, les jeux visibles au menu, puis le compte et le code.</p>
   </header>
 
   <div class="params-body">
@@ -413,53 +413,59 @@ function creerSettingsHtml() {
 
   <div class="params-panels">
     <section class="params-panel is-active" data-panel="vue" role="tabpanel">
+      <h3 class="params-section-title">Activité sur ce profil</h3>
       <div class="params-kpi-grid">
         <div class="params-kpi">
           <span class="params-kpi-val">${resume.temps}</span>
-          <span class="params-kpi-lbl">minutes (ordre de grandeur)</span>
+          <span class="params-kpi-lbl">Minutes estimées</span>
         </div>
         <div class="params-kpi">
           <span class="params-kpi-val">${resume.reussite}<span class="params-kpi-unit">%</span></span>
-          <span class="params-kpi-lbl">réussite moyenne</span>
+          <span class="params-kpi-lbl">Réussite moyenne</span>
         </div>
-        <p class="params-kpi-hint" role="note">Indicatif : environ une demi-minute par question en moyenne — ce n’est pas un chronomètre précis.</p>
+        <p class="params-kpi-hint" role="note">À titre indicatif (~30&nbsp;s par question en moyenne), pas un chronomètre exact.</p>
       </div>
-      <label class="params-switch params-chrono-opt" id="params-chrono-bloc" hidden>
-        <input type="checkbox" class="params-check params-chrono-cb" id="params-chrono-cb">
-        <span class="params-switch-track" aria-hidden="true"><span class="params-switch-thumb"></span></span>
-        <span class="params-switch-label">
-          <strong>Temps limité par question (dès le CE1)</strong>
-          <span class="params-chrono-desc" id="params-chrono-desc">Même réglage que le 3e bouton du bandeau violet. Désactivé = symbole infini côté enfant (pas de chrono).</span>
-        </span>
-      </label>
-      <div class="params-menu-aide">
-        <p class="params-menu-aide-titre">Icônes en haut dans le menu (enfant)</p>
-        <ul class="params-menu-aide-list">
-          <li><strong>Bandeau violet « Réglages »</strong> : nuit, sons, minuteur (dès le CE1 ; infini = sans chrono). L’interrupteur « Temps limité » ci-dessus fait la même chose.</li>
-          <li><strong>À côté</strong> : les étoiles, la série (flamme) et le bouton pour changer de profil.</li>
-        </ul>
-      </div>
-      <p class="params-mini">${escapeHtml(resume.topJeux)}</p>
+      <p class="params-snippet">${escapeHtml(resume.topJeux)}</p>
       <div class="params-callout">
         <span class="params-callout-ico">🎯</span>
         <div>
-          <strong>À renforcer</strong>
+          <strong>À suivre en priorité</strong>
           <p class="params-callout-txt">${recoAffiche.map((x) => escapeHtml(x)).join(", ")}</p>
         </div>
+      </div>
+      <div class="params-chrono-wrap" id="params-chrono-bloc" hidden>
+      <h3 class="params-section-title params-section-title--chrono">Temps limite par question (CE1 et +)</h3>
+      <label class="params-switch params-chrono-opt">
+        <input type="checkbox" class="params-check params-chrono-cb" id="params-chrono-cb">
+        <span class="params-switch-track" aria-hidden="true"><span class="params-switch-thumb"></span></span>
+        <span class="params-switch-label">
+          <strong>Activer le temps limité</strong>
+          <span class="params-chrono-desc" id="params-chrono-desc">Identique au réglage temps du bandeau violet « Réglages » pour l’enfant. Désactivé&nbsp;: temps illimité (symbole ∞).</span>
+        </span>
+      </label>
+      </div>
+      <div class="params-menu-aide">
+        <h4 class="params-menu-aide-titre">Repères&nbsp;: barre du haut pour l’enfant</h4>
+        <ul class="params-menu-aide-list">
+          <li><strong>Réglages (violet)</strong> — nuit, sons, temps par question au menu. L’option ci‑dessus synchronise cette dernière.</li>
+          <li><strong>À côté</strong> — étoiles, série et changement de profil.</li>
+        </ul>
       </div>
       <h3 class="params-subtitre">Détail par jeu</h3>
       <ul class="params-stat-list">${lignes}</ul>
     </section>
 
     <section class="params-panel" data-panel="conseils" role="tabpanel" hidden>
-      <p class="params-hint-block">Idées courtes, à adapter au rythme de l’enfant.</p>
+      <h3 class="params-section-title">Pistes personnalisées</h3>
+      <p class="params-hint-block">Court et concret&nbsp;; adapte la durée et le jour au rythme de l’enfant.</p>
       <ul class="params-conseils-list">
         ${recoDetail.map((txt) => `<li class="params-conseil-item">${txt}</li>`).join("")}
       </ul>
     </section>
 
     <section class="params-panel params-panel--jeux" data-panel="jeux" role="tabpanel" hidden>
-      <p class="params-hint-block params-hint-jeux">À droite : interrupteur vert = <strong>visible</strong> ; gris = <strong>masqué</strong>. Tu peux chercher par nom ou passer en <strong>liste A à Z</strong>.</p>
+      <h3 class="params-section-title">Jeux affichés pour l’enfant</h3>
+      <p class="params-hint-block params-hint-jeux">À droite de chaque ligne&nbsp;: interrupteur vert = <strong>dans le menu</strong>, gris = <strong>masqué</strong>. Recherche par nom ou tri <strong>A à Z</strong>.</p>
       <div class="params-jeux-barre">
         <div class="params-jeux-entete">
           <p class="params-jeux-resume" id="params-jeux-resume-compte" aria-live="polite"></p>
@@ -475,9 +481,10 @@ function creerSettingsHtml() {
     </section>
 
     <section class="params-panel" data-panel="compte" role="tabpanel" hidden>
+      <h3 class="params-section-title">Profil et code sur cet appareil</h3>
       <div class="params-danger-intro">
         <span class="params-danger-ico">⚠️</span>
-        <p><strong>Zone sensible.</strong> Ces actions touchent le profil actuel sur cet appareil.</p>
+        <p><strong>Actions sensibles.</strong> Elles touchent le profil utilisé tout de suite après la fermeture de cette fenêtre.</p>
       </div>
       <div class="params-actions">
         <button type="button" class="btn-params-action btn-params-reset">Remettre les étoiles à zéro</button>
