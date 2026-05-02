@@ -23,6 +23,8 @@ import {
   lireEtoiles,
   lireNomRenard,
   confetti,
+  lireAccessoires,
+  debloquerAccessoire,
   getNiveauCourant,
   getDifficulte,
   getDifficulteJeu,
@@ -80,7 +82,15 @@ let mauvaisesDepuisDebutJeu = 0;
 let essaisDepuisEncouragement = 0;
 let correctionsDepuisEncouragement = 0;
 let derniereQuestionEtaitErreur = false;
+let bonnesSession = 0;
+let erreursSession = 0;
 let indicesSession = 0;
+let lecturesSession = 0;
+let revisionsSession = 0;
+let objectifSession = null;
+let objectifSessionAtteint = false;
+let lectureFacileActivee = false;
+let miniLeconVueJeu = null;
 
 const LIBELLE_THEME_JEU = {
   maths: "Nombres",
@@ -136,10 +146,19 @@ function stopChrono() {
   if (el) el.hidden = true;
 }
 
+function enregistrerErreurQuestion() {
+  erreursSession++;
+  mauvaisesDepuisDebutJeu++;
+  essaisDepuisEncouragement++;
+  recompenserCorrectionSiBesoin(false);
+}
+
 function chronoExpire() {
   if (getRepondu()) return;
   setRepondu(true);
   stopChrono();
+  questionsDepuisDebutJeu++;
+  enregistrerErreurQuestion();
   elChoix.querySelectorAll(".btn-choix").forEach(btn => {
     btn.disabled = true;
     if (Number(btn.dataset.valeur) === getBonneReponse() || btn.dataset.valeur === String(getBonneReponse()))
@@ -147,11 +166,17 @@ function chronoExpire() {
   });
   track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant(), timeout: true });
   sonMauvaise();
+  incrementStats(false, getJeuCourant());
   comboActuel = 0;
   elFeedback.textContent = "⏰ Temps écoulé ! Indice : relis doucement la question 👀";
   elFeedback.className = "feedback non";
   afficherAideDouce(getBonneReponse(), { timeout: true });
+  montrerExplicationVisuelle(getBonneReponse());
+  afficherActionRevision(getJeuCourant());
   declencherReactionRenard(false);
+  verifierObjectifSession();
+  mettreAJourProgressEffort();
+  recompenserEffortSiBesoin();
   elSuivant.hidden = false;
 }
 
@@ -174,6 +199,7 @@ export function entrerRevision(nomJeu, questions) {
   if (!jeuEl) return;
   setBadgeVisible(true);
   resetFeedback();
+  preparerOutilsQuestion();
   const titre = document.getElementById("jeu-titre");
   if (titre) {
     const carte = document.querySelector(`.carte-jeu[data-jeu="${nomJeu}"]`);
@@ -188,6 +214,9 @@ export function entrerRevision(nomJeu, questions) {
 function _afficherRevision() {
   if (!_modeRevision || _modeRevision.index >= _modeRevision.questions.length) {
     _modeRevision = null;
+    revisionsSession++;
+    verifierObjectifSession();
+    afficherBilanSession();
     montrerMenu();
     afficherMissions();
     return;
@@ -211,6 +240,7 @@ function _afficherRevision() {
     }
     elChoix.appendChild(b);
   });
+  preparerOutilsQuestion();
 }
 
 // ── Histoires jeu : vues une fois par session ─────────────────────────────────
@@ -332,10 +362,70 @@ function getEffortProgressEl() {
   return document.getElementById("effort-progress");
 }
 
+function getBilanSessionEl() {
+  return document.getElementById("bilan-session");
+}
+
+function getLeconJeuEl() {
+  return document.getElementById("mini-lecon-jeu");
+}
+
+function getExplicationVisuelleEl() {
+  return document.getElementById("explication-visuelle");
+}
+
 function getQuestionTexteLisible() {
   const zq = document.getElementById("zone-question");
   if (!zq) return "";
   return zq.textContent.replace(/\s+/g, " ").trim();
+}
+
+function lireTexte(texte) {
+  if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+    afficherToastSimple("🔇 Lecture audio indisponible", "Tu peux lire doucement.");
+    return false;
+  }
+  const propre = String(texte || "").replace(/\s+/g, " ").trim();
+  if (!propre) return false;
+  window.speechSynthesis.cancel();
+  const voix = new SpeechSynthesisUtterance(propre);
+  voix.lang = "fr-FR";
+  voix.rate = estGrand() ? 0.98 : 0.9;
+  window.speechSynthesis.speak(voix);
+  return true;
+}
+
+function getTexteJeu(jeu) {
+  const carte = jeu ? document.querySelector(`.carte-jeu[data-jeu="${jeu}"]`) : null;
+  return carte?.querySelector(".nom-jeu")?.textContent?.trim() || jeu || "ce jeu";
+}
+
+function getGuidageDuJour() {
+  const n = getNiveauCourant();
+  if (n === "cm2") return ["proportionnalite", "pourcentages", "lectureTexte"];
+  if (n === "cm1") return ["decimaux", "fractionsCM", "aires"];
+  if (n === "ce2") return ["fractions", "heure", "lectureTexte"];
+  if (n === "ce1") return ["addition", "soustraction", "multiplication"];
+  return ["compte", "addition", "lecture"];
+}
+
+function leconPourJeu(jeu) {
+  const lecons = {
+    compte: "Je compte chaque objet une seule fois, avec mon doigt si besoin.",
+    addition: "Pour additionner, je peux partir du plus grand nombre puis avancer.",
+    soustraction: "Pour soustraire, j'enlève petit à petit et je regarde ce qui reste.",
+    multiplication: "Multiplier, c'est faire des paquets de même taille.",
+    division: "Diviser, c'est partager en groupes égaux.",
+    fractions: "Une fraction montre combien de parts d'un même tout on prend.",
+    fractionsCM: "Pour comparer des fractions, je regarde le dénominateur et les parts.",
+    heure: "La petite aiguille donne l'heure, la grande aiguille donne les minutes.",
+    grammaire: "Je cherche d'abord le verbe, puis je regarde les autres mots autour.",
+    lecture: "Je regarde l'image, puis je lis le mot doucement.",
+    lectureTexte: "Je peux retourner dans le texte pour retrouver l'information.",
+    sequence: "Un algorithme se lit étape par étape, dans l'ordre.",
+    code: "Je lis chaque ligne du programme, puis je prévois le résultat.",
+  };
+  return lecons[jeu] || "Je lis la consigne, je prends mon temps, puis je choisis.";
 }
 
 function rappelErreur(jeu) {
@@ -427,11 +517,62 @@ function afficherAideDouce(correct, { timeout = false } = {}) {
   el.append(titre, indice, reponse, encouragement);
 }
 
+function montrerExplicationVisuelle(correct) {
+  const el = getExplicationVisuelleEl();
+  if (!el) return;
+  const jeu = getJeuCourant();
+  const question = getQuestionTexteLisible();
+  el.innerHTML = "";
+  el.hidden = false;
+
+  const titre = document.createElement("p");
+  titre.className = "explication-titre";
+  titre.textContent = "Regarde la méthode";
+
+  const visuel = document.createElement("div");
+  visuel.className = "explication-visuel";
+  let detail = "";
+
+  const nombres = extraireNombresQuestion();
+  if (jeu === "addition" && nombres.length >= 2) {
+    const [a, b] = nombres;
+    visuel.textContent = "🔵".repeat(Math.min(a, 9)) + " + " + "🟡".repeat(Math.min(b, 9));
+    detail = `${a} puis encore ${b}, cela fait ${correct}.`;
+    if (a + b > 18) detail = `Additionne par paquets : la réponse est ${correct}.`;
+  } else if (jeu === "soustraction" && nombres.length >= 2) {
+    const [a, b] = nombres;
+    visuel.textContent = "🍎".repeat(Math.min(a, 12)) + "  ➜  " + "❌".repeat(Math.min(b, 12));
+    detail = `On part de ${a}, on enlève ${b}. Il reste ${correct}.`;
+  } else if (jeu === "fractions" || jeu === "fractionsCM") {
+    visuel.textContent = "◼️ ◼️ ◻️ ◻️";
+    detail = "Compare les parts colorées avec le même tout.";
+  } else if (jeu === "grammaire" || jeu === "conjugaison") {
+    visuel.textContent = "Sujet  →  verbe  →  complément";
+    detail = "Repère d'abord le verbe, puis regarde les mots autour.";
+  } else if (question) {
+    visuel.textContent = "👀  →  💡  →  ✅";
+    detail = `Relis la consigne doucement. La bonne réponse était ${correct}.`;
+  } else {
+    visuel.textContent = "💡";
+    detail = `La bonne réponse était ${correct}.`;
+  }
+
+  const texte = document.createElement("p");
+  texte.className = "explication-detail";
+  texte.textContent = detail;
+  el.append(titre, visuel, texte);
+}
+
 function cacherAideDouce() {
   const el = getAideDouceEl();
   if (!el) return;
   el.hidden = true;
   el.innerHTML = "";
+  const explication = getExplicationVisuelleEl();
+  if (explication) {
+    explication.hidden = true;
+    explication.innerHTML = "";
+  }
 }
 
 function afficherIndiceAvantReponse() {
@@ -464,18 +605,24 @@ function afficherIndiceAvantReponse() {
 }
 
 function lireQuestion() {
-  if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
-    afficherToastSimple("🔇 Lecture audio indisponible", "Tu peux lire la consigne doucement.");
-    return;
-  }
   const texte = getQuestionTexteLisible();
   if (!texte) return;
-  window.speechSynthesis.cancel();
-  const voix = new SpeechSynthesisUtterance(texte);
-  voix.lang = "fr-FR";
-  voix.rate = estGrand() ? 0.98 : 0.9;
-  window.speechSynthesis.speak(voix);
-  track("question_read_aloud", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+  if (lireTexte(texte)) {
+    lecturesSession++;
+    track("question_read_aloud", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+  }
+}
+
+function lireTexteCourt(texte, source) {
+  if (!texte) return;
+  if (lireTexte(texte)) {
+    lecturesSession++;
+    if (lecturesSession >= 5 && debloquerBadge("narrateur")) {
+      const b = BADGES.find(x => x.id === "narrateur");
+      if (b) afficherNotifBadge(b);
+    }
+    track("text_read_aloud", { game_name: getJeuCourant(), niveau: getNiveauCourant(), source });
+  }
 }
 
 function afficherToastSimple(titre, detail) {
@@ -490,6 +637,13 @@ function afficherToastSimple(titre, detail) {
   toast.append(span, strong);
   app.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
+}
+
+function debloquerAccessoireEffort(id, message) {
+  if (lireAccessoires().includes(id)) return;
+  debloquerAccessoire(id);
+  mettreAJourRenardHeader();
+  afficherToastSimple(message, "Va voir le dressing de ton renard.");
 }
 
 function mettreAJourProgressEffort() {
@@ -511,6 +665,7 @@ function recompenserEffortSiBesoin() {
   essaisDepuisEncouragement = 0;
   ajouterEtoiles(1);
   progresserMission("etoiles");
+  debloquerAccessoireEffort("medaille-effort", "🏅 Médaille d'effort débloquée !");
   afficherToastSimple("🌱 Bel effort !", "+1 étoile pour ta persévérance");
   if (debloquerBadge("perseverant")) {
     const b = BADGES.find(x => x.id === "perseverant");
@@ -534,8 +689,149 @@ function recompenserCorrectionSiBesoin(correct) {
   correctionsDepuisEncouragement++;
   if (correctionsDepuisEncouragement < 2) return;
   correctionsDepuisEncouragement = 0;
+  debloquerAccessoireEffort("cape-courage", "🦸 Cape courage débloquée !");
   afficherToastSimple("💪 Erreur corrigée !", "Tu as continué après une difficulté");
   track("error_recovered", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+}
+
+function verifierObjectifSession() {
+  if (!objectifSession || objectifSessionAtteint) return;
+  const atteint =
+    (objectifSession === "etoiles3" && bonnesSession >= 3) ||
+    (objectifSession === "revision" && revisionsSession >= 1) ||
+    (objectifSession === "questions5" && (bonnesSession + erreursSession) >= 5);
+  if (!atteint) return;
+  objectifSessionAtteint = true;
+  afficherToastSimple("🎯 Objectif réussi !", "Tu peux continuer ou faire une pause.");
+  if (debloquerBadge("objectif")) {
+    const b = BADGES.find(x => x.id === "objectif");
+    if (b) afficherNotifBadge(b);
+  }
+  track("session_goal_reached", { goal: objectifSession, niveau: getNiveauCourant() });
+}
+
+function afficherBilanSession() {
+  const el = getBilanSessionEl();
+  if (!el) return;
+  const total = bonnesSession + erreursSession;
+  if (total <= 0 && indicesSession <= 0 && revisionsSession <= 0) {
+    el.hidden = true;
+    el.innerHTML = "";
+    return;
+  }
+  el.hidden = false;
+  el.innerHTML = "";
+  const titre = document.createElement("p");
+  titre.className = "bilan-session-titre";
+  titre.textContent = "Bravo pour ta session !";
+  const stats = document.createElement("p");
+  stats.className = "bilan-session-stats";
+  stats.textContent = `${total} question${total > 1 ? "s" : ""} · ${indicesSession} indice${indicesSession > 1 ? "s" : ""} · ${revisionsSession} révision${revisionsSession > 1 ? "s" : ""}`;
+  const encouragement = document.createElement("p");
+  encouragement.className = "bilan-session-texte";
+  encouragement.textContent = objectifSessionAtteint
+    ? "Objectif atteint, Foxy est fier de toi."
+    : "Tu as appris en essayant, c'est déjà une réussite.";
+  el.append(titre, stats, encouragement);
+}
+
+function mettreAJourObjectifSession() {
+  const box = document.getElementById("objectif-session");
+  if (!box) return;
+  box.hidden = !!objectifSession;
+}
+
+function choisirObjectifSession(goal) {
+  objectifSession = goal;
+  objectifSessionAtteint = false;
+  mettreAJourObjectifSession();
+  const labels = {
+    etoiles3: "Gagner 3 étoiles",
+    questions5: "Faire 5 questions",
+    revision: "Revoir mes erreurs",
+  };
+  afficherToastSimple("🎯 Objectif choisi", labels[goal] || "Je joue tranquillement");
+  track("session_goal_selected", { goal, niveau: getNiveauCourant() });
+}
+
+function brancherObjectifSession() {
+  const box = document.getElementById("objectif-session");
+  if (!box || box.dataset.amGoalBound === "1") return;
+  box.dataset.amGoalBound = "1";
+  box.querySelectorAll("[data-objectif]").forEach((btn) => {
+    btn.addEventListener("click", () => choisirObjectifSession(btn.dataset.objectif));
+  });
+}
+
+function afficherGuidageDuJour() {
+  const el = document.getElementById("guidage-jour");
+  if (!el) return;
+  const ids = getGuidageDuJour().filter((jeu) => {
+    const carte = document.querySelector(`.carte-jeu[data-jeu="${jeu}"]`);
+    return carte && !carte.hidden;
+  });
+  if (ids.length === 0) {
+    el.hidden = true;
+    el.innerHTML = "";
+    return;
+  }
+  el.hidden = false;
+  el.innerHTML = "";
+  const titre = document.createElement("p");
+  titre.className = "guidage-titre";
+  titre.textContent = "🦊 Parcours conseillé";
+  const texte = document.createElement("p");
+  texte.className = "guidage-texte";
+  texte.textContent = ids.map(getTexteJeu).join(" → ");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "guidage-btn";
+  btn.textContent = "Commencer";
+  btn.addEventListener("click", () => {
+    const carte = document.querySelector(`.carte-jeu[data-jeu="${ids[0]}"]`);
+    if (carte) carte.click();
+  });
+  el.append(titre, texte, btn);
+}
+
+function appliquerLectureFacile() {
+  const jeuEl = elJeu || document.getElementById("ecran-jeu");
+  if (jeuEl) jeuEl.classList.toggle("lecture-facile", lectureFacileActivee);
+  const btn = document.getElementById("btn-lecture-facile");
+  if (btn) {
+    btn.setAttribute("aria-pressed", lectureFacileActivee ? "true" : "false");
+    btn.textContent = lectureFacileActivee ? "👀 Lecture facile ✓" : "👀 Lecture facile";
+  }
+}
+
+function basculerLectureFacile() {
+  lectureFacileActivee = !lectureFacileActivee;
+  appliquerLectureFacile();
+  if (lectureFacileActivee && debloquerBadge("lecture_facile")) {
+    const b = BADGES.find(x => x.id === "lecture_facile");
+    if (b) afficherNotifBadge(b);
+  }
+  track("easy_reading_toggle", { active: lectureFacileActivee, niveau: getNiveauCourant() });
+}
+
+function afficherMiniLecon(jeu) {
+  const el = getLeconJeuEl();
+  if (!el || miniLeconVueJeu === jeu || _modeRevision) return;
+  miniLeconVueJeu = jeu;
+  el.hidden = false;
+  el.innerHTML = "";
+  const titre = document.createElement("p");
+  titre.className = "mini-lecon-titre";
+  titre.textContent = `🦊 Avant de jouer à ${getTexteJeu(jeu)}`;
+  const texte = document.createElement("p");
+  texte.className = "mini-lecon-texte";
+  texte.textContent = leconPourJeu(jeu);
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "mini-lecon-btn";
+  btn.textContent = "J'ai compris, je joue";
+  btn.addEventListener("click", () => { el.hidden = true; });
+  el.append(titre, texte, btn);
 }
 
 function preparerOutilsQuestion() {
@@ -543,6 +839,7 @@ function preparerOutilsQuestion() {
   brancherOutilsQuestion();
   mettreAJourProgressEffort();
   mettreAJourBoutonRevision();
+  appliquerLectureFacile();
 }
 
 function lancerRevisionDepuisBouton(jeu) {
@@ -551,6 +848,7 @@ function lancerRevisionDepuisBouton(jeu) {
   track("revision_started", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: questions.length, source: "inline" });
   const btn = document.getElementById("btn-reviser-erreurs");
   if (btn) btn.hidden = true;
+  debloquerAccessoireEffort("sac-aventure", "🎒 Sac d'aventure débloqué !");
   entrerRevision(jeu, questions);
   if (debloquerBadge("revision")) {
     const b = BADGES.find(x => x.id === "revision");
@@ -576,6 +874,7 @@ export function proposerRevisionSiErreurs(jeu, onRetourMenu) {
   document.getElementById("revision-oui").addEventListener("click", () => {
     track("revision_started", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: questions.length, source: "exit" });
     overlay.remove();
+    debloquerAccessoireEffort("sac-aventure", "🎒 Sac d'aventure débloqué !");
     entrerRevision(jeu, questions);
     if (debloquerBadge("revision")) {
       const b = BADGES.find(x => x.id === "revision");
@@ -613,6 +912,24 @@ function afficherActionRevision(jeu) {
   afficherToastSimple("🔁 Tu pourras t'entraîner", "Le bouton Revoir garde tes questions difficiles.");
 }
 
+function brancherAudioChoix() {
+  elChoix.querySelectorAll(".btn-choix").forEach((btn) => {
+    if (btn.dataset.amReadChoiceBound === "1") return;
+    btn.dataset.amReadChoiceBound = "1";
+    const texte = btn.textContent.trim();
+    btn.setAttribute("aria-label", `${texte}. Entrée pour répondre.`);
+    const lecteur = document.createElement("span");
+    lecteur.className = "choix-audio-indice";
+    lecteur.setAttribute("aria-hidden", "true");
+    lecteur.textContent = "🔊";
+    btn.appendChild(lecteur);
+    btn.addEventListener("contextmenu", (ev) => {
+      ev.preventDefault();
+      lireTexteCourt(texte, "choice_context");
+    });
+  });
+}
+
 function brancherOutilsQuestion() {
   const outils = getOutilsJeuEl();
   if (!outils) return;
@@ -626,6 +943,15 @@ function brancherOutilsQuestion() {
   if (btnLire && btnLire.dataset.amReadBound !== "1") {
     btnLire.dataset.amReadBound = "1";
     btnLire.addEventListener("click", lireQuestion);
+  }
+  brancherAudioChoix();
+  const btnLectureFacile = document.getElementById("btn-lecture-facile");
+  if (btnLectureFacile) {
+    btnLectureFacile.setAttribute("aria-pressed", lectureFacileActivee ? "true" : "false");
+    if (btnLectureFacile.dataset.amEasyReadBound !== "1") {
+      btnLectureFacile.dataset.amEasyReadBound = "1";
+      btnLectureFacile.addEventListener("click", basculerLectureFacile);
+    }
   }
 }
 
@@ -770,6 +1096,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
   if (choix !== correct) bouton.classList.add("mauvaise");
 
   if (choix === correct) {
+    bonnesSession++;
     comboActuel++;
     erreursSerie = 0;
     recompenserCorrectionSiBesoin(true);
@@ -799,6 +1126,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    erreursSession++;
     erreursSerie++;
     mauvaisesDepuisDebutJeu++;
     essaisDepuisEncouragement++;
@@ -822,10 +1150,12 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       elFeedback.textContent += " Mini entraînement : 2 questions faciles 💡";
     }
     afficherAideDouce(correct);
+    montrerExplicationVisuelle(correct);
     afficherActionRevision(getJeuCourant());
     declencherReactionRenard(false);
     tenterModeFatigue();
   }
+  verifierObjectifSession();
   mettreAJourProgressEffort();
   recompenserEffortSiBesoin();
   if (rattrapageRestant > 0) {
@@ -1010,6 +1340,10 @@ export function montrerMenu() {
   if (modal) modal.hidden = true;
   revelerSeulEcran(menu);
   synchroniserAffichageMenu();
+  brancherObjectifSession();
+  mettreAJourObjectifSession();
+  afficherGuidageDuJour();
+  afficherBilanSession();
 }
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────
@@ -1027,6 +1361,7 @@ export function montrerJeu(nom, lanceurs) {
   essaisDepuisEncouragement = 0;
   correctionsDepuisEncouragement = 0;
   derniereQuestionEtaitErreur = false;
+  miniLeconVueJeu = null;
   revelerSeulEcran(jeu);
   setBadgeVisible(true);
   const diffBadge = document.getElementById("diff-badge");
@@ -1034,6 +1369,7 @@ export function montrerJeu(nom, lanceurs) {
   resetFeedback();
   _histoireQuestions[nom] = [];
   lancerAvecAntiRepeat(nom, lanceurs);
+  afficherMiniLecon(nom);
   startChrono();
   afficherHistoireJeu(nom);
 }

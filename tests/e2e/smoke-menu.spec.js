@@ -56,6 +56,9 @@ test("une mauvaise réponse affiche une aide douce et la bonne réponse", async 
   }
 
   await expect(page.locator("#btn-indice-question")).toBeVisible();
+  await expect(page.locator("#btn-lecture-facile")).toBeVisible();
+  await page.locator("#btn-lecture-facile").click();
+  await expect(page.locator("#btn-lecture-facile")).toHaveAttribute("aria-pressed", "true");
   await page.locator("#btn-indice-question").click();
   await expect(page.locator("#aide-douce")).toContainText("Petit coup de pouce");
 
@@ -76,4 +79,6 @@ test("une mauvaise réponse affiche une aide douce et la bonne réponse", async 
   await expect(page.locator("#aide-douce")).toBeVisible();
   await expect(page.locator("#aide-douce")).toContainText("Bonne tentative");
   await expect(page.locator("#aide-douce")).toContainText(`La bonne réponse était : ${bonneReponse.answer}`);
+  await expect(page.locator("#explication-visuelle")).toBeVisible();
+  await expect(page.locator("#btn-reviser-erreurs")).toBeVisible();
 });

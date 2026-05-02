@@ -686,6 +686,82 @@ h1 {
   outline-offset: 2px;
 }
 
+.mini-lecon-jeu,
+.explication-visuelle,
+.bilan-session,
+.guidage-jour,
+.objectif-session {
+  margin: 0.75rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.78);
+  border: 2px solid rgba(108, 92, 231, 0.12);
+  box-shadow: 0 5px 16px var(--ombre);
+}
+
+.mini-lecon-jeu p,
+.explication-visuelle p,
+.bilan-session p,
+.guidage-jour p,
+.objectif-session p {
+  margin: 0;
+}
+
+.mini-lecon-titre,
+.explication-titre,
+.bilan-session-titre,
+.guidage-titre,
+.objectif-titre {
+  font-weight: 700;
+  color: var(--primaire-fonce);
+}
+
+.mini-lecon-texte,
+.explication-detail,
+.bilan-session-texte,
+.guidage-texte {
+  margin-top: 0.35rem !important;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.mini-lecon-btn,
+.guidage-btn,
+.objectif-session button {
+  margin-top: 0.55rem;
+  min-height: 44px;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primaire), #a29bfe);
+  cursor: pointer;
+}
+
+.explication-visuel {
+  margin-top: 0.45rem;
+  padding: 0.65rem;
+  border-radius: 0.8rem;
+  background: rgba(0, 206, 201, 0.1);
+  text-align: center;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.bilan-session-stats {
+  margin-top: 0.35rem !important;
+  font-weight: 700;
+}
+
+.lecture-facile .zone-question,
+.lecture-facile .aide-douce,
+.lecture-facile .explication-visuelle {
+  font-size: 1.18rem;
+  line-height: 1.65;
+}
+
 .chrono-libre {
   background: linear-gradient(135deg, #dffaf4, #e9fff9);
   color: #006b57;
@@ -2494,11 +2570,18 @@ h1 {
 [data-theme="nuit"] .btn-choix.bonne { background: #00b894; color: white; }
 [data-theme="nuit"] .btn-choix.mauvaise { background: #e17055; color: white; }
 [data-theme="nuit"] .aide-douce,
-[data-theme="nuit"] .effort-progress { background: #2a2a55; border-color: #6c5ce7; color: #dfe6e9; }
+[data-theme="nuit"] .effort-progress,
+[data-theme="nuit"] .mini-lecon-jeu,
+[data-theme="nuit"] .explication-visuelle,
+[data-theme="nuit"] .bilan-session,
+[data-theme="nuit"] .objectif-session,
+[data-theme="nuit"] .guidage-jour { background: #2a2a55; border-color: #6c5ce7; color: #dfe6e9; }
 [data-theme="nuit"] .aide-douce-titre { color: #fdcb6e; }
 [data-theme="nuit"] .aide-douce-reponse { background: rgba(0, 184, 148, 0.18); color: #8ff0dd; }
 [data-theme="nuit"] .btn-outil-jeu,
-[data-theme="nuit"] .btn-reviser-erreurs { background: #1e1e3f; color: #dfe6e9; border-color: #4a4a88; }
+[data-theme="nuit"] .btn-reviser-erreurs,
+[data-theme="nuit"] .objectif-session button,
+[data-theme="nuit"] .mini-lecon-btn { background: #1e1e3f; color: #dfe6e9; border-color: #4a4a88; }
 [data-theme="nuit"] .chrono-libre { background: rgba(0, 184, 148, 0.18); color: #8ff0dd; }
 [data-theme="nuit"] .maison-etoiles { background: #2a2a55; border-color: #4a4a88; }
 [data-theme="nuit"] .classe-info-barre { background: #1e1e3f; }
