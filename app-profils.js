@@ -10,7 +10,7 @@ import {
 const CLE_LISTE = "profils-liste";
 const CLE_ACTIF = "profil-actif-id";
 const EXCLUS = new Set([
-  "rgpd-consent", "sons-actifs", "theme-nuit", "landing-seen",
+  "rgpd-consent", "sons-actifs", "theme-nuit", "landing-seen", "jeu-chrono-actif",
   CLE_LISTE, CLE_ACTIF,
 ]);
 

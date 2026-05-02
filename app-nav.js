@@ -16,6 +16,7 @@ import {
   setBadgeVisible,
   estFille,
   estGrand,
+  estMinuteurDisponible,
   majGenre,
   sauverFaim,
   lireFaim,
@@ -36,6 +37,8 @@ import {
   piegerFocus,
   revelerSeulEcran,
   syncPrefsDepuisStockage,
+  lireChronoJeuActif,
+  sauverChronoJeuActif,
 } from "./app-state.js";
 
 import { track } from "./app-analytics.js";
@@ -61,6 +64,7 @@ import {
 
 import { getHistoireJeu } from "./app-histoire.js";
 import { getMasques } from "./app-params.js";
+import { texteDescCarteJeu } from "./app-menu-descriptions.js";
 
 // Re-export confetti so game files can import it from here if desired
 export { confetti } from "./app-state.js";
@@ -87,8 +91,11 @@ const LIBELLE_THEME_JEU = {
 let _chronoTimer = null;
 
 function secondesChrono() {
-  if (!estGrand()) return 0;
-  return Math.min(56, 30 + Math.min(4, erreursSerie) * 7);
+  if (!lireChronoJeuActif()) return 0;
+  if (!estMinuteurDisponible()) return 0;
+  const base = 30 + Math.min(4, erreursSerie) * 7;
+  const max = estGrand() ? 56 : 64;
+  return Math.min(max, base);
 }
 
 function startChrono() {
@@ -575,8 +582,14 @@ export function synchroniserAffichageMenu() {
     btn.setAttribute("aria-pressed", actif ? "true" : "false");
   });
   filtrerJeuxParNiveau();
+  const nivMenu = getNiveauCourant();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach((btn) => {
     const jeu = btn.dataset.jeu;
+    const descEl = btn.querySelector(".desc-jeu");
+    if (descEl) {
+      const d = texteDescCarteJeu(jeu, nivMenu);
+      if (d) descEl.textContent = d;
+    }
     const m = lireMaitrise(jeu);
     const n = m.filter(Boolean).length;
 
@@ -591,6 +604,59 @@ export function synchroniserAffichageMenu() {
     diffEl.title = DIFFICULTE_LABELS[d].replace(/^[^\s]+\s/, "");
 
     btn.classList.toggle("jeu-maitrise", n === 3);
+  });
+  majUiBoutonChrono();
+}
+
+export function majUiBoutonChrono() {
+  const btn = document.getElementById("btn-chrono");
+  if (!btn) return;
+  syncPrefsDepuisStockage();
+  const chronoOk = estMinuteurDisponible();
+  btn.hidden = !chronoOk;
+  if (!chronoOk) return;
+  const on = lireChronoJeuActif();
+  const symEl = btn.querySelector(".header-chrono-symbole");
+  const sym = on ? "⏱️" : "∞";
+  if (symEl) symEl.textContent = sym;
+  btn.dataset.chronoEtat = on ? "limite" : "libre";
+  btn.setAttribute("aria-pressed", on ? "true" : "false");
+  btn.setAttribute(
+    "aria-label",
+    on
+      ? "Temps pour répondre : activé — appuie pour jouer sans limite."
+      : "Temps pour répondre : coupé — appuie pour activer le temps par question.",
+  );
+  btn.title = on
+    ? "Une barre rouge descend à chaque question. Appuie ici pour tout ton temps sans chrono."
+    : "Pas de chrono pendant le jeu. Appuie ici pour te dépêcher comme en classe.";
+}
+
+export function reglerMinuteurPourEnfant(actif) {
+  syncPrefsDepuisStockage();
+  if (!estMinuteurDisponible()) return;
+  sauverChronoJeuActif(!!actif);
+  if (!lireChronoJeuActif()) stopChrono();
+  majUiBoutonChrono();
+}
+
+export function basculerMinuteurViaHeader() {
+  syncPrefsDepuisStockage();
+  if (!estMinuteurDisponible()) return false;
+  const next = !lireChronoJeuActif();
+  sauverChronoJeuActif(next);
+  if (!next) stopChrono();
+  majUiBoutonChrono();
+  return true;
+}
+
+export function brancherBoutonChronoMenu() {
+  const btn = document.getElementById("btn-chrono");
+  if (!btn || btn.dataset.amChronoBound === "1") return;
+  btn.dataset.amChronoBound = "1";
+  btn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    basculerMinuteurViaHeader();
   });
 }
 

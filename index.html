@@ -181,13 +181,22 @@
         <p class="sous-titre" id="sous-titre">Jeux Montessori pour apprendre en s'amusant !</p>
       </div>
       <div class="header-droite">
-        <button type="button" id="btn-theme" class="btn-sons" aria-label="Mode nuit">🌙</button>
-        <button type="button" id="btn-sons" class="btn-sons" aria-label="Sons on/off">🔊</button>
-        <button type="button" id="btn-profils-header" class="btn-sons" aria-label="Changer de profil" hidden>👥</button>
-        <div class="streak-header" id="streak-header"></div>
-        <div class="score-global" title="Étoiles gagnées">
-          <span class="score-icone">⭐</span>
-          <span id="total-etoiles">0</span>
+        <div class="header-toolbar" role="group" aria-label="Réglages de l'écran">
+          <button type="button" id="btn-theme" class="header-tool" aria-label="Activer le mode nuit">🌙</button>
+          <button type="button" id="btn-sons" class="header-tool" aria-label="Sons activés" aria-pressed="true">🔊</button>
+          <button type="button" id="btn-chrono" class="header-tool header-tool-chrono" hidden aria-pressed="true"
+            data-chrono-etat="limite" aria-label="Minuteur : temps pour répondre (dès le CE1, pas au CP)">
+            <span class="header-chrono-symbole" aria-hidden="true">⏱️</span>
+          </button>
+        </div>
+        <div class="header-compte-row" aria-label="Étoiles et compte">
+          <div class="score-global score-global-compact" title="Étoiles gagnées">
+            <span class="score-icone">⭐</span>
+            <span id="total-etoiles">0</span>
+          </div>
+          <div class="streak-header" id="streak-header"></div>
+          <button type="button" id="btn-profils-header" class="header-tool header-tool-profil" hidden
+            aria-label="Changer de profil ou de renard">👥</button>
         </div>
       </div>
     </header>

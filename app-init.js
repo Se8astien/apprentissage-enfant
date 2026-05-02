@@ -52,6 +52,8 @@ import {
   getWrongQuestions,
   clearWrongQuestions,
   entrerRevision,
+  brancherBoutonChronoMenu,
+  majUiBoutonChrono,
 } from "./app-nav.js";
 
 import {
@@ -239,23 +241,44 @@ function brancherOnboardingUI() {
     if (bnr) bnr.hidden = true;
   });
 
+  function syncUiTheme(btn) {
+    const nuit = stockageGet(STORAGE_THEME_NUIT) === "1";
+    btn.textContent = nuit ? "☀️" : "🌙";
+    btn.setAttribute("aria-pressed", nuit ? "true" : "false");
+    btn.setAttribute(
+      "aria-label",
+      nuit ? "Mode nuit actif — passer en mode jour clair" : "Activer le mode nuit (écran plus doux)",
+    );
+  }
+
+  function syncUiSons(btn) {
+    const on = sonsActifs();
+    btn.textContent = on ? "🔊" : "🔇";
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.classList.toggle("header-tool-sons-muet", !on);
+    btn.setAttribute(
+      "aria-label",
+      on ? "Sons activés — appuie pour couper les bruits du jeu" : "Sons coupés — appuie pour les rallumer",
+    );
+  }
+
   const btnTheme = document.getElementById("btn-theme");
   if (btnTheme) {
-    btnTheme.textContent = stockageGet(STORAGE_THEME_NUIT) === "1" ? "☀️" : "🌙";
+    syncUiTheme(btnTheme);
     uneFois(btnTheme, "click", () => {
       const nuit = stockageGet(STORAGE_THEME_NUIT) !== "1";
       stockageSet(STORAGE_THEME_NUIT, nuit ? "1" : "0");
       document.documentElement.setAttribute("data-theme", nuit ? "nuit" : "");
-      btnTheme.textContent = nuit ? "☀️" : "🌙";
+      syncUiTheme(btnTheme);
     });
   }
 
   const btnSonsBar = document.getElementById("btn-sons");
   if (btnSonsBar) {
-    btnSonsBar.textContent = sonsActifs() ? "🔊" : "🔇";
+    syncUiSons(btnSonsBar);
     uneFois(btnSonsBar, "click", () => {
       toggleSons();
-      btnSonsBar.textContent = sonsActifs() ? "🔊" : "🔇";
+      syncUiSons(btnSonsBar);
     });
   }
 
@@ -309,6 +332,8 @@ function brancherOnboardingUI() {
 }
 
 brancherOnboardingUI();
+brancherBoutonChronoMenu();
+majUiBoutonChrono();
 
 // ── Sélecteur de profils (multi-comptes) ──────────────────────────────────────
 function afficherSelecteurProfils(liste, actifId) {

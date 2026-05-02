@@ -15,6 +15,7 @@ export const RENARD_CALIN_DATE_KEY = "renard-calin-date";
 export const RENARD_STREAK_KEY  = "renard-streak";
 export const STORAGE_THEME_NUIT = "theme-nuit";
 export const STORAGE_SONS_ACTIFS = "sons-actifs";
+export const STORAGE_CHRONO_JEU   = "jeu-chrono-actif";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2", CM1: "cm1", CM2: "cm2" };
@@ -85,6 +86,10 @@ export function estCM1() { return niveauCourant === NIVEAU.CM1; }
 export function estCM2() { return niveauCourant === NIVEAU.CM2; }
 export function estGrand() { return niveauCourant === NIVEAU.CM1 || niveauCourant === NIVEAU.CM2; }
 
+export function estMinuteurDisponible() {
+  return niveauCourant !== NIVEAU.CP;
+}
+
 // ── Genre ─────────────────────────────────────────────────────────────────────
 export function lireGenre() {
   const v = localStorage.getItem(STORAGE_GENRE);
@@ -94,6 +99,14 @@ export function lireGenre() {
 export function sauverGenre(g) {
   localStorage.setItem(STORAGE_GENRE, g);
   genreCourant = g;
+}
+
+export function lireChronoJeuActif() {
+  return localStorage.getItem(STORAGE_CHRONO_JEU) !== "0";
+}
+
+export function sauverChronoJeuActif(actif) {
+  localStorage.setItem(STORAGE_CHRONO_JEU, actif ? "1" : "0");
 }
 
 export function estFille() {
