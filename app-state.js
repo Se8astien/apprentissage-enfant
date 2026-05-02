@@ -13,6 +13,8 @@ export const RENARD_BONHEUR_KEY = "renard-bonheur";
 export const RENARD_BONHEUR_TS_KEY = "renard-bonheur-ts";
 export const RENARD_CALIN_DATE_KEY = "renard-calin-date";
 export const RENARD_STREAK_KEY  = "renard-streak";
+export const STORAGE_THEME_NUIT = "theme-nuit";
+export const STORAGE_SONS_ACTIFS = "sons-actifs";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2", CM1: "cm1", CM2: "cm2" };

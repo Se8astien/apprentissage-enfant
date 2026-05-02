@@ -5,6 +5,62 @@ import { escapeHtml } from "./app-state.js";
 
 const PIN_CLE = "parent-pin";
 const MASQUES_CLE = "jeux-masques";
+const SS_PARENT_DEADLINE = "parent-unlock-deadline";
+const PARENT_SKIP_PIN_MS = 10 * 60 * 1000;
+const PARENT_IDLE_MS = 3 * 60 * 1000;
+
+function nettoyerSessionParent() {
+  sessionStorage.removeItem(SS_PARENT_DEADLINE);
+}
+
+function prolongerSessionParent() {
+  sessionStorage.setItem(SS_PARENT_DEADLINE, String(Date.now() + PARENT_SKIP_PIN_MS));
+}
+
+function sessionParentEncoreValide() {
+  const t = parseInt(sessionStorage.getItem(SS_PARENT_DEADLINE) || "0", 10);
+  return t > Date.now();
+}
+
+function fermerOverlayParent(overlay, onFermer, opts = {}) {
+  const { fromIdle = false } = opts;
+  if (!overlay.isConnected) return;
+  if (overlay._parentIdleClear) {
+    overlay._parentIdleClear();
+    delete overlay._parentIdleClear;
+  }
+  nettoyerSessionParent();
+  overlay.remove();
+  if (onFermer) onFermer();
+  if (fromIdle) {
+    try {
+      const accueil = document.querySelector(".accueil");
+      if (accueil) {
+        const prev = accueil.textContent;
+        accueil.textContent = "Espace parents fermé (inactivité).";
+        setTimeout(() => { accueil.textContent = prev; }, 3500);
+      }
+    } catch { /* ignore */ }
+  }
+}
+
+function brancherIdleParent(overlay, onFermer) {
+  let idleTimer;
+  const bump = () => {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      fermerOverlayParent(overlay, onFermer, { fromIdle: true });
+    }, PARENT_IDLE_MS);
+  };
+  overlay._parentIdleClear = () => {
+    clearTimeout(idleTimer);
+    delete overlay._parentIdleClear;
+  };
+  ["pointerdown", "keydown", "touchstart", "scroll"].forEach((ev) => {
+    overlay.addEventListener(ev, bump, true);
+  });
+  bump();
+}
 
 function labelJeu(id) {
   const el = document.querySelector(`.carte-jeu[data-jeu="${id}"]`);
@@ -25,9 +81,16 @@ export function montrerParams(onFermer) {
   const pin = localStorage.getItem(PIN_CLE);
   const overlay = document.createElement("div");
   overlay.className = "evolution-overlay params-overlay";
-  overlay.innerHTML = creerPinHtml(pin ? "Code parent" : "Créer un code parent", pin ? "Valider" : "Enregistrer");
-  document.body.appendChild(overlay);
-  brancherPin(overlay, pin, onFermer);
+  const peutSauterPin = pin && sessionParentEncoreValide();
+  if (peutSauterPin) {
+    overlay.innerHTML = creerSettingsHtml();
+    document.body.appendChild(overlay);
+    brancherSettings(overlay, onFermer);
+  } else {
+    overlay.innerHTML = creerPinHtml(pin ? "Code parent" : "Créer un code parent", pin ? "Valider" : "Enregistrer");
+    document.body.appendChild(overlay);
+    brancherPin(overlay, pin, onFermer);
+  }
 }
 
 function creerPinHtml(titre, label) {
@@ -73,6 +136,7 @@ function brancherPin(overlay, pinExistant, onFermer) {
     if (saisi.length < 4) { msg.textContent = "Tape 4 chiffres."; return; }
     if (!pinExistant || saisi === pinExistant) {
       if (!pinExistant) localStorage.setItem(PIN_CLE, saisi);
+      prolongerSessionParent();
       overlay.innerHTML = creerSettingsHtml();
       brancherSettings(overlay, onFermer);
     } else {
@@ -82,8 +146,16 @@ function brancherPin(overlay, pinExistant, onFermer) {
     }
   });
 
-  btnFerm.addEventListener("click", () => { overlay.remove(); if (onFermer) onFermer(); });
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) { overlay.remove(); if (onFermer) onFermer(); } });
+  btnFerm.addEventListener("click", () => {
+    overlay.remove();
+    if (onFermer) onFermer();
+  });
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+      if (onFermer) onFermer();
+    }
+  });
 }
 
 function creerSettingsHtml() {
@@ -267,8 +339,7 @@ function brancherSettings(overlay, onFermer) {
     btnReset.addEventListener("click", () => {
       if (confirm("Remettre les étoiles à zéro pour ce profil ?")) {
         localStorage.setItem("maths-cp-etoiles", "0");
-        overlay.remove();
-        if (onFermer) onFermer();
+        fermerOverlayParent(overlay, onFermer);
       }
     });
   }
@@ -281,6 +352,8 @@ function brancherSettings(overlay, onFermer) {
           "Les réglages (thème, sons, consentement, code parent, jeux masqués) seront conservés."
       )) return;
       effacerDonneesProfilCourant();
+      if (overlay._parentIdleClear) overlay._parentIdleClear();
+      nettoyerSessionParent();
       overlay.remove();
       location.reload();
     });
@@ -290,12 +363,19 @@ function brancherSettings(overlay, onFermer) {
   if (btnPin) {
     btnPin.addEventListener("click", () => {
       localStorage.removeItem(PIN_CLE);
+      if (overlay._parentIdleClear) overlay._parentIdleClear();
+      nettoyerSessionParent();
       overlay.remove();
       montrerParams(onFermer);
     });
   }
 
   const btnFerm = overlay.querySelector(".btn-params-fermer");
-  if (btnFerm) btnFerm.addEventListener("click", () => { overlay.remove(); if (onFermer) onFermer(); });
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) { overlay.remove(); if (onFermer) onFermer(); } });
+  if (btnFerm) btnFerm.addEventListener("click", () => fermerOverlayParent(overlay, onFermer));
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) fermerOverlayParent(overlay, onFermer);
+  });
+
+  brancherIdleParent(overlay, onFermer);
 }
+

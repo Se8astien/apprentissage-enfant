@@ -6,6 +6,8 @@ import {
   btnRetour,
   elSuivant,
   sauverNiveau,
+  sauverGenre,
+  setDifficulte,
   lireNomRenard,
   sauverNomRenard,
   lireEtoiles,
@@ -22,6 +24,7 @@ import {
   piegerFocus,
   revelerSeulEcran,
   syncPrefsDepuisStockage,
+  STORAGE_THEME_NUIT,
 } from "./app-state.js";
 
 import {
@@ -49,7 +52,6 @@ import {
   getWrongQuestions,
   clearWrongQuestions,
   entrerRevision,
-  synchroniserAffichageMenu,
 } from "./app-nav.js";
 
 import {
@@ -68,28 +70,18 @@ import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM
 import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol, lancerItalienMots, lancerTraductionItalien, lancerPortugaisMots, lancerTraductionPortugais } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
 import { lancerSequence, lancerCode } from "./games-algo.js";
-import { track, setAnalyticsConsent, flushAnalyticsQueue } from "./app-analytics.js";
+import {
+  track,
+  setAnalyticsConsent,
+  flushAnalyticsQueue,
+  chargerTagAnalytics,
+  CONSENT_KEY,
+} from "./app-analytics.js";
 import { toggleSons, sonsActifs } from "./app-sons.js";
 import { initProfils, getProfils, basculerProfil, creerProfil, syncProfilActif } from "./app-profils.js";
 import { montrerParams } from "./app-params.js";
-
-// ── Analytics setup ──────────────────────────────────────────────────────────
-window.dataLayer = window.dataLayer || [];
-window.gtag = window.gtag || function gtag(){ window.dataLayer.push(arguments); };
-window.gtag("consent", "default", { analytics_storage: "denied", ad_storage: "denied", wait_for_update: 500 });
-
-const GA_ID = "G-5EDQ2KCS8X";
-let analyticsCharge = false;
-function chargerAnalytics() {
-  if (analyticsCharge || document.querySelector(`script[src*="${GA_ID}"]`)) return;
-  analyticsCharge = true;
-  const s = document.createElement("script");
-  s.async = true;
-  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-  document.head.appendChild(s);
-  window.gtag("js", new Date());
-  window.gtag("config", GA_ID);
-}
+import { rafraichirUiComplete } from "./app-sync-ui.js";
+import { stockageGet, stockageSet } from "./app-stockage.js";
 
 // ── Lancers map ───────────────────────────────────────────────────────────────
 const lanceurs = {
@@ -114,6 +106,25 @@ const lanceurs = {
   sequence: lancerSequence, code: lancerCode,
 };
 
+window.__amModuleReady = false;
+
+function uneFois(el, evt, fn) {
+  if (!el || el.dataset.amBound === "1") return;
+  el.dataset.amBound = "1";
+  el.addEventListener(evt, fn);
+}
+
+function idEcranOnboarding() {
+  if (!landingDejaVu()) return "ecran-landing";
+  const etape = etapeCourante();
+  if (etape === "genre") return "ecran-genre";
+  if (etape === "classe") return "ecran-classe";
+  if (etape === "nommage") return "ecran-nommage";
+  return "ecran-menu";
+}
+
+window.__amRecharger = rafraichirUiComplete;
+
 // ── Helpers d'écrans ──────────────────────────────────────────────────────────
 function montrerClasse() {
   if (!montrerEcranParId("ecran-classe")) return;
@@ -128,15 +139,6 @@ function entrerMenu() {
   montrerMenu();
   afficherMissions();
 }
-
-window.__amRecharger = () => {
-  try {
-    syncPrefsDepuisStockage();
-    syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
-    synchroniserAffichageMenu();
-    afficherMissions();
-  } catch { /* ignore */ }
-};
 
 // ── Routeur central : 1 point qui décide quel écran montrer ──────────────────
 function routerVersEtape() {
@@ -177,9 +179,163 @@ function montrerLandingPuisRouter() {
   };
   const cta1 = document.getElementById("btn-landing-cta");
   const cta2 = document.getElementById("btn-landing-cta-2");
-  if (cta1) cta1.addEventListener("click", passer);
-  if (cta2) cta2.addEventListener("click", passer);
+  [cta1, cta2].forEach((el) => {
+    if (!el || el.dataset.amBound === "1") return;
+    el.addEventListener("click", passer);
+  });
 }
+
+function brancherOnboardingUI() {
+  try {
+    const bnr0 = document.getElementById("banner-rgpd");
+    if (bnr0 && !stockageGet(CONSENT_KEY)) bnr0.hidden = false;
+  } catch { /* ignore */ }
+
+  montrerEcranParId(idEcranOnboarding());
+
+  ["btn-landing-cta", "btn-landing-cta-2"].forEach((id) => {
+    const el = document.getElementById(id);
+    uneFois(el, "click", () => {
+      marquerLandingVu();
+      routerVersEtape();
+    });
+  });
+
+  document.querySelectorAll(".btn-genre").forEach((btn) => {
+    uneFois(btn, "click", () => {
+      const g = btn.getAttribute("data-genre");
+      if (!g) return;
+      sauverGenre(g);
+      routerVersEtape();
+    });
+  });
+
+  const bClasse = document.querySelectorAll(".btn-classe");
+  bClasse.forEach((btn) => {
+    uneFois(btn, "click", () => {
+      const nv = btn.getAttribute("data-niveau");
+      if (!nv) return;
+      sauverNiveau(nv);
+      bClasse.forEach((b) => b.classList.toggle("selectionne", b === btn));
+      const diffEl = document.getElementById("diff-choix");
+      if (diffEl) {
+        diffEl.hidden = false;
+        try { diffEl.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch { /* ignore */ }
+      }
+    });
+  });
+
+  document.querySelectorAll(".btn-diff").forEach((btn) => {
+    uneFois(btn, "click", () => {
+      let d = parseInt(btn.getAttribute("data-diff") || "1", 10);
+      if (Number.isNaN(d)) d = 1;
+      setDifficulte(Math.max(0, Math.min(2, d)));
+      routerVersEtape();
+    });
+  });
+
+  document.querySelectorAll(".niveau-btn").forEach((btn) => {
+    uneFois(btn, "click", () => {
+      const nv = btn.getAttribute("data-niveau");
+      if (!nv) return;
+      sauverNiveau(nv);
+      rafraichirUiComplete();
+    });
+  });
+
+  const formNom = document.getElementById("nommage-form");
+  uneFois(formNom, "submit", (ev) => {
+    ev.preventDefault();
+    const inp = document.getElementById("input-nom-renard");
+    const nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
+    sauverNomRenard(nom);
+    mettreAJourRenardHeader();
+    routerVersEtape();
+    setTimeout(() => afficherIntroHistoire(nom), 0);
+    rafraichirUiComplete();
+  });
+
+  const bnr = document.getElementById("banner-rgpd");
+  uneFois(document.getElementById("btn-rgpd-accepter"), "click", () => {
+    setAnalyticsConsent("accepte");
+    chargerTagAnalytics();
+    if (bnr) bnr.hidden = true;
+  });
+  uneFois(document.getElementById("btn-rgpd-refuser"), "click", () => {
+    setAnalyticsConsent("refuse");
+    if (bnr) bnr.hidden = true;
+  });
+
+  const btnTheme = document.getElementById("btn-theme");
+  if (btnTheme) {
+    btnTheme.textContent = stockageGet(STORAGE_THEME_NUIT) === "1" ? "☀️" : "🌙";
+    uneFois(btnTheme, "click", () => {
+      const nuit = stockageGet(STORAGE_THEME_NUIT) !== "1";
+      stockageSet(STORAGE_THEME_NUIT, nuit ? "1" : "0");
+      document.documentElement.setAttribute("data-theme", nuit ? "nuit" : "");
+      btnTheme.textContent = nuit ? "☀️" : "🌙";
+    });
+  }
+
+  const btnSonsBar = document.getElementById("btn-sons");
+  if (btnSonsBar) {
+    btnSonsBar.textContent = sonsActifs() ? "🔊" : "🔇";
+    uneFois(btnSonsBar, "click", () => {
+      toggleSons();
+      btnSonsBar.textContent = sonsActifs() ? "🔊" : "🔇";
+    });
+  }
+
+  function partager() {
+    const data = {
+      title: "Apprentissage Magique — Jeux Montessori",
+      text: "🦊 Des jeux Montessori gratuits pour apprendre en s'amusant, du CP au CM2 !",
+      url: "https://apprentissage-magique.fr",
+    };
+    if (navigator.share) {
+      navigator.share(data).catch(() => {});
+    } else {
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(`${data.text} ${data.url}`)}`,
+        "_blank",
+        "noopener"
+      );
+    }
+  }
+  uneFois(document.getElementById("btn-landing-partager"), "click", partager);
+  uneFois(document.getElementById("btn-partager"), "click", partager);
+
+  uneFois(document.getElementById("btn-changer-classe"), "click", () => {
+    montrerEcranParId("ecran-classe");
+    const diffChoix = document.getElementById("diff-choix");
+    if (diffChoix) diffChoix.hidden = true;
+    document.querySelectorAll(".btn-classe").forEach((b) => b.classList.remove("selectionne"));
+  });
+
+  uneFois(document.getElementById("btn-changer-genre"), "click", () => {
+    montrerEcranParId("ecran-genre");
+  });
+
+  setTimeout(() => {
+    if (window.__amModuleReady) return;
+    document.querySelectorAll(".carte-jeu[data-jeu]").forEach((btn) => {
+      uneFois(btn, "click", () => {
+        alert("Les jeux ne se chargent pas en local (file://). Lance un serveur, par exemple :\n\n  python3 -m http.server 8000\n\npuis ouvre http://localhost:8000");
+      });
+    });
+  }, 1500);
+
+  window.addEventListener("error", (ev) => {
+    try {
+      const src = ev && ev.filename ? String(ev.filename) : "";
+      if (src.includes("app-") || src.includes("games-")) {
+        console.error("[Apprentissage] erreur dans", src, ev && ev.message);
+      }
+    } catch { /* ignore */ }
+  });
+}
+
+brancherOnboardingUI();
 
 // ── Sélecteur de profils (multi-comptes) ──────────────────────────────────────
 function afficherSelecteurProfils(liste, actifId) {
@@ -246,7 +402,7 @@ function premierEcran() {
     return;
   }
   sessionStorage.removeItem("skip-selector");
-  // L'écran initial est déjà révélé par le mini script inline du HTML.
+  // L'écran initial vient de brancherOnboardingUI (idEcranOnboarding).
   // On ne fait que rafraîchir l'affichage menu si on est sur le menu (étoiles, missions).
   syncPrefsDepuisStockage();
   if (etapeCourante() === "menu" && document.getElementById("ecran-menu")?.classList.contains("actif")) {
@@ -266,19 +422,6 @@ premierEcran();
 setTimeout(() => {
   if (!document.querySelector(".ecran.actif:not([hidden])")) routerVersEtape();
 }, 800);
-
-// Onboarding (genre/classe/diff/nommage/niveau header) entièrement géré par le mini script inline.
-// Le module ajoute uniquement l'intro d'histoire après le nommage.
-const formNommageMod = document.getElementById("nommage-form");
-if (formNommageMod) {
-  formNommageMod.addEventListener("submit", () => {
-    const inp = document.getElementById("input-nom-renard");
-    const nom = ((inp && inp.value) || "").trim().slice(0, 12) || "Foxy";
-    sauverNomRenard(nom);
-    mettreAJourRenardHeader();
-    setTimeout(() => afficherIntroHistoire(nom), 0);
-  });
-}
 
 // ── Boutons jeux ──────────────────────────────────────────────────────────────
 function majEtoilesMaitrise() {
@@ -342,7 +485,7 @@ if (btnRetour) btnRetour.addEventListener("click", () => {
 });
 if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
-// Changer de genre/classe gérés par le mini script inline.
+// Changer de genre/classe gérés par brancherOnboardingUI.
 
 const btnMaison = document.getElementById("btn-maison");
 if (btnMaison) btnMaison.addEventListener("click", () => montrerMaison(entrerMenu));
@@ -443,8 +586,6 @@ if (btnRetourBadges) btnRetourBadges.addEventListener("click", entrerMenu);
   }
 }
 
-// Partage géré par le mini script inline (fonctionne même sans modules ES).
-
 // ── Profils header ────────────────────────────────────────────────────────────
 const btnProfilsHeader = document.getElementById("btn-profils-header");
 if (btnProfilsHeader) {
@@ -454,27 +595,16 @@ if (btnProfilsHeader) {
   });
 }
 
-// RGPD : boutons gérés par mini script inline. Le module se contente de synchroniser
-// l'analytics (chargement GA + flag consent) avec le choix déjà persisté.
 {
-  const consentSauve = localStorage.getItem("rgpd-consent");
+  const consentSauve = stockageGet(CONSENT_KEY);
   if (consentSauve) {
     setAnalyticsConsent(consentSauve);
-    if (consentSauve === "accepte") chargerAnalytics();
+    if (consentSauve === "accepte") chargerTagAnalytics();
   }
   window.addEventListener("storage", (ev) => {
-    if (ev.key !== "rgpd-consent" || !ev.newValue) return;
+    if (ev.key !== CONSENT_KEY || !ev.newValue) return;
     setAnalyticsConsent(ev.newValue);
-    if (ev.newValue === "accepte") chargerAnalytics();
-  });
-}
-
-// Sons : bouton géré par inline (toggle localStorage "sons-actifs") ; module aligne app-sons.
-const btnSonsMod = document.getElementById("btn-sons");
-if (btnSonsMod) {
-  btnSonsMod.addEventListener("click", () => {
-    const veutOn = localStorage.getItem("sons-actifs") !== "0";
-    if (sonsActifs() !== veutOn) toggleSons();
+    if (ev.newValue === "accepte") chargerTagAnalytics();
   });
 }
 

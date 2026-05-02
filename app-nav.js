@@ -12,6 +12,7 @@ import {
   getRepondu,
   setRepondu,
   getBonneReponse,
+  setBonneReponse,
   setBadgeVisible,
   estFille,
   estGrand,
@@ -59,6 +60,7 @@ import {
 } from "./app-gamification.js";
 
 import { getHistoireJeu } from "./app-histoire.js";
+import { getMasques } from "./app-params.js";
 
 // Re-export confetti so game files can import it from here if desired
 export { confetti } from "./app-state.js";
@@ -543,7 +545,7 @@ function proposerClasseSuivante() {
 // ── Filtrage jeux par niveau (programme EN) ───────────────────────────────────
 function filtrerJeuxParNiveau() {
   const n = getNiveauCourant();
-  const masques = (() => { try { return JSON.parse(localStorage.getItem("jeux-masques")) || []; } catch { return []; } })();
+  const masques = getMasques();
   let sectionCourante = null;
   let sectionVisible = false;
   document.querySelectorAll(".grille-jeux > *").forEach(el => {

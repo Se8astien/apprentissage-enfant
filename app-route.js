@@ -1,8 +1,7 @@
 // app-route.js — routage des écrans onboarding/menu (un seul point de contrôle)
 
-import { STORAGE_NIVEAU, RENARD_NOM_KEY, revelerSeulEcran } from "./app-state.js";
+import { STORAGE_NIVEAU, STORAGE_GENRE, RENARD_NOM_KEY, revelerSeulEcran } from "./app-state.js";
 
-const STORAGE_GENRE = "maths-cp-genre";
 export const STORAGE_LANDING_VU = "landing-seen";
 
 export function etapeCourante() {

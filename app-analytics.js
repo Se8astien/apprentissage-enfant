@@ -1,4 +1,16 @@
-const CONSENT_KEY = "rgpd-consent";
+export const CONSENT_KEY = "rgpd-consent";
+export const GA_MEASUREMENT_ID = "G-5EDQ2KCS8X";
+
+export function chargerTagAnalytics() {
+  if (typeof window.gtag !== "function") return;
+  if (document.querySelector(`script[src*="${GA_MEASUREMENT_ID}"]`)) return;
+  const s = document.createElement("script");
+  s.async = true;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  document.head.appendChild(s);
+  window.gtag("js", new Date());
+  window.gtag("config", GA_MEASUREMENT_ID);
+}
 const QUEUE_KEY = "analytics-queue";
 
 const EVENT_SCHEMA = {
