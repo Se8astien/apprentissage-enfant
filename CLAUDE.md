@@ -17,7 +17,7 @@ Application web éducative pour enfants du CP au CM2 (6–11 ans). Jeux de maths
 
 ## Architecture
 
-**Vanilla JS + ES modules natifs** — pas de bundler, pas de framework, pas de dépendances.
+**Vanilla JS + ES modules natifs** — pas de bundler, pas de framework, pas de dépendances d’exécution. Les seules dépendances **npm** sont en **dev** : Playwright pour les tests smoke (voir **Tests**).
 
 ```
 index.html           ~580 lignes  — HTML statique, écrans cachés/visibles via JS
@@ -137,6 +137,12 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - **Ne modifier que la branche concernée** sans toucher aux autres niveaux
 - **Pas de commentaires** sauf pour les invariants non-évidents
 - **Pas de bundler** — les modules ES natifs suffisent, tester dans un navigateur récent
+
+## Tests (smoke E2E)
+
+- **Playwright** : `tests/e2e/smoke-menu.spec.js` vérifie menu + barre de classe après chargement du module, puis synchronisation au clic sur CE2 et CM2 (`#classe-info-label`, `aria-pressed` sur les boutons niveau).
+- Première installation : `npm install` puis `npx playwright install chromium`.
+- Lancer : `npm run test:e2e` (démarre un serveur HTTP statique sur le dossier du projet, comme pour un navigateur réel).
 
 ## Livraison
 
