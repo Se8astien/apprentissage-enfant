@@ -10,7 +10,7 @@ const strictRules = {
 };
 
 const esModules = {
-  files: ["app-init.js", "app-*.js", "games-*.js"],
+  files: ["app-init.js", "app-*.js", "games-*.js", "games-registry.js"],
   languageOptions: {
     ecmaVersion: 2022,
     sourceType: "module",

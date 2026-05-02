@@ -62,14 +62,8 @@ import {
   lireBadges,
 } from "./app-gamification.js";
 
-import { lancerCompte, lancerAddition, lancerSoustraction, lancerCompare, lancerSuite, lancerDoubles, lancerMoitie, lancerDizaines, lancerPairImpair, lancerPerlesDorees, lancerPlanche100, lancerDecimaux } from "./games-maths.js";
-import { lancerFormes, lancerFractions, lancerSymetrie, lancerPerimetre, lancerAngles, lancerAires } from "./games-formes.js";
-import { lancerHeure, lancerDurees, lancerMesures, lancerMasse, lancerCalendrier } from "./games-temps.js";
-import { lancerMonnaieCp, lancerMonnaieCe1 } from "./games-argent.js";
-import { lancerMultiplication, lancerDivision, lancerProbleme, lancerFractionsCM, lancerProportionnalite, lancerPourcentages } from "./games-avance.js";
-import { lancerSyllabes, lancerLecture, lancerAnglaisMots, lancerTraduction, lancerSons, lancerGrammaire, lancerLecturePhrase, lancerPhraseMobile, lancerLectureTexte, lancerConjugaison, lancerHomophones, lancerSynonymes, lancerAllemandMots, lancerTraductionAllemand, lancerEspagnolMots, lancerTraductionEspagnol, lancerItalienMots, lancerTraductionItalien, lancerPortugaisMots, lancerTraductionPortugais } from "./games-langage.js";
 import { afficherIntroHistoire } from "./app-histoire.js";
-import { lancerSequence, lancerCode } from "./games-algo.js";
+import { LISTE_IDS_JEUX, assurerLanceurDansMap } from "./games-registry.js";
 import {
   track,
   setAnalyticsConsent,
@@ -83,28 +77,7 @@ import { montrerParams } from "./app-params.js";
 import { rafraichirUiComplete } from "./app-sync-ui.js";
 import { stockageGet, stockageSet } from "./app-stockage.js";
 
-// ── Lancers map ───────────────────────────────────────────────────────────────
-const lanceurs = {
-  compte: lancerCompte, addition: lancerAddition, soustraction: lancerSoustraction,
-  compare: lancerCompare, suite: lancerSuite, doubles: lancerDoubles,
-  heure: lancerHeure, pairimpair: lancerPairImpair, dizaines: lancerDizaines,
-  formes: lancerFormes, monnaiecp: lancerMonnaieCp, moitie: lancerMoitie,
-  multiplication: lancerMultiplication, division: lancerDivision, fractions: lancerFractions,
-  mesures: lancerMesures, monnaiece1: lancerMonnaieCe1, symetrie: lancerSymetrie,
-  syllabes: lancerSyllabes, lecture: lancerLecture, anglais: lancerAnglaisMots,
-  traduction: lancerTraduction, durees: lancerDurees, probleme: lancerProbleme,
-  masse: lancerMasse, perimetre: lancerPerimetre, angles: lancerAngles,
-  perlesDorees: lancerPerlesDorees, planche100: lancerPlanche100, sons: lancerSons,
-  grammaire: lancerGrammaire, lecturePhrase: lancerLecturePhrase, phraseMobile: lancerPhraseMobile,
-  lectureTexte: lancerLectureTexte, aires: lancerAires, decimaux: lancerDecimaux,
-  fractionsCM: lancerFractionsCM, proportionnalite: lancerProportionnalite, pourcentages: lancerPourcentages,
-  conjugaison: lancerConjugaison, homophones: lancerHomophones, synonymes: lancerSynonymes,
-  calendrier: lancerCalendrier, allemand: lancerAllemandMots, traductionAllemand: lancerTraductionAllemand,
-  espagnol: lancerEspagnolMots, traductionEspagnol: lancerTraductionEspagnol,
-  italien: lancerItalienMots, traductionItalien: lancerTraductionItalien,
-  portugais: lancerPortugaisMots, traductionPortugais: lancerTraductionPortugais,
-  sequence: lancerSequence, code: lancerCode,
-};
+const lanceurs = {};
 
 window.__amModuleReady = false;
 
@@ -436,10 +409,12 @@ function majEtoilesMaitrise() {
 }
 majEtoilesMaitrise();
 
-document.querySelectorAll(".carte-jeu").forEach(btn => {
-  btn.addEventListener("click", () => {
+document.querySelectorAll(".carte-jeu").forEach((btn) => {
+  btn.addEventListener("click", async () => {
     const jeu = btn.dataset.jeu;
-    if (!jeu || typeof lanceurs[jeu] !== "function") return;
+    if (!jeu) return;
+    const ok = await assurerLanceurDansMap(jeu, lanceurs);
+    if (!ok || typeof lanceurs[jeu] !== "function") return;
     track("game_start", { game_name: jeu, niveau: getNiveauCourant(), difficulte: getDifficulte() });
     montrerJeu(jeu, lanceurs);
   });
@@ -618,7 +593,7 @@ function imprimerCertificat() {
   const niveau = { cp: "CP", ce1: "CE1", ce2: "CE2", cm1: "CM1", cm2: "CM2" }[getNiveauCourant()] || "CP";
   const etoiles = lireEtoiles();
   const badgesObtenus = lireBadges();
-  const nbJeux = Object.keys(lanceurs).filter(j => lireMaitrise(j).some(Boolean)).length;
+  const nbJeux = LISTE_IDS_JEUX.filter((j) => lireMaitrise(j).some(Boolean)).length;
   const date = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   const badgesHtml = badgesObtenus.slice(0, 15).map(id => {
     const b = BADGES.find(x => x.id === id);

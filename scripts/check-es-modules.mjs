@@ -35,12 +35,15 @@ function nodeCheck(file) {
 }
 
 const relFromRe = /\bfrom\s+['"](\.\.?(?:\/[^'"]+)+)['"]/g;
+const dynImportRe = /\bimport\s*\(\s*['"](\.\.?(?:\/[^'"]+)+(?:\.js)?)['"]\s*\)/g;
 
 function extractRelativeSpecifiers(source) {
   const specs = new Set();
   relFromRe.lastIndex = 0;
+  dynImportRe.lastIndex = 0;
   let m;
   while ((m = relFromRe.exec(source)) !== null) specs.add(m[1]);
+  while ((m = dynImportRe.exec(source)) !== null) specs.add(m[1]);
   return [...specs];
 }
 
