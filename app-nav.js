@@ -561,33 +561,19 @@ function filtrerJeuxParNiveau() {
   if (sectionCourante) sectionCourante.hidden = !sectionVisible;
 }
 
-// ── montrerMenu ───────────────────────────────────────────────────────────────
-export function montrerMenu() {
-  const menu = elMenu || document.getElementById("ecran-menu");
-  if (!menu) return;
+export function synchroniserAffichageMenu() {
   syncPrefsDepuisStockage();
-  resetFeedback();
-  stopChrono();
-  _modeRevision = null;
-  rattrapageRestant = 0;
-  rattrapageDiffOriginale = null;
-  setJeuCourant(null);
-  setBadgeVisible(false);
-  const modal = document.getElementById("modal-classe-suivante");
-  if (modal) modal.hidden = true;
-  revelerSeulEcran(menu);
   majGenre();
   mettreAJourMaisonBanner();
-  // Update classe/difficulte info bar
   const classeLabel = document.getElementById("classe-info-label");
   if (classeLabel) classeLabel.textContent = NIVEAUX_LABELS[getNiveauCourant()] || "";
-  document.querySelectorAll(".niveau-btn").forEach(btn => {
+  document.querySelectorAll(".niveau-btn").forEach((btn) => {
     const actif = btn.dataset.niveau === getNiveauCourant();
     btn.classList.toggle("actif", actif);
     btn.setAttribute("aria-pressed", actif ? "true" : "false");
   });
   filtrerJeuxParNiveau();
-  document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
+  document.querySelectorAll(".carte-jeu[data-jeu]").forEach((btn) => {
     const jeu = btn.dataset.jeu;
     const m = lireMaitrise(jeu);
     const n = m.filter(Boolean).length;
@@ -604,6 +590,24 @@ export function montrerMenu() {
 
     btn.classList.toggle("jeu-maitrise", n === 3);
   });
+}
+
+// ── montrerMenu ───────────────────────────────────────────────────────────────
+export function montrerMenu() {
+  const menu = elMenu || document.getElementById("ecran-menu");
+  if (!menu) return;
+  syncPrefsDepuisStockage();
+  resetFeedback();
+  stopChrono();
+  _modeRevision = null;
+  rattrapageRestant = 0;
+  rattrapageDiffOriginale = null;
+  setJeuCourant(null);
+  setBadgeVisible(false);
+  const modal = document.getElementById("modal-classe-suivante");
+  if (modal) modal.hidden = true;
+  revelerSeulEcran(menu);
+  synchroniserAffichageMenu();
 }
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────

@@ -49,6 +49,7 @@ import {
   getWrongQuestions,
   clearWrongQuestions,
   entrerRevision,
+  synchroniserAffichageMenu,
 } from "./app-nav.js";
 
 import {
@@ -114,15 +115,6 @@ const lanceurs = {
 };
 
 // ── Helpers d'écrans ──────────────────────────────────────────────────────────
-function syncNiveauButtons() {
-  const niveau = getNiveauCourant();
-  document.querySelectorAll(".niveau-btn").forEach(btn => {
-    const actif = btn.dataset.niveau === niveau;
-    btn.classList.toggle("actif", actif);
-    btn.setAttribute("aria-pressed", actif ? "true" : "false");
-  });
-}
-
 function montrerClasse() {
   if (!montrerEcranParId("ecran-classe")) return;
   const mascot = document.getElementById("classe-mascotte");
@@ -133,9 +125,6 @@ function montrerClasse() {
 }
 
 function entrerMenu() {
-  syncPrefsDepuisStockage();
-  majGenre();
-  syncNiveauButtons();
   montrerMenu();
   afficherMissions();
 }
@@ -143,8 +132,8 @@ function entrerMenu() {
 window.__amRecharger = () => {
   try {
     syncPrefsDepuisStockage();
-    majGenre();
-    syncNiveauButtons();
+    syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
+    synchroniserAffichageMenu();
     afficherMissions();
   } catch { /* ignore */ }
 };
