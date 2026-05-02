@@ -164,6 +164,10 @@ body {
   user-select: none;
 }
 
+.header-chrono-label {
+  display: none;
+}
+
 .header-tool-profil {
   font-size: 1.22rem;
 }
@@ -655,6 +659,39 @@ h1 {
   gap: 0.65rem;
 }
 
+.jeu-outils {
+  display: flex;
+  justify-content: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin: -0.25rem 0 0.75rem;
+}
+
+.btn-outil-jeu {
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  min-height: 44px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primaire-fonce);
+  background: rgba(108, 92, 231, 0.1);
+  box-shadow: 0 3px 10px rgba(108, 92, 231, 0.12);
+  cursor: pointer;
+}
+
+.btn-outil-jeu:focus-visible {
+  outline: 3px solid var(--primaire);
+  outline-offset: 2px;
+}
+
+.chrono-libre {
+  background: linear-gradient(135deg, #dffaf4, #e9fff9);
+  color: #006b57;
+  box-shadow: 0 4px 14px rgba(0, 184, 148, 0.22);
+}
+
 .btn-choix {
   border: none;
   border-radius: 1rem;
@@ -754,6 +791,33 @@ h1 {
 .aide-douce-encouragement {
   font-size: 0.86rem;
   opacity: 0.82;
+}
+
+.btn-reviser-erreurs {
+  margin-top: 0.55rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.58rem 0.9rem;
+  min-height: 44px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(108, 92, 231, 0.28);
+}
+
+.effort-progress {
+  margin: 0.6rem auto 0;
+  width: min(100%, 18rem);
+  border-radius: 999px;
+  padding: 0.42rem 0.65rem;
+  background: rgba(253, 203, 110, 0.16);
+  color: #8a5a00;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
 }
 
 .btn-suivant {
@@ -2429,9 +2493,13 @@ h1 {
 [data-theme="nuit"] .btn-choix { background: #2a2a55; color: #dfe6e9; border-color: #4a4a88; }
 [data-theme="nuit"] .btn-choix.bonne { background: #00b894; color: white; }
 [data-theme="nuit"] .btn-choix.mauvaise { background: #e17055; color: white; }
-[data-theme="nuit"] .aide-douce { background: #2a2a55; border-color: #6c5ce7; color: #dfe6e9; }
+[data-theme="nuit"] .aide-douce,
+[data-theme="nuit"] .effort-progress { background: #2a2a55; border-color: #6c5ce7; color: #dfe6e9; }
 [data-theme="nuit"] .aide-douce-titre { color: #fdcb6e; }
 [data-theme="nuit"] .aide-douce-reponse { background: rgba(0, 184, 148, 0.18); color: #8ff0dd; }
+[data-theme="nuit"] .btn-outil-jeu,
+[data-theme="nuit"] .btn-reviser-erreurs { background: #1e1e3f; color: #dfe6e9; border-color: #4a4a88; }
+[data-theme="nuit"] .chrono-libre { background: rgba(0, 184, 148, 0.18); color: #8ff0dd; }
 [data-theme="nuit"] .maison-etoiles { background: #2a2a55; border-color: #4a4a88; }
 [data-theme="nuit"] .classe-info-barre { background: #1e1e3f; }
 [data-theme="nuit"] .seo-footer { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); }

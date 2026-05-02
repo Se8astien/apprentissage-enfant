@@ -55,6 +55,10 @@ test("une mauvaise réponse affiche une aide douce et la bonne réponse", async 
     await intro.click();
   }
 
+  await expect(page.locator("#btn-indice-question")).toBeVisible();
+  await page.locator("#btn-indice-question").click();
+  await expect(page.locator("#aide-douce")).toContainText("Petit coup de pouce");
+
   const bonneReponse = await page.locator("#zone-choix .btn-choix").evaluateAll((buttons) => {
     const values = buttons.map((button) => button.getAttribute("data-valeur") || "");
     const question = document.getElementById("zone-question")?.textContent || "";

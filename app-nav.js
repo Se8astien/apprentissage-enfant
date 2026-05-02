@@ -75,6 +75,12 @@ let erreursSerie = 0;
 let fatigueActivee = false;
 let rattrapageRestant = 0;
 let rattrapageDiffOriginale = null;
+let questionsDepuisDebutJeu = 0;
+let mauvaisesDepuisDebutJeu = 0;
+let essaisDepuisEncouragement = 0;
+let correctionsDepuisEncouragement = 0;
+let derniereQuestionEtaitErreur = false;
+let indicesSession = 0;
 
 const LIBELLE_THEME_JEU = {
   maths: "Nombres",
@@ -100,9 +106,17 @@ function secondesChrono() {
 
 function startChrono() {
   const secs = secondesChrono();
-  if (secs <= 0) return;
   stopChrono();
+  majUiBoutonChrono();
   const el = document.getElementById("chrono");
+  if (secs <= 0) {
+    if (el && estMinuteurDisponible()) {
+      el.hidden = false;
+      el.textContent = "🕊️ Temps libre";
+      el.className = "chrono chrono-libre";
+    }
+    return;
+  }
   if (!el) return;
   el.hidden = false;
   let reste = secs;
@@ -256,6 +270,7 @@ function lancerAvecAntiRepeat(jeu, lanceurs) {
   if (!_histoireQuestions[jeu]) _histoireQuestions[jeu] = [];
   _histoireQuestions[jeu].push(fp);
   if (_histoireQuestions[jeu].length > HIST_MAX) _histoireQuestions[jeu].shift();
+  preparerOutilsQuestion();
 }
 
 // ── Messages ──────────────────────────────────────────────────────────────────
@@ -307,6 +322,20 @@ function libelleBonneReponse(correct) {
 
 function getAideDouceEl() {
   return document.getElementById("aide-douce");
+}
+
+function getOutilsJeuEl() {
+  return document.getElementById("outils-jeu");
+}
+
+function getEffortProgressEl() {
+  return document.getElementById("effort-progress");
+}
+
+function getQuestionTexteLisible() {
+  const zq = document.getElementById("zone-question");
+  if (!zq) return "";
+  return zq.textContent.replace(/\s+/g, " ").trim();
 }
 
 function rappelErreur(jeu) {
@@ -403,6 +432,206 @@ function cacherAideDouce() {
   if (!el) return;
   el.hidden = true;
   el.innerHTML = "";
+}
+
+function afficherIndiceAvantReponse() {
+  if (getRepondu()) return;
+  if (!indiceUtiliseQuestion) {
+    indiceUtiliseQuestion = true;
+    indicesSession++;
+    if (indicesSession >= 5 && debloquerBadge("curieux")) {
+      const b = BADGES.find(x => x.id === "curieux");
+      if (b) afficherNotifBadge(b);
+    }
+  }
+  const el = getAideDouceEl();
+  if (!el) return;
+  el.hidden = false;
+  el.innerHTML = "";
+  const titre = document.createElement("p");
+  titre.className = "aide-douce-titre";
+  titre.textContent = "Petit coup de pouce";
+  const indice = document.createElement("p");
+  indice.className = "aide-douce-indice";
+  indice.textContent = rappelErreur(getJeuCourant());
+  const encouragement = document.createElement("p");
+  encouragement.className = "aide-douce-encouragement";
+  encouragement.textContent = estGrand()
+    ? "Utilise l'indice, puis choisis ta réponse."
+    : "Tu peux prendre ton temps, puis choisir.";
+  el.append(titre, indice, encouragement);
+  track("hint_used", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+}
+
+function lireQuestion() {
+  if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+    afficherToastSimple("🔇 Lecture audio indisponible", "Tu peux lire la consigne doucement.");
+    return;
+  }
+  const texte = getQuestionTexteLisible();
+  if (!texte) return;
+  window.speechSynthesis.cancel();
+  const voix = new SpeechSynthesisUtterance(texte);
+  voix.lang = "fr-FR";
+  voix.rate = estGrand() ? 0.98 : 0.9;
+  window.speechSynthesis.speak(voix);
+  track("question_read_aloud", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+}
+
+function afficherToastSimple(titre, detail) {
+  const app = document.querySelector(".app");
+  if (!app) return;
+  const toast = document.createElement("div");
+  toast.className = "toast-progression";
+  const span = document.createElement("span");
+  span.textContent = titre;
+  const strong = document.createElement("strong");
+  strong.textContent = detail;
+  toast.append(span, strong);
+  app.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function mettreAJourProgressEffort() {
+  const el = getEffortProgressEl();
+  if (!el) return;
+  const total = questionsDepuisDebutJeu + mauvaisesDepuisDebutJeu;
+  if (total <= 0) {
+    el.hidden = true;
+    el.textContent = "";
+    return;
+  }
+  el.hidden = false;
+  const effort = Math.min(5, total);
+  el.textContent = `🌱 Effort ${effort}/5`;
+}
+
+function recompenserEffortSiBesoin() {
+  if (essaisDepuisEncouragement < 5) return;
+  essaisDepuisEncouragement = 0;
+  ajouterEtoiles(1);
+  progresserMission("etoiles");
+  afficherToastSimple("🌱 Bel effort !", "+1 étoile pour ta persévérance");
+  if (debloquerBadge("perseverant")) {
+    const b = BADGES.find(x => x.id === "perseverant");
+    if (b) afficherNotifBadge(b);
+  }
+  track("effort_reward", {
+    game_name: getJeuCourant(),
+    niveau: getNiveauCourant(),
+    questions: questionsDepuisDebutJeu,
+    errors: mauvaisesDepuisDebutJeu,
+  });
+}
+
+function recompenserCorrectionSiBesoin(correct) {
+  if (!correct) {
+    derniereQuestionEtaitErreur = true;
+    return;
+  }
+  if (!derniereQuestionEtaitErreur) return;
+  derniereQuestionEtaitErreur = false;
+  correctionsDepuisEncouragement++;
+  if (correctionsDepuisEncouragement < 2) return;
+  correctionsDepuisEncouragement = 0;
+  afficherToastSimple("💪 Erreur corrigée !", "Tu as continué après une difficulté");
+  track("error_recovered", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+}
+
+function preparerOutilsQuestion() {
+  cacherAideDouce();
+  brancherOutilsQuestion();
+  mettreAJourProgressEffort();
+  mettreAJourBoutonRevision();
+}
+
+function lancerRevisionDepuisBouton(jeu) {
+  const questions = getWrongQuestions(jeu);
+  if (!jeu || questions.length === 0) return;
+  track("revision_started", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: questions.length, source: "inline" });
+  const btn = document.getElementById("btn-reviser-erreurs");
+  if (btn) btn.hidden = true;
+  entrerRevision(jeu, questions);
+  if (debloquerBadge("revision")) {
+    const b = BADGES.find(x => x.id === "revision");
+    if (b) afficherNotifBadge(b);
+  }
+}
+
+export function proposerRevisionSiErreurs(jeu, onRetourMenu) {
+  const questions = getWrongQuestions(jeu);
+  if (!jeu || questions.length === 0) return false;
+  const overlay = document.createElement("div");
+  overlay.className = "evolution-overlay";
+  overlay.innerHTML = `
+    <div class="evolution-carte">
+      <p style="font-size:2rem;margin:0">🔁</p>
+      <p class="evolution-titre">Tu as ${questions.length} question${questions.length > 1 ? "s" : ""} à revoir</p>
+      <p class="evolution-msg">On les reprend doucement ?</p>
+      <button type="button" class="btn-evolution-fermer" id="revision-oui">Oui, je m'entraîne 💪</button>
+      <button type="button" class="btn-revision-non" id="revision-non">Plus tard</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  piegerFocus(overlay);
+  document.getElementById("revision-oui").addEventListener("click", () => {
+    track("revision_started", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: questions.length, source: "exit" });
+    overlay.remove();
+    entrerRevision(jeu, questions);
+    if (debloquerBadge("revision")) {
+      const b = BADGES.find(x => x.id === "revision");
+      if (b) afficherNotifBadge(b);
+    }
+  });
+  document.getElementById("revision-non").addEventListener("click", () => {
+    track("revision_declined", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: questions.length });
+    clearWrongQuestions(jeu);
+    overlay.remove();
+    if (onRetourMenu) onRetourMenu();
+  });
+  return true;
+}
+
+function mettreAJourBoutonRevision() {
+  const btn = document.getElementById("btn-reviser-erreurs");
+  if (!btn) return;
+  const jeu = getJeuCourant();
+  const nb = jeu ? getWrongQuestions(jeu).length : 0;
+  btn.hidden = nb <= 0 || !!_modeRevision;
+  btn.textContent = nb > 0 ? `🔁 Revoir ${nb} question${nb > 1 ? "s" : ""}` : "🔁 Revoir mes erreurs";
+  btn.setAttribute("aria-label", nb > 0 ? `Revoir ${nb} question${nb > 1 ? "s" : ""} difficile${nb > 1 ? "s" : ""}` : "Revoir mes erreurs");
+  if (btn.dataset.amRevisionBound !== "1") {
+    btn.dataset.amRevisionBound = "1";
+    btn.addEventListener("click", () => lancerRevisionDepuisBouton(getJeuCourant()));
+  }
+}
+
+function afficherActionRevision(jeu) {
+  if (!jeu || _modeRevision) return;
+  mettreAJourBoutonRevision();
+  const nb = getWrongQuestions(jeu).length;
+  if (nb <= 0) return;
+  afficherToastSimple("🔁 Tu pourras t'entraîner", "Le bouton Revoir garde tes questions difficiles.");
+}
+
+function brancherOutilsQuestion() {
+  const outils = getOutilsJeuEl();
+  if (!outils) return;
+  outils.hidden = false;
+  const btnIndice = document.getElementById("btn-indice-question");
+  if (btnIndice && btnIndice.dataset.amHintBound !== "1") {
+    btnIndice.dataset.amHintBound = "1";
+    btnIndice.addEventListener("click", afficherIndiceAvantReponse);
+  }
+  const btnLire = document.getElementById("btn-lire-question");
+  if (btnLire && btnLire.dataset.amReadBound !== "1") {
+    btnLire.dataset.amReadBound = "1";
+    btnLire.addEventListener("click", lireQuestion);
+  }
+}
+
+function cacherOutilsQuestion() {
+  const outils = getOutilsJeuEl();
+  if (outils) outils.hidden = true;
 }
 
 function tenterModeFatigue() {
@@ -529,6 +758,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
   if (getRepondu()) return;
   setRepondu(true);
   stopChrono();
+  questionsDepuisDebutJeu++;
   const boutons = elChoix.querySelectorAll(".btn-choix");
   boutons.forEach((btn) => {
     btn.disabled = true;
@@ -542,6 +772,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
   if (choix === correct) {
     comboActuel++;
     erreursSerie = 0;
+    recompenserCorrectionSiBesoin(true);
     track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
     elFeedback.textContent = "✓ " + ok[Math.floor(Math.random() * ok.length)];
@@ -569,6 +800,9 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
     erreursSerie++;
+    mauvaisesDepuisDebutJeu++;
+    essaisDepuisEncouragement++;
+    recompenserCorrectionSiBesoin(false);
     if (!_modeRevision) {
       const _jeu = getJeuCourant();
       if (!_wrongByGame[_jeu]) _wrongByGame[_jeu] = [];
@@ -588,9 +822,12 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       elFeedback.textContent += " Mini entraînement : 2 questions faciles 💡";
     }
     afficherAideDouce(correct);
+    afficherActionRevision(getJeuCourant());
     declencherReactionRenard(false);
     tenterModeFatigue();
   }
+  mettreAJourProgressEffort();
+  recompenserEffortSiBesoin();
   if (rattrapageRestant > 0) {
     rattrapageRestant--;
     finaliserMiniRattrapage();
@@ -711,19 +948,21 @@ export function majUiBoutonChrono() {
   if (!chronoOk) return;
   const on = lireChronoJeuActif();
   const symEl = btn.querySelector(".header-chrono-symbole");
-  const sym = on ? "⏱️" : "∞";
+  const labelEl = btn.querySelector(".header-chrono-label");
+  const sym = on ? "⏱️" : "🌿";
   if (symEl) symEl.textContent = sym;
+  if (labelEl) labelEl.textContent = on ? "Chrono" : "Zen";
   btn.dataset.chronoEtat = on ? "limite" : "libre";
   btn.setAttribute("aria-pressed", on ? "true" : "false");
   btn.setAttribute(
     "aria-label",
     on
-      ? "Temps pour répondre : activé — appuie pour jouer sans limite."
-      : "Temps pour répondre : coupé — appuie pour activer le temps par question.",
+      ? "Mode chrono activé. Appuie pour passer en mode zen sans limite de temps."
+      : "Mode zen activé, sans limite de temps. Appuie pour remettre le chrono.",
   );
   btn.title = on
-    ? "Une barre rouge descend à chaque question. Appuie ici pour tout ton temps sans chrono."
-    : "Pas de chrono pendant le jeu. Appuie ici pour te dépêcher comme en classe.";
+    ? "Mode chrono : réponds avant la fin. Appuie ici pour jouer tranquillement."
+    : "Mode zen : prends tout ton temps. Appuie ici pour remettre le chrono.";
 }
 
 export function reglerMinuteurPourEnfant(actif) {
@@ -761,6 +1000,7 @@ export function montrerMenu() {
   syncPrefsDepuisStockage();
   resetFeedback();
   stopChrono();
+  cacherOutilsQuestion();
   _modeRevision = null;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
@@ -782,6 +1022,11 @@ export function montrerJeu(nom, lanceurs) {
   fatigueActivee = false;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
+  questionsDepuisDebutJeu = 0;
+  mauvaisesDepuisDebutJeu = 0;
+  essaisDepuisEncouragement = 0;
+  correctionsDepuisEncouragement = 0;
+  derniereQuestionEtaitErreur = false;
   revelerSeulEcran(jeu);
   setBadgeVisible(true);
   const diffBadge = document.getElementById("diff-badge");

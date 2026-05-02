@@ -58,6 +58,9 @@ export const ACCESSOIRES_DEF = {
   "lunettes-base": { nom: "👓 Lunettes",   svg: (t) => `<circle cx="37" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><circle cx="63" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><line x1="45.5" y1="63" x2="54.5" y2="63" stroke="#2d3436" stroke-width="2"/><line x1="28.5" y1="63" x2="22" y2="60" stroke="#2d3436" stroke-width="2"/><line x1="71.5" y1="63" x2="78" y2="60" stroke="#2d3436" stroke-width="2"/>` },
   "echarpe-rare":  { nom: "🧣 Écharpe",    svg: (t) => `<path d="M20,88 Q35,82 50,84 Q65,82 80,88" stroke="#e74c3c" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50,84 L54,97" stroke="#e74c3c" stroke-width="6" stroke-linecap="round"/>` },
   "couronne-legendaire": { nom: "👑 Couronne légendaire", svg: (t) => `<polygon points="28,26 34,8 50,18 66,8 72,26" fill="#ffd700" stroke="#b8860b" stroke-width="1.5"/><circle cx="34" cy="9" r="4.5" fill="#e74c3c"/><circle cx="50" cy="19" r="4.5" fill="#9b59b6"/><circle cx="66" cy="9" r="4.5" fill="#e74c3c"/>` },
+  "medaille-effort": { nom: "🏅 Médaille d'effort", svg: (t) => `<path d="M43,90 L50,103 L57,90" fill="#6c5ce7"/><circle cx="50" cy="88" r="8" fill="#fdcb6e" stroke="#b8860b" stroke-width="1.5"/><text x="50" y="92" text-anchor="middle" font-size="8" fill="#8a5a00" font-family="Arial">✓</text>` },
+  "cape-courage": { nom: "🦸 Cape courage", svg: (t) => `<path d="M22,78 Q12,93 18,106 Q36,101 42,86" fill="#a29bfe" opacity="0.85"/><path d="M78,78 Q88,93 82,106 Q64,101 58,86" fill="#a29bfe" opacity="0.85"/>` },
+  "sac-aventure": { nom: "🎒 Sac d'aventure", svg: (t) => `<rect x="18" y="75" width="16" height="22" rx="5" fill="#00b894" stroke="#00745e" stroke-width="1.5"/><path d="M21,78 Q26,70 31,78" fill="none" stroke="#00745e" stroke-width="2"/><line x1="21" y1="86" x2="31" y2="86" stroke="#00745e" stroke-width="1.5"/>` },
 };
 
 // ── SVG renard ────────────────────────────────────────────────────────────────
