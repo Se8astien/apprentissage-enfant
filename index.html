@@ -157,12 +157,9 @@
       flex-direction: column;
       align-items: stretch;
     }
-    #ecran-menu.ecran.actif .classe-info-ligne,
-    #ecran-menu.ecran.actif .classe-info-outils,
-    #ecran-menu.ecran.actif .classe-info-barre,
+    #ecran-menu.ecran.actif .menu-classe-cartouche,
     #ecran-menu.ecran.actif .menu-secondaire,
     #ecran-menu.ecran.actif .maison-banner,
-    #ecran-menu.ecran.actif .niveau-barre,
     #ecran-menu.ecran.actif .grille-jeux,
     #ecran-menu.ecran.actif .bilan-session {
       position: relative;
@@ -358,7 +355,8 @@
 
     <main id="ecran-menu" class="ecran" hidden>
 
-      <div class="classe-info-barre" id="classe-info-barre">
+      <div class="menu-classe-cartouche">
+        <p class="menu-libelle-niveau">Ta classe</p>
         <div class="classe-info-ligne classe-info-ligne--rythme">
           <span id="classe-info-difficulte" class="classe-info-difficulte" role="status" title="Ton choix « comment tu te sens » — tu peux le changer avec le bouton Classe"></span>
           <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer la classe ou comment tu te sens">
@@ -371,17 +369,14 @@
           <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
           <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤 Partager</button>
         </div>
-      </div>
-
-      <p class="menu-libelle-niveau">Ta classe</p>
-      <!-- ── Sélecteur CP → CM2 (seul endroit pour changer de niveau ici) ───── -->
-      <div class="niveau-barre" role="group" aria-label="Choisir la classe">
-        <div class="niveau-switch">
-          <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
-          <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>
-          <button type="button" class="niveau-btn" id="niveau-ce2" data-niveau="ce2">⭐ CE2</button>
-          <button type="button" class="niveau-btn" id="niveau-cm1" data-niveau="cm1">🌟 CM1</button>
-          <button type="button" class="niveau-btn" id="niveau-cm2" data-niveau="cm2">🏆 CM2</button>
+        <div class="niveau-barre" role="group" aria-label="Choisir la classe">
+          <div class="niveau-switch">
+            <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
+            <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>
+            <button type="button" class="niveau-btn" id="niveau-ce2" data-niveau="ce2">⭐ CE2</button>
+            <button type="button" class="niveau-btn" id="niveau-cm1" data-niveau="cm1">🌟 CM1</button>
+            <button type="button" class="niveau-btn" id="niveau-cm2" data-niveau="cm2">🏆 CM2</button>
+          </div>
         </div>
       </div>
 
