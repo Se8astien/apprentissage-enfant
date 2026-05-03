@@ -160,7 +160,7 @@
     #ecran-menu.ecran.actif .classe-info-ligne,
     #ecran-menu.ecran.actif .classe-info-outils,
     #ecran-menu.ecran.actif .classe-info-barre,
-    #ecran-menu.ecran.actif .menu-activites-haut,
+    #ecran-menu.ecran.actif .menu-secondaire,
     #ecran-menu.ecran.actif .maison-banner,
     #ecran-menu.ecran.actif .niveau-barre,
     #ecran-menu.ecran.actif .grille-jeux,
@@ -373,38 +373,7 @@
         </div>
       </div>
 
-      <div class="menu-activites-haut" aria-label="Missions, parcours et profil">
-        <div class="missions-section">
-          <h3 class="missions-titre">🎯 Missions du jour</h3>
-          <div id="missions-widget"></div>
-        </div>
-        <div id="guidage-jour" class="guidage-jour" hidden></div>
-        <div id="objectif-session" class="objectif-session" hidden>
-          <p class="objectif-titre">🎯 Mon objectif</p>
-          <button type="button" data-objectif="etoiles3">3 étoiles</button>
-          <button type="button" data-objectif="questions5">5 questions</button>
-          <button type="button" data-objectif="revision">Réviser</button>
-        </div>
-        <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
-          <span id="icone-genre-actuel">👧</span>
-          <span class="btn-changer-genre-libelle">Profil</span>
-        </button>
-      </div>
-
-      <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
-      <button type="button" class="maison-banner" id="btn-maison" aria-label="Ma Maison">
-        <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
-        <div class="maison-banner-infos">
-          <span class="maison-banner-nom" id="maison-banner-nom">Ta maison</span>
-          <span class="maison-banner-sub" id="maison-banner-sub">Touche pour voir ton renard 🦊</span>
-        </div>
-        <div class="maison-banner-droite">
-          <span class="maison-banner-stars" id="maison-banner-stars">⭐ 0</span>
-          <span class="maison-banner-fleche" aria-hidden="true">›</span>
-        </div>
-      </button>
-
-      <!-- ── Sélecteur de niveau ──────────────────────────────── -->
+      <!-- ── Sélecteur de niveau (juste au-dessus des jeux) ───── -->
       <div class="niveau-barre" role="group" aria-label="Classe de l'enfant">
         <div class="niveau-switch">
           <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
@@ -415,7 +384,7 @@
         </div>
       </div>
 
-      <p class="accueil">Touche un jeu pour commencer</p>
+      <p class="accueil">Touche un jeu</p>
 
       <!-- ── Grille des jeux ─────────────────────────────────── -->
       <div class="grille-jeux">
@@ -489,6 +458,36 @@
         <button type="button" class="carte-jeu" data-jeu="sequence"   data-cat="algo" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🤖</span><span class="nom-jeu">Algorithmes</span><span class="desc-jeu">Suis les instructions</span></button>
         <button type="button" class="carte-jeu" data-jeu="code"       data-cat="algo" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">💻</span><span class="nom-jeu">Code</span><span class="desc-jeu">Variables, boucles, conditions</span></button>
 
+      </div>
+
+      <button type="button" class="maison-banner maison-banner--menu-fin" id="btn-maison" aria-label="Ma Maison">
+        <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
+        <div class="maison-banner-infos">
+          <span class="maison-banner-nom" id="maison-banner-nom">Ta maison</span>
+          <span class="maison-banner-sub" id="maison-banner-sub">Touche pour voir ton renard 🦊</span>
+        </div>
+        <div class="maison-banner-droite">
+          <span class="maison-banner-stars" id="maison-banner-stars">⭐ 0</span>
+          <span class="maison-banner-fleche" aria-hidden="true">›</span>
+        </div>
+      </button>
+
+      <div class="menu-secondaire" aria-label="Missions, parcours et profil">
+        <div class="missions-section">
+          <h3 class="missions-titre">🎯 Missions du jour</h3>
+          <div id="missions-widget"></div>
+        </div>
+        <div id="guidage-jour" class="guidage-jour" hidden></div>
+        <div id="objectif-session" class="objectif-session" hidden>
+          <p class="objectif-titre">🎯 Mon objectif</p>
+          <button type="button" data-objectif="etoiles3">3 étoiles</button>
+          <button type="button" data-objectif="questions5">5 questions</button>
+          <button type="button" data-objectif="revision">Réviser</button>
+        </div>
+        <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
+          <span id="icone-genre-actuel">👧</span>
+          <span class="btn-changer-genre-libelle">Profil</span>
+        </button>
       </div>
 
       <div id="bilan-session" class="bilan-session" hidden></div>
