@@ -359,11 +359,8 @@
     <main id="ecran-menu" class="ecran" hidden>
 
       <div class="classe-info-barre" id="classe-info-barre">
-        <div class="classe-info-ligne">
-          <div class="classe-info-identite">
-            <span id="classe-info-label" class="classe-info-niveau"></span>
-            <span id="classe-info-difficulte" class="classe-info-difficulte" role="status" title="Ton choix « comment tu te sens » — tu peux le changer avec le bouton Classe"></span>
-          </div>
+        <div class="classe-info-ligne classe-info-ligne--rythme">
+          <span id="classe-info-difficulte" class="classe-info-difficulte" role="status" title="Ton choix « comment tu te sens » — tu peux le changer avec le bouton Classe"></span>
           <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer la classe ou comment tu te sens">
             <span class="btn-changer-classe-emoji" aria-hidden="true">✏️</span>
             <span class="btn-changer-classe-lib">Classe</span>
@@ -376,8 +373,9 @@
         </div>
       </div>
 
-      <!-- ── Sélecteur de niveau (juste au-dessus des jeux) ───── -->
-      <div class="niveau-barre" role="group" aria-label="Classe de l'enfant">
+      <p class="menu-libelle-niveau">Ta classe</p>
+      <!-- ── Sélecteur CP → CM2 (seul endroit pour changer de niveau ici) ───── -->
+      <div class="niveau-barre" role="group" aria-label="Choisir la classe">
         <div class="niveau-switch">
           <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
           <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>

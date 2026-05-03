@@ -439,25 +439,15 @@ h1 {
   width: 100%;
 }
 
-.classe-info-identite {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.22rem;
-}
-
-.classe-info-niveau {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--primaire-fonce);
-  line-height: 1.2;
+.classe-info-ligne--rythme {
+  align-items: center;
 }
 
 .classe-info-difficulte {
   display: inline-flex;
   align-items: center;
-  align-self: flex-start;
+  flex: 1;
+  min-width: 0;
   max-width: 100%;
   padding: 0.22rem 0.58rem;
   border-radius: 999px;
@@ -516,6 +506,17 @@ h1 {
 
 .btn-changer-classe-lib {
   letter-spacing: 0.01em;
+}
+
+.menu-libelle-niveau {
+  margin: 0.05rem 0 0.32rem;
+  padding: 0 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--texte);
+  opacity: 0.68;
+  text-align: center;
+  letter-spacing: 0.02em;
 }
 
 .niveau-barre {
@@ -2746,8 +2747,9 @@ h1 {
 [data-theme="nuit"] .classe-info-outils {
   border-top-color: rgba(162, 155, 254, 0.22);
 }
-[data-theme="nuit"] .classe-info-niveau {
-  color: var(--primaire);
+[data-theme="nuit"] .menu-libelle-niveau {
+  color: #dfe6e9;
+  opacity: 0.82;
 }
 [data-theme="nuit"] .classe-info-difficulte {
   background: rgba(162, 155, 254, 0.14);

@@ -140,7 +140,7 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 
 ## Tests (smoke E2E)
 
-- **Playwright** : `tests/e2e/smoke-menu.spec.js` vérifie menu + barre de classe après chargement du module, puis synchronisation au clic sur CE2 et CM2 (`#classe-info-label`, `aria-pressed` sur les boutons niveau).
+- **Playwright** : `tests/e2e/smoke-menu.spec.js` vérifie menu + rythme affiché et synchronisation des boutons CP–CM2 (`aria-pressed` sur `#niveau-cp` …).
 - Première installation : `npm install` puis `npx playwright install chromium`.
 - Lancer : `npm run test:e2e` (démarre un serveur HTTP statique sur le dossier du projet, comme pour un navigateur réel).
 

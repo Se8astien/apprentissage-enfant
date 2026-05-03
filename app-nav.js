@@ -33,7 +33,6 @@ import {
   marquerMaitrise,
   lireMaitrise,
   escapeHtml,
-  NIVEAUX_LABELS,
   DIFFICULTE_ICONES,
   DIFFICULTE_LABELS,
   libelleDifficulteProfil,
@@ -1240,8 +1239,6 @@ export function synchroniserAffichageMenu() {
   syncPrefsDepuisStockage();
   majGenre();
   mettreAJourMaisonBanner();
-  const classeLabel = document.getElementById("classe-info-label");
-  if (classeLabel) classeLabel.textContent = NIVEAUX_LABELS[getNiveauCourant()] || "";
   const diffProfilEl = document.getElementById("classe-info-difficulte");
   if (diffProfilEl) diffProfilEl.textContent = libelleDifficulteProfil();
   document.querySelectorAll(".niveau-btn").forEach((btn) => {

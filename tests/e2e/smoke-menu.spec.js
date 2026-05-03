@@ -24,18 +24,14 @@ test("menu visible après onboarding simulé + barre classe synchronisée au cha
 
   await expect(page.locator("#ecran-menu")).toBeVisible();
 
-  const label = page.locator("#classe-info-label");
-  await expect(label).toContainText("CP");
-
   await expect(page.locator("#niveau-cp")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#classe-info-difficulte")).toContainText("Normal");
 
   await page.locator("#niveau-ce2").click();
-  await expect(label).toContainText("CE2");
   await expect(page.locator("#niveau-ce2")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#niveau-cp")).toHaveAttribute("aria-pressed", "false");
 
   await page.locator("#niveau-cm2").click();
-  await expect(label).toContainText("CM2");
   await expect(page.locator("#niveau-cm2")).toHaveAttribute("aria-pressed", "true");
 });
 
