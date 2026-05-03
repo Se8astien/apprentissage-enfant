@@ -157,6 +157,8 @@
       flex-direction: column;
       align-items: stretch;
     }
+    #ecran-menu.ecran.actif .classe-info-ligne,
+    #ecran-menu.ecran.actif .classe-info-outils,
     #ecran-menu.ecran.actif .classe-info-barre,
     #ecran-menu.ecran.actif .maison-banner,
     #ecran-menu.ecran.actif .niveau-barre,
@@ -352,11 +354,18 @@
     <main id="ecran-menu" class="ecran" hidden>
 
       <div class="classe-info-barre" id="classe-info-barre">
-        <span id="classe-info-label"></span>
-        <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer de classe">✏️</button>
-        <button type="button" id="btn-badges" class="btn-badges-menu" aria-label="Voir mes trophées">🏅 Trophées</button>
-        <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
-        <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤</button>
+        <div class="classe-info-ligne">
+          <span id="classe-info-label" class="classe-info-niveau"></span>
+          <button type="button" class="btn-changer-classe" id="btn-changer-classe" aria-label="Changer de classe">
+            <span class="btn-changer-classe-emoji" aria-hidden="true">✏️</span>
+            <span class="btn-changer-classe-lib">Classe</span>
+          </button>
+        </div>
+        <div class="classe-info-outils" role="group" aria-label="Trophées, parents, partage">
+          <button type="button" id="btn-badges" class="btn-badges-menu" aria-label="Voir mes trophées">🏅 Trophées</button>
+          <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
+          <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤 Partager</button>
+        </div>
       </div>
 
       <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
@@ -364,7 +373,7 @@
         <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
         <div class="maison-banner-infos">
           <span class="maison-banner-nom" id="maison-banner-nom">Ta maison</span>
-          <span class="maison-banner-sub" id="maison-banner-sub">Vois ton renard et tes étoiles ✨</span>
+          <span class="maison-banner-sub" id="maison-banner-sub">Touche pour voir ton renard 🦊</span>
         </div>
         <div class="maison-banner-droite">
           <span class="maison-banner-stars" id="maison-banner-stars">⭐ 0</span>
@@ -383,7 +392,7 @@
         </div>
       </div>
 
-      <p class="accueil">Choisis ton jeu !</p>
+      <p class="accueil">Touche un jeu pour commencer</p>
 
       <!-- ── Grille des jeux ─────────────────────────────────── -->
       <div class="grille-jeux">
