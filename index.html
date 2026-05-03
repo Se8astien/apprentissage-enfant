@@ -160,11 +160,11 @@
     #ecran-menu.ecran.actif .classe-info-ligne,
     #ecran-menu.ecran.actif .classe-info-outils,
     #ecran-menu.ecran.actif .classe-info-barre,
+    #ecran-menu.ecran.actif .menu-activites-haut,
     #ecran-menu.ecran.actif .maison-banner,
     #ecran-menu.ecran.actif .niveau-barre,
     #ecran-menu.ecran.actif .grille-jeux,
-    #ecran-menu.ecran.actif .missions-section,
-    #ecran-menu.ecran.actif .btn-changer-genre {
+    #ecran-menu.ecran.actif .bilan-session {
       position: relative;
       z-index: 2;
     }
@@ -373,6 +373,24 @@
         </div>
       </div>
 
+      <div class="menu-activites-haut" aria-label="Missions, parcours et profil">
+        <div class="missions-section">
+          <h3 class="missions-titre">🎯 Missions du jour</h3>
+          <div id="missions-widget"></div>
+        </div>
+        <div id="guidage-jour" class="guidage-jour" hidden></div>
+        <div id="objectif-session" class="objectif-session" hidden>
+          <p class="objectif-titre">🎯 Mon objectif</p>
+          <button type="button" data-objectif="etoiles3">3 étoiles</button>
+          <button type="button" data-objectif="questions5">5 questions</button>
+          <button type="button" data-objectif="revision">Réviser</button>
+        </div>
+        <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
+          <span id="icone-genre-actuel">👧</span>
+          <span class="btn-changer-genre-libelle">Profil</span>
+        </button>
+      </div>
+
       <!-- ── Carte Ma Maison ─── toujours visible en haut ────── -->
       <button type="button" class="maison-banner" id="btn-maison" aria-label="Ma Maison">
         <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
@@ -473,23 +491,6 @@
 
       </div>
 
-      <!-- Missions du jour -->
-      <div class="missions-section">
-        <h3 class="missions-titre">🎯 Missions du jour</h3>
-        <div id="missions-widget"></div>
-      </div>
-
-      <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
-        <span id="icone-genre-actuel">👧</span>
-        <span class="btn-changer-genre-libelle">Profil</span>
-      </button>
-      <div id="guidage-jour" class="guidage-jour" hidden></div>
-      <div id="objectif-session" class="objectif-session" hidden>
-        <p class="objectif-titre">🎯 Mon objectif</p>
-        <button type="button" data-objectif="etoiles3">3 étoiles</button>
-        <button type="button" data-objectif="questions5">5 questions</button>
-        <button type="button" data-objectif="revision">Réviser</button>
-      </div>
       <div id="bilan-session" class="bilan-session" hidden></div>
     </main>
 
