@@ -132,10 +132,18 @@ export function setDifficulteJeu(jeu, v) {
   localStorage.setItem("diff-jeu-" + jeu, String(Math.max(0, Math.min(2, v))));
 }
 
-export function getDifficulte() {
-  if (jeuCourant) return getDifficulteJeu(jeuCourant);
+export function getDifficulteProfil() {
   const v = parseInt(localStorage.getItem(STORAGE_DIFFICULTE) || "0", 10);
   return (v >= 0 && v <= 2) ? v : 0;
+}
+
+export function libelleDifficulteProfil() {
+  return DIFFICULTE_LABELS[getDifficulteProfil()];
+}
+
+export function getDifficulte() {
+  if (jeuCourant) return getDifficulteJeu(jeuCourant);
+  return getDifficulteProfil();
 }
 
 export function setDifficulte(v) {

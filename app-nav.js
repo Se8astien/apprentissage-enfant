@@ -36,6 +36,7 @@ import {
   NIVEAUX_LABELS,
   DIFFICULTE_ICONES,
   DIFFICULTE_LABELS,
+  libelleDifficulteProfil,
   piegerFocus,
   revelerSeulEcran,
   syncPrefsDepuisStockage,
@@ -1241,6 +1242,8 @@ export function synchroniserAffichageMenu() {
   mettreAJourMaisonBanner();
   const classeLabel = document.getElementById("classe-info-label");
   if (classeLabel) classeLabel.textContent = NIVEAUX_LABELS[getNiveauCourant()] || "";
+  const diffProfilEl = document.getElementById("classe-info-difficulte");
+  if (diffProfilEl) diffProfilEl.textContent = libelleDifficulteProfil();
   document.querySelectorAll(".niveau-btn").forEach((btn) => {
     const actif = btn.dataset.niveau === getNiveauCourant();
     btn.classList.toggle("actif", actif);
