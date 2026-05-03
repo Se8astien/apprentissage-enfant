@@ -25,7 +25,7 @@ test("menu visible après onboarding simulé + barre classe synchronisée au cha
   await expect(page.locator("#ecran-menu")).toBeVisible();
 
   await expect(page.locator("#niveau-cp")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#classe-info-difficulte")).toContainText("Normal");
+  await expect(page.locator("#btn-changer-rythme")).toContainText("Normal");
 
   await page.locator("#niveau-ce2").click();
   await expect(page.locator("#niveau-ce2")).toHaveAttribute("aria-pressed", "true");
@@ -46,17 +46,29 @@ test("une mauvaise réponse affiche une aide douce et la bonne réponse", async 
 
   await page.locator('.carte-jeu[data-jeu="addition"]').click();
   await expect(page.locator("#ecran-jeu")).toBeVisible();
-  const intro = page.locator(".btn-evolution-fermer");
-  if (await intro.isVisible()) {
-    await intro.click();
+  const jouerHistoire = page.getByRole("button", { name: /Jouer/i });
+  if (await jouerHistoire.isVisible()) {
+    await jouerHistoire.click();
+  }
+  const miniLeconOk = page.locator("#mini-lecon-jeu .mini-lecon-btn");
+  if (await miniLeconOk.isVisible()) {
+    await miniLeconOk.click();
   }
 
-  await expect(page.locator("#btn-indice-question")).toBeVisible();
+  await expect(page.locator("#outils-jeu #btn-indice-question")).toBeVisible();
   await expect(page.locator("#btn-lecture-facile")).toBeVisible();
+  await page.locator("#outils-jeu #btn-indice-question").click();
+  await expect(page.locator("#aide-douce")).toBeVisible();
+  await expect(page.locator("#aide-douce")).toContainText("Petit coup de pouce");
+
   await page.locator("#btn-lecture-facile").click();
   await expect(page.locator("#btn-lecture-facile")).toHaveAttribute("aria-pressed", "true");
-  await page.locator("#btn-indice-question").click();
-  await expect(page.locator("#aide-douce")).toContainText("Petit coup de pouce");
+  const notifBadgeOk = page.locator(".badge-notif-overlay .btn-evolution-fermer");
+  try {
+    await notifBadgeOk.click({ timeout: 4000 });
+  } catch {
+    /* pas de trophée ou déjà fermé */
+  }
 
   const bonneReponse = await page.locator("#zone-choix .btn-choix").evaluateAll((buttons) => {
     const values = buttons.map((button) => button.getAttribute("data-valeur") || "");

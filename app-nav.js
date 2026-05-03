@@ -36,6 +36,7 @@ import {
   DIFFICULTE_ICONES,
   DIFFICULTE_LABELS,
   libelleDifficulteProfil,
+  getDifficulteProfil,
   piegerFocus,
   revelerSeulEcran,
   syncPrefsDepuisStockage,
@@ -91,6 +92,13 @@ let objectifSession = null;
 let objectifSessionAtteint = false;
 let lectureFacileActivee = false;
 let miniLeconVueJeu = null;
+let indiceUtiliseQuestion = false;
+
+function jeuActifId() {
+  const j = getJeuCourant();
+  if (j) return j;
+  return document.getElementById("ecran-jeu")?.dataset?.jeuActif || null;
+}
 
 const LIBELLE_THEME_JEU = {
   maths: "Nombres",
@@ -172,7 +180,7 @@ function chronoExpire() {
   elFeedback.className = "feedback non";
   afficherAideDouce(getBonneReponse(), { timeout: true });
   montrerExplicationVisuelle(getBonneReponse());
-  afficherActionRevision(getJeuCourant());
+  afficherActionRevision(jeuActifId());
   declencherReactionRenard(false);
   verifierObjectifSession();
   mettreAJourProgressEffort();
@@ -181,11 +189,15 @@ function chronoExpire() {
 }
 
 // ── Mode révision ─────────────────────────────────────────────────────────────
-const _wrongByGame = {};
+const _wrongByGame = Object.create(null);
 let _modeRevision = null;
 
-export function getWrongQuestions(jeu) { return _wrongByGame[jeu] || []; }
-export function clearWrongQuestions(jeu) { delete _wrongByGame[jeu]; }
+export function getWrongQuestions(jeu) {
+  return _wrongByGame[jeu] || [];
+}
+export function clearWrongQuestions(jeu) {
+  delete _wrongByGame[jeu];
+}
 
 export function entrerRevision(nomJeu, questions) {
   const qs = [...questions];
@@ -197,6 +209,7 @@ export function entrerRevision(nomJeu, questions) {
   rattrapageDiffOriginale = null;
   const jeuEl = elJeu || document.getElementById("ecran-jeu");
   if (!jeuEl) return;
+  jeuEl.dataset.jeuActif = nomJeu;
   setBadgeVisible(true);
   resetFeedback();
   preparerOutilsQuestion();
@@ -378,6 +391,15 @@ function getQuestionTexteLisible() {
   const zq = document.getElementById("zone-question");
   if (!zq) return "";
   return zq.textContent.replace(/\s+/g, " ").trim();
+}
+
+function extraireNombresQuestion() {
+  const zq = document.getElementById("zone-question");
+  if (!zq) return [];
+  const raw = zq.textContent.replace(/\s+/g, " ");
+  const matches = raw.match(/\d+/g);
+  if (!matches) return [];
+  return matches.map((s) => parseInt(s, 10)).filter((n) => Number.isFinite(n));
 }
 
 function lireTexte(texte) {
@@ -840,6 +862,7 @@ function afficherMiniLecon(jeu) {
 }
 
 function preparerOutilsQuestion() {
+  indiceUtiliseQuestion = false;
   cacherAideDouce();
   brancherOutilsQuestion();
   mettreAJourProgressEffort();
@@ -895,10 +918,10 @@ export function proposerRevisionSiErreurs(jeu, onRetourMenu) {
   return true;
 }
 
-function mettreAJourBoutonRevision() {
+function mettreAJourBoutonRevision(jeuCible) {
   const btn = document.getElementById("btn-reviser-erreurs");
   if (!btn) return;
-  const jeu = getJeuCourant();
+  const jeu = jeuCible !== undefined ? jeuCible : jeuActifId();
   const nb = jeu ? getWrongQuestions(jeu).length : 0;
   btn.hidden = nb <= 0 || !!_modeRevision;
   btn.textContent = nb > 0 ? `🔁 Revoir ${nb} question${nb > 1 ? "s" : ""}` : "🔁 Revoir mes erreurs";
@@ -910,9 +933,10 @@ function mettreAJourBoutonRevision() {
 }
 
 function afficherActionRevision(jeu) {
-  if (!jeu || _modeRevision) return;
-  mettreAJourBoutonRevision();
-  const nb = getWrongQuestions(jeu).length;
+  const j = jeu || jeuActifId();
+  if (!j || _modeRevision) return;
+  mettreAJourBoutonRevision(j);
+  const nb = getWrongQuestions(j).length;
   if (nb <= 0) return;
   afficherToastSimple("🔁 Tu pourras t'entraîner", "Le bouton Revoir garde tes questions difficiles.");
 }
@@ -1130,16 +1154,16 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       });
     } else if (comboActuel === 5) declencherCombo(5);
   } else {
+    const idJeuErreur = jeuActifId();
     erreursSession++;
     erreursSerie++;
     mauvaisesDepuisDebutJeu++;
     essaisDepuisEncouragement++;
     recompenserCorrectionSiBesoin(false);
-    if (!_modeRevision) {
-      const _jeu = getJeuCourant();
-      if (!_wrongByGame[_jeu]) _wrongByGame[_jeu] = [];
+    if (!_modeRevision && idJeuErreur) {
+      if (!_wrongByGame[idJeuErreur]) _wrongByGame[idJeuErreur] = [];
       const _zq = document.getElementById("zone-question");
-      _wrongByGame[_jeu].push({ html: _zq ? _zq.innerHTML : "", bonne: correct, isText, options: [...elChoix.querySelectorAll(".btn-choix")].map(b => b.textContent.trim()) });
+      _wrongByGame[idJeuErreur].push({ html: _zq ? _zq.innerHTML : "", bonne: correct, isText, options: [...elChoix.querySelectorAll(".btn-choix")].map(b => b.textContent.trim()) });
     }
     track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
     sonMauvaise();
@@ -1155,7 +1179,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     }
     afficherAideDouce(correct);
     montrerExplicationVisuelle(correct);
-    afficherActionRevision(getJeuCourant());
+    afficherActionRevision(idJeuErreur);
     declencherReactionRenard(false);
     tenterModeFatigue();
   }
@@ -1239,8 +1263,15 @@ export function synchroniserAffichageMenu() {
   syncPrefsDepuisStockage();
   majGenre();
   mettreAJourMaisonBanner();
-  const diffProfilEl = document.getElementById("classe-info-difficulte");
-  if (diffProfilEl) diffProfilEl.textContent = libelleDifficulteProfil();
+  const diffProfilEl = document.getElementById("btn-changer-rythme");
+  if (diffProfilEl) {
+    diffProfilEl.textContent = libelleDifficulteProfil();
+    const nomsRythme = ["Débutant", "Normal", "Expert"];
+    diffProfilEl.setAttribute(
+      "aria-label",
+      `Ton rythme : ${nomsRythme[getDifficulteProfil()]}. Touche pour changer.`,
+    );
+  }
   document.querySelectorAll(".niveau-btn").forEach((btn) => {
     const actif = btn.dataset.niveau === getNiveauCourant();
     btn.classList.toggle("actif", actif);
@@ -1338,6 +1369,8 @@ export function montrerMenu() {
   _modeRevision = null;
   rattrapageRestant = 0;
   rattrapageDiffOriginale = null;
+  const ecranJeuData = document.getElementById("ecran-jeu");
+  if (ecranJeuData) delete ecranJeuData.dataset.jeuActif;
   setJeuCourant(null);
   setBadgeVisible(false);
   const modal = document.getElementById("modal-classe-suivante");
@@ -1355,6 +1388,7 @@ export function montrerJeu(nom, lanceurs) {
   const jeu = elJeu || document.getElementById("ecran-jeu");
   if (!jeu || !nom || !lanceurs || typeof lanceurs[nom] !== "function") return;
   setJeuCourant(nom);
+  jeu.dataset.jeuActif = nom;
   comboActuel = 0;
   erreursSerie = 0;
   fatigueActivee = false;

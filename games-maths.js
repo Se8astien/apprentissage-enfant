@@ -63,7 +63,7 @@ function activerIndiceGraduel(indice1, indice2) {
   const box = document.createElement("div");
   box.id = "indice-graduel";
   box.style.marginTop = "0.5rem";
-  box.innerHTML = '<button type="button" class="btn-choix" style="font-size:0.95rem;padding:0.5rem 0.8rem;min-height:44px">💡 Indice</button><p style="margin:0.35rem 0 0;font-size:0.85rem;color:#5c5c5c"></p>';
+  box.innerHTML = '<button type="button" class="btn-choix" style="font-size:0.95rem;padding:0.5rem 0.8rem;min-height:44px">🔎 Aide pas à pas</button><p style="margin:0.35rem 0 0;font-size:0.85rem;color:#5c5c5c"></p>';
   const btn = box.querySelector("button");
   const txt = box.querySelector("p");
   let niveau = 0;

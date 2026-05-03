@@ -300,11 +300,22 @@ function brancherOnboardingUI() {
   uneFois(document.getElementById("btn-landing-partager"), "click", partager);
   uneFois(document.getElementById("btn-partager"), "click", partager);
 
-  uneFois(document.getElementById("btn-changer-classe"), "click", () => {
+  uneFois(document.getElementById("btn-changer-rythme"), "click", () => {
+    syncPrefsDepuisStockage();
+    const nv = getNiveauCourant();
     montrerEcranParId("ecran-classe");
+    document.querySelectorAll(".btn-classe").forEach((b) => {
+      b.classList.toggle("selectionne", b.getAttribute("data-niveau") === nv);
+    });
     const diffChoix = document.getElementById("diff-choix");
-    if (diffChoix) diffChoix.hidden = true;
-    document.querySelectorAll(".btn-classe").forEach((b) => b.classList.remove("selectionne"));
+    if (diffChoix) {
+      diffChoix.hidden = false;
+      try {
+        diffChoix.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } catch {
+        /* ignore */
+      }
+    }
   });
 
   uneFois(document.getElementById("btn-changer-genre"), "click", () => {
