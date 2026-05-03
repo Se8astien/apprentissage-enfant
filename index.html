@@ -186,7 +186,12 @@
         <div class="header-toolbar" role="group" aria-label="Réglages de l'écran">
           <button type="button" id="btn-theme" class="header-tool" aria-label="Activer le mode nuit">🌙</button>
           <button type="button" id="btn-sons" class="header-tool" aria-label="Sons activés" aria-pressed="true">🔊</button>
-          <button type="button" id="btn-lecture-facile" class="header-tool header-tool-lecture" aria-label="Activer la lecture facile" aria-pressed="false">Aa</button>
+          <button type="button" id="btn-lecture-facile" class="header-tool header-tool-lecture" aria-label="Activer la lecture facile : texte plus grand dans les jeux" aria-pressed="false">
+            <span class="header-lecture-wrap" aria-hidden="true">
+              <span class="header-lecture-ic">📖</span>
+              <span class="header-lecture-check">✓</span>
+            </span>
+          </button>
           <button type="button" id="btn-chrono" class="header-tool header-tool-chrono" hidden aria-pressed="true"
             data-chrono-etat="limite" aria-label="Minuteur : temps pour répondre (dès le CE1, pas au CP)">
             <span class="header-chrono-symbole" aria-hidden="true">⏱️</span>

@@ -800,7 +800,12 @@ function appliquerLectureFacile() {
   const btn = document.getElementById("btn-lecture-facile");
   if (btn) {
     btn.setAttribute("aria-pressed", lectureFacileActivee ? "true" : "false");
-    btn.textContent = lectureFacileActivee ? "👀 Lecture facile ✓" : "👀 Lecture facile";
+    btn.setAttribute(
+      "aria-label",
+      lectureFacileActivee
+        ? "Lecture facile activée : texte plus grand"
+        : "Activer la lecture facile : texte plus grand dans les jeux",
+    );
   }
 }
 
@@ -947,7 +952,6 @@ function brancherOutilsQuestion() {
   brancherAudioChoix();
   const btnLectureFacile = document.getElementById("btn-lecture-facile");
   if (btnLectureFacile) {
-    btnLectureFacile.setAttribute("aria-pressed", lectureFacileActivee ? "true" : "false");
     if (btnLectureFacile.dataset.amEasyReadBound !== "1") {
       btnLectureFacile.dataset.amEasyReadBound = "1";
       btnLectureFacile.addEventListener("click", basculerLectureFacile);
