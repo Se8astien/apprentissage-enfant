@@ -45,6 +45,7 @@ import {
 } from "./app-state.js";
 
 import { track } from "./app-analytics.js";
+import { montrerMenuOuAventureApresRevision } from "./app-aventure.js";
 import { sonBonne, sonMauvaise, sonCombo } from "./app-sons.js";
 
 import {
@@ -230,8 +231,7 @@ function _afficherRevision() {
     revisionsSession++;
     verifierObjectifSession();
     afficherBilanSession();
-    montrerMenu();
-    afficherMissions();
+    montrerMenuOuAventureApresRevision(montrerMenu, afficherMissions);
     return;
   }
   const q = _modeRevision.questions[_modeRevision.index];

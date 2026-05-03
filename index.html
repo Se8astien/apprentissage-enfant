@@ -169,6 +169,11 @@
       position: relative;
       z-index: 3;
     }
+    #ecran-aventure.ecran.actif {
+      display: flex !important;
+      flex-direction: column;
+      align-items: stretch;
+    }
   </style>
 </head>
 <body>
@@ -376,6 +381,10 @@
         </div>
       </div>
 
+      <div class="aventure-raccourci">
+        <button type="button" id="btn-aventure" class="btn-aventure-menu">🗺️ Aventure</button>
+      </div>
+
       <p class="accueil">Touche un jeu</p>
 
       <!-- ── Grille des jeux ─────────────────────────────────── -->
@@ -484,6 +493,20 @@
 
       <div id="bilan-session" class="bilan-session" hidden></div>
     </main>
+
+    <section id="ecran-aventure" class="ecran" hidden aria-label="Mode aventure">
+      <button type="button" class="btn-retour" id="btn-retour-aventure">← Menu</button>
+      <h2 id="aventure-monde-titre" class="aventure-titre"></h2>
+      <p id="aventure-soustitre" class="aventure-soustitre"></p>
+      <div id="aventure-carte-wrap" class="aventure-carte-wrap">
+        <div id="aventure-grille" class="aventure-grille" role="group" aria-label="Chemin du renard"></div>
+      </div>
+      <div class="aventure-actions">
+        <button type="button" id="btn-aventure-reculer" class="btn-aventure-nav" disabled>◀ Reculer</button>
+        <button type="button" id="btn-aventure-jouer" class="btn-aventure-jouer">Jouer ce défi</button>
+        <button type="button" id="btn-aventure-avancer" class="btn-aventure-nav">Avancer ▶</button>
+      </div>
+    </section>
 
     <section class="ecran" id="ecran-badges" hidden>
       <div class="badges-header">

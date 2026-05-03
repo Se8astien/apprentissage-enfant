@@ -16,6 +16,7 @@ export const RENARD_STREAK_KEY  = "renard-streak";
 export const STORAGE_THEME_NUIT = "theme-nuit";
 export const STORAGE_SONS_ACTIFS = "sons-actifs";
 export const STORAGE_CHRONO_JEU   = "jeu-chrono-actif";
+const STORAGE_AVENTURE_PREFIX = "am-aventure-";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2", CM1: "cm1", CM2: "cm2" };
@@ -107,6 +108,25 @@ export function lireChronoJeuActif() {
 
 export function sauverChronoJeuActif(actif) {
   localStorage.setItem(STORAGE_CHRONO_JEU, actif ? "1" : "0");
+}
+
+export function lireEtatAventure(niveau) {
+  try {
+    const raw = localStorage.getItem(STORAGE_AVENTURE_PREFIX + niveau);
+    if (!raw) return { pos: 0, done: [] };
+    const o = JSON.parse(raw);
+    const pos = Math.max(0, parseInt(o.pos, 10) || 0);
+    const done = Array.isArray(o.done)
+      ? o.done.map((x) => parseInt(x, 10)).filter((n) => !Number.isNaN(n))
+      : [];
+    return { pos, done };
+  } catch {
+    return { pos: 0, done: [] };
+  }
+}
+
+export function sauverEtatAventure(niveau, etat) {
+  localStorage.setItem(STORAGE_AVENTURE_PREFIX + niveau, JSON.stringify(etat));
 }
 
 export function estFille() {

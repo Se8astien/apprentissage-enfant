@@ -77,6 +77,12 @@ import { initProfils, getProfils, basculerProfil, creerProfil, syncProfilActif }
 import { montrerParams } from "./app-params.js";
 import { rafraichirUiComplete } from "./app-sync-ui.js";
 import { stockageGet, stockageSet } from "./app-stockage.js";
+import {
+  initAventure,
+  montrerAventure,
+  consommerRetourDepuisAventure,
+  rafraichirAventureSiOuverte,
+} from "./app-aventure.js";
 
 const lanceurs = {};
 
@@ -214,6 +220,7 @@ function brancherOnboardingUI() {
       if (!nv) return;
       sauverNiveau(nv);
       rafraichirUiComplete();
+      rafraichirAventureSiOuverte();
     });
   });
 
@@ -341,6 +348,13 @@ function brancherOnboardingUI() {
   });
 }
 
+initAventure({
+  montrerJeu,
+  assurerLanceurDansMap,
+  lanceurs,
+  entrerMenu,
+});
+
 brancherOnboardingUI();
 brancherBoutonChronoMenu();
 majUiBoutonChrono();
@@ -455,6 +469,22 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
   });
 });
 
+const btnAventure = document.getElementById("btn-aventure");
+if (btnAventure) {
+  btnAventure.addEventListener("click", () => {
+    track("aventure_from_menu", { niveau: getNiveauCourant() });
+    montrerAventure();
+  });
+}
+
+function retourDepuisJeuVersMenuOuAventure() {
+  if (consommerRetourDepuisAventure()) {
+    montrerAventure();
+    return;
+  }
+  entrerMenu();
+}
+
 // ── Navigation jeu ────────────────────────────────────────────────────────────
 if (btnRetour) btnRetour.addEventListener("click", () => {
   const jeu = getJeuCourant();
@@ -465,10 +495,10 @@ if (btnRetour) btnRetour.addEventListener("click", () => {
     wrong_count: wrongs.length,
     revision_prompted: wrongs.length > 0,
   });
-  if (proposerRevisionSiErreurs(jeu, entrerMenu)) {
+  if (proposerRevisionSiErreurs(jeu, retourDepuisJeuVersMenuOuAventure)) {
     return;
   } else {
-    entrerMenu();
+    retourDepuisJeuVersMenuOuAventure();
   }
 });
 if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
