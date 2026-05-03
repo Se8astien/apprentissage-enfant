@@ -31,6 +31,12 @@ export const BADGES = [
   { id: "renard_lv2",   emoji: "🦊",  nom: "Ami du renard",    desc: "Faire évoluer le renard" },
   { id: "diff_expert",  emoji: "💎",  nom: "Niveau Expert",    desc: "Atteindre le niveau Expert" },
   { id: "retour",       emoji: "🌞",  nom: "De retour !",      desc: "Rejouer après 2 jours d'absence" },
+  { id: "perseverant",  emoji: "💪",  nom: "Persévérant",      desc: "Continuer après 3 difficultés" },
+  { id: "curieux",      emoji: "💡",  nom: "Curieux",          desc: "Demander 5 indices pour apprendre" },
+  { id: "revision",     emoji: "🔁",  nom: "Je corrige",       desc: "Revoir une question difficile" },
+  { id: "objectif",     emoji: "🎯",  nom: "Objectif atteint", desc: "Réussir un objectif de session" },
+  { id: "lecture_facile", emoji: "👀", nom: "Lecture facile",  desc: "Activer l'aide de lecture" },
+  { id: "narrateur",    emoji: "🔊",  nom: "Narrateur",        desc: "Écouter 5 consignes ou réponses" },
 ];
 
 const BADGES_STORAGE_KEY = "badges-obtenus";

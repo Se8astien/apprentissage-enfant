@@ -184,9 +184,11 @@
         <div class="header-toolbar" role="group" aria-label="Réglages de l'écran">
           <button type="button" id="btn-theme" class="header-tool" aria-label="Activer le mode nuit">🌙</button>
           <button type="button" id="btn-sons" class="header-tool" aria-label="Sons activés" aria-pressed="true">🔊</button>
+          <button type="button" id="btn-lecture-facile" class="header-tool header-tool-lecture" aria-label="Activer la lecture facile" aria-pressed="false">Aa</button>
           <button type="button" id="btn-chrono" class="header-tool header-tool-chrono" hidden aria-pressed="true"
             data-chrono-etat="limite" aria-label="Minuteur : temps pour répondre (dès le CE1, pas au CP)">
             <span class="header-chrono-symbole" aria-hidden="true">⏱️</span>
+            <span class="header-chrono-label" aria-hidden="true">Chrono</span>
           </button>
         </div>
         <div class="header-compte-row" aria-label="Étoiles et compte">
@@ -467,6 +469,14 @@
         <span id="icone-genre-actuel">👧</span>
         <span class="btn-changer-genre-libelle">Profil</span>
       </button>
+      <div id="guidage-jour" class="guidage-jour" hidden></div>
+      <div id="objectif-session" class="objectif-session" hidden>
+        <p class="objectif-titre">🎯 Mon objectif</p>
+        <button type="button" data-objectif="etoiles3">3 étoiles</button>
+        <button type="button" data-objectif="questions5">5 questions</button>
+        <button type="button" data-objectif="revision">Réviser</button>
+      </div>
+      <div id="bilan-session" class="bilan-session" hidden></div>
     </main>
 
     <section class="ecran" id="ecran-badges" hidden>
@@ -539,10 +549,19 @@
       <button type="button" class="btn-retour" id="btn-retour" aria-label="Retour au menu">← Menu</button>
       <div class="diff-badge" id="diff-badge" hidden></div>
       <h2 id="jeu-titre" class="jeu-titre"></h2>
+      <div id="mini-lecon-jeu" class="mini-lecon-jeu" hidden></div>
       <div id="chrono" class="chrono" hidden aria-live="polite" aria-label="Temps restant"></div>
       <div id="zone-question" class="zone-question" aria-live="polite" aria-atomic="true"></div>
+      <div id="outils-jeu" class="jeu-outils" hidden aria-label="Aides pour répondre">
+        <button type="button" id="btn-indice-question" class="btn-outil-jeu" aria-controls="aide-douce">💡 Indice</button>
+        <button type="button" id="btn-lire-question" class="btn-outil-jeu">🔊 Lire</button>
+      </div>
       <div id="zone-choix" class="zone-choix" role="group" aria-label="Choix de réponse"></div>
       <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+      <div id="aide-douce" class="aide-douce" hidden aria-live="polite" aria-atomic="true"></div>
+      <div id="explication-visuelle" class="explication-visuelle" hidden aria-live="polite"></div>
+      <p id="effort-progress" class="effort-progress" hidden aria-live="polite"></p>
+      <button type="button" id="btn-reviser-erreurs" class="btn-reviser-erreurs" hidden>🔁 Revoir mes erreurs</button>
       <button type="button" class="btn-suivant" id="btn-suivant" hidden aria-label="Question suivante">Question suivante →</button>
     </section>
 

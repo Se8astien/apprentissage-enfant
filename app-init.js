@@ -50,10 +50,9 @@ import {
   montrerJeu,
   questionSuivante,
   getWrongQuestions,
-  clearWrongQuestions,
-  entrerRevision,
   brancherBoutonChronoMenu,
   majUiBoutonChrono,
+  proposerRevisionSiErreurs,
 } from "./app-nav.js";
 
 import {
@@ -455,30 +454,8 @@ if (btnRetour) btnRetour.addEventListener("click", () => {
     wrong_count: wrongs.length,
     revision_prompted: wrongs.length > 0,
   });
-  if (jeu && wrongs.length > 0) {
-    const overlay = document.createElement("div");
-    overlay.className = "evolution-overlay";
-    overlay.innerHTML = `
-      <div class="evolution-carte">
-        <p style="font-size:2rem;margin:0">🔁</p>
-        <p class="evolution-titre">Tu as eu ${wrongs.length} erreur${wrongs.length > 1 ? "s" : ""} !</p>
-        <p class="evolution-msg">Veux-tu revoir ces questions ?</p>
-        <button type="button" class="btn-evolution-fermer" id="revision-oui">Oui, revoir ! 💪</button>
-        <button type="button" class="btn-revision-non" id="revision-non">Non merci</button>
-      </div>`;
-    document.body.appendChild(overlay);
-    piegerFocus(overlay);
-    document.getElementById("revision-oui").addEventListener("click", () => {
-      track("revision_started", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: wrongs.length });
-      overlay.remove();
-      entrerRevision(jeu, wrongs);
-    });
-    document.getElementById("revision-non").addEventListener("click", () => {
-      track("revision_declined", { game_name: jeu, niveau: getNiveauCourant(), wrong_count: wrongs.length });
-      clearWrongQuestions(jeu);
-      overlay.remove();
-      entrerMenu();
-    });
+  if (proposerRevisionSiErreurs(jeu, entrerMenu)) {
+    return;
   } else {
     entrerMenu();
   }
