@@ -242,3 +242,45 @@ export function lancerMonnaieCe1() {
     elChoix.appendChild(b);
   });
 }
+
+export function lancerMarcheMalin() {
+  elTitre.textContent = "🛒 Marché malin";
+  const diff = getDifficulte();
+  const nbArticles = estCE2() ? 3 : estCE1() ? [2, 2, 3][diff] : 2;
+  const pool = melanger(ARTICLES_BOUTIQUE).slice(0, nbArticles);
+  const prixBase = estCE2()
+    ? [100, 150, 200, 250, 300, 350, 400, 500]
+    : estCE1()
+      ? [50, 100, 150, 200, 250, 300]
+      : [20, 50, 80, 100, 120];
+
+  const prix = pool.map(() => prixBase[Math.floor(Math.random() * prixBase.length)]);
+  const total = prix.reduce((acc, v) => acc + v, 0);
+  setBonneReponse(total);
+
+  const lignes = pool.map((a, i) =>
+    `<div class="monnaie-ligne">${a.emoji} ${a.nom} → <strong>${labelEuros(prix[i])}</strong></div>`
+  ).join("");
+
+  elQuestion.innerHTML = `<div class="monnaie-question">
+    <p style="font-size:0.9rem;margin:0 0 0.35rem">
+      Tu prends ${nbArticles} article${nbArticles > 1 ? "s" : ""}. Combien dois-tu payer en tout ?
+    </p>
+    ${lignes}
+    <div class="monnaie-ligne">🧾 Total = <strong>?</strong></div>
+  </div>`;
+
+  const marge = estCE2() ? 300 : estCE1() ? 200 : 100;
+  const faux = entiersDistincts(Math.max(1, total - marge), total + marge, 3, total);
+  const opts = melanger([total, ...faux]);
+  elChoix.innerHTML = "";
+  opts.forEach((v) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.textContent = labelEuros(v);
+    b.dataset.valeur = String(v);
+    b.addEventListener("click", () => apresReponse(v, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}

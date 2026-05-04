@@ -183,6 +183,13 @@ const PAR_JEU = {
     cm1: "Budgets",
     cm2: "Problèmes d'argent",
   },
+  marcheMalin: {
+    cp: "Additionne 2 prix simples",
+    ce1: "Fais le total du panier",
+    ce2: "Panier de 3 articles",
+    cm1: "Total rapide en caisse",
+    cm2: "Calcul de panier mental",
+  },
   multiplication: {
     cp: "Groupes égaux intro",
     ce1: "Tables ×2 ×5 ×10",
@@ -295,6 +302,13 @@ const PAR_JEU = {
     cm1: "Futur et impéraitf",
     cm2: "Plusieurs temps",
   },
+  detectiveErreurs: {
+    cp: "Repère la phrase juste",
+    ce1: "Corrige l'accord simple",
+    ce2: "Trouve la bonne écriture",
+    cm1: "Orthographe et accords",
+    cm2: "Correction fine de phrase",
+  },
   anglais: {
     cp: "Mots très simples",
     ce1: "Lexique famille école",
@@ -378,6 +392,13 @@ const PAR_JEU = {
     ce2: "Variables et liste",
     cm1: "Boucles et conditions",
     cm2: "Programmes plusieurs pas",
+  },
+  labyrintheLogique: {
+    cp: "Suite visuelle simple",
+    ce1: "Trouve la case suivante",
+    ce2: "Règles et motifs",
+    cm1: "Suites de logique",
+    cm2: "Raisonnement avancé",
   },
 };
 

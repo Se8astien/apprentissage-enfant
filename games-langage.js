@@ -19,6 +19,19 @@ import {
 
 import { apresReponse, apresReponseTexte } from "./app-nav.js";
 
+const PHRASES_DETECTIVE = [
+  { phrase: "Les chat joue dans le jardin.", bonne: "Le chat joue dans le jardin." },
+  { phrase: "Nous mangeons des pomme.", bonne: "Nous mangeons des pommes." },
+  { phrase: "Il sont content de gagner.", bonne: "Ils sont contents de gagner." },
+  { phrase: "Tu a fini ton exercice.", bonne: "Tu as fini ton exercice." },
+  { phrase: "Les enfant lisent une histoire.", bonne: "Les enfants lisent une histoire." },
+  { phrase: "Elle chantent très bien.", bonne: "Elle chante très bien." },
+  { phrase: "On n'oublie pas c'est affaires.", bonne: "On n'oublie pas ses affaires." },
+  { phrase: "Demain nous irons au parc avec mes ami.", bonne: "Demain nous irons au parc avec mes amis." },
+  { phrase: "Le renard et malin.", bonne: "Le renard est malin." },
+  { phrase: "Ces mon livre préféré.", bonne: "C'est mon livre préféré." },
+];
+
 // ── Syllabes ──────────────────────────────────────────────────────────────────
 const MOTS_SYLLABES_CP = [
   { mot: "maison",  parties: ["mai", "son"] },
@@ -106,6 +119,33 @@ export function lancerSyllabes() {
     b.textContent = syl;
     b.dataset.valeur = String(idx);
     b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+export function lancerDetectiveErreurs() {
+  elTitre.textContent = "🕵️ Détective des erreurs";
+  const diff = getDifficulte();
+  const item = PHRASES_DETECTIVE[Math.floor(Math.random() * PHRASES_DETECTIVE.length)];
+  const banque = melanger(PHRASES_DETECTIVE.map((x) => x.bonne).filter((x) => x !== item.bonne));
+  const fausses = banque.slice(0, diff >= 2 ? 3 : 2);
+  while (fausses.length < 3) fausses.push(banque[Math.floor(Math.random() * banque.length)] || item.bonne);
+  const options = melanger([item.bonne, ...fausses.slice(0, 3)]);
+  setBonneReponse(item.bonne);
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.92rem;margin-bottom:0.35rem'>Trouve la phrase bien écrite :</p>" +
+    `<p style="font-size:1.1rem;font-weight:700;color:var(--primaire);margin:0">${item.phrase}</p>`;
+
+  elChoix.innerHTML = "";
+  options.forEach((texte) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "0.95rem";
+    b.textContent = texte;
+    b.dataset.valeur = texte;
+    b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));
     elChoix.appendChild(b);
   });
 }

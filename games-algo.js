@@ -16,6 +16,19 @@ import {
 
 import { apresReponse } from "./app-nav.js";
 
+const LABYRINTHE_LOGIQUE = [
+  { motif: "🟩 🟦 🟩 🟦 🟩 ?", bonne: "🟦", fausses: ["🟩", "🟥", "🟨"] },
+  { motif: "⭐ ⭐ 🌙 ⭐ ⭐ 🌙 ?", bonne: "⭐", fausses: ["🌙", "☀️", "🌧️"] },
+  { motif: "1 3 5 7 ?", bonne: "9", fausses: ["8", "10", "11"] },
+  { motif: "🔺 🔺 🔻 🔺 🔺 ?", bonne: "🔻", fausses: ["🔺", "🔷", "🔵"] },
+  { motif: "2 4 8 16 ?", bonne: "32", fausses: ["24", "18", "30"] },
+  { motif: "⬆️ ➡️ ⬆️ ➡️ ⬆️ ?", bonne: "➡️", fausses: ["⬆️", "⬇️", "⬅️"] },
+  { motif: "A C E G ?", bonne: "I", fausses: ["H", "J", "K"] },
+  { motif: "🍎 🍌 🍎 🍌 🍎 ?", bonne: "🍌", fausses: ["🍎", "🍇", "🍐"] },
+  { motif: "10 20 30 40 ?", bonne: "50", fausses: ["45", "60", "55"] },
+  { motif: "🔴 🟡 🟢 🔴 🟡 ?", bonne: "🟢", fausses: ["🔴", "🟡", "🔵"] },
+];
+
 function bloc(texte) {
   return `<div style="font-family:'Courier New',monospace;background:#f0eeff;border-radius:0.8rem;padding:0.65rem 1rem;margin:0.4rem auto;font-size:0.88rem;line-height:1.85;text-align:left;max-width:300px;border-left:3px solid #6c5ce7;color:#2d3436">${texte.replace(/\n/g, "<br>")}</div>`;
 }
@@ -210,4 +223,29 @@ export function lancerCode() {
     liste = diff === 0 ? CODE_CE2.slice(0, 6) : diff === 1 ? CODE_CE2 : [...CODE_CE2, ...CODE_CM1.slice(0, 4)];
   }
   lancer(liste);
+}
+
+export function lancerLabyrintheLogique() {
+  elTitre.textContent = "🧭 Labyrinthe logique";
+  const diff = getDifficulte();
+  const pool = diff === 0 ? LABYRINTHE_LOGIQUE.slice(0, 6) : diff === 1 ? LABYRINTHE_LOGIQUE : LABYRINTHE_LOGIQUE;
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  setBonneReponse(options.indexOf(item.bonne));
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.9rem;margin:0 0 0.35rem'>Trouve la prochaine case du chemin :</p>" +
+    `<p style="font-size:1.35rem;font-weight:800;color:var(--primaire);margin:0">${item.motif}</p>`;
+
+  elChoix.innerHTML = "";
+  options.forEach((opt, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = opt;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
 }

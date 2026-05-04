@@ -35,6 +35,7 @@ const JEU_SPEC = {
   calendrier: ["temps", "lancerCalendrier"],
   monnaiecp: ["argent", "lancerMonnaieCp"],
   monnaiece1: ["argent", "lancerMonnaieCe1"],
+  marcheMalin: ["argent", "lancerMarcheMalin"],
   multiplication: ["avance", "lancerMultiplication"],
   division: ["avance", "lancerDivision"],
   probleme: ["avance", "lancerProbleme"],
@@ -61,8 +62,10 @@ const JEU_SPEC = {
   traductionItalien: ["langage", "lancerTraductionItalien"],
   portugais: ["langage", "lancerPortugaisMots"],
   traductionPortugais: ["langage", "lancerTraductionPortugais"],
+  detectiveErreurs: ["langage", "lancerDetectiveErreurs"],
   sequence: ["algo", "lancerSequence"],
   code: ["algo", "lancerCode"],
+  labyrintheLogique: ["algo", "lancerLabyrintheLogique"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
