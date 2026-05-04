@@ -6,6 +6,7 @@ const CHARGEURS = {
   avance: () => import("./games-avance.js"),
   langage: () => import("./games-langage.js"),
   algo: () => import("./games-algo.js"),
+  musique: () => import("./games-musique.js"),
 };
 
 const JEU_SPEC = {
@@ -70,6 +71,9 @@ const JEU_SPEC = {
   atelierAccords: ["langage", "lancerAtelierAccords"],
   conjugaisonMission: ["langage", "lancerConjugaisonMission"],
   motsJungle: ["langage", "lancerMotsJungle"],
+  rythmeMagique: ["musique", "lancerRythmeMagique"],
+  notesMelodie: ["musique", "lancerNotesMelodie"],
+  tempoSprint: ["musique", "lancerTempoSprint"],
   sequence: ["algo", "lancerSequence"],
   code: ["algo", "lancerCode"],
   labyrintheLogique: ["algo", "lancerLabyrintheLogique"],

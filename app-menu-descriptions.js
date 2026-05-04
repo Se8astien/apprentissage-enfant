@@ -428,6 +428,27 @@ const PAR_JEU = {
     cm1: "Expressões próximas",
     cm2: "Tradução PT refinada",
   },
+  rythmeMagique: {
+    cp: "Compter les battements",
+    ce1: "Rythmes simples à lire",
+    ce2: "Motifs rythmiques variés",
+    cm1: "Rythme et mémoire",
+    cm2: "Défis rythmiques rapides",
+  },
+  notesMelodie: {
+    cp: "Do ré mi en ordre",
+    ce1: "Note avant/après",
+    ce2: "Gammes plus longues",
+    cm1: "Repérage de notes",
+    cm2: "Enchaînements de notes",
+  },
+  tempoSprint: {
+    cp: "Reconnaître lent/rapide",
+    ce1: "Catégoriser le tempo",
+    ce2: "Lire les BPM simples",
+    cm1: "Comparer des tempos",
+    cm2: "Tempo précis et rapide",
+  },
   sequence: {
     cp: "3 pictos puis action",
     ce1: "Plus d'étapes",
