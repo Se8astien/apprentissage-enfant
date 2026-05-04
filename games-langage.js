@@ -43,6 +43,27 @@ const ATELIER_ACCORDS = [
   { phrase: "Cette histoire est ___ .", bonne: "intéressante", fausses: ["intéressant", "intéressants", "intéressantes"] },
 ];
 
+const CONJ_MISSION_CE1 = [
+  { phrase: "Hier, nous ___ au parc.", bonne: "sommes allés", fausses: ["va au parc", "allons au parc", "irai au parc"] },
+  { phrase: "Demain, tu ___ ton poème.", bonne: "réciteras", fausses: ["récites", "récitais", "récite"] },
+  { phrase: "Chaque matin, je ___ mes dents.", bonne: "brosse", fausses: ["brosses", "brossait", "brossera"] },
+  { phrase: "Vous ___ très vite en récréation.", bonne: "courez", fausses: ["court", "courons", "couraient"] },
+];
+
+const CONJ_MISSION_CE2 = [
+  { phrase: "Si nous avons du temps, nous ___ un jeu.", bonne: "ferons", fausses: ["faisons", "faisait", "fait"] },
+  { phrase: "La semaine dernière, elle ___ sa leçon.", bonne: "apprenait", fausses: ["apprendra", "apprend", "appris"] },
+  { phrase: "Tous les soirs, ils ___ leurs affaires.", bonne: "rangent", fausses: ["range", "rangeront", "rangeaient"] },
+  { phrase: "Tu ___ ton dessin avant le goûter.", bonne: "finiras", fausses: ["finis", "finissait", "finir"] },
+];
+
+const CONJ_MISSION_CM = [
+  { phrase: "Quand vous aurez fini, vous ___ vos résultats.", bonne: "noterez", fausses: ["notez", "notiez", "noter"] },
+  { phrase: "Pendant que je lisais, ils ___ en silence.", bonne: "écrivaient", fausses: ["écrivent", "écriront", "écrire"] },
+  { phrase: "Si tu veux progresser, tu ___ chaque jour.", bonne: "réviseras", fausses: ["révises", "révisais", "réviser"] },
+  { phrase: "Nous ___ déjà la réponse quand tu es arrivé.", bonne: "savions", fausses: ["savons", "saurons", "savent"] },
+];
+
 // ── Syllabes ──────────────────────────────────────────────────────────────────
 const MOTS_SYLLABES_CP = [
   { mot: "maison",  parties: ["mai", "son"] },
@@ -179,6 +200,31 @@ export function lancerAtelierAccords() {
     b.type = "button";
     b.className = "btn-choix";
     b.style.fontSize = "1rem";
+    b.textContent = texte;
+    b.dataset.valeur = texte;
+    b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+export function lancerConjugaisonMission() {
+  elTitre.textContent = "🧠 Conjugaison mission";
+  const diff = getDifficulte();
+  const base = estCM2() || estCM1() ? CONJ_MISSION_CM : estCE2() ? CONJ_MISSION_CE2 : CONJ_MISSION_CE1;
+  const extra = estCM2() ? CONJ_MISSION_CE2 : estCM1() ? CONJ_MISSION_CE2.slice(0, 2) : estCE2() ? CONJ_MISSION_CE1.slice(0, 2) : [];
+  const pool = diff === 0 ? base : diff === 1 ? [...base, ...extra] : [...base, ...extra, ...CONJ_MISSION_CM.slice(0, 2)];
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  setBonneReponse(item.bonne);
+  elQuestion.innerHTML =
+    "<p style='font-size:0.92rem;margin-bottom:0.35rem'>Mission : choisis la bonne conjugaison.</p>" +
+    `<p style="font-size:1.08rem;font-weight:700;color:var(--primaire);margin:0">${item.phrase}</p>`;
+  elChoix.innerHTML = "";
+  options.forEach((texte) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "0.98rem";
     b.textContent = texte;
     b.dataset.valeur = texte;
     b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));

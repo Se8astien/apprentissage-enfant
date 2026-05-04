@@ -417,8 +417,22 @@ h1 {
 .diff-nom { font-size: 0.8rem; font-weight: 700; color: var(--texte); }
 
 /* ── Bouton Classe + popup ──────────────────────────────────────────────────── */
+.menu-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
+}
+
+.menu-bloc {
+  border-radius: 1.1rem;
+  border: 1px solid rgba(108, 92, 231, 0.16);
+  background: white;
+  box-shadow: 0 3px 12px var(--ombre);
+}
+
 .menu-classe-rapide {
-  margin: 0 0 0.55rem;
+  margin: 0;
 }
 
 .btn-classe-menu {
@@ -433,7 +447,7 @@ h1 {
   padding: 0.55rem 0.75rem;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 2px 10px var(--ombre);
+  box-shadow: 0 3px 12px var(--ombre);
 }
 .btn-classe-menu-emoji { font-size: 1.45rem; }
 .btn-classe-menu-texte { display: flex; flex-direction: column; align-items: flex-start; text-align: left; flex: 1; min-width: 0; }
@@ -524,12 +538,11 @@ h1 {
   justify-content: center;
   gap: 0.35rem;
   width: 100%;
-  margin: 0 0 0.55rem;
+  margin: 0;
   padding: 0.48rem 0.55rem;
   box-sizing: border-box;
-  border-radius: 1.05rem;
-  background: rgba(108, 92, 231, 0.06);
-  border: 1px solid rgba(108, 92, 231, 0.14);
+  border-radius: 1.1rem;
+  background: linear-gradient(145deg, #f7f6ff 0%, #f1f7ff 100%);
 }
 
 .menu-barre-liens .btn-badges-menu,
@@ -560,12 +573,12 @@ h1 {
 }
 
 .menu-surprises-encart {
-  margin: 0 0 0.6rem;
+  margin: 0;
   padding: 0.6rem 0.65rem 0.55rem;
-  border-radius: 1.15rem;
+  border-radius: 1.1rem;
   background: linear-gradient(145deg, #f5f0ff 0%, #eef8ff 55%, #f0f4ff 100%);
-  border: 2px solid rgba(108, 92, 231, 0.22);
-  box-shadow: 0 2px 10px var(--ombre);
+  border: 1px solid rgba(108, 92, 231, 0.16);
+  box-shadow: 0 3px 12px var(--ombre);
 }
 
 .menu-surprises-titre {
@@ -2444,7 +2457,9 @@ h1 {
   flex-direction: column;
   align-items: stretch;
   gap: 0.6rem;
-  margin-top: 0.55rem;
+  margin-top: 0;
+  padding: 0.6rem 0.65rem;
+  background: linear-gradient(145deg, #f9f8ff 0%, #f5fbff 100%);
 }
 
 .menu-secondaire .missions-section {
@@ -2458,6 +2473,15 @@ h1 {
 
 .menu-secondaire .objectif-session {
   margin-bottom: 0.5rem;
+}
+
+.menu-secondaire .missions-section,
+.menu-secondaire .guidage-jour,
+.menu-secondaire .objectif-session {
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 0.95rem;
+  padding: 0.62rem 0.7rem;
+  border: 1px solid rgba(108, 92, 231, 0.12);
 }
 
 .missions-entete-ligne {
@@ -2912,6 +2936,10 @@ h1 {
   background: #1e1e3f;
   border-color: rgba(162, 155, 254, 0.32);
 }
+[data-theme="nuit"] .menu-bloc {
+  background: #1e1e3f;
+  border-color: rgba(162, 155, 254, 0.28);
+}
 [data-theme="nuit"] .btn-classe-menu-detail {
   color: #e8e6ff;
 }
@@ -2926,12 +2954,21 @@ h1 {
   border-top-color: rgba(162, 155, 254, 0.22);
 }
 [data-theme="nuit"] .menu-barre-liens {
-  background: rgba(30, 30, 63, 0.85);
+  background: linear-gradient(145deg, #1e1e3f 0%, #232348 100%);
   border-color: rgba(162, 155, 254, 0.28);
 }
 [data-theme="nuit"] .menu-surprises-encart {
   background: linear-gradient(145deg, #1e1e3f 0%, #25254a 100%);
   border-color: rgba(162, 155, 254, 0.32);
+}
+[data-theme="nuit"] .menu-secondaire {
+  background: linear-gradient(145deg, #1f1f40 0%, #25254a 100%);
+}
+[data-theme="nuit"] .menu-secondaire .missions-section,
+[data-theme="nuit"] .menu-secondaire .guidage-jour,
+[data-theme="nuit"] .menu-secondaire .objectif-session {
+  background: rgba(15, 15, 30, 0.38);
+  border-color: rgba(162, 155, 254, 0.24);
 }
 [data-theme="nuit"] .menu-surprises-encart .menu-fun-bar {
   background: rgba(15, 15, 30, 0.45);

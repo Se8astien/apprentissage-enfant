@@ -362,16 +362,17 @@
 
     <main id="ecran-menu" class="ecran" hidden>
 
-      <div class="menu-classe-rapide">
-        <button type="button" id="btn-classe-menu" class="btn-classe-menu" aria-haspopup="dialog" aria-controls="menu-classe-modal">
-          <span class="btn-classe-menu-emoji" aria-hidden="true">🏫</span>
-          <span class="btn-classe-menu-texte">
-            <span class="btn-classe-menu-titre">Classe</span>
-            <span class="btn-classe-menu-detail" id="btn-classe-menu-detail">CP · Normal</span>
-          </span>
-          <span class="btn-classe-menu-fleche" aria-hidden="true">›</span>
-        </button>
-      </div>
+      <div class="menu-hub">
+        <div class="menu-classe-rapide">
+          <button type="button" id="btn-classe-menu" class="btn-classe-menu" aria-haspopup="dialog" aria-controls="menu-classe-modal">
+            <span class="btn-classe-menu-emoji" aria-hidden="true">🏫</span>
+            <span class="btn-classe-menu-texte">
+              <span class="btn-classe-menu-titre">Classe</span>
+              <span class="btn-classe-menu-detail" id="btn-classe-menu-detail">CP · Normal</span>
+            </span>
+            <span class="btn-classe-menu-fleche" aria-hidden="true">›</span>
+          </button>
+        </div>
 
       <div id="menu-classe-modal" class="menu-classe-modal" hidden role="dialog" aria-modal="true" aria-labelledby="menu-classe-modal-titre">
         <div class="menu-classe-modal-carte">
@@ -392,49 +393,50 @@
         </div>
       </div>
 
-      <div class="menu-barre-liens" role="group" aria-label="Trophées, parents et partage">
-        <button type="button" id="btn-badges" class="btn-badges-menu" aria-label="Voir mes trophées">🏅 Trophées</button>
-        <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
-        <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤 Partager</button>
-        <button type="button" id="btn-certificat-menu" class="btn-certificat btn-certificat--menu" aria-label="Voir mon bulletin (à imprimer)">🎓 Mon Bulletin</button>
-      </div>
-
-      <div class="menu-surprises-encart" aria-label="Autres façons de jouer">
-        <p class="menu-surprises-titre">Si tu hésites…</p>
-        <div class="aventure-raccourci">
-          <button type="button" id="btn-aventure" class="btn-aventure-menu">🗺️ Aventure</button>
+        <div class="menu-barre-liens menu-bloc" role="group" aria-label="Trophées, parents et partage">
+          <button type="button" id="btn-badges" class="btn-badges-menu" aria-label="Voir mes trophées">🏅 Trophées</button>
+          <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
+          <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤 Partager</button>
+          <button type="button" id="btn-certificat-menu" class="btn-certificat btn-certificat--menu" aria-label="Voir mon bulletin (à imprimer)">🎓 Mon Bulletin</button>
         </div>
-        <div class="menu-fun-bar" id="menu-fun-bar">
-          <p class="menu-fun-weekend" id="menu-fun-weekend" hidden></p>
-          <div class="menu-fun-btns">
-            <button type="button" class="btn-fun-menu" id="btn-fun-mystere">🎁 Carte du jour</button>
-            <button type="button" class="btn-fun-menu" id="btn-fun-roue">🎡 Jeu au hasard</button>
-            <button type="button" class="btn-fun-menu" id="btn-fun-suggestion">🦊 Encore ce jeu ?</button>
+
+        <div class="menu-surprises-encart menu-bloc" aria-label="Autres façons de jouer">
+          <p class="menu-surprises-titre">Si tu hésites…</p>
+          <div class="aventure-raccourci">
+            <button type="button" id="btn-aventure" class="btn-aventure-menu">🗺️ Aventure</button>
+          </div>
+          <div class="menu-fun-bar" id="menu-fun-bar">
+            <p class="menu-fun-weekend" id="menu-fun-weekend" hidden></p>
+            <div class="menu-fun-btns">
+              <button type="button" class="btn-fun-menu" id="btn-fun-mystere">🎁 Carte du jour</button>
+              <button type="button" class="btn-fun-menu" id="btn-fun-roue">🎡 Jeu au hasard</button>
+              <button type="button" class="btn-fun-menu" id="btn-fun-suggestion">🦊 Encore ce jeu ?</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="menu-secondaire" aria-label="Missions, parcours et profil">
-        <div class="missions-section">
-          <div class="missions-entete-ligne">
-            <h3 class="missions-titre">🎯 Missions du jour</h3>
-            <button type="button" class="btn-changer-genre btn-changer-genre--entete" id="btn-changer-genre" aria-label="Changer de profil">
-              <span id="icone-genre-actuel">👧</span>
-              <span class="btn-changer-genre-libelle">Profil</span>
-            </button>
+        <div class="menu-secondaire menu-bloc" aria-label="Missions, parcours et profil">
+          <div class="missions-section">
+            <div class="missions-entete-ligne">
+              <h3 class="missions-titre">🎯 Missions du jour</h3>
+              <button type="button" class="btn-changer-genre btn-changer-genre--entete" id="btn-changer-genre" aria-label="Changer de profil">
+                <span id="icone-genre-actuel">👧</span>
+                <span class="btn-changer-genre-libelle">Profil</span>
+              </button>
+            </div>
+            <div id="missions-widget"></div>
           </div>
-          <div id="missions-widget"></div>
+          <div id="guidage-jour" class="guidage-jour" hidden></div>
+          <div id="objectif-session" class="objectif-session" hidden>
+            <p class="objectif-titre">🎯 Mon objectif</p>
+            <button type="button" data-objectif="etoiles3">3 étoiles</button>
+            <button type="button" data-objectif="questions5">5 questions</button>
+            <button type="button" data-objectif="revision">Réviser</button>
+          </div>
         </div>
-        <div id="guidage-jour" class="guidage-jour" hidden></div>
-        <div id="objectif-session" class="objectif-session" hidden>
-          <p class="objectif-titre">🎯 Mon objectif</p>
-          <button type="button" data-objectif="etoiles3">3 étoiles</button>
-          <button type="button" data-objectif="questions5">5 questions</button>
-          <button type="button" data-objectif="revision">Réviser</button>
-        </div>
-      </div>
 
-      <div id="bilan-session" class="bilan-session" hidden></div>
+        <div id="bilan-session" class="bilan-session menu-bloc" hidden></div>
+      </div>
 
       <button type="button" class="maison-banner maison-banner--avant-jeux" id="btn-maison" aria-label="Ma Maison">
         <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
@@ -473,6 +475,7 @@
         <button type="button" class="carte-jeu" data-jeu="symetrie"      data-cat="formes" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🪞</span><span class="nom-jeu">Symétrie</span><span class="desc-jeu">Trouve le miroir</span></button>
         <button type="button" class="carte-jeu" data-jeu="perimetre"     data-cat="formes" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔲</span><span class="nom-jeu">Périmètre</span><span class="desc-jeu">Tour de la figure</span></button>
         <button type="button" class="carte-jeu" data-jeu="angles"        data-cat="formes" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">📐</span><span class="nom-jeu">Les angles</span><span class="desc-jeu">Droit, aigu, obtus</span></button>
+        <button type="button" class="carte-jeu" data-jeu="geoConstructeur" data-cat="formes" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🧱</span><span class="nom-jeu">Géo-constructeur</span><span class="desc-jeu">Assemble et compte les côtés</span></button>
 
         <h3 class="grille-section">⏰ Temps &amp; Mesures</h3>
         <button type="button" class="carte-jeu" data-jeu="calendrier"    data-cat="temps" data-niveaux="cp ce1"><span class="emoji-jeu">📅</span><span class="nom-jeu">Calendrier</span><span class="desc-jeu">Jours et mois</span></button>
@@ -505,6 +508,7 @@
         <button type="button" class="carte-jeu" data-jeu="conjugaison"   data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">✍️</span><span class="nom-jeu">Conjugaison</span><span class="desc-jeu">Temps et personnes</span></button>
         <button type="button" class="carte-jeu" data-jeu="detectiveErreurs" data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🕵️</span><span class="nom-jeu">Détective des erreurs</span><span class="desc-jeu">Trouve la bonne phrase</span></button>
         <button type="button" class="carte-jeu" data-jeu="atelierAccords" data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🧩</span><span class="nom-jeu">Atelier des accords</span><span class="desc-jeu">Complète avec le bon mot</span></button>
+        <button type="button" class="carte-jeu" data-jeu="conjugaisonMission" data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🧠</span><span class="nom-jeu">Conjugaison mission</span><span class="desc-jeu">Choisis le bon verbe</span></button>
         <button type="button" class="carte-jeu" data-jeu="anglais"       data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇬🇧</span><span class="nom-jeu">English</span><span class="desc-jeu">What is this?</span></button>
         <button type="button" class="carte-jeu" data-jeu="traduction"    data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">Traduction</span><span class="desc-jeu">Français → Anglais</span></button>
         <button type="button" class="carte-jeu" data-jeu="allemand"      data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🇩🇪</span><span class="nom-jeu">Deutsch</span><span class="desc-jeu">Was ist das?</span></button>
@@ -520,6 +524,7 @@
         <button type="button" class="carte-jeu" data-jeu="aires"             data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">📐</span><span class="nom-jeu">Aires</span><span class="desc-jeu">Surface des figures</span></button>
         <button type="button" class="carte-jeu" data-jeu="decimaux"          data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">🔢</span><span class="nom-jeu">Décimaux</span><span class="desc-jeu">Virgules et dixièmes</span></button>
         <button type="button" class="carte-jeu" data-jeu="fractionsCM"       data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">½</span><span class="nom-jeu">Fractions CM</span><span class="desc-jeu">Calcul sur fractions</span></button>
+        <button type="button" class="carte-jeu" data-jeu="courseFractions"    data-cat="cm" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">🏁</span><span class="nom-jeu">Course des fractions</span><span class="desc-jeu">Trouve la fraction équivalente</span></button>
         <button type="button" class="carte-jeu" data-jeu="proportionnalite"  data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">Proportionnalité</span><span class="desc-jeu">Règle de trois</span></button>
         <button type="button" class="carte-jeu" data-jeu="pourcentages"      data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">%</span><span class="nom-jeu">Pourcentages</span><span class="desc-jeu">50%, 25%, 10%</span></button>
 

@@ -808,3 +808,70 @@ export function lancerAires() {
     afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
   }
 }
+
+export function lancerCourseFractions() {
+  elTitre.textContent = "🏁 Course des fractions";
+  const diff = getDifficulte();
+  const denomMax = estCM2() ? [9, 12, 16][diff] : estCM1() ? [8, 10, 12][diff] : [6, 8, 10][diff];
+  const denom = 3 + Math.floor(Math.random() * Math.max(2, denomMax - 2));
+  const num = 1 + Math.floor(Math.random() * (denom - 1));
+  const facteurMax = estCM2() ? 5 : estCM1() ? 4 : 3;
+  const facteur = 2 + Math.floor(Math.random() * (facteurMax - 1));
+  const bonne = `${num * facteur}/${denom * facteur}`;
+  const cible = `${num}/${denom}`;
+  const fausses = [];
+  const essais = [
+    `${num + 1}/${denom + 1}`,
+    `${Math.max(1, num - 1)}/${denom}`,
+    `${num * facteur}/${denom * Math.max(2, facteur - 1)}`,
+    `${num * (facteur + 1)}/${denom * facteur}`,
+    `${num + facteur}/${denom * facteur}`,
+  ];
+  essais.forEach((f) => {
+    if (f !== bonne && !fausses.includes(f)) fausses.push(f);
+  });
+  while (fausses.length < 3) {
+    const n = 1 + Math.floor(Math.random() * (denom * facteur));
+    const d = denom * facteur;
+    const f = `${n}/${d}`;
+    if (f !== bonne && !fausses.includes(f)) fausses.push(f);
+  }
+  const options = melanger([bonne, ...fausses.slice(0, 3)]);
+  setBonneReponse(options.indexOf(bonne));
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin:0 0 0.35rem">Trouve une fraction équivalente à :</p>` +
+    `<p class="equation" style="font-size:2rem;font-weight:800;margin:0 0 0.45rem;color:var(--primaire)">${cible}</p>` +
+    `<p style="font-size:0.78rem;color:#888;margin:0">Même part du gâteau, écriture différente.</p>`;
+  elChoix.innerHTML = "";
+  options.forEach((val, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
+    b.textContent = val;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+export function lancerGeoConstructeur() {
+  elTitre.textContent = "🧱 Géo-constructeur";
+  const diff = getDifficulte();
+  const tri = 1 + Math.floor(Math.random() * [2, 3, 4][diff]);
+  const car = 1 + Math.floor(Math.random() * [2, 3, 4][diff]);
+  const rec = (estCM1() || estCM2()) ? Math.floor(Math.random() * [2, 3, 4][diff]) : 0;
+  const pent = estCM2() && diff > 0 ? Math.floor(Math.random() * 2) : 0;
+  const total = tri * 3 + car * 4 + rec * 4 + pent * 5;
+  setBonneReponse(total);
+  const morceaux = [`${tri} triangle${tri > 1 ? "s" : ""}`, `${car} carré${car > 1 ? "s" : ""}`];
+  if (rec > 0) morceaux.push(`${rec} rectangle${rec > 1 ? "s" : ""}`);
+  if (pent > 0) morceaux.push(`${pent} pentagone${pent > 1 ? "s" : ""}`);
+  elQuestion.innerHTML =
+    `<p style="font-size:0.9rem;margin:0 0 0.35rem">Combien de côtés au total ?</p>` +
+    `<p style="font-size:1.05rem;font-weight:700;margin:0 0 0.45rem;color:var(--primaire)">${morceaux.join(" + ")}</p>`;
+  const minVal = Math.max(3, total - [6, 8, 10][diff]);
+  const maxVal = total + [8, 12, 16][diff];
+  const props = propositionsAvecBonne(total, minVal, maxVal, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}

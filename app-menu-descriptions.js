@@ -134,6 +134,13 @@ const PAR_JEU = {
     cm1: "Assemblages de figures",
     cm2: "Formules et défis",
   },
+  geoConstructeur: {
+    cp: "Assembler des formes simples",
+    ce1: "Compter les côtés d'un montage",
+    ce2: "Assemblage de 3 à 4 formes",
+    cm1: "Calcul de côtés total",
+    cm2: "Montages géométriques complexes",
+  },
   calendrier: {
     cp: "Jours de la semaine",
     ce1: "Mois et ordre des jours",
@@ -239,6 +246,13 @@ const PAR_JEU = {
     cm1: "Réduction et calcul",
     cm2: "% et proportionnalité",
   },
+  courseFractions: {
+    cp: "Repérer moitié et quart",
+    ce1: "Fractions de base",
+    ce2: "Équivalences simples",
+    cm1: "Fractions équivalentes variées",
+    cm2: "Défis rapides de fractions",
+  },
   sons: {
     cp: "Son initial",
     ce1: "Syllabe complexe",
@@ -322,6 +336,13 @@ const PAR_JEU = {
     ce2: "Accords dans la phrase",
     cm1: "Accords plus subtils",
     cm2: "Accords complexes",
+  },
+  conjugaisonMission: {
+    cp: "Verbes du quotidien",
+    ce1: "Présent et futur simple",
+    ce2: "Mission conjugaison guidée",
+    cm1: "Temps variés en contexte",
+    cm2: "Choix verbal plus précis",
   },
   anglais: {
     cp: "Mots très simples",
