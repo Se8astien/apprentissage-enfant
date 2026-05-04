@@ -158,6 +158,8 @@
       align-items: stretch;
     }
     #ecran-menu.ecran.actif .menu-classe-cartouche,
+    #ecran-menu.ecran.actif .menu-barre-liens,
+    #ecran-menu.ecran.actif .menu-surprises-encart,
     #ecran-menu.ecran.actif .menu-secondaire,
     #ecran-menu.ecran.actif .maison-banner,
     #ecran-menu.ecran.actif .grille-jeux,
@@ -365,11 +367,6 @@
         <div class="classe-info-ligne classe-info-ligne--rythme">
           <button type="button" id="btn-changer-rythme" class="classe-info-difficulte" aria-live="polite" title="Touche pour changer comment tu te sens (débutant, normal, expert)"></button>
         </div>
-        <div class="classe-info-outils" role="group" aria-label="Trophées, parents, partage">
-          <button type="button" id="btn-badges" class="btn-badges-menu" aria-label="Voir mes trophées">🏅 Trophées</button>
-          <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
-          <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤 Partager</button>
-        </div>
         <div class="niveau-barre" role="group" aria-label="Choisir la classe">
           <div class="niveau-switch">
             <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
@@ -381,18 +378,38 @@
         </div>
       </div>
 
-      <div class="aventure-raccourci">
-        <button type="button" id="btn-aventure" class="btn-aventure-menu">🗺️ Aventure</button>
+      <div class="menu-barre-liens" role="group" aria-label="Trophées, parents et partage">
+        <button type="button" id="btn-badges" class="btn-badges-menu" aria-label="Voir mes trophées">🏅 Trophées</button>
+        <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
+        <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤 Partager</button>
       </div>
 
-      <div class="menu-fun-bar" id="menu-fun-bar">
-        <p class="menu-fun-weekend" id="menu-fun-weekend" hidden></p>
-        <div class="menu-fun-btns">
-          <button type="button" class="btn-fun-menu" id="btn-fun-mystere">🎁 Carte du jour</button>
-          <button type="button" class="btn-fun-menu" id="btn-fun-roue">🎡 Jeu au hasard</button>
-          <button type="button" class="btn-fun-menu" id="btn-fun-suggestion">🦊 Encore ce jeu ?</button>
+      <div class="menu-surprises-encart" aria-label="Autres façons de jouer">
+        <p class="menu-surprises-titre">Si tu hésites…</p>
+        <div class="aventure-raccourci">
+          <button type="button" id="btn-aventure" class="btn-aventure-menu">🗺️ Aventure</button>
+        </div>
+        <div class="menu-fun-bar" id="menu-fun-bar">
+          <p class="menu-fun-weekend" id="menu-fun-weekend" hidden></p>
+          <div class="menu-fun-btns">
+            <button type="button" class="btn-fun-menu" id="btn-fun-mystere">🎁 Carte du jour</button>
+            <button type="button" class="btn-fun-menu" id="btn-fun-roue">🎡 Jeu au hasard</button>
+            <button type="button" class="btn-fun-menu" id="btn-fun-suggestion">🦊 Encore ce jeu ?</button>
+          </div>
         </div>
       </div>
+
+      <button type="button" class="maison-banner maison-banner--avant-jeux" id="btn-maison" aria-label="Ma Maison">
+        <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
+        <div class="maison-banner-infos">
+          <span class="maison-banner-nom" id="maison-banner-nom">Ta maison</span>
+          <span class="maison-banner-sub" id="maison-banner-sub">Touche pour voir ton renard 🦊</span>
+        </div>
+        <div class="maison-banner-droite">
+          <span class="maison-banner-stars" id="maison-banner-stars">⭐ 0</span>
+          <span class="maison-banner-fleche" aria-hidden="true">›</span>
+        </div>
+      </button>
 
       <p class="accueil">Touche un jeu</p>
 
@@ -471,21 +488,15 @@
 
       </div>
 
-      <button type="button" class="maison-banner maison-banner--menu-fin" id="btn-maison" aria-label="Ma Maison">
-        <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
-        <div class="maison-banner-infos">
-          <span class="maison-banner-nom" id="maison-banner-nom">Ta maison</span>
-          <span class="maison-banner-sub" id="maison-banner-sub">Touche pour voir ton renard 🦊</span>
-        </div>
-        <div class="maison-banner-droite">
-          <span class="maison-banner-stars" id="maison-banner-stars">⭐ 0</span>
-          <span class="maison-banner-fleche" aria-hidden="true">›</span>
-        </div>
-      </button>
-
       <div class="menu-secondaire" aria-label="Missions, parcours et profil">
         <div class="missions-section">
-          <h3 class="missions-titre">🎯 Missions du jour</h3>
+          <div class="missions-entete-ligne">
+            <h3 class="missions-titre">🎯 Missions du jour</h3>
+            <button type="button" class="btn-changer-genre btn-changer-genre--entete" id="btn-changer-genre" aria-label="Changer de profil">
+              <span id="icone-genre-actuel">👧</span>
+              <span class="btn-changer-genre-libelle">Profil</span>
+            </button>
+          </div>
           <div id="missions-widget"></div>
         </div>
         <div id="guidage-jour" class="guidage-jour" hidden></div>
@@ -495,10 +506,6 @@
           <button type="button" data-objectif="questions5">5 questions</button>
           <button type="button" data-objectif="revision">Réviser</button>
         </div>
-        <button type="button" class="btn-changer-genre" id="btn-changer-genre" aria-label="Changer de profil">
-          <span id="icone-genre-actuel">👧</span>
-          <span class="btn-changer-genre-libelle">Profil</span>
-        </button>
       </div>
 
       <div id="bilan-session" class="bilan-session" hidden></div>

@@ -478,19 +478,65 @@ h1 {
   outline-offset: 2px;
 }
 
-.menu-classe-cartouche .classe-info-outils {
-  padding-top: 0.38rem;
-}
-
-.classe-info-outils {
+.menu-barre-liens {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  gap: 0.38rem;
+  gap: 0.35rem;
   width: 100%;
-  padding-top: 0.42rem;
-  border-top: 1px solid rgba(108, 92, 231, 0.1);
+  margin: 0 0 0.55rem;
+  padding: 0.48rem 0.55rem;
+  box-sizing: border-box;
+  border-radius: 1.05rem;
+  background: rgba(108, 92, 231, 0.06);
+  border: 1px solid rgba(108, 92, 231, 0.14);
+}
+
+.menu-barre-liens .btn-badges-menu,
+.menu-barre-liens .btn-params-menu,
+.menu-barre-liens .btn-partager-menu {
+  flex: 1 1 calc(33.333% - 0.35rem);
+  min-width: min(100%, 5.5rem);
+  max-width: 12rem;
+  justify-content: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.4rem 0.55rem;
+  min-height: 2.4rem;
+}
+
+.menu-surprises-encart {
+  margin: 0 0 0.6rem;
+  padding: 0.6rem 0.65rem 0.55rem;
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, #f5f0ff 0%, #eef8ff 55%, #f0f4ff 100%);
+  border: 2px solid rgba(108, 92, 231, 0.22);
+  box-shadow: 0 2px 10px var(--ombre);
+}
+
+.menu-surprises-titre {
+  margin: 0 0 0.5rem;
+  text-align: center;
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--texte);
+  opacity: 0.72;
+}
+
+.menu-surprises-encart .aventure-raccourci {
+  padding: 0 0 0.55rem;
+  margin: 0;
+}
+
+.menu-surprises-encart .menu-fun-bar {
+  margin: 0;
+  padding: 0.45rem 0.35rem 0.4rem;
+  border: none;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .menu-libelle-niveau {
@@ -1848,9 +1894,9 @@ h1 {
   box-shadow: 0 1px 0 #3d2fc0, 0 4px 12px rgba(108,92,231,0.25);
 }
 
-.maison-banner--menu-fin {
-  margin-top: 0.65rem;
-  margin-bottom: 0.35rem;
+.maison-banner--avant-jeux {
+  margin-top: 0;
+  margin-bottom: 0.55rem;
   padding: 0.72rem 0.95rem;
 }
 
@@ -2339,9 +2385,28 @@ h1 {
   margin: 0;
 }
 
-.menu-secondaire .btn-changer-genre {
-  align-self: center;
-  opacity: 0.88;
+.missions-entete-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.missions-entete-ligne .missions-titre {
+  margin: 0;
+  flex: 1;
+  min-width: min(100%, 10rem);
+}
+
+.menu-secondaire .btn-changer-genre--entete {
+  flex-shrink: 0;
+  margin: 0;
+  opacity: 0.92;
+  padding: 0.38rem 0.72rem;
+  font-size: 0.78rem;
+  min-height: 2.5rem;
 }
 
 .missions-section { margin: 1.15rem 0; }
@@ -2754,8 +2819,21 @@ h1 {
 [data-theme="nuit"] .menu-classe-cartouche .niveau-barre {
   border-top-color: rgba(162, 155, 254, 0.22);
 }
-[data-theme="nuit"] .classe-info-outils {
-  border-top-color: rgba(162, 155, 254, 0.22);
+[data-theme="nuit"] .menu-barre-liens {
+  background: rgba(30, 30, 63, 0.85);
+  border-color: rgba(162, 155, 254, 0.28);
+}
+[data-theme="nuit"] .menu-surprises-encart {
+  background: linear-gradient(145deg, #1e1e3f 0%, #25254a 100%);
+  border-color: rgba(162, 155, 254, 0.32);
+}
+[data-theme="nuit"] .menu-surprises-encart .menu-fun-bar {
+  background: rgba(15, 15, 30, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+[data-theme="nuit"] .menu-surprises-titre {
+  color: #dfe6e9;
+  opacity: 0.85;
 }
 [data-theme="nuit"] .menu-libelle-niveau {
   color: #dfe6e9;
@@ -4506,7 +4584,7 @@ h4.params-menu-aide-titre {
 
 /* ── Mode aventure ─────────────────────────────────────────────────────────── */
 .aventure-raccourci {
-  padding: 0 1rem 0.75rem;
+  padding: 0 0.25rem 0.75rem;
   display: flex;
   justify-content: center;
 }
@@ -4532,7 +4610,7 @@ h4.params-menu-aide-titre {
 }
 
 .menu-fun-bar {
-  margin: 0.35rem 1rem 0.5rem;
+  margin: 0.35rem 0 0.5rem;
   padding: 0.55rem 0.65rem;
   border-radius: 1rem;
   background: linear-gradient(135deg, #f3eeff 0%, #e8f6ff 100%);
