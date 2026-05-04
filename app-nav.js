@@ -1297,8 +1297,6 @@ export function synchroniserAffichageMenu() {
   syncPrefsDepuisStockage();
   majGenre();
   mettreAJourMaisonBanner();
-  const diffProfil = getDifficulteProfil();
-  const marqueurRythme = DIFFICULTE_ICONES[diffProfil] || "⚡";
   const diffProfilEl = document.getElementById("btn-changer-rythme");
   if (diffProfilEl) {
     diffProfilEl.textContent = libelleDifficulteProfil();
@@ -1317,11 +1315,6 @@ export function synchroniserAffichageMenu() {
   const nivMenu = getNiveauCourant();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach((btn) => {
     const jeu = btn.dataset.jeu;
-    const emojiEl = btn.querySelector(".emoji-jeu");
-    if (emojiEl) {
-      if (!emojiEl.dataset.baseEmoji) emojiEl.dataset.baseEmoji = emojiEl.textContent.trim();
-      emojiEl.textContent = `${marqueurRythme} ${emojiEl.dataset.baseEmoji}`;
-    }
     const descEl = btn.querySelector(".desc-jeu");
     if (descEl) {
       const d = texteDescCarteJeu(jeu, nivMenu);
