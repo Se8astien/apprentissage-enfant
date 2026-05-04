@@ -1306,6 +1306,12 @@ export function synchroniserAffichageMenu() {
       `Ton rythme : ${nomsRythme[getDifficulteProfil()]}. Touche pour changer.`,
     );
   }
+  const detailClasseEl = document.getElementById("btn-classe-menu-detail");
+  if (detailClasseEl) {
+    const niveau = getNiveauCourant().toUpperCase();
+    const nomsRythme = ["Débutant", "Normal", "Expert"];
+    detailClasseEl.textContent = `${niveau} · ${nomsRythme[getDifficulteProfil()]}`;
+  }
   document.querySelectorAll(".niveau-btn").forEach((btn) => {
     const actif = btn.dataset.niveau === getNiveauCourant();
     btn.classList.toggle("actif", actif);

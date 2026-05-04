@@ -416,23 +416,62 @@ h1 {
 .diff-emoji { font-size: 1.6rem; }
 .diff-nom { font-size: 0.8rem; font-weight: 700; color: var(--texte); }
 
-/* ── Cartouche menu : Ta classe + rythme + outils + CP→CM2 ───────────────── */
-.menu-classe-cartouche {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.42rem;
-  padding: 0.55rem 0.72rem 0.52rem;
-  background: white;
-  border-radius: 1.15rem;
-  box-shadow: 0 2px 10px var(--ombre);
-  font-size: 0.88rem;
-  font-weight: 700;
-  margin-bottom: 0.55rem;
+/* ── Bouton Classe + popup ──────────────────────────────────────────────────── */
+.menu-classe-rapide {
+  margin: 0 0 0.55rem;
 }
 
-.menu-classe-cartouche > .menu-libelle-niveau {
-  margin: 0 0 0.08rem;
+.btn-classe-menu {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 2px solid rgba(108, 92, 231, 0.25);
+  border-radius: 1.1rem;
+  background: white;
+  color: var(--texte);
+  padding: 0.55rem 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 10px var(--ombre);
+}
+.btn-classe-menu-emoji { font-size: 1.45rem; }
+.btn-classe-menu-texte { display: flex; flex-direction: column; align-items: flex-start; text-align: left; flex: 1; min-width: 0; }
+.btn-classe-menu-titre { font-size: 0.78rem; opacity: 0.7; font-weight: 700; }
+.btn-classe-menu-detail { font-size: 0.92rem; font-weight: 800; color: var(--primaire-fonce); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.btn-classe-menu-fleche { font-size: 1.25rem; color: var(--primaire-fonce); opacity: 0.75; }
+
+.menu-classe-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 52, 54, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem;
+  z-index: 220;
+}
+.menu-classe-modal[hidden] { display: none !important; }
+.menu-classe-modal-carte {
+  width: min(26rem, 100%);
+  background: white;
+  border-radius: 1.2rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.24);
+  padding: 0.9rem 0.75rem 0.8rem;
+  position: relative;
+}
+.btn-fermer-classe-modal {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(108, 92, 231, 0.12);
+  color: var(--primaire-fonce);
+  font-size: 1rem;
+  cursor: pointer;
 }
 
 .classe-info-ligne {
@@ -570,7 +609,7 @@ h1 {
   margin-bottom: 0;
 }
 
-.menu-classe-cartouche .niveau-barre {
+.menu-classe-modal .niveau-barre {
   padding-top: 0.4rem;
   margin-top: 0.08rem;
   border-top: 1px solid rgba(108, 92, 231, 0.1);
@@ -587,7 +626,7 @@ h1 {
   box-shadow: 0 2px 10px var(--ombre);
 }
 
-.menu-classe-cartouche .niveau-switch {
+.menu-classe-modal .niveau-switch {
   background: rgba(108, 92, 231, 0.07);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
@@ -2417,6 +2456,10 @@ h1 {
   margin: 0;
 }
 
+.menu-secondaire .objectif-session {
+  margin-bottom: 0.5rem;
+}
+
 .missions-entete-ligne {
   display: flex;
   align-items: center;
@@ -2865,12 +2908,21 @@ h1 {
 [data-theme="nuit"] .mini-lecon-btn { background: #1e1e3f; color: #dfe6e9; border-color: #4a4a88; }
 [data-theme="nuit"] .chrono-libre { background: rgba(0, 184, 148, 0.18); color: #8ff0dd; }
 [data-theme="nuit"] .maison-etoiles { background: #2a2a55; border-color: #4a4a88; }
-[data-theme="nuit"] .menu-classe-cartouche { background: #1e1e3f; }
-[data-theme="nuit"] .menu-classe-cartouche .niveau-switch {
+[data-theme="nuit"] .btn-classe-menu {
+  background: #1e1e3f;
+  border-color: rgba(162, 155, 254, 0.32);
+}
+[data-theme="nuit"] .btn-classe-menu-detail {
+  color: #e8e6ff;
+}
+[data-theme="nuit"] .menu-classe-modal-carte {
+  background: #1e1e3f;
+}
+[data-theme="nuit"] .menu-classe-modal .niveau-switch {
   background: rgba(162, 155, 254, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
-[data-theme="nuit"] .menu-classe-cartouche .niveau-barre {
+[data-theme="nuit"] .menu-classe-modal .niveau-barre {
   border-top-color: rgba(162, 155, 254, 0.22);
 }
 [data-theme="nuit"] .menu-barre-liens {

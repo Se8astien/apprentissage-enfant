@@ -216,6 +216,11 @@ function brancherOnboardingUI() {
     });
   });
 
+  const modalClasse = document.getElementById("menu-classe-modal");
+  const fermerClasse = () => {
+    if (modalClasse) modalClasse.hidden = true;
+  };
+
   document.querySelectorAll(".niveau-btn").forEach((btn) => {
     uneFois(btn, "click", () => {
       const nv = btn.getAttribute("data-niveau");
@@ -223,6 +228,7 @@ function brancherOnboardingUI() {
       sauverNiveau(nv);
       rafraichirUiComplete();
       rafraichirAventureSiOuverte();
+      fermerClasse();
     });
   });
 
@@ -309,22 +315,24 @@ function brancherOnboardingUI() {
   uneFois(document.getElementById("btn-landing-partager"), "click", partager);
   uneFois(document.getElementById("btn-partager"), "click", partager);
 
-  uneFois(document.getElementById("btn-changer-rythme"), "click", () => {
-    syncPrefsDepuisStockage();
-    const nv = getNiveauCourant();
-    montrerEcranParId("ecran-classe");
-    document.querySelectorAll(".btn-classe").forEach((b) => {
-      b.classList.toggle("selectionne", b.getAttribute("data-niveau") === nv);
+  const ouvrirClasse = () => {
+    if (!modalClasse) return;
+    modalClasse.hidden = false;
+    const focus = document.getElementById("btn-changer-rythme");
+    if (focus) focus.focus();
+  };
+  uneFois(document.getElementById("btn-classe-menu"), "click", ouvrirClasse);
+  uneFois(document.getElementById("btn-fermer-classe-modal"), "click", fermerClasse);
+  if (modalClasse && modalClasse.dataset.amBound !== "1") {
+    modalClasse.dataset.amBound = "1";
+    modalClasse.addEventListener("click", (ev) => {
+      if (ev.target === modalClasse) fermerClasse();
     });
-    const diffChoix = document.getElementById("diff-choix");
-    if (diffChoix) {
-      diffChoix.hidden = false;
-      try {
-        diffChoix.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      } catch {
-        /* ignore */
-      }
-    }
+  }
+  uneFois(document.getElementById("btn-changer-rythme"), "click", () => {
+    const prochain = (getDifficulte() + 1) % 3;
+    setDifficulte(prochain);
+    rafraichirUiComplete();
   });
 
   uneFois(document.getElementById("btn-changer-genre"), "click", () => {

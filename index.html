@@ -157,7 +157,7 @@
       flex-direction: column;
       align-items: stretch;
     }
-    #ecran-menu.ecran.actif .menu-classe-cartouche,
+    #ecran-menu.ecran.actif .menu-classe-rapide,
     #ecran-menu.ecran.actif .menu-barre-liens,
     #ecran-menu.ecran.actif .menu-surprises-encart,
     #ecran-menu.ecran.actif .menu-secondaire,
@@ -362,18 +362,32 @@
 
     <main id="ecran-menu" class="ecran" hidden>
 
-      <div class="menu-classe-cartouche">
-        <p class="menu-libelle-niveau">Ta classe</p>
-        <div class="classe-info-ligne classe-info-ligne--rythme">
-          <button type="button" id="btn-changer-rythme" class="classe-info-difficulte" aria-live="polite" title="Touche pour changer comment tu te sens (débutant, normal, expert)"></button>
-        </div>
-        <div class="niveau-barre" role="group" aria-label="Choisir la classe">
-          <div class="niveau-switch">
-            <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
-            <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>
-            <button type="button" class="niveau-btn" id="niveau-ce2" data-niveau="ce2">⭐ CE2</button>
-            <button type="button" class="niveau-btn" id="niveau-cm1" data-niveau="cm1">🌟 CM1</button>
-            <button type="button" class="niveau-btn" id="niveau-cm2" data-niveau="cm2">🏆 CM2</button>
+      <div class="menu-classe-rapide">
+        <button type="button" id="btn-classe-menu" class="btn-classe-menu" aria-haspopup="dialog" aria-controls="menu-classe-modal">
+          <span class="btn-classe-menu-emoji" aria-hidden="true">🏫</span>
+          <span class="btn-classe-menu-texte">
+            <span class="btn-classe-menu-titre">Classe</span>
+            <span class="btn-classe-menu-detail" id="btn-classe-menu-detail">CP · Normal</span>
+          </span>
+          <span class="btn-classe-menu-fleche" aria-hidden="true">›</span>
+        </button>
+      </div>
+
+      <div id="menu-classe-modal" class="menu-classe-modal" hidden role="dialog" aria-modal="true" aria-labelledby="menu-classe-modal-titre">
+        <div class="menu-classe-modal-carte">
+          <button type="button" id="btn-fermer-classe-modal" class="btn-fermer-classe-modal" aria-label="Fermer">✕</button>
+          <p class="menu-libelle-niveau" id="menu-classe-modal-titre">Ta classe</p>
+          <div class="classe-info-ligne classe-info-ligne--rythme">
+            <button type="button" id="btn-changer-rythme" class="classe-info-difficulte" aria-live="polite" title="Touche pour changer comment tu te sens (débutant, normal, expert)"></button>
+          </div>
+          <div class="niveau-barre" role="group" aria-label="Choisir la classe">
+            <div class="niveau-switch">
+              <button type="button" class="niveau-btn actif" id="niveau-cp" data-niveau="cp">🌱 CP</button>
+              <button type="button" class="niveau-btn" id="niveau-ce1" data-niveau="ce1">🚀 CE1</button>
+              <button type="button" class="niveau-btn" id="niveau-ce2" data-niveau="ce2">⭐ CE2</button>
+              <button type="button" class="niveau-btn" id="niveau-cm1" data-niveau="cm1">🌟 CM1</button>
+              <button type="button" class="niveau-btn" id="niveau-cm2" data-niveau="cm2">🏆 CM2</button>
+            </div>
           </div>
         </div>
       </div>
@@ -399,6 +413,28 @@
           </div>
         </div>
       </div>
+
+      <div class="menu-secondaire" aria-label="Missions, parcours et profil">
+        <div class="missions-section">
+          <div class="missions-entete-ligne">
+            <h3 class="missions-titre">🎯 Missions du jour</h3>
+            <button type="button" class="btn-changer-genre btn-changer-genre--entete" id="btn-changer-genre" aria-label="Changer de profil">
+              <span id="icone-genre-actuel">👧</span>
+              <span class="btn-changer-genre-libelle">Profil</span>
+            </button>
+          </div>
+          <div id="missions-widget"></div>
+        </div>
+        <div id="guidage-jour" class="guidage-jour" hidden></div>
+        <div id="objectif-session" class="objectif-session" hidden>
+          <p class="objectif-titre">🎯 Mon objectif</p>
+          <button type="button" data-objectif="etoiles3">3 étoiles</button>
+          <button type="button" data-objectif="questions5">5 questions</button>
+          <button type="button" data-objectif="revision">Réviser</button>
+        </div>
+      </div>
+
+      <div id="bilan-session" class="bilan-session" hidden></div>
 
       <button type="button" class="maison-banner maison-banner--avant-jeux" id="btn-maison" aria-label="Ma Maison">
         <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
@@ -495,27 +531,6 @@
 
       </div>
 
-      <div class="menu-secondaire" aria-label="Missions, parcours et profil">
-        <div class="missions-section">
-          <div class="missions-entete-ligne">
-            <h3 class="missions-titre">🎯 Missions du jour</h3>
-            <button type="button" class="btn-changer-genre btn-changer-genre--entete" id="btn-changer-genre" aria-label="Changer de profil">
-              <span id="icone-genre-actuel">👧</span>
-              <span class="btn-changer-genre-libelle">Profil</span>
-            </button>
-          </div>
-          <div id="missions-widget"></div>
-        </div>
-        <div id="guidage-jour" class="guidage-jour" hidden></div>
-        <div id="objectif-session" class="objectif-session" hidden>
-          <p class="objectif-titre">🎯 Mon objectif</p>
-          <button type="button" data-objectif="etoiles3">3 étoiles</button>
-          <button type="button" data-objectif="questions5">5 questions</button>
-          <button type="button" data-objectif="revision">Réviser</button>
-        </div>
-      </div>
-
-      <div id="bilan-session" class="bilan-session" hidden></div>
     </main>
 
     <section id="ecran-aventure" class="ecran" hidden aria-label="Mode aventure">
