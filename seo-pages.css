@@ -1,0 +1,129 @@
+:root {
+  --fond: #f6f8ff;
+  --texte: #222;
+  --primaire: #5f50e0;
+  --primaire-fonce: #4639b5;
+  --carte: #fff;
+  --bordure: rgba(95, 80, 224, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Fredoka", "Segoe UI", sans-serif;
+  background: var(--fond);
+  color: var(--texte);
+  line-height: 1.6;
+}
+
+.wrap {
+  width: min(960px, 100% - 2rem);
+  margin: 0 auto;
+}
+
+.hero {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, #6151e6 0%, #8a7fff 100%);
+  color: #fff;
+  border-radius: 1.4rem;
+  padding: 1.2rem 1rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.1rem);
+}
+
+.hero p {
+  margin: 0.6rem 0 0;
+  font-size: 1rem;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.btn-primaire {
+  background: #fff;
+  color: var(--primaire-fonce);
+}
+
+.btn-secondaire {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+main {
+  padding: 1rem 0 1.6rem;
+}
+
+section {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 1.2rem;
+  padding: 0.95rem;
+  margin-bottom: 0.85rem;
+}
+
+h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.2rem;
+  color: var(--primaire-fonce);
+}
+
+ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.65rem;
+}
+
+.carte {
+  background: #fbfbff;
+  border: 1px solid var(--bordure);
+  border-radius: 0.95rem;
+  padding: 0.7rem;
+}
+
+.carte strong {
+  display: block;
+  color: var(--primaire-fonce);
+}
+
+.liens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.7rem;
+}
+
+.liens a {
+  color: var(--primaire-fonce);
+  font-weight: 600;
+}
+
+footer {
+  padding: 0.8rem 0 2rem;
+  font-size: 0.92rem;
+}
