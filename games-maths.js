@@ -17,6 +17,8 @@ import {
   propositionsAvecBonne,
   afficherChoix,
   getDifficulte,
+  getNiveauCourant,
+  NIVEAU,
 } from "./app-state.js";
 
 import { apresReponse, apresReponseTexte } from "./app-nav.js";
@@ -1496,4 +1498,72 @@ export function lancerDecimaux() {
     const props = propositionsAvecBonne(arrondi, Math.max(1, arrondi - 3), arrondi + 3, 3);
     afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
   }
+}
+
+function pickShownEgalite(ok, spread) {
+  if (Math.random() < 0.52) return ok;
+  let s = ok;
+  for (let i = 0; i < 28 && s === ok; i++) {
+    const delta = (1 + Math.floor(Math.random() * spread)) * (Math.random() < 0.5 ? -1 : 1);
+    s = Math.max(0, ok + delta);
+  }
+  return s === ok ? ok + 1 : s;
+}
+
+function afficherVraiFauxChoix() {
+  elChoix.innerHTML = "";
+  [["Vrai", 1], ["Faux", 0]].forEach(([label, val]) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-choix btn-vrai-faux";
+    btn.textContent = label;
+    btn.dataset.valeur = String(val);
+    btn.addEventListener("click", () => apresReponse(val, btn, getBonneReponse()));
+    elChoix.appendChild(btn);
+  });
+}
+
+export function lancerVraiFaux() {
+  elTitre.textContent = "Vrai ou faux ?";
+  const nv = getNiveauCourant();
+  let ok;
+  let shown;
+  let htmlLine;
+  if (nv === NIVEAU.CM2 && Math.random() < 0.42) {
+    const a = 5 + Math.floor(Math.random() * 8);
+    const b = 5 + Math.floor(Math.random() * 8);
+    ok = a * b;
+    shown = pickShownEgalite(ok, 7);
+    htmlLine = `${a} × ${b} = ${shown}`;
+  } else if (nv === NIVEAU.CM2 || nv === NIVEAU.CM1) {
+    const a = 18 + Math.floor(Math.random() * 42);
+    const b = 18 + Math.floor(Math.random() * 42);
+    ok = a + b;
+    shown = pickShownEgalite(ok, 6);
+    htmlLine = `${a} + ${b} = ${shown}`;
+  } else if (nv === NIVEAU.CE2) {
+    const a = 8 + Math.floor(Math.random() * 25);
+    const b = 8 + Math.floor(Math.random() * 25);
+    ok = a + b;
+    shown = pickShownEgalite(ok, 5);
+    htmlLine = `${a} + ${b} = ${shown}`;
+  } else if (nv === NIVEAU.CE1) {
+    const a = 2 + Math.floor(Math.random() * 18);
+    const b = 2 + Math.floor(Math.random() * 18);
+    ok = a + b;
+    shown = pickShownEgalite(ok, 4);
+    htmlLine = `${a} + ${b} = ${shown}`;
+  } else {
+    const a = 1 + Math.floor(Math.random() * 9);
+    const b = 1 + Math.floor(Math.random() * 9);
+    ok = a + b;
+    shown = pickShownEgalite(ok, 3);
+    htmlLine = `${a} + ${b} = ${shown}`;
+  }
+  const bonne = shown === ok ? 1 : 0;
+  setBonneReponse(bonne);
+  elQuestion.innerHTML =
+    "<p class=\"vrai-faux-consigne\">L'égalité est-elle exacte ?</p>" +
+    `<p class="equation vrai-faux-equation">${htmlLine}</p>`;
+  afficherVraiFauxChoix();
 }

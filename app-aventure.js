@@ -14,6 +14,7 @@ const SS_INDEX = "am-aventure-case-index";
 const CHEMIN_BASE = [
   "compte",
   "addition",
+  "vraiFaux",
   "formes",
   "suite",
   "calendrier",

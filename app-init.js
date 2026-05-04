@@ -83,6 +83,7 @@ import {
   consommerRetourDepuisAventure,
   rafraichirAventureSiOuverte,
 } from "./app-aventure.js";
+import { initFunMenuBar, accueillirWeekEndSiMenu } from "./app-fun-menu.js";
 
 const lanceurs = {};
 
@@ -118,6 +119,7 @@ function montrerClasse() {
 function entrerMenu() {
   montrerMenu();
   afficherMissions();
+  accueillirWeekEndSiMenu();
 }
 
 // ── Routeur central : 1 point qui décide quel écran montrer ──────────────────
@@ -469,6 +471,8 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
   });
 });
 
+initFunMenuBar({ montrerJeu, assurerLanceurDansMap, lanceurs });
+
 const btnAventure = document.getElementById("btn-aventure");
 if (btnAventure) {
   btnAventure.addEventListener("click", () => {
@@ -539,7 +543,7 @@ if (modalOui) {
     fermerModalClasse({ retourFocus: false });
     if (suivant) {
       sauverNiveau(suivant);
-      confetti();
+      confetti({ tier: "burst" });
       if (debloquerBadge(suivant)) {
         const b = BADGES.find(x => x.id === suivant);
         if (b) afficherNotifBadge(b);

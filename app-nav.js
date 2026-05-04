@@ -42,11 +42,16 @@ import {
   syncPrefsDepuisStockage,
   lireChronoJeuActif,
   sauverChronoJeuActif,
+  elQuestion,
+  sauverDernierJeuMenu,
 } from "./app-state.js";
+
+import { texteAccrocheAleatoire } from "./app-accroches.js";
+import { rafraichirBarreFunMenu } from "./app-fun-menu.js";
 
 import { track } from "./app-analytics.js";
 import { montrerMenuOuAventureApresRevision } from "./app-aventure.js";
-import { sonBonne, sonMauvaise, sonCombo } from "./app-sons.js";
+import { sonBonne, sonMauvaise, sonCombo, sonMission, sonAccessoire } from "./app-sons.js";
 
 import {
   ajouterEtoiles,
@@ -140,12 +145,12 @@ function startChrono() {
   el.hidden = false;
   let reste = secs;
   el.textContent = `⏱ ${reste}s`;
-  el.className = "chrono";
+  el.className = "chrono" + (getDifficulte() >= 2 ? " chrono--expert" : "");
   _chronoTimer = setInterval(() => {
     reste--;
     if (reste <= 0) { clearInterval(_chronoTimer); _chronoTimer = null; chronoExpire(); return; }
     el.textContent = `⏱ ${reste}s`;
-    if (reste <= 10) el.className = "chrono chrono-urgent";
+    if (reste <= 10) el.className = "chrono chrono-urgent" + (getDifficulte() >= 2 ? " chrono--expert" : "");
   }, 1000);
 }
 
@@ -314,6 +319,21 @@ function lancerAvecAntiRepeat(jeu, lanceurs) {
   _histoireQuestions[jeu].push(fp);
   if (_histoireQuestions[jeu].length > HIST_MAX) _histoireQuestions[jeu].shift();
   preparerOutilsQuestion();
+  injectAccrocheQuestion(jeu);
+}
+
+function injectAccrocheQuestion(jeu) {
+  if (_modeRevision) return;
+  document.getElementById("accroche-contexte")?.remove();
+  const t = texteAccrocheAleatoire(jeu);
+  if (!t) return;
+  const wrap = document.createElement("p");
+  wrap.id = "accroche-contexte";
+  wrap.className = "accroche-contexte";
+  wrap.textContent = t;
+  const zq = elQuestion || document.getElementById("zone-question");
+  if (!zq) return;
+  zq.insertBefore(wrap, zq.firstChild);
 }
 
 // ── Messages ──────────────────────────────────────────────────────────────────
@@ -664,6 +684,7 @@ function afficherToastSimple(titre, detail) {
 function debloquerAccessoireEffort(id, message) {
   if (lireAccessoires().includes(id)) return;
   debloquerAccessoire(id);
+  sonAccessoire();
   mettreAJourRenardHeader();
   afficherToastSimple(message, "Va voir le dressing de ton renard.");
 }
@@ -686,7 +707,11 @@ function recompenserEffortSiBesoin() {
   if (essaisDepuisEncouragement < 5) return;
   essaisDepuisEncouragement = 0;
   ajouterEtoiles(1);
-  progresserMission("etoiles");
+  const missEffort = progresserMission("etoiles");
+  if (missEffort.length) {
+    sonMission();
+    setTimeout(() => confetti({ tier: "burst" }), 260);
+  }
   debloquerAccessoireEffort("medaille-effort", "🏅 Médaille d'effort débloquée !");
   afficherToastSimple("🌱 Bel effort !", "+1 étoile pour ta persévérance");
   if (debloquerBadge("perseverant")) {
@@ -1047,7 +1072,9 @@ function declencherReactionRenard(correct) {
   el.hidden = false;
   el.className = "renard-reaction";
   const stade = getStade(lireEtoiles());
-  const bulle = correct ? "Ouais ! 🎉" : "Tu y es presque !";
+  const bulle = correct
+    ? (estGrand() ? "Bravo !" : "Ouais ! 🎉")
+    : (estGrand() ? "Presque bon." : "Tu y es presque !");
   el.innerHTML = `<div class="renard-bulle">${bulle}</div>${svgRenard(stade, 72)}`;
   void el.offsetWidth;
   el.classList.add(correct ? "visible" : "encourage");
@@ -1073,12 +1100,16 @@ function declencherCombo(nb, onFermer) {
   document.body.appendChild(overlay);
   piegerFocus(overlay);
   const prevFocusCombo = document.activeElement;
-  confetti();
+  confetti({ tier: "burst" });
   sonCombo();
   track("combo_reached", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: nb });
   if (nb >= 5) {
-    progresserMission("combo5");
+    const mCombo = progresserMission("combo5");
     afficherMissions();
+    if (mCombo.length) {
+      sonMission();
+      setTimeout(() => confetti(estGrand() ? { tier: "sparkle", sobre: true } : { tier: "sparkle" }), 450);
+    }
     if (debloquerBadge("combo5")) { const b = BADGES.find(x => x.id === "combo5"); if (b) afficherNotifBadge(b); }
   }
   if (nb >= 10) {
@@ -1130,18 +1161,24 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     recompenserCorrectionSiBesoin(true);
     track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
-    elFeedback.textContent = "✓ " + ok[Math.floor(Math.random() * ok.length)];
+    elFeedback.textContent = (estGrand() ? "Correct — " : "✓ ") + ok[Math.floor(Math.random() * ok.length)];
     elFeedback.className = "feedback ok";
     ajouterEtoiles(1);
     sauverFaim(lireFaim() + 5);
-    confetti();
-    sonBonne();
+    confetti(estGrand() ? { tier: "sparkle", sobre: true } : { tier: "sparkle" });
+    sonBonne(comboActuel);
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
-    progresserMission("bonnes");
-    progresserMission("etoiles");
-    progresserMission("jeux", getJeuCourant());
+    const missOk = [
+      ...progresserMission("bonnes"),
+      ...progresserMission("etoiles"),
+      ...progresserMission("jeux", getJeuCourant()),
+    ];
     afficherMissions();
+    if (missOk.length) {
+      sonMission();
+      setTimeout(() => confetti({ tier: "burst" }), 320);
+    }
     const newBadges = verifierBadgesStats();
     newBadges.forEach(id => { const b = BADGES.find(x => x.id === id); if (b) afficherNotifBadge(b); });
     if (comboActuel % 10 === 0) {
@@ -1221,14 +1258,16 @@ function afficherToastDifficulte() {
   if (!app) return;
   const toast = document.createElement("div");
   toast.className = "toast-progression";
-  toast.innerHTML = `<span>🎉 Tu passes en mode Ninja !</span><strong>${getDiffLabel()}</strong>`;
+  toast.innerHTML = estGrand()
+    ? `<span>Tu passes en mode expert pour ce jeu.</span><strong>${getDiffLabel()}</strong>`
+    : `<span>🎉 Tu passes en mode Ninja !</span><strong>${getDiffLabel()}</strong>`;
   app.appendChild(toast);
   setTimeout(() => toast.remove(), 3200);
 }
 
 function proposerClasseSuivante() {
   const suivantNom = { cp: "CE1 🚀", ce1: "CE2 ⭐", ce2: "CM1 🌟", cm1: "CM2 🏆", cm2: null }[getNiveauCourant()];
-  if (!suivantNom) { confetti(); return; }
+  if (!suivantNom) { confetti({ tier: "burst" }); return; }
   const modal = document.getElementById("modal-classe-suivante");
   const nomEl = document.getElementById("modal-classe-nom");
   if (modal && nomEl) {
@@ -1302,6 +1341,7 @@ export function synchroniserAffichageMenu() {
     btn.classList.toggle("jeu-maitrise", n === 3);
   });
   majUiBoutonChrono();
+  rafraichirBarreFunMenu();
 }
 
 export function majUiBoutonChrono() {
@@ -1362,6 +1402,8 @@ export function brancherBoutonChronoMenu() {
 export function montrerMenu() {
   const menu = elMenu || document.getElementById("ecran-menu");
   if (!menu) return;
+  const jeuQuitte = jeuActifId() || getJeuCourant();
+  if (jeuQuitte) sauverDernierJeuMenu(jeuQuitte);
   syncPrefsDepuisStockage();
   resetFeedback();
   stopChrono();

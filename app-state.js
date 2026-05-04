@@ -17,6 +17,7 @@ export const STORAGE_THEME_NUIT = "theme-nuit";
 export const STORAGE_SONS_ACTIFS = "sons-actifs";
 export const STORAGE_CHRONO_JEU   = "jeu-chrono-actif";
 const STORAGE_AVENTURE_PREFIX = "am-aventure-";
+const STORAGE_DERNIER_JEU     = "am-dernier-jeu";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 export const NIVEAU = { CP: "cp", CE1: "ce1", CE2: "ce2", CM1: "cm1", CM2: "cm2" };
@@ -275,8 +276,10 @@ export function debloquerAccessoire(id) {
     if (!liste.includes(id)) {
       liste.push(id);
       localStorage.setItem("renard-accessoires", JSON.stringify(liste));
+      return true;
     }
   } catch { /* ignore */ }
+  return false;
 }
 
 export function lireStreak() {
@@ -285,6 +288,14 @@ export function lireStreak() {
 }
 
 export function sauverStreak(s) { localStorage.setItem(RENARD_STREAK_KEY, JSON.stringify(s)); }
+
+export function sauverDernierJeuMenu(id) {
+  if (id) localStorage.setItem(STORAGE_DERNIER_JEU, id);
+}
+
+export function lireDernierJeuMenu() {
+  return localStorage.getItem(STORAGE_DERNIER_JEU) || "";
+}
 
 export function revelerEcran(el) {
   if (!el) return;
@@ -407,17 +418,29 @@ export function marquerMaitrise(jeu, diff) {
   localStorage.setItem("maitrise-" + jeu, JSON.stringify(m));
 }
 
-// ── Confetti ──────────────────────────────────────────────────────────────────
-export function confetti() {
+// ── Confetti (tier: sparkle = léger, party = standard, burst = fort) ───────────
+export function confetti(opts) {
   const root = document.getElementById("confetti");
+  if (!root) return;
+  const o = typeof opts === "object" && opts !== null ? opts : {};
+  const tier = o.tier || "party";
+  const sobre = !!o.sobre;
+  const sym = sobre
+    ? ["⭐", "✨", "🌟"]
+    : ["⭐", "✨", "🌟", "💫", "🎉"];
+  const counts = { sparkle: 6, party: 18, burst: 28 };
+  const n = counts[tier] || counts.party;
   root.innerHTML = "";
-  const sym = ["⭐", "✨", "🌟", "💫", "🎉"];
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < n; i++) {
     const s = document.createElement("span");
     s.textContent = sym[i % sym.length];
     s.style.left = Math.random() * 100 + "%";
     s.style.animationDelay = Math.random() * 0.4 + "s";
+    let cls = "confetti-part";
+    if (tier === "sparkle") cls += " confetti-part--sparkle";
+    else if (tier === "burst") cls += " confetti-part--burst";
+    s.className = cls;
     root.appendChild(s);
-    setTimeout(() => s.remove(), 2500);
+    setTimeout(() => s.remove(), tier === "sparkle" ? 1600 : 2500);
   }
 }

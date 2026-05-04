@@ -13,6 +13,7 @@ const JEU_SPEC = {
   addition: ["maths", "lancerAddition"],
   soustraction: ["maths", "lancerSoustraction"],
   compare: ["maths", "lancerCompare"],
+  vraiFaux: ["maths", "lancerVraiFaux"],
   suite: ["maths", "lancerSuite"],
   doubles: ["maths", "lancerDoubles"],
   moitie: ["maths", "lancerMoitie"],

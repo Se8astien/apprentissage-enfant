@@ -385,6 +385,15 @@
         <button type="button" id="btn-aventure" class="btn-aventure-menu">🗺️ Aventure</button>
       </div>
 
+      <div class="menu-fun-bar" id="menu-fun-bar">
+        <p class="menu-fun-weekend" id="menu-fun-weekend" hidden></p>
+        <div class="menu-fun-btns">
+          <button type="button" class="btn-fun-menu" id="btn-fun-mystere">🎁 Carte du jour</button>
+          <button type="button" class="btn-fun-menu" id="btn-fun-roue">🎡 Jeu au hasard</button>
+          <button type="button" class="btn-fun-menu" id="btn-fun-suggestion">🦊 Encore ce jeu ?</button>
+        </div>
+      </div>
+
       <p class="accueil">Touche un jeu</p>
 
       <!-- ── Grille des jeux ─────────────────────────────────── -->
@@ -395,6 +404,7 @@
         <button type="button" class="carte-jeu" data-jeu="addition"      data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🎈</span><span class="nom-jeu">Addition</span><span class="desc-jeu" id="desc-addition">Jusqu'à 10</span></button>
         <button type="button" class="carte-jeu" data-jeu="soustraction"  data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🍎</span><span class="nom-jeu">Soustraction</span><span class="desc-jeu">On enlève, combien reste ?</span></button>
         <button type="button" class="carte-jeu" data-jeu="compare"       data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">Comparer</span><span class="desc-jeu">Le plus grand gagne</span></button>
+        <button type="button" class="carte-jeu" data-jeu="vraiFaux"      data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">✅</span><span class="nom-jeu">Vrai ou faux</span><span class="desc-jeu">Deux gros boutons</span></button>
         <button type="button" class="carte-jeu" data-jeu="suite"         data-cat="maths" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔢</span><span class="nom-jeu">Numéro manquant</span><span class="desc-jeu">Trouve le chiffre caché</span></button>
         <button type="button" class="carte-jeu" data-jeu="doubles"       data-cat="maths" data-niveaux="cp ce1"><span class="emoji-jeu">👯</span><span class="nom-jeu">Doubles</span><span class="desc-jeu">2+2, 3+3…</span></button>
         <button type="button" class="carte-jeu" data-jeu="moitie"        data-cat="maths" data-niveaux="cp ce1 ce2"><span class="emoji-jeu">✂️</span><span class="nom-jeu">La moitié</span><span class="desc-jeu">Partage en 2 parts égales</span></button>
@@ -526,6 +536,7 @@
           <p class="maison-nom" id="maison-nom"></p>
           <p class="maison-stade" id="maison-stade"></p>
           <p class="maison-jours" id="maison-jours"></p>
+          <p class="maison-conseil" id="maison-conseil" hidden></p>
         </div>
         <div class="maison-etoiles">
           <span class="maison-etoiles-icone">⭐</span>

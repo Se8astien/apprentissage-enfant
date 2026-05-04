@@ -1,6 +1,7 @@
 // app-gamification.js — badges, missions du jour, stats
 
 import { lireEtoiles, confetti, lireStreak } from "./app-state.js";
+import { sonTrophee } from "./app-sons.js";
 
 // ── Badges ────────────────────────────────────────────────────────────────────
 export const BADGES = [
@@ -79,7 +80,8 @@ function _afficherProchaineBadge() {
       <button type="button" class="btn-evolution-fermer">Super !</button>
     </div>`;
   document.body.appendChild(overlay);
-  confetti();
+  confetti({ tier: "burst" });
+  sonTrophee();
 
   const fermer = () => {
     overlay.remove();

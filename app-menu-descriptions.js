@@ -29,6 +29,13 @@ const PAR_JEU = {
     cm1: "Très grands nombres",
     cm2: "Comparer des décimaux",
   },
+  vraiFaux: {
+    cp: "Égalités simples + / ×",
+    ce1: "Additions jusqu'à ~40",
+    ce2: "Additions plus grandes",
+    cm1: "Additions jusqu'à ~120",
+    cm2: "Additions ou multiplications",
+  },
   suite: {
     cp: "Compléter une suite +1 +2",
     ce1: "Sauts de 2, 5, 10…",

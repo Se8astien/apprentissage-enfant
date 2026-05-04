@@ -28,8 +28,10 @@ function jouer(notes, type = "sine") {
   } catch (_) {}
 }
 
-export function sonBonne() {
-  jouer([[523, 0.08], [659, 0.08], [784, 0.18]]);
+export function sonBonne(comboStreak = 0) {
+  const shift = comboStreak >= 10 ? 1.25 : comboStreak >= 5 ? 1.12 : 1;
+  const base = 523 * shift;
+  jouer([[base, 0.07], [base * 1.26, 0.07], [base * 1.5, 0.16]]);
 }
 
 export function sonMauvaise() {
@@ -38,6 +40,18 @@ export function sonMauvaise() {
 
 export function sonCombo() {
   jouer([[523, 0.07], [659, 0.07], [784, 0.07], [1047, 0.3]]);
+}
+
+export function sonMission() {
+  jouer([[392, 0.06], [523, 0.06], [659, 0.06], [784, 0.14], [988, 0.22]]);
+}
+
+export function sonAccessoire() {
+  jouer([[659, 0.06], [784, 0.06], [1047, 0.18], [1319, 0.12]]);
+}
+
+export function sonTrophee() {
+  jouer([[392, 0.05], [523, 0.05], [659, 0.05], [784, 0.1], [1047, 0.24]]);
 }
 
 export function toggleSons() {

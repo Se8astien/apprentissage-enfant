@@ -1,6 +1,8 @@
 // app-renard.js — fox companion: SVG, accessories, dressing, streak, evolution
 
 import { getChapitreParStade, afficherContexteHistoireMaison } from "./app-histoire.js";
+import { ligneAccrocheMenu } from "./app-accroches.js";
+import { sonAccessoire } from "./app-sons.js";
 
 import {
   STORAGE_KEY,
@@ -26,6 +28,7 @@ import {
   confetti,
   estGrand,
   localDate,
+  lireDernierJeuMenu,
   localDateHier,
   escapeHtml,
   piegerFocus,
@@ -182,7 +185,7 @@ export function montrerNommage() {
 
 // ── Evolution overlay ─────────────────────────────────────────────────────────
 function declencherEvolution(stade) {
-  confetti();
+  confetti({ tier: "burst" });
   const s = RENARD_STADES[stade];
   const overlay = document.createElement("div");
   overlay.className = "evolution-overlay";
@@ -202,7 +205,7 @@ function declencherEvolution(stade) {
   document.body.appendChild(overlay);
   piegerFocus(overlay);
   const prevFocusEvol = document.activeElement;
-  setTimeout(() => confetti(), 400);
+  setTimeout(() => confetti(estGrand() ? { tier: "sparkle", sobre: true } : { tier: "sparkle" }), 400);
   overlay.querySelector(".btn-evolution-fermer").addEventListener("click", () => {
     overlay.style.opacity = "0";
     overlay.style.transition = "opacity 0.3s";
@@ -234,7 +237,7 @@ export function mettreAJourStreak() {
   sauverStreak(streakData);
 
   const paliers = { 3: "chapeau-base", 7: "lunettes-base", 30: "echarpe-rare" };
-  if (paliers[newCount]) debloquerAccessoire(paliers[newCount]);
+  if (paliers[newCount] && debloquerAccessoire(paliers[newCount])) sonAccessoire();
 
   if (s.lastVisit && s.lastVisit !== yesterday && s.count > 0) {
     if (elSousTitre) {
@@ -351,6 +354,33 @@ export function montrerMaison(montrerMenuFn) {
   majBulle(faim, bonheur, nom);
   renderSegments("tama-faim-segments",    faim);
   renderSegments("tama-bonheur-segments", bonheur);
+
+  const conseilEl = document.getElementById("maison-conseil");
+  if (conseilEl) {
+    const last = lireDernierJeuMenu();
+    const tip = last ? ligneAccrocheMenu(last) : null;
+    if (tip) conseilEl.textContent = tip;
+    else if (triste) {
+      conseilEl.textContent = estGrand()
+        ? `${nom} a besoin de douceur : joue un peu ou offre un câlin.`
+        : `${nom} veut un câlin ou une petite partie ! 🦊`;
+    } else {
+      conseilEl.textContent = estGrand()
+        ? "Varie les jeux pour progresser partout."
+        : "Essaie un jeu que tu n'as pas fait depuis longtemps ! ⭐";
+    }
+    conseilEl.hidden = false;
+  }
+
+  const mr = document.getElementById("maison-renard");
+  if (mr && mr.dataset.amTap !== "1") {
+    mr.dataset.amTap = "1";
+    mr.addEventListener("click", () => {
+      mr.classList.remove("maison-renard--wiggle");
+      void mr.offsetWidth;
+      mr.classList.add("maison-renard--wiggle");
+    });
+  }
 
   const btnNourrir = document.getElementById("btn-nourrir");
   btnNourrir.disabled = etoiles < 2 || faim >= 95;

@@ -1035,11 +1035,18 @@ h1 {
   z-index: 100;
 }
 
-.confetti span {
+.confetti .confetti-part {
   position: absolute;
   top: -10%;
   animation: tomber 2.2s ease-out forwards;
   font-size: 1.25rem;
+}
+.confetti-part--sparkle {
+  font-size: 1.05rem;
+  animation-duration: 1.55s !important;
+}
+.confetti-part--burst {
+  font-size: 1.42rem;
 }
 
 @keyframes tomber {
@@ -2842,6 +2849,9 @@ h1 {
   animation: chronoPulse 0.5s ease-in-out infinite alternate;
 }
 @keyframes chronoPulse { from { transform: scale(1); } to { transform: scale(1.08); } }
+.chrono.chrono--expert {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55), 0 0 12px rgba(108, 92, 231, 0.45);
+}
 
 /* ── Mode révision ────────────────────────────────────────────────────────────── */
 .btn-revision-non {
@@ -4520,6 +4530,96 @@ h4.params-menu-aide-titre {
   transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(0, 113, 184, 0.2);
 }
+
+.menu-fun-bar {
+  margin: 0.35rem 1rem 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #f3eeff 0%, #e8f6ff 100%);
+  border: 2px solid rgba(108, 92, 231, 0.22);
+}
+.menu-fun-weekend {
+  margin: 0 0 0.45rem;
+  font-size: 0.88rem;
+  text-align: center;
+  color: #444;
+  font-weight: 700;
+}
+.menu-fun-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: center;
+}
+.btn-fun-menu {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.55rem 0.75rem;
+  min-height: 2.75rem;
+  border-radius: 999px;
+  border: 2px solid #b8aef0;
+  background: #fff;
+  color: #4a3fa8;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.btn-fun-menu:hover,
+.btn-fun-menu:focus-visible {
+  background: #f7f4ff;
+  outline: none;
+}
+.btn-fun-menu:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.accroche-contexte {
+  font-size: 0.92rem;
+  color: #5a4fb0;
+  margin: 0 0 0.55rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.carte-jeu--pulse {
+  animation: cartePulseFun 0.65s ease-in-out 3;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.42);
+  border-radius: 1rem;
+}
+@keyframes cartePulseFun {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.btn-vrai-faux {
+  min-height: 3.1rem;
+  font-size: 1.28rem !important;
+  font-weight: 800;
+}
+.vrai-faux-consigne {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+}
+.vrai-faux-equation {
+  margin: 0;
+}
+
+.maison-conseil {
+  font-size: 0.92rem;
+  color: #555;
+  margin: 0.4rem 0 0;
+  line-height: 1.35;
+}
+.maison-renard--wiggle {
+  animation: maisonRenardWiggle 0.55s ease;
+}
+@keyframes maisonRenardWiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg) scale(1.02); }
+  75% { transform: rotate(4deg) scale(1.02); }
+}
+
 #ecran-aventure {
   padding: 0 1rem 2rem;
   min-height: 70vh;
@@ -4694,5 +4794,5 @@ h4.params-menu-aide-titre {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .confetti span { display: none; }
+  .confetti .confetti-part { display: none; }
 }
