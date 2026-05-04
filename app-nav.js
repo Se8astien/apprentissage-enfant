@@ -136,7 +136,7 @@ function startChrono() {
   if (secs <= 0) {
     if (el && estMinuteurDisponible()) {
       el.hidden = false;
-      el.textContent = "🕊️ Temps libre";
+      el.textContent = "∞ Temps libre";
       el.className = "chrono chrono-libre";
     }
     return;
@@ -1297,6 +1297,8 @@ export function synchroniserAffichageMenu() {
   syncPrefsDepuisStockage();
   majGenre();
   mettreAJourMaisonBanner();
+  const diffProfil = getDifficulteProfil();
+  const marqueurRythme = DIFFICULTE_ICONES[diffProfil] || "⚡";
   const diffProfilEl = document.getElementById("btn-changer-rythme");
   if (diffProfilEl) {
     diffProfilEl.textContent = libelleDifficulteProfil();
@@ -1315,6 +1317,11 @@ export function synchroniserAffichageMenu() {
   const nivMenu = getNiveauCourant();
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach((btn) => {
     const jeu = btn.dataset.jeu;
+    const emojiEl = btn.querySelector(".emoji-jeu");
+    if (emojiEl) {
+      if (!emojiEl.dataset.baseEmoji) emojiEl.dataset.baseEmoji = emojiEl.textContent.trim();
+      emojiEl.textContent = `${marqueurRythme} ${emojiEl.dataset.baseEmoji}`;
+    }
     const descEl = btn.querySelector(".desc-jeu");
     if (descEl) {
       const d = texteDescCarteJeu(jeu, nivMenu);
@@ -1349,7 +1356,7 @@ export function majUiBoutonChrono() {
   const on = lireChronoJeuActif();
   const symEl = btn.querySelector(".header-chrono-symbole");
   const labelEl = btn.querySelector(".header-chrono-label");
-  const sym = on ? "⏱️" : "🌿";
+  const sym = on ? "⏱️" : "∞";
   if (symEl) symEl.textContent = sym;
   if (labelEl) labelEl.textContent = on ? "Chrono" : "Zen";
   btn.dataset.chronoEtat = on ? "limite" : "libre";
