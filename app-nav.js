@@ -972,11 +972,6 @@ function brancherAudioChoix() {
     btn.dataset.amReadChoiceBound = "1";
     const texte = btn.textContent.trim();
     btn.setAttribute("aria-label", `${texte}. Entrée pour répondre.`);
-    const lecteur = document.createElement("span");
-    lecteur.className = "choix-audio-indice";
-    lecteur.setAttribute("aria-hidden", "true");
-    lecteur.textContent = "🔊";
-    btn.appendChild(lecteur);
     btn.addEventListener("contextmenu", (ev) => {
       ev.preventDefault();
       lireTexteCourt(texte, "choice_context");
