@@ -1,6 +1,6 @@
 # Apprentissage Magique — Guide pour Claude
 
-Application web éducative pour enfants du CP au CM2 (6–11 ans). Jeux de maths et de langage avec un compagnon renard.
+Application web éducative pour enfants du CP au CM2 (6–11 ans). Jeux de maths, langage, logique et musique avec un compagnon renard.
 
 ## Utilisateurs
 
@@ -20,20 +20,24 @@ Application web éducative pour enfants du CP au CM2 (6–11 ans). Jeux de maths
 **Vanilla JS + ES modules natifs** — pas de bundler, pas de framework, pas de dépendances d’exécution. Les seules dépendances **npm** sont en **dev** : Playwright pour les tests smoke (voir **Tests**).
 
 ```
-index.html           ~580 lignes  — HTML statique, écrans cachés/visibles via JS
-style.css           ~2400 lignes  — styles, catégories jeux, animations
-app-state.js         ~380 lignes  — état partagé, constantes, helpers purs, rendu écrans
-app-route.js          ~30 lignes  — étape onboarding/menu selon localStorage + helpers landing
-app-renard.js        ~400 lignes  — compagnon renard (accessoires, dressing, streak)
-app-nav.js           ~640 lignes  — navigation menu/jeu, combo, apresReponse, révision
-app-init.js          ~660 lignes  — point d’entrée : init état, routeur, listeners boutons
-app-gamification.js  ~270 lignes  — badges (27), missions du jour, stats de jeu
-games-maths.js      ~1120 lignes  — 12 jeux mathématiques (CP→CM2)
-games-formes.js      ~750 lignes  — 5 jeux géométrie/formes (CP→CM2)
-games-temps.js       ~650 lignes  — 4 jeux temps/mesures (CP→CM2)
-games-argent.js      ~240 lignes  — 2 jeux monnaie (CP→CE2)
-games-avance.js      ~550 lignes  — 5 jeux calcul avancé (CE1→CM2)
-games-langage.js     ~960 lignes  — 10 jeux langage/anglais (CP→CM2)
+index.html              ~700 lignes  — HTML statique, écrans cachés/visibles via JS
+style.css              ~4700 lignes  — styles, catégories jeux, animations
+app-state.js            ~380 lignes  — état partagé, constantes, helpers purs, rendu écrans
+app-route.js             ~30 lignes  — étape onboarding/menu selon localStorage + helpers landing
+app-renard.js           ~400 lignes  — compagnon renard (accessoires, dressing, streak)
+app-nav.js              ~640 lignes  — navigation menu/jeu, combo, apresReponse, révision
+app-init.js             ~660 lignes  — point d’entrée : init état, routeur, listeners boutons
+app-gamification.js     ~270 lignes  — badges (27), missions du jour, stats de jeu
+games-registry.js       ~120 lignes  — registre dynamique des lanceurs de jeux (source de vérité)
+games-maths.js         ~1120 lignes  — jeux mathématiques (CP→CM2)
+games-formes.js         ~900 lignes  — jeux géométrie/formes (CP→CM2)
+games-temps.js          ~820 lignes  — jeux temps/mesures (CP→CM2)
+games-argent.js         ~300 lignes  — jeux monnaie (CP→CE2)
+games-avance.js         ~550 lignes  — jeux calcul avancé (CE1→CM2)
+games-langage.js       ~2250 lignes  — jeux langage/français/langues (CP→CM2)
+games-algo.js           ~320 lignes  — jeux algorithmie/logique (CP→CM2)
+games-musique.js        ~120 lignes  — jeux musique/rythme (CP→CM2)
+seo-pages.css            ~90 lignes  — style partagé des landing pages SEO
 ```
 
 ## État partagé (app-state.js)
@@ -103,9 +107,10 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 ```
 
 ### Ajouter un jeu
-1. Créer `lancerMonJeu()` dans le fichier `games-*.js` approprié, l'exporter
-2. L'importer dans `app-init.js` et l'ajouter à la map `lanceurs`
+1. Créer `lancerMonJeu()` dans le fichier `games-*.js` approprié, puis l'exporter
+2. Déclarer le jeu dans `games-registry.js` (clé `data-jeu` → `[module, nomExport]`)
 3. Ajouter un bouton `.carte-jeu` dans `index.html` avec `data-jeu="monJeu"` et `data-niveaux="..."`
+4. Ajouter sa description par classe dans `app-menu-descriptions.js`
 
 ## Niveaux et difficulté
 
