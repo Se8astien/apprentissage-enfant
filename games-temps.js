@@ -790,3 +790,25 @@ export function lancerHorlogeExpress() {
   const options = melanger([bonne, ...melanger(faux).slice(0, 3)]);
   afficherChoixHorloge(options);
 }
+
+export function lancerChronoDefi() {
+  elTitre.textContent = "⏳ Chrono défi";
+  const diff = getDifficulte();
+  const baseH = 6 + Math.floor(Math.random() * 14);
+  const baseM = [0, 10, 15, 20, 30, 40, 45, 50][Math.floor(Math.random() * 8)];
+  const baseTotal = baseH * 60 + baseM;
+  const operations = diff === 0 ? [10, 15, -10] : diff === 1 ? [15, 20, 25, -10, -15] : [20, 25, 30, 35, -15, -20];
+  const delta = operations[Math.floor(Math.random() * operations.length)];
+  const bonne = baseTotal + delta;
+  setBonneReponse(bonne);
+  const texteDepart = `${baseH}h${String(baseM).padStart(2, "0")}`;
+  const estAjout = delta >= 0;
+  const texteAction = estAjout ? `Ajoute ${delta} min` : `Retire ${Math.abs(delta)} min`;
+  elQuestion.innerHTML =
+    `<div class="grande-horloge">${svgHorloge(baseH || 12, baseM, 150)}</div>` +
+    `<p style="font-size:0.9rem;margin:0.35rem 0 0.15rem">Départ : <strong>${texteDepart}</strong></p>` +
+    `<p style="font-size:0.9rem;margin:0"><strong>${texteAction}</strong>. Quelle heure obtiens-tu ?</p>`;
+  const faux = [-30, -20, -10, 10, 20, 30].map((d) => bonne + d).filter((t) => t > 0 && t !== bonne);
+  const options = melanger([bonne, ...melanger(faux).slice(0, 3)]);
+  afficherChoixHorloge(options);
+}

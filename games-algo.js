@@ -38,6 +38,15 @@ const PLANIFICATION_RENARD = [
   { q: "🦊 Le renard lit une carte au trésor. Quelle action doit venir avant de creuser ?", bonne: "Trouver l'endroit X", fausses: ["Repartir à la maison", "Lancer le dé", "Colorier la carte"] },
 ];
 
+const TRI_LOGIQUE = [
+  { q: "Quel nombre doit venir EN PREMIER ?", elements: "12, 4, 9, 1", bonne: "1", fausses: ["4", "9", "12"] },
+  { q: "Quel nombre doit venir EN DERNIER ?", elements: "3, 18, 7, 11", bonne: "18", fausses: ["3", "7", "11"] },
+  { q: "Trie du plus petit au plus grand : quelle est la 2e valeur ?", elements: "5, 2, 8, 3", bonne: "3", fausses: ["2", "5", "8"] },
+  { q: "Dans cet ordre alphabétique, quel mot est en 1er ?", elements: "tigre, antilope, zèbre, lion", bonne: "antilope", fausses: ["lion", "tigre", "zèbre"] },
+  { q: "Quel mot vient en DERNIER par ordre alphabétique ?", elements: "banane, ananas, kiwi, pomme", bonne: "pomme", fausses: ["ananas", "banane", "kiwi"] },
+  { q: "Quel nombre manque dans l'ordre croissant ?", elements: "14, 16, ?, 20", bonne: "18", fausses: ["17", "19", "22"] },
+];
+
 function bloc(texte) {
   return `<div style="font-family:'Courier New',monospace;background:#f0eeff;border-radius:0.8rem;padding:0.65rem 1rem;margin:0.4rem auto;font-size:0.88rem;line-height:1.85;text-align:left;max-width:300px;border-left:3px solid #6c5ce7;color:#2d3436">${texte.replace(/\n/g, "<br>")}</div>`;
 }
@@ -274,6 +283,29 @@ export function lancerPlanificationRenard() {
     b.type = "button";
     b.className = "btn-choix";
     b.style.fontSize = "0.95rem";
+    b.textContent = opt;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+export function lancerTriLogique() {
+  elTitre.textContent = "🧠 Tri logique";
+  const diff = getDifficulte();
+  const pool = diff === 0 ? TRI_LOGIQUE.slice(0, 4) : diff === 1 ? TRI_LOGIQUE.slice(0, 5) : TRI_LOGIQUE;
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  setBonneReponse(options.indexOf(item.bonne));
+  elQuestion.innerHTML =
+    `<p style="font-size:0.92rem;margin:0 0 0.35rem">${item.q}</p>` +
+    `<p style="font-size:1.05rem;font-weight:700;color:var(--primaire);margin:0 0 0.45rem">${item.elements}</p>`;
+  elChoix.innerHTML = "";
+  options.forEach((opt, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "0.96rem";
     b.textContent = opt;
     b.dataset.valeur = String(idx);
     b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));

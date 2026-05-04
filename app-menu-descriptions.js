@@ -155,6 +155,13 @@ const PAR_JEU = {
     cm1: "Heure + durée courte",
     cm2: "Calculs d'horloge rapides",
   },
+  chronoDefi: {
+    cp: "Lire l'heure et bouger de 10 min",
+    ce1: "Ajouter ou retirer des minutes",
+    ce2: "Défis rapides de chrono",
+    cm1: "Calculs minute précis",
+    cm2: "Enchaînements temporels",
+  },
   heure: {
     cp: "Heure pile (grand aigu)",
     ce1: "Heures et demies",
@@ -344,6 +351,13 @@ const PAR_JEU = {
     cm1: "Temps variés en contexte",
     cm2: "Choix verbal plus précis",
   },
+  motsJungle: {
+    cp: "Associer image et mot simple",
+    ce1: "Trouver le mot avec indice",
+    ce2: "Vocabulaire nature et animaux",
+    cm1: "Indices plus subtils",
+    cm2: "Lexique thématique avancé",
+  },
   anglais: {
     cp: "Mots très simples",
     ce1: "Lexique famille école",
@@ -441,6 +455,13 @@ const PAR_JEU = {
     ce2: "Planifier une action",
     cm1: "Étapes et priorités",
     cm2: "Organisation stratégique",
+  },
+  triLogique: {
+    cp: "Mettre en ordre simple",
+    ce1: "Trier des nombres faciles",
+    ce2: "Ordre et classement",
+    cm1: "Tri logique plus long",
+    cm2: "Classement rapide expert",
   },
 };
 

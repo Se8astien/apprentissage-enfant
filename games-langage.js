@@ -64,6 +64,17 @@ const CONJ_MISSION_CM = [
   { phrase: "Nous ___ déjà la réponse quand tu es arrivé.", bonne: "savions", fausses: ["savons", "saurons", "savent"] },
 ];
 
+const MOTS_JUNGLE = [
+  { indice: "🐘 Grand animal avec une trompe", bonne: "éléphant", fausses: ["girafe", "rhinocéros", "hippopotame"] },
+  { indice: "🦜 Oiseau qui répète des mots", bonne: "perroquet", fausses: ["toucan", "hibou", "pigeon"] },
+  { indice: "🐒 Animal qui grimpe aux arbres", bonne: "singe", fausses: ["koala", "panda", "kangourou"] },
+  { indice: "🐍 Reptile qui rampe", bonne: "serpent", fausses: ["lézard", "crocodile", "tortue"] },
+  { indice: "🦁 Roi des animaux", bonne: "lion", fausses: ["tigre", "panthère", "guépard"] },
+  { indice: "🦓 Animal rayé noir et blanc", bonne: "zèbre", fausses: ["cheval", "girafe", "âne"] },
+  { indice: "🐊 Reptile avec de grandes dents", bonne: "crocodile", fausses: ["alligator", "lézard", "iguane"] },
+  { indice: "🦋 Insecte coloré qui vole", bonne: "papillon", fausses: ["abeille", "guêpe", "libellule"] },
+];
+
 // ── Syllabes ──────────────────────────────────────────────────────────────────
 const MOTS_SYLLABES_CP = [
   { mot: "maison",  parties: ["mai", "son"] },
@@ -219,6 +230,29 @@ export function lancerConjugaisonMission() {
   elQuestion.innerHTML =
     "<p style='font-size:0.92rem;margin-bottom:0.35rem'>Mission : choisis la bonne conjugaison.</p>" +
     `<p style="font-size:1.08rem;font-weight:700;color:var(--primaire);margin:0">${item.phrase}</p>`;
+  elChoix.innerHTML = "";
+  options.forEach((texte) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "0.98rem";
+    b.textContent = texte;
+    b.dataset.valeur = texte;
+    b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+export function lancerMotsJungle() {
+  elTitre.textContent = "🌴 Mots de la jungle";
+  const diff = getDifficulte();
+  const pool = diff === 0 ? MOTS_JUNGLE.slice(0, 5) : diff === 1 ? MOTS_JUNGLE.slice(0, 7) : MOTS_JUNGLE;
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  setBonneReponse(item.bonne);
+  elQuestion.innerHTML =
+    "<p style='font-size:0.92rem;margin-bottom:0.35rem'>Trouve le bon mot grâce à l'indice :</p>" +
+    `<p style="font-size:1.08rem;font-weight:700;color:var(--primaire);margin:0">${item.indice}</p>`;
   elChoix.innerHTML = "";
   options.forEach((texte) => {
     const b = document.createElement("button");
