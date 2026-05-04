@@ -506,6 +506,20 @@ h1 {
   min-height: 2.4rem;
 }
 
+.menu-barre-liens .btn-certificat--menu {
+  flex: 1 1 calc(50% - 0.35rem);
+  min-width: min(100%, 8.5rem);
+  max-width: 22rem;
+  justify-content: center;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.4rem 0.7rem;
+  min-height: 2.4rem;
+  border-radius: 999px;
+  border-width: 2px;
+  margin: 0;
+}
+
 .menu-surprises-encart {
   margin: 0 0 0.6rem;
   padding: 0.6rem 0.65rem 0.55rem;
@@ -2105,6 +2119,24 @@ h1 {
   cursor: pointer;
   font-family: inherit;
   box-shadow: 0 3px 10px rgba(108, 92, 231, 0.35);
+}
+
+.btn-certificat--principal {
+  display: block;
+  width: 100%;
+  max-width: 22rem;
+  margin: 0.1rem auto 0.2rem;
+  padding: 0.75rem 1.2rem;
+  border-radius: 1.35rem;
+  font-size: 1.02rem;
+  font-weight: 900;
+  border-width: 3px;
+  background: linear-gradient(180deg, #fff 0%, #f1f6ff 100%);
+  box-shadow: 0 4px 0 rgba(108, 92, 231, 0.18), 0 10px 24px rgba(108, 92, 231, 0.14);
+}
+.btn-certificat--principal:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(108, 92, 231, 0.16), 0 8px 18px rgba(108, 92, 231, 0.12);
 }
 .dressing-titre {
   text-align: center;

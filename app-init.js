@@ -675,6 +675,8 @@ function imprimerCertificat() {
 }
 const btnCertificat = document.getElementById("btn-certificat");
 if (btnCertificat) btnCertificat.addEventListener("click", imprimerCertificat);
+const btnCertificatMenu = document.getElementById("btn-certificat-menu");
+if (btnCertificatMenu) btnCertificatMenu.addEventListener("click", imprimerCertificat);
 
 // ── Raccourcis clavier ────────────────────────────────────────────────────────
 document.addEventListener("keydown", (e) => {
