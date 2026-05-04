@@ -141,6 +141,13 @@ const PAR_JEU = {
     cm1: "Durées entre dates",
     cm2: "Calendriers complexes",
   },
+  horlogeExpress: {
+    cp: "Heure +10 minutes",
+    ce1: "Ajoute 10 à 30 min",
+    ce2: "Calcul minute rapide",
+    cm1: "Heure + durée courte",
+    cm2: "Calculs d'horloge rapides",
+  },
   heure: {
     cp: "Heure pile (grand aigu)",
     ce1: "Heures et demies",
@@ -309,6 +316,13 @@ const PAR_JEU = {
     cm1: "Orthographe et accords",
     cm2: "Correction fine de phrase",
   },
+  atelierAccords: {
+    cp: "Choisir le bon mot",
+    ce1: "Accord simple nom/adjectif",
+    ce2: "Accords dans la phrase",
+    cm1: "Accords plus subtils",
+    cm2: "Accords complexes",
+  },
   anglais: {
     cp: "Mots très simples",
     ce1: "Lexique famille école",
@@ -399,6 +413,13 @@ const PAR_JEU = {
     ce2: "Règles et motifs",
     cm1: "Suites de logique",
     cm2: "Raisonnement avancé",
+  },
+  planificationRenard: {
+    cp: "Trouve la première étape",
+    ce1: "Quel ordre est logique ?",
+    ce2: "Planifier une action",
+    cm1: "Étapes et priorités",
+    cm2: "Organisation stratégique",
   },
 };
 

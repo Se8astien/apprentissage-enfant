@@ -768,3 +768,25 @@ export function lancerCalendrier() {
     elChoix.appendChild(b);
   });
 }
+
+export function lancerHorlogeExpress() {
+  elTitre.textContent = "⚡ Horloge express";
+  const diff = getDifficulte();
+  const baseH = 7 + Math.floor(Math.random() * 13);
+  const baseM = [0, 10, 15, 20, 30, 40, 45, 50][Math.floor(Math.random() * 8)];
+  const totalBase = baseH * 60 + baseM;
+  const ecarts = diff === 0 ? [10, 15, 20, 30] : diff === 1 ? [15, 20, 25, 30, 35, 40] : [20, 25, 30, 35, 40, 45, 50];
+  const avance = ecarts[Math.floor(Math.random() * ecarts.length)];
+  const bonne = totalBase + avance;
+  setBonneReponse(bonne);
+
+  const texteDepart = `${baseH}h${String(baseM).padStart(2, "0")}`;
+  elQuestion.innerHTML =
+    `<div class="grande-horloge">${svgHorloge(baseH || 12, baseM, 150)}</div>` +
+    `<p style="font-size:0.9rem;margin:0.35rem 0 0.15rem">Il est <strong>${texteDepart}</strong>.</p>` +
+    `<p style="font-size:0.9rem;margin:0">Dans <strong>${avance} minutes</strong>, quelle heure sera-t-il ?</p>`;
+
+  const faux = [-25, -20, -15, -10, 10, 15, 20, 25].map((d) => bonne + d).filter((t) => t > 0 && t !== bonne);
+  const options = melanger([bonne, ...melanger(faux).slice(0, 3)]);
+  afficherChoixHorloge(options);
+}

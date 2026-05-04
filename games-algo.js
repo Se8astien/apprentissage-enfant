@@ -29,6 +29,15 @@ const LABYRINTHE_LOGIQUE = [
   { motif: "🔴 🟡 🟢 🔴 🟡 ?", bonne: "🟢", fausses: ["🔴", "🟡", "🔵"] },
 ];
 
+const PLANIFICATION_RENARD = [
+  { q: "🦊 Le renard veut partir à l'école. Que doit-il faire EN PREMIER ?", bonne: "Mettre ses chaussures", fausses: ["Ouvrir son cahier", "Manger le goûter", "Dire bonsoir"] },
+  { q: "🦊 Le renard plante une graine. Quelle étape vient juste APRÈS ?", bonne: "Arroser la graine", fausses: ["Cueillir la fleur", "Dormir", "Fermer le livre"] },
+  { q: "🦊 Pour préparer un gâteau, quelle action vient AVANT la cuisson ?", bonne: "Verser la pâte", fausses: ["Manger le gâteau", "Laver le vélo", "Aller dormir"] },
+  { q: "🦊 Le renard range sa chambre. Quelle action est la plus logique d'abord ?", bonne: "Ramasser les jouets", fausses: ["Éteindre la lumière", "Mettre le pyjama", "Ouvrir le frigo"] },
+  { q: "🦊 Il est prêt pour le sport. Que fait-il en dernier ?", bonne: "Boire de l'eau", fausses: ["Mettre ses baskets", "Prendre son sac", "Sortir de la maison"] },
+  { q: "🦊 Le renard lit une carte au trésor. Quelle action doit venir avant de creuser ?", bonne: "Trouver l'endroit X", fausses: ["Repartir à la maison", "Lancer le dé", "Colorier la carte"] },
+];
+
 function bloc(texte) {
   return `<div style="font-family:'Courier New',monospace;background:#f0eeff;border-radius:0.8rem;padding:0.65rem 1rem;margin:0.4rem auto;font-size:0.88rem;line-height:1.85;text-align:left;max-width:300px;border-left:3px solid #6c5ce7;color:#2d3436">${texte.replace(/\n/g, "<br>")}</div>`;
 }
@@ -243,6 +252,28 @@ export function lancerLabyrintheLogique() {
     b.type = "button";
     b.className = "btn-choix";
     b.style.fontSize = "1rem";
+    b.textContent = opt;
+    b.dataset.valeur = String(idx);
+    b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+export function lancerPlanificationRenard() {
+  elTitre.textContent = "🦊 Planification renard";
+  const diff = getDifficulte();
+  const pool = diff === 0 ? PLANIFICATION_RENARD.slice(0, 4) : diff === 1 ? PLANIFICATION_RENARD.slice(0, 5) : PLANIFICATION_RENARD;
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  setBonneReponse(options.indexOf(item.bonne));
+
+  elQuestion.innerHTML = `<p style="font-size:0.92rem;margin:0 0 0.4rem">${item.q}</p>`;
+  elChoix.innerHTML = "";
+  options.forEach((opt, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "0.95rem";
     b.textContent = opt;
     b.dataset.valeur = String(idx);
     b.addEventListener("click", () => apresReponse(idx, b, getBonneReponse()));

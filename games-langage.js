@@ -32,6 +32,17 @@ const PHRASES_DETECTIVE = [
   { phrase: "Ces mon livre préféré.", bonne: "C'est mon livre préféré." },
 ];
 
+const ATELIER_ACCORDS = [
+  { phrase: "Les ___ jouent dans la cour.", bonne: "enfants", fausses: ["enfant", "enfantes", "enfan"] },
+  { phrase: "La petite fille est ___ .", bonne: "contente", fausses: ["content", "contentes", "conten"] },
+  { phrase: "Ils ont une maison ___ .", bonne: "bleue", fausses: ["bleu", "bleues", "bleus"] },
+  { phrase: "Mes amis sont très ___ .", bonne: "gentils", fausses: ["gentil", "gentiles", "gentille"] },
+  { phrase: "La voiture rouge est ___ .", bonne: "rapide", fausses: ["rapides", "rapidu", "rapid"] },
+  { phrase: "Les fleurs sont ___ .", bonne: "jolies", fausses: ["jolie", "jolis", "joliees"] },
+  { phrase: "Mon frère et moi sommes ___ .", bonne: "prêts", fausses: ["prêt", "prête", "prêtes"] },
+  { phrase: "Cette histoire est ___ .", bonne: "intéressante", fausses: ["intéressant", "intéressants", "intéressantes"] },
+];
+
 // ── Syllabes ──────────────────────────────────────────────────────────────────
 const MOTS_SYLLABES_CP = [
   { mot: "maison",  parties: ["mai", "son"] },
@@ -143,6 +154,31 @@ export function lancerDetectiveErreurs() {
     b.type = "button";
     b.className = "btn-choix";
     b.style.fontSize = "0.95rem";
+    b.textContent = texte;
+    b.dataset.valeur = texte;
+    b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));
+    elChoix.appendChild(b);
+  });
+}
+
+export function lancerAtelierAccords() {
+  elTitre.textContent = "🧩 Atelier des accords";
+  const diff = getDifficulte();
+  const pool = diff === 0 ? ATELIER_ACCORDS.slice(0, 5) : diff === 1 ? ATELIER_ACCORDS.slice(0, 7) : ATELIER_ACCORDS;
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const options = melanger([item.bonne, ...item.fausses.slice(0, 3)]);
+  setBonneReponse(item.bonne);
+
+  elQuestion.innerHTML =
+    "<p style='font-size:0.92rem;margin-bottom:0.35rem'>Choisis le bon mot pour compléter :</p>" +
+    `<p style="font-size:1.15rem;font-weight:700;color:var(--primaire);margin:0">${item.phrase}</p>`;
+
+  elChoix.innerHTML = "";
+  options.forEach((texte) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-choix";
+    b.style.fontSize = "1rem";
     b.textContent = texte;
     b.dataset.valeur = texte;
     b.addEventListener("click", () => apresReponseTexte(texte, b, getBonneReponse()));
