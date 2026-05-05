@@ -4,6 +4,7 @@ import { effacerDonneesProfilCourant } from "./app-profils.js";
 import {
   escapeHtml,
   estMinuteurDisponible,
+  getNiveauCourant,
   lireChronoJeuActif,
   piegerFocus,
 } from "./app-state.js";
@@ -445,6 +446,18 @@ function creerSettingsHtml() {
         </span>
       </label>
       </div>
+      ${getNiveauCourant() === "cp" ? `
+      <div class="params-lecture-cp-bloc">
+        <h3 class="params-section-title">Pour le CP</h3>
+        <label class="params-switch params-lecture-cp-opt">
+          <input type="checkbox" class="params-check" id="params-lecture-auto-cp"${localStorage.getItem("am-lecture-auto-cp") !== "0" ? " checked" : ""}>
+          <span class="params-switch-track" aria-hidden="true"><span class="params-switch-thumb"></span></span>
+          <span class="params-switch-label">
+            <strong>Lecture automatique de la question</strong>
+            <span class="params-chrono-desc">Quand c’est possible, la consigne se lit toute seule. Tu peux la désactiver ici.</span>
+          </span>
+        </label>
+      </div>` : ""}
       <div class="params-menu-aide">
         <h4 class="params-menu-aide-titre">Repères&nbsp;: barre du haut pour l’enfant</h4>
         <ul class="params-menu-aide-list">
@@ -778,6 +791,14 @@ function brancherSettings(overlay, onFermer) {
     } else {
       blocChrono.hidden = true;
     }
+  }
+
+  const cbLectureCp = overlay.querySelector("#params-lecture-auto-cp");
+  if (cbLectureCp) {
+    cbLectureCp.checked = localStorage.getItem("am-lecture-auto-cp") !== "0";
+    cbLectureCp.addEventListener("change", () => {
+      localStorage.setItem("am-lecture-auto-cp", cbLectureCp.checked ? "1" : "0");
+    });
   }
 
   brancherListeJeuxParent(overlay);

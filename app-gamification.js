@@ -1,6 +1,6 @@
 // app-gamification.js — badges, missions du jour, stats
 
-import { lireEtoiles, confetti, lireStreak } from "./app-state.js";
+import { lireEtoiles, confetti, lireStreak, escapeHtml, piegerFocus } from "./app-state.js";
 import { sonTrophee } from "./app-sons.js";
 
 // ── Badges ────────────────────────────────────────────────────────────────────
@@ -71,15 +71,19 @@ function _afficherProchaineBadge() {
 
   const overlay = document.createElement("div");
   overlay.className = "badge-notif-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "badge-notif-dialog-lbl");
   overlay.innerHTML = `
     <div class="badge-notif-carte">
-      <p class="badge-notif-label">Nouveau trophée !</p>
+      <p id="badge-notif-dialog-lbl" class="badge-notif-label">Nouveau trophée !</p>
       <span class="badge-notif-emoji">${badge.emoji}</span>
       <h3 class="badge-notif-nom">${badge.nom}</h3>
       <p class="badge-notif-desc">${badge.desc}</p>
       <button type="button" class="btn-evolution-fermer">Super !</button>
     </div>`;
   document.body.appendChild(overlay);
+  piegerFocus(overlay);
   confetti({ tier: "burst" });
   sonTrophee();
 
@@ -147,10 +151,12 @@ function missionFocusJeuFaible() {
   if (candidats.length === 0) return null;
   const cible = candidats[0];
   const objectif = cible.total >= 12 ? 5 : 3;
+  const tauxPct = Math.round(cible.taux * 100);
   return {
     type: "focus_jeu",
     emoji: "🎯",
     texte: `Progresse en ${libelleMissionJeu(cible.jeu)} (${objectif} bonnes réponses)`,
+    pourquoi: `Parce que sur ce jeu, tu réussis un peu moins souvent (${tauxPct}% de bonnes réponses sur tes derniers essais).`,
     cible: objectif,
     progres: 0,
     complete: false,
@@ -259,7 +265,8 @@ export function afficherMissions() {
       <div class="mission-item${m.complete ? " complete" : ""}">
         <span class="mission-emoji">${m.emoji}</span>
         <div style="flex:1">
-          <div class="mission-texte">${m.texte}</div>
+          <div class="mission-texte">${escapeHtml(m.texte)}</div>
+          ${m.pourquoi ? `<p class="mission-pourquoi">${escapeHtml(m.pourquoi)}</p>` : ""}
           <div class="mission-progress">${m.progres} / ${m.cible}</div>
           <div class="mission-barre"><div class="mission-barre-fill" style="width:${pct}%"></div></div>
         </div>

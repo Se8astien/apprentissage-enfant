@@ -101,6 +101,8 @@ let miniLeconVueJeu = null;
 let indiceUtiliseQuestion = false;
 let tsQuestionCourante = 0;
 const _tempsReponseParJeu = Object.create(null);
+let _snapBonnesAuDebutJeu = 0;
+let _snapErreursAuDebutJeu = 0;
 
 function jeuActifId() {
   const j = getJeuCourant();
@@ -228,7 +230,7 @@ function chronoExpire() {
 
 // ── Mode révision ─────────────────────────────────────────────────────────────
 const _wrongByGame = Object.create(null);
-const _revisionRappelQuestionByGame = Object.create(null);
+const _revisionFileParJeu = Object.create(null);
 let _modeRevision = null;
 
 export function getWrongQuestions(jeu) {
@@ -236,24 +238,45 @@ export function getWrongQuestions(jeu) {
 }
 export function clearWrongQuestions(jeu) {
   delete _wrongByGame[jeu];
-  delete _revisionRappelQuestionByGame[jeu];
+  delete _revisionFileParJeu[jeu];
 }
 
 function planifierRappelRevision(jeu) {
   if (!jeu || _modeRevision) return;
-  const cible = questionsDepuisDebutJeu + 5;
-  const precedent = _revisionRappelQuestionByGame[jeu];
-  if (precedent == null || precedent > cible) _revisionRappelQuestionByGame[jeu] = cible;
+  const q = questionsDepuisDebutJeu;
+  if (!_revisionFileParJeu[jeu]) _revisionFileParJeu[jeu] = [];
+  _revisionFileParJeu[jeu].push({ at: q + 5, after: 5 }, { at: q + 15, after: 15 });
+  _revisionFileParJeu[jeu].sort((a, b) => a.at - b.at || a.after - b.after);
 }
 
 function verifierRappelRevisionEspacee(jeu) {
   if (!jeu || _modeRevision) return;
-  const cible = _revisionRappelQuestionByGame[jeu];
-  if (cible == null || questionsDepuisDebutJeu < cible) return;
-  delete _revisionRappelQuestionByGame[jeu];
+  const file = _revisionFileParJeu[jeu];
+  if (!file || !file.length) return;
+  const q = questionsDepuisDebutJeu;
+  if (file[0].at > q) return;
   const nb = getWrongQuestions(jeu).length;
-  if (nb <= 0) return;
-  afficherToastSimple("🔁 Moment revision", "Tu peux revoir tes questions difficiles.");
+  if (nb <= 0) {
+    _revisionFileParJeu[jeu] = [];
+    return;
+  }
+  const pulses = [];
+  while (file.length && file[0].at <= q) {
+    const x = file.shift();
+    pulses.push(x.after);
+    track("revision_nudge", {
+      game_name: jeu,
+      niveau: getNiveauCourant(),
+      wrong_count: nb,
+      after_questions: x.after,
+    });
+  }
+  const apresMin = Math.min(...pulses);
+  const apresMax = Math.max(...pulses);
+  const detail = apresMin === apresMax
+    ? `Il y a quelques questions, tu peux revoir tes difficultés (${apresMin}).`
+    : `Petit rappel après ${apresMin} et encore après ${apresMax} questions.`;
+  afficherToastSimple(pulses.includes(15) ? "🔁 Rappel révision" : "🔁 Moment révision", detail);
   mettreAJourBoutonRevision(jeu);
   const btn = document.getElementById("btn-reviser-erreurs");
   if (btn) {
@@ -261,12 +284,6 @@ function verifierRappelRevisionEspacee(jeu) {
     void btn.offsetWidth;
     btn.classList.add("revision-rappel");
   }
-  track("revision_nudge", {
-    game_name: jeu,
-    niveau: getNiveauCourant(),
-    wrong_count: nb,
-    after_questions: 5,
-  });
 }
 
 export function entrerRevision(nomJeu, questions) {
@@ -299,7 +316,7 @@ function _afficherRevision() {
     _modeRevision = null;
     revisionsSession++;
     verifierObjectifSession();
-    afficherBilanSession();
+    afficherBilanSession(null);
     montrerMenuOuAventureApresRevision(montrerMenu, afficherMissions);
     return;
   }
@@ -783,6 +800,20 @@ function lireQuestionLentement() {
   }
 }
 
+function tentativeLectureAutoCp() {
+  if (getNiveauCourant() !== "cp") return;
+  if (localStorage.getItem("am-lecture-auto-cp") === "0") return;
+  if (_modeRevision) return;
+  const ml = document.getElementById("mini-lecon-jeu");
+  if (ml && !ml.hidden) return;
+  if (getRepondu()) return;
+  if (!getQuestionTexteLisible()) return;
+  requestAnimationFrame(() => {
+    if (getRepondu()) return;
+    lireQuestion();
+  });
+}
+
 function lireTexteCourt(texte, source) {
   if (!texte) return;
   if (lireTexte(texte)) {
@@ -885,7 +916,7 @@ function verifierObjectifSession() {
   track("session_goal_reached", { goal: objectifSession, niveau: getNiveauCourant() });
 }
 
-function afficherBilanSession() {
+function afficherBilanSession(recapJeuCle) {
   const el = getBilanSessionEl();
   if (!el) return;
   const total = bonnesSession + erreursSession;
@@ -902,12 +933,26 @@ function afficherBilanSession() {
   const stats = document.createElement("p");
   stats.className = "bilan-session-stats";
   stats.textContent = `${total} question${total > 1 ? "s" : ""} · ${indicesSession} indice${indicesSession > 1 ? "s" : ""} · ${revisionsSession} révision${revisionsSession > 1 ? "s" : ""}`;
+  const fragSuivants = [];
+  if (recapJeuCle) {
+    const bPartie = Math.max(0, bonnesSession - _snapBonnesAuDebutJeu);
+    const ePartie = Math.max(0, erreursSession - _snapErreursAuDebutJeu);
+    if (bPartie + ePartie > 0) {
+      const recap = document.createElement("p");
+      recap.className = "bilan-session-recap";
+      const nomJ = escapeHtml(getTexteJeu(recapJeuCle));
+      recap.innerHTML = ePartie > 0
+        ? `<strong>${nomJ}</strong> : ${bPartie} réussite${bPartie > 1 ? "s" : ""}, ${ePartie} question${ePartie > 1 ? "s" : ""} à mieux faire. Continue comme ça !`
+        : `<strong>${nomJ}</strong> : ${bPartie} réussite${bPartie > 1 ? "s" : ""}. Super travail !`;
+      fragSuivants.push(recap);
+    }
+  }
   const encouragement = document.createElement("p");
   encouragement.className = "bilan-session-texte";
   encouragement.textContent = objectifSessionAtteint
     ? "Objectif atteint, Foxy est fier de toi."
     : "Tu as appris en essayant, c'est déjà une réussite.";
-  el.append(titre, stats, encouragement);
+  el.append(titre, stats, ...fragSuivants, encouragement);
 }
 
 function mettreAJourObjectifSession() {
@@ -1010,7 +1055,10 @@ function afficherMiniLecon(jeu) {
   btn.type = "button";
   btn.className = "mini-lecon-btn";
   btn.textContent = "J'ai compris, je joue";
-  btn.addEventListener("click", () => { el.hidden = true; });
+  btn.addEventListener("click", () => {
+    el.hidden = true;
+    tentativeLectureAutoCp();
+  });
   el.append(titre, texte, btn);
 }
 
@@ -1024,6 +1072,7 @@ function preparerOutilsQuestion() {
   marquerDebutQuestion();
   const btnIndice = document.getElementById("btn-indice-question");
   if (btnIndice) btnIndice.textContent = "💡 Indice";
+  tentativeLectureAutoCp();
 }
 
 function lancerRevisionDepuisBouton(jeu) {
@@ -1045,10 +1094,13 @@ export function proposerRevisionSiErreurs(jeu, onRetourMenu) {
   if (!jeu || questions.length === 0) return false;
   const overlay = document.createElement("div");
   overlay.className = "evolution-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "revision-exit-dialog-titre");
   overlay.innerHTML = `
     <div class="evolution-carte">
       <p style="font-size:2rem;margin:0">🔁</p>
-      <p class="evolution-titre">Tu as ${questions.length} question${questions.length > 1 ? "s" : ""} à revoir</p>
+      <p id="revision-exit-dialog-titre" class="evolution-titre">Tu as ${questions.length} question${questions.length > 1 ? "s" : ""} à revoir</p>
       <p class="evolution-msg">On les reprend doucement ?</p>
       <button type="button" class="btn-evolution-fermer" id="revision-oui">Oui, je m'entraîne 💪</button>
       <button type="button" class="btn-revision-non" id="revision-non">Plus tard</button>
@@ -1223,10 +1275,13 @@ function declencherCombo(nb, onFermer) {
   const stade = getStade(lireEtoiles());
   const overlay = document.createElement("div");
   overlay.className = "evolution-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "combo-dialog-titre");
   overlay.innerHTML = `
     <div class="evolution-carte combo-carte">
       <div class="evolution-renard">${svgRenard(stade, 100)}</div>
-      <p class="combo-flamme">${nb >= 10 ? "🔥🔥 COMBO ×10 ! 🔥🔥" : "🔥 COMBO ×5 !"}</p>
+      <p id="combo-dialog-titre" class="combo-flamme">${nb >= 10 ? "🔥🔥 COMBO ×10 ! 🔥🔥" : "🔥 COMBO ×5 !"}</p>
       <p class="evolution-titre">${escapeHtml(nom)} est fier de toi !</p>
       <p class="evolution-msg">+${bonus} ⭐ bonus !</p>
       <button type="button" class="btn-evolution-fermer">Super !</button>
@@ -1573,7 +1628,7 @@ export function montrerMenu() {
   brancherObjectifSession();
   mettreAJourObjectifSession();
   afficherGuidageDuJour();
-  afficherBilanSession();
+  afficherBilanSession(jeuQuitte);
 }
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────
@@ -1593,7 +1648,9 @@ export function montrerJeu(nom, lanceurs) {
   correctionsDepuisEncouragement = 0;
   derniereQuestionEtaitErreur = false;
   miniLeconVueJeu = null;
-  delete _revisionRappelQuestionByGame[nom];
+  delete _revisionFileParJeu[nom];
+  _snapBonnesAuDebutJeu = bonnesSession;
+  _snapErreursAuDebutJeu = erreursSession;
   revelerSeulEcran(jeu);
   setBadgeVisible(true);
   const diffBadge = document.getElementById("diff-badge");

@@ -138,8 +138,10 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 ## Mises à jour UX/IA récentes
 
 - Outils de question enrichis : `💡 Indice` en 2 niveaux + `🐢 Relire lentement` (CP/CE1)
-- Révision espacée : après erreur, rappel automatique vers `+5` questions avec mise en avant du bouton `🔁`
-- Mission intelligente : une mission du jour peut cibler le jeu le plus fragile (`focus_jeu`) selon les stats
+- Lecture auto de la consigne en CP (Web Speech quand dispo) : activable/désactivable dans l’espace parents (`localStorage` `am-lecture-auto-cp`, désactivé si `'0'`)
+- Révision espacée : après erreur, rappels automatiques vers `+5` et `+15` questions avec mise en avant du bouton `🔁`
+- Mission intelligente : une mission du jour peut cibler le jeu le plus fragile (`focus_jeu`) selon les stats, avec une courte phrase « pourquoi » dans le widget
+- Retour menu : encart récap de la mini-session (réussites / à retravailler sur le jeu quitté)
 - Espace parents : ajout d’un plan “3 exercices conseillés pour demain” basé sur les performances réelles
 - Explications visuelles renforcées sur `addition`, `soustraction`, `fractions`
 - Montée de difficulté plus fine : tient compte aussi du temps de réponse moyen récent

@@ -1001,6 +1001,13 @@ h1 {
   font-weight: 700;
 }
 
+.bilan-session-recap {
+  margin-top: 0.45rem !important;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--primaire-fonce);
+}
+
 .lecture-facile .zone-question,
 .lecture-facile .aide-douce,
 .lecture-facile .explication-visuelle {
@@ -2543,9 +2550,12 @@ h1 {
 .mission-item { display:flex; align-items:center; gap:0.65rem; background:white; border-radius:1.1rem; padding:0.75rem 1.05rem; margin-bottom:0.55rem; box-shadow:0 2px 10px rgba(0,0,0,0.07); min-height: 3rem; }
 .mission-emoji { font-size:1.45rem; flex-shrink:0; }
 .mission-texte { flex:1; font-size:0.9rem; font-weight:600; line-height:1.35; }
+.mission-pourquoi { margin:0.35rem 0 0; font-size:0.78rem; font-weight:500; color:#666; line-height:1.35; }
 .mission-progress { font-size:0.78rem; color:#888; }
 .mission-item.complete { opacity:0.6; }
 .mission-item.complete .mission-texte { text-decoration:line-through; }
+.mission-item.complete .mission-pourquoi { text-decoration:line-through; opacity:0.75; }
+.params-lecture-cp-bloc { margin-top:1rem; }
 .mission-barre { height:4px; background:#eee; border-radius:2px; margin-top:4px; }
 .mission-barre-fill { height:100%; background:linear-gradient(90deg,var(--primaire),var(--accent)); border-radius:2px; transition:width 0.4s ease; }
 
@@ -2954,6 +2964,8 @@ h1 {
 [data-theme="nuit"] .bilan-session,
 [data-theme="nuit"] .objectif-session,
 [data-theme="nuit"] .guidage-jour { background: #2a2a55; border-color: #6c5ce7; color: #dfe6e9; }
+[data-theme="nuit"] .mission-pourquoi { color: #b2b8c7; }
+[data-theme="nuit"] .bilan-session-recap { color: #c9b8ff; }
 [data-theme="nuit"] .aide-douce-titre { color: #fdcb6e; }
 [data-theme="nuit"] .aide-douce-reponse { background: rgba(0, 184, 148, 0.18); color: #8ff0dd; }
 [data-theme="nuit"] .btn-outil-jeu,
