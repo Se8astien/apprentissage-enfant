@@ -2780,6 +2780,21 @@ h1 {
   line-height: 1.45;
 }
 
+.landing-trust-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.36rem;
+  text-align: left;
+  font-size: 0.82rem;
+  color: #4f5b66;
+  background: rgba(108, 92, 231, 0.08);
+  border: 1px solid rgba(108, 92, 231, 0.16);
+  border-radius: 0.9rem;
+  padding: 0.62rem 0.75rem;
+}
+
+.landing-trust-row span { line-height: 1.35; }
+
 #ecran-landing .btn-landing-cta {
   align-self: stretch;
   width: 100%;
@@ -2886,6 +2901,45 @@ h1 {
   font-size: clamp(0.8rem, 2.6vw, 0.89rem);
   color: var(--texte);
   box-shadow: 0 2px 8px var(--ombre);
+}
+
+.landing-social-proof {
+  width: 100%;
+  border-top: 1px solid rgba(108, 92, 231, 0.14);
+  padding-top: clamp(1.25rem, 3.8vw, 1.8rem);
+}
+
+.landing-social-proof-titre {
+  margin: 0 0 0.7rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--primaire-fonce);
+}
+
+.landing-social-proof-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.landing-social-proof-list blockquote {
+  margin: 0;
+  background: #fff;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(108, 92, 231, 0.14);
+  padding: 0.85rem 0.9rem;
+}
+
+.landing-social-proof-list p {
+  margin: 0 0 0.45rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--texte);
+}
+
+.landing-social-proof-list cite {
+  font-size: 0.77rem;
+  font-style: normal;
+  color: #6d767d;
 }
 
 /* ── Bouton partage landing ──────────────────────────────────────────────────── */
@@ -3046,6 +3100,11 @@ h1 {
 [data-theme="nuit"] .landing-feature p { color: rgba(223, 230, 233, 0.75); }
 [data-theme="nuit"] .landing-matieres span { background: #1e1e3f !important; color: #dfe6e9; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35); }
 [data-theme="nuit"] .landing-gratuit { color: #8892a6; }
+[data-theme="nuit"] .landing-trust-row { background: rgba(108, 92, 231, 0.18); border-color: rgba(162, 155, 254, 0.35); color: #dfe6e9; }
+[data-theme="nuit"] .landing-social-proof { border-top-color: rgba(162, 155, 254, 0.28); }
+[data-theme="nuit"] .landing-social-proof-list blockquote { background: #1e1e3f; border-color: rgba(162, 155, 254, 0.35); }
+[data-theme="nuit"] .landing-social-proof-list p { color: #dfe6e9; }
+[data-theme="nuit"] .landing-social-proof-list cite { color: #b2b8c7; }
 [data-theme="nuit"] .niveau-barre,
 [data-theme="nuit"] .niveau-switch { background: #1e1e3f; }
 [data-theme="nuit"] .profil-carte { background: #1e1e3f; border-color: #3a3a6a; }

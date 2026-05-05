@@ -147,6 +147,7 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - Montée de difficulté plus fine : tient compte aussi du temps de réponse moyen récent
 - Onboarding rapide : bouton `Commencer vite (Normal)` après choix de classe
 - Navigation jeu mobile : bouton `← Retour au menu` en bas d’écran en plus du bouton haut
+- Refonte conversion parent-centric : landing et pages SEO orientées problèmes parents (lecture difficile, concentration, écrans passifs), avec promesse claire, trust immédiat, preuves sociales, FAQ objections et CTA explicites
 
 ## Conventions
 
@@ -155,10 +156,16 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - **Ne modifier que la branche concernée** sans toucher aux autres niveaux
 - **Pas de commentaires** sauf pour les invariants non-évidents
 - **Pas de bundler** — les modules ES natifs suffisent, tester dans un navigateur récent
+- **Copy IA/SEO** : parler d’abord au parent décideur (résultat concret + effort/temps), puis à l’enfant dans l’expérience de jeu
+- **Structure des pages SEO** : problème parent → solution/pédagogie → preuves → FAQ objections → CTA
+- **Trust obligatoire au-dessus de la ligne de flottaison** : gratuité, sans inscription, espace parents protégé, compatibilité tablette/ordinateur
 
 ## Tests (smoke E2E)
 
-- **Playwright** : `tests/e2e/smoke-menu.spec.js` vérifie menu + rythme affiché et synchronisation des boutons CP–CM2 (`aria-pressed` sur `#niveau-cp` …).
+- **Playwright** : `tests/e2e/smoke-menu.spec.js` vérifie :
+  - menu + rythme affiché et synchronisation des boutons CP–CM2 (`aria-pressed` sur `#niveau-cp` …)
+  - affichage d’aide douce après erreur sur un jeu
+  - présence des éléments conversion de landing (promesse parent, trust, preuve sociale, CTA principal)
 - Première installation : `npm install` puis `npx playwright install chromium`.
 - Lancer : `npm run test:e2e` (démarre un serveur HTTP statique sur le dossier du projet, comme pour un navigateur réel).
 

@@ -42,6 +42,21 @@ body {
   font-size: 1rem;
 }
 
+.hero-kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+.hero-proof {
+  margin: 0.85rem 0 0;
+  font-size: 0.84rem;
+  opacity: 0.95;
+}
+
 .cta-row {
   display: flex;
   flex-wrap: wrap;
@@ -89,6 +104,12 @@ h2 {
   color: var(--primaire-fonce);
 }
 
+h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  color: var(--texte);
+}
+
 ul {
   margin: 0;
   padding-left: 1.2rem;
@@ -110,6 +131,22 @@ ul {
 .carte strong {
   display: block;
   color: var(--primaire-fonce);
+}
+
+.faq-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.faq-list article {
+  background: #fbfbff;
+  border: 1px solid var(--bordure);
+  border-radius: 0.95rem;
+  padding: 0.72rem;
+}
+
+.faq-list p {
+  margin: 0;
 }
 
 .liens {

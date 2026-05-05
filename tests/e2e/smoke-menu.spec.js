@@ -4,7 +4,6 @@ test.describe.configure({ mode: "serial" });
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
-    localStorage.setItem("landing-seen", "1");
     localStorage.setItem("maths-cp-genre", "fille");
     localStorage.setItem("maths-cp-niveau", "cp");
     localStorage.setItem("renard-nom", "Foxy");
@@ -16,6 +15,9 @@ test.beforeEach(async ({ context }) => {
 test("menu visible après onboarding simulé + barre classe synchronisée au changement de niveau", async ({
   page,
 }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("landing-seen", "1");
+  });
   await page.goto("/index.html");
 
   await page.waitForFunction(() => window.__amModuleReady === true, null, {
@@ -40,6 +42,9 @@ test("menu visible après onboarding simulé + barre classe synchronisée au cha
 test("une mauvaise réponse affiche une aide douce et la bonne réponse", async ({
   page,
 }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("landing-seen", "1");
+  });
   await page.goto("/index.html");
 
   await page.waitForFunction(() => window.__amModuleReady === true, null, {
@@ -91,4 +96,24 @@ test("une mauvaise réponse affiche une aide douce et la bonne réponse", async 
   await expect(page.locator("#aide-douce")).toContainText(`La bonne réponse était : ${bonneReponse.answer}`);
   await expect(page.locator("#explication-visuelle")).toBeVisible();
   await expect(page.locator("#btn-reviser-erreurs")).toBeVisible();
+});
+
+test("landing parent-centric affiche promesse, trust et preuve sociale", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.removeItem("landing-seen");
+  });
+  await page.goto("/index.html");
+
+  await page.waitForFunction(() => window.__amModuleReady === true, null, {
+    timeout: 20_000,
+  });
+
+  await expect(page.locator("#ecran-landing")).toBeVisible();
+  await expect(page.locator(".landing-titre")).toContainText("Aidez votre enfant à progresser");
+  await expect(page.locator(".landing-gratuit")).toContainText("Sans inscription");
+  await expect(page.locator(".landing-trust-row")).toContainText("Espace parents protégé");
+  await expect(page.locator(".landing-social-proof")).toContainText("Ce que disent les parents");
+  await expect(page.locator("#btn-landing-cta")).toContainText("Tester gratuitement maintenant");
 });
