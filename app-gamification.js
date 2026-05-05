@@ -105,6 +105,59 @@ const TYPES_MISSIONS = [
   () => ({ type: "combo5", emoji: "🔥", texte: "Fais un combo ×5 🔥", cible: 1, progres: 0, complete: false }),
 ];
 
+function lireStatsParJeu() {
+  try {
+    const raw = localStorage.getItem(STATS_PAR_JEU_KEY);
+    if (!raw || /^\d+$/.test(raw.trim())) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function libelleMissionJeu(jeuId) {
+  const labels = {
+    addition: "les additions",
+    soustraction: "les soustractions",
+    multiplication: "les multiplications",
+    division: "les divisions",
+    fractions: "les fractions",
+    fractionsCM: "les fractions",
+    lecture: "la lecture",
+    lectureTexte: "la lecture de texte",
+    grammaire: "la grammaire",
+    conjugaison: "la conjugaison",
+    heure: "l'heure",
+    decimaux: "les décimaux",
+  };
+  return labels[jeuId] || "ce jeu";
+}
+
+function missionFocusJeuFaible() {
+  const perJeu = lireStatsParJeu();
+  const candidats = Object.entries(perJeu)
+    .filter(([, s]) => s && Number.isFinite(s.total) && s.total >= 4)
+    .map(([jeu, s]) => {
+      const total = Math.max(1, parseInt(s.total, 10) || 0);
+      const bonnes = Math.max(0, parseInt(s.bonnes, 10) || 0);
+      return { jeu, total, bonnes, taux: bonnes / total };
+    })
+    .sort((a, b) => a.taux - b.taux || b.total - a.total);
+  if (candidats.length === 0) return null;
+  const cible = candidats[0];
+  const objectif = cible.total >= 12 ? 5 : 3;
+  return {
+    type: "focus_jeu",
+    emoji: "🎯",
+    texte: `Progresse en ${libelleMissionJeu(cible.jeu)} (${objectif} bonnes réponses)`,
+    cible: objectif,
+    progres: 0,
+    complete: false,
+    jeuId: cible.jeu,
+  };
+}
+
 function dateAujourdhui() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -140,8 +193,16 @@ function _genererMissionsJour() {
       }
     }
   } catch { /* ignore */ }
+  const missions = [];
+  const focus = missionFocusJeuFaible();
+  if (focus) missions.push(focus);
   const shuffled = TYPES_MISSIONS.slice().sort(() => Math.random() - 0.5);
-  const missions = shuffled.slice(0, 3).map(fn => fn());
+  shuffled.forEach((fn) => {
+    if (missions.length >= 3) return;
+    const m = fn();
+    if (missions.some((x) => x.type === m.type)) return;
+    missions.push(m);
+  });
   const data = { date: dateAujourdhui(), missions, totalCompletees: 0 };
   localStorage.setItem(MISSIONS_STORAGE_KEY, JSON.stringify(data));
   return data;
@@ -171,6 +232,8 @@ export function progresserMission(type, data) {
       }
     } else if (type === "combo5") {
       m.progres = 1;
+    } else if (type === "focus_jeu") {
+      if (m.jeuId && data === m.jeuId) m.progres++;
     }
 
     if (m.progres >= m.cible) {

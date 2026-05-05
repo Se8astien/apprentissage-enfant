@@ -379,6 +379,7 @@ function creerSettingsHtml() {
   const resume = lireResumeParent(stats);
   const reco = lireRecommandations(stats);
   const recoDetail = lireRecommandationsDetaillees(stats);
+  const planDemain = lirePlanDemain(stats);
   const lignes = Object.entries(stats)
     .filter(([, s]) => s.total > 0)
     .sort((a, b) => (b[1].total || 0) - (a[1].total || 0))
@@ -460,6 +461,10 @@ function creerSettingsHtml() {
       <p class="params-hint-block">Court et concret&nbsp;; adapte la durée et le jour au rythme de l’enfant.</p>
       <ul class="params-conseils-list">
         ${recoDetail.map((txt) => `<li class="params-conseil-item">${txt}</li>`).join("")}
+      </ul>
+      <h3 class="params-section-title">3 exercices conseillés pour demain</h3>
+      <ul class="params-conseils-list">
+        ${planDemain.map((txt) => `<li class="params-conseil-item">${txt}</li>`).join("")}
       </ul>
     </section>
 
@@ -545,6 +550,32 @@ function lireRecommandationsDetaillees(stats) {
     if (taux < 55) return `<strong>${nom}</strong> (${taux}% sur ${total} questions) : viser 5 min par jour en débutant cette semaine.`;
     if (taux < 70) return `<strong>${nom}</strong> (${taux}% sur ${total} questions) : petites sessions de révision, souvent courtes.`;
     return `<strong>${nom}</strong> (${taux}% sur ${total} questions) : consolider avec une session courte de temps en temps.`;
+  });
+}
+
+function lirePlanDemain(stats) {
+  const entries = Object.entries(stats)
+    .filter(([, s]) => s.total >= 6)
+    .map(([jeu, s]) => {
+      const total = Math.max(1, parseInt(s.total, 10) || 0);
+      const bonnes = Math.max(0, parseInt(s.bonnes, 10) || 0);
+      const taux = Math.round((bonnes / total) * 100);
+      return { jeu, taux, total };
+    })
+    .sort((a, b) => a.taux - b.taux || b.total - a.total)
+    .slice(0, 3);
+  if (!entries.length) {
+    return [
+      "Faire 5 questions dans un jeu de maths pour lancer la séance.",
+      "Faire 5 questions dans un jeu de langage en lisant chaque consigne à voix haute.",
+      "Terminer par 3 questions faciles pour finir sur une réussite.",
+    ];
+  }
+  return entries.map(({ jeu, taux, total }) => {
+    const nom = escapeHtml(labelJeu(jeu));
+    if (taux < 55) return `<strong>${nom}</strong> : 6 questions en mode débutant, puis 2 questions de vérification (actuellement ${taux}% sur ${total}).`;
+    if (taux < 70) return `<strong>${nom}</strong> : 5 questions avec un indice au besoin, puis 1 mini révision (actuellement ${taux}% sur ${total}).`;
+    return `<strong>${nom}</strong> : 4 questions de consolidation, sans se presser, puis arrêt (actuellement ${taux}% sur ${total}).`;
   });
 }
 

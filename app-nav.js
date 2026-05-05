@@ -99,11 +99,39 @@ let objectifSessionAtteint = false;
 let lectureFacileActivee = false;
 let miniLeconVueJeu = null;
 let indiceUtiliseQuestion = false;
+let tsQuestionCourante = 0;
+const _tempsReponseParJeu = Object.create(null);
 
 function jeuActifId() {
   const j = getJeuCourant();
   if (j) return j;
   return document.getElementById("ecran-jeu")?.dataset?.jeuActif || null;
+}
+
+function marquerDebutQuestion() {
+  tsQuestionCourante = Date.now();
+}
+
+function enregistrerTempsReponse(jeu, timeout = false) {
+  if (!jeu || !tsQuestionCourante) return;
+  const brut = Date.now() - tsQuestionCourante;
+  const ms = timeout ? Math.max(9000, brut) : Math.max(400, brut);
+  if (!_tempsReponseParJeu[jeu]) _tempsReponseParJeu[jeu] = [];
+  _tempsReponseParJeu[jeu].push(ms);
+  if (_tempsReponseParJeu[jeu].length > 8) _tempsReponseParJeu[jeu].shift();
+}
+
+function moyenneTempsReponse(jeu) {
+  const arr = _tempsReponseParJeu[jeu];
+  if (!arr || !arr.length) return 0;
+  const total = arr.reduce((acc, n) => acc + n, 0);
+  return Math.round(total / arr.length);
+}
+
+function seuilMonteeDifficulte() {
+  const base = estGrand() ? 9000 : 12000;
+  const diff = getDifficulte();
+  return Math.max(6500, base - diff * 800);
 }
 
 const LIBELLE_THEME_JEU = {
@@ -171,6 +199,7 @@ function chronoExpire() {
   if (getRepondu()) return;
   setRepondu(true);
   stopChrono();
+  enregistrerTempsReponse(getJeuCourant(), true);
   questionsDepuisDebutJeu++;
   enregistrerErreurQuestion();
   elChoix.querySelectorAll(".btn-choix").forEach(btn => {
@@ -186,7 +215,10 @@ function chronoExpire() {
   elFeedback.className = "feedback non";
   afficherAideDouce(getBonneReponse(), { timeout: true });
   montrerExplicationVisuelle(getBonneReponse());
-  afficherActionRevision(jeuActifId());
+  const jeuErreur = jeuActifId();
+  if (jeuErreur) planifierRappelRevision(jeuErreur);
+  afficherActionRevision(jeuErreur);
+  verifierRappelRevisionEspacee(jeuErreur);
   declencherReactionRenard(false);
   verifierObjectifSession();
   mettreAJourProgressEffort();
@@ -196,6 +228,7 @@ function chronoExpire() {
 
 // ── Mode révision ─────────────────────────────────────────────────────────────
 const _wrongByGame = Object.create(null);
+const _revisionRappelQuestionByGame = Object.create(null);
 let _modeRevision = null;
 
 export function getWrongQuestions(jeu) {
@@ -203,6 +236,37 @@ export function getWrongQuestions(jeu) {
 }
 export function clearWrongQuestions(jeu) {
   delete _wrongByGame[jeu];
+  delete _revisionRappelQuestionByGame[jeu];
+}
+
+function planifierRappelRevision(jeu) {
+  if (!jeu || _modeRevision) return;
+  const cible = questionsDepuisDebutJeu + 5;
+  const precedent = _revisionRappelQuestionByGame[jeu];
+  if (precedent == null || precedent > cible) _revisionRappelQuestionByGame[jeu] = cible;
+}
+
+function verifierRappelRevisionEspacee(jeu) {
+  if (!jeu || _modeRevision) return;
+  const cible = _revisionRappelQuestionByGame[jeu];
+  if (cible == null || questionsDepuisDebutJeu < cible) return;
+  delete _revisionRappelQuestionByGame[jeu];
+  const nb = getWrongQuestions(jeu).length;
+  if (nb <= 0) return;
+  afficherToastSimple("🔁 Moment revision", "Tu peux revoir tes questions difficiles.");
+  mettreAJourBoutonRevision(jeu);
+  const btn = document.getElementById("btn-reviser-erreurs");
+  if (btn) {
+    btn.classList.remove("revision-rappel");
+    void btn.offsetWidth;
+    btn.classList.add("revision-rappel");
+  }
+  track("revision_nudge", {
+    game_name: jeu,
+    niveau: getNiveauCourant(),
+    wrong_count: nb,
+    after_questions: 5,
+  });
 }
 
 export function entrerRevision(nomJeu, questions) {
@@ -422,7 +486,7 @@ function extraireNombresQuestion() {
   return matches.map((s) => parseInt(s, 10)).filter((n) => Number.isFinite(n));
 }
 
-function lireTexte(texte) {
+function lireTexte(texte, opts = {}) {
   if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
     afficherToastSimple("🔇 Lecture audio indisponible", "Tu peux lire doucement.");
     return false;
@@ -432,7 +496,7 @@ function lireTexte(texte) {
   window.speechSynthesis.cancel();
   const voix = new SpeechSynthesisUtterance(propre);
   voix.lang = "fr-FR";
-  voix.rate = estGrand() ? 0.98 : 0.9;
+  voix.rate = opts.lentement ? (estGrand() ? 0.82 : 0.78) : (estGrand() ? 0.98 : 0.9);
   window.speechSynthesis.speak(voix);
   return true;
 }
@@ -529,6 +593,24 @@ function rappelErreur(jeu) {
   return aides[jeu] || "Astuce : prends ton temps et relis 👀";
 }
 
+function exempleIndice(jeu) {
+  const exemples = {
+    addition: "Exemple : 8 + 5 = 8 + 2 + 3, donc 13.",
+    soustraction: "Exemple : 14 - 6 = 14 - 4 - 2, donc 8.",
+    multiplication: "Exemple : 3 x 4, c'est 3 paquets de 4.",
+    division: "Exemple : 12 partage en 3 groupes egaux, cela fait 4.",
+    fractions: "Exemple : 1/2 est plus grand que 1/4.",
+    fractionsCM: "Exemple : 3/6 et 1/2 representent la meme quantite.",
+    lecture: "Exemple : lis d'abord la premiere syllabe, puis la seconde.",
+    lectureTexte: "Exemple : relis la phrase ou il y a le mot cle de la question.",
+    grammaire: "Exemple : dans 'Le chat mange', le verbe est 'mange'.",
+    conjugaison: "Exemple : 'nous' appelle souvent la terminaison '-ons'.",
+    heure: "Exemple : grande aiguille sur le 6 = et demie.",
+    decimaux: "Exemple : 3,4 = 3 unites et 4 dixiemes.",
+  };
+  return exemples[jeu] || "Exemple : prends un cas simple, puis applique la meme methode.";
+}
+
 function afficherAideDouce(correct, { timeout = false } = {}) {
   const el = getAideDouceEl();
   if (!el) return;
@@ -578,16 +660,27 @@ function montrerExplicationVisuelle(correct) {
   const nombres = extraireNombresQuestion();
   if (jeu === "addition" && nombres.length >= 2) {
     const [a, b] = nombres;
-    visuel.textContent = "🔵".repeat(Math.min(a, 9)) + " + " + "🟡".repeat(Math.min(b, 9));
-    detail = `${a} puis encore ${b}, cela fait ${correct}.`;
-    if (a + b > 18) detail = `Additionne par paquets : la réponse est ${correct}.`;
+    const versDizaine = a % 10 === 0 ? 0 : 10 - (a % 10);
+    const utilise = versDizaine > 0 ? Math.min(versDizaine, b) : 0;
+    const reste = b - utilise;
+    visuel.textContent = `${a} + ${b}  ➜  ${a}+${utilise}${reste > 0 ? `+${reste}` : ""}`;
+    detail = reste > 0
+      ? `Fais une dizaine d'abord : ${a}+${utilise} puis +${reste}, donc ${correct}.`
+      : `${a} puis encore ${b}, cela fait ${correct}.`;
   } else if (jeu === "soustraction" && nombres.length >= 2) {
     const [a, b] = nombres;
-    visuel.textContent = "🍎".repeat(Math.min(a, 12)) + "  ➜  " + "❌".repeat(Math.min(b, 12));
-    detail = `On part de ${a}, on enlève ${b}. Il reste ${correct}.`;
+    const unite = b % 10;
+    const dizaine = b - unite;
+    visuel.textContent = `${a} - ${b}  ➜  ${a}-${dizaine}${unite > 0 ? `-${unite}` : ""}`;
+    detail = dizaine > 0 && unite > 0
+      ? `Enlève d'abord ${dizaine}, puis ${unite}. Il reste ${correct}.`
+      : `On part de ${a}, on enlève ${b}. Il reste ${correct}.`;
   } else if (jeu === "fractions" || jeu === "fractionsCM") {
-    visuel.textContent = "◼️ ◼️ ◻️ ◻️";
-    detail = "Compare les parts colorées avec le même tout.";
+    const fractions = (question.match(/\d+\s*\/\s*\d+/g) || []).slice(0, 2).map((f) => f.replace(/\s+/g, ""));
+    visuel.textContent = fractions.length === 2 ? `${fractions[0]}  ⚖️  ${fractions[1]}` : "◼️◼️◻️◻️  ⚖️  ◼️◻️◻️◻️";
+    detail = fractions.length === 2
+      ? "Compare les parts: plus le dénominateur est grand, plus chaque part est petite."
+      : "Compare les parts du même tout avant de choisir.";
   } else if (jeu === "grammaire" || jeu === "conjugaison") {
     visuel.textContent = "Sujet  →  verbe  →  complément";
     detail = "Repère d'abord le verbe, puis regarde les mots autour.";
@@ -619,6 +712,7 @@ function cacherAideDouce() {
 
 function afficherIndiceAvantReponse() {
   if (getRepondu()) return;
+  const btnIndice = document.getElementById("btn-indice-question");
   if (!indiceUtiliseQuestion) {
     indiceUtiliseQuestion = true;
     indicesSession++;
@@ -626,6 +720,25 @@ function afficherIndiceAvantReponse() {
       const b = BADGES.find(x => x.id === "curieux");
       if (b) afficherNotifBadge(b);
     }
+    const el = getAideDouceEl();
+    if (!el) return;
+    el.hidden = false;
+    el.innerHTML = "";
+    const titre = document.createElement("p");
+    titre.className = "aide-douce-titre";
+    titre.textContent = "Petit coup de pouce";
+    const indice = document.createElement("p");
+    indice.className = "aide-douce-indice";
+    indice.textContent = rappelErreur(getJeuCourant());
+    const encouragement = document.createElement("p");
+    encouragement.className = "aide-douce-encouragement";
+    encouragement.textContent = estGrand()
+      ? "Utilise l'indice, puis choisis ta réponse."
+      : "Tu peux prendre ton temps, puis choisir.";
+    el.append(titre, indice, encouragement);
+    if (btnIndice) btnIndice.textContent = "💡 Indice ++";
+    track("hint_used", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    return;
   }
   const el = getAideDouceEl();
   if (!el) return;
@@ -633,17 +746,21 @@ function afficherIndiceAvantReponse() {
   el.innerHTML = "";
   const titre = document.createElement("p");
   titre.className = "aide-douce-titre";
-  titre.textContent = "Petit coup de pouce";
+  titre.textContent = "Indice guide";
   const indice = document.createElement("p");
   indice.className = "aide-douce-indice";
   indice.textContent = rappelErreur(getJeuCourant());
+  const exemple = document.createElement("p");
+  exemple.className = "aide-douce-reponse";
+  exemple.textContent = exempleIndice(getJeuCourant());
   const encouragement = document.createElement("p");
   encouragement.className = "aide-douce-encouragement";
   encouragement.textContent = estGrand()
-    ? "Utilise l'indice, puis choisis ta réponse."
-    : "Tu peux prendre ton temps, puis choisir.";
-  el.append(titre, indice, encouragement);
-  track("hint_used", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    ? "Refais la methode avec ta question."
+    : "Essaie pareil avec ta question.";
+  el.append(titre, indice, exemple, encouragement);
+  if (btnIndice) btnIndice.textContent = "💡 Indice guide";
+  track("hint_level_2", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
 }
 
 function lireQuestion() {
@@ -652,6 +769,17 @@ function lireQuestion() {
   if (lireTexte(texte)) {
     lecturesSession++;
     track("question_read_aloud", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+  }
+}
+
+function lireQuestionLentement() {
+  const niveau = getNiveauCourant();
+  if (niveau !== "cp" && niveau !== "ce1") return;
+  const texte = getQuestionTexteLisible();
+  if (!texte) return;
+  if (lireTexte(texte, { lentement: true })) {
+    lecturesSession++;
+    track("read_slow", { game_name: getJeuCourant(), niveau });
   }
 }
 
@@ -893,6 +1021,9 @@ function preparerOutilsQuestion() {
   mettreAJourProgressEffort();
   mettreAJourBoutonRevision();
   appliquerLectureFacile();
+  marquerDebutQuestion();
+  const btnIndice = document.getElementById("btn-indice-question");
+  if (btnIndice) btnIndice.textContent = "💡 Indice";
 }
 
 function lancerRevisionDepuisBouton(jeu) {
@@ -992,6 +1123,14 @@ function brancherOutilsQuestion() {
   if (btnLire && btnLire.dataset.amReadBound !== "1") {
     btnLire.dataset.amReadBound = "1";
     btnLire.addEventListener("click", lireQuestion);
+  }
+  const btnLireLentement = document.getElementById("btn-lire-lentement");
+  if (btnLireLentement) {
+    btnLireLentement.hidden = !(getNiveauCourant() === "cp" || getNiveauCourant() === "ce1");
+    if (btnLireLentement.dataset.amReadSlowBound !== "1") {
+      btnLireLentement.dataset.amReadSlowBound = "1";
+      btnLireLentement.addEventListener("click", lireQuestionLentement);
+    }
   }
   brancherAudioChoix();
   const btnLectureFacile = document.getElementById("btn-lecture-facile");
@@ -1138,6 +1277,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
   if (getRepondu()) return;
   setRepondu(true);
   stopChrono();
+  enregistrerTempsReponse(getJeuCourant(), false);
   questionsDepuisDebutJeu++;
   const boutons = elChoix.querySelectorAll(".btn-choix");
   boutons.forEach((btn) => {
@@ -1168,6 +1308,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       ...progresserMission("bonnes"),
       ...progresserMission("etoiles"),
       ...progresserMission("jeux", getJeuCourant()),
+      ...progresserMission("focus_jeu", getJeuCourant()),
     ];
     afficherMissions();
     if (missOk.length) {
@@ -1196,6 +1337,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       if (!_wrongByGame[idJeuErreur]) _wrongByGame[idJeuErreur] = [];
       const _zq = document.getElementById("zone-question");
       _wrongByGame[idJeuErreur].push({ html: _zq ? _zq.innerHTML : "", bonne: correct, isText, options: [...elChoix.querySelectorAll(".btn-choix")].map(b => b.textContent.trim()) });
+      planifierRappelRevision(idJeuErreur);
     }
     track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
     sonMauvaise();
@@ -1212,9 +1354,11 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     afficherAideDouce(correct);
     montrerExplicationVisuelle(correct);
     afficherActionRevision(idJeuErreur);
+    verifierRappelRevisionEspacee(idJeuErreur);
     declencherReactionRenard(false);
     tenterModeFatigue();
   }
+  verifierRappelRevisionEspacee(jeuActifId());
   verifierObjectifSession();
   mettreAJourProgressEffort();
   recompenserEffortSiBesoin();
@@ -1237,7 +1381,13 @@ export function apresReponseTexte(choix, bouton, correct) {
 function gererProgressionDifficulte() {
   const jeu = getJeuCourant();
   const diff = getDifficulteJeu(jeu);
+  const tempsMoyen = moyenneTempsReponse(jeu);
+  const seuil = seuilMonteeDifficulte();
   if (diff < 2) {
+    if (tempsMoyen > seuil) {
+      afficherToastSimple("🧭 On consolide", "Encore quelques questions avant d'augmenter la difficulté.");
+      return;
+    }
     setDifficulteJeu(jeu, diff + 1);
     track("difficulty_up", { game_name: jeu, niveau: getNiveauCourant(), from: diff, to: diff + 1 });
     afficherToastDifficulte();
@@ -1443,6 +1593,7 @@ export function montrerJeu(nom, lanceurs) {
   correctionsDepuisEncouragement = 0;
   derniereQuestionEtaitErreur = false;
   miniLeconVueJeu = null;
+  delete _revisionRappelQuestionByGame[nom];
   revelerSeulEcran(jeu);
   setBadgeVisible(true);
   const diffBadge = document.getElementById("diff-badge");

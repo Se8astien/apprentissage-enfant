@@ -135,6 +135,17 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - Missions du jour : 3 objectifs renouvelés chaque jour (ex. "Fais 10 additions")
 - Stats de jeu : parties jouées, taux de réussite, meilleure série
 
+## Mises à jour UX/IA récentes
+
+- Outils de question enrichis : `💡 Indice` en 2 niveaux + `🐢 Relire lentement` (CP/CE1)
+- Révision espacée : après erreur, rappel automatique vers `+5` questions avec mise en avant du bouton `🔁`
+- Mission intelligente : une mission du jour peut cibler le jeu le plus fragile (`focus_jeu`) selon les stats
+- Espace parents : ajout d’un plan “3 exercices conseillés pour demain” basé sur les performances réelles
+- Explications visuelles renforcées sur `addition`, `soustraction`, `fractions`
+- Montée de difficulté plus fine : tient compte aussi du temps de réponse moyen récent
+- Onboarding rapide : bouton `Commencer vite (Normal)` après choix de classe
+- Navigation jeu mobile : bouton `← Retour au menu` en bas d’écran en plus du bouton haut
+
 ## Conventions
 
 - **Vérifier la syntaxe** après chaque modification : `node --check fichier.js`

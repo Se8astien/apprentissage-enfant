@@ -340,6 +340,7 @@
             <span class="classe-desc">10–11 ans</span>
           </button>
         </div>
+        <button type="button" id="btn-classe-rapide" class="btn-classe-rapide" hidden>✨ Commencer vite (Normal)</button>
         <div class="diff-choix" id="diff-choix" hidden>
           <h3 class="diff-titre">Comment tu te sens ?</h3>
           <div class="diff-btns">
@@ -637,6 +638,7 @@
       <div id="outils-jeu" class="jeu-outils" hidden aria-label="Aides pour répondre">
         <button type="button" id="btn-indice-question" class="btn-outil-jeu" aria-controls="aide-douce">💡 Indice</button>
         <button type="button" id="btn-lire-question" class="btn-outil-jeu">🔊 Lire</button>
+        <button type="button" id="btn-lire-lentement" class="btn-outil-jeu" hidden>🐢 Relire lentement</button>
       </div>
       <div id="zone-choix" class="zone-choix" role="group" aria-label="Choix de réponse"></div>
       <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
@@ -645,6 +647,7 @@
       <p id="effort-progress" class="effort-progress" hidden aria-live="polite"></p>
       <button type="button" id="btn-reviser-erreurs" class="btn-reviser-erreurs" hidden>🔁 Revoir mes erreurs</button>
       <button type="button" class="btn-suivant" id="btn-suivant" hidden aria-label="Question suivante">Question suivante →</button>
+      <button type="button" class="btn-retour btn-retour-bas" id="btn-retour-bas" aria-label="Retour au menu">← Retour au menu</button>
     </section>
 
     <div id="modal-classe-suivante" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-classe-titre" aria-describedby="modal-classe-texte">

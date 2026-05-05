@@ -113,6 +113,8 @@ function montrerClasse() {
   if (mascot) mascot.innerHTML = svgRenard(getStade(lireEtoiles()), 80, {});
   const diffChoix = document.getElementById("diff-choix");
   if (diffChoix) diffChoix.hidden = true;
+  const btnRapide = document.getElementById("btn-classe-rapide");
+  if (btnRapide) btnRapide.hidden = true;
   document.querySelectorAll(".btn-classe").forEach(b => b.classList.remove("selectionne"));
 }
 
@@ -204,7 +206,19 @@ function brancherOnboardingUI() {
         diffEl.hidden = false;
         try { diffEl.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch { /* ignore */ }
       }
+      const btnRapide = document.getElementById("btn-classe-rapide");
+      if (btnRapide) btnRapide.hidden = false;
     });
+  });
+
+  const btnClasseRapide = document.getElementById("btn-classe-rapide");
+  uneFois(btnClasseRapide, "click", () => {
+    const btnSel = document.querySelector(".btn-classe.selectionne");
+    const nv = btnSel ? btnSel.getAttribute("data-niveau") : null;
+    if (!nv) return;
+    sauverNiveau(nv);
+    setDifficulte(1);
+    routerVersEtape();
   });
 
   document.querySelectorAll(".btn-diff").forEach((btn) => {
@@ -497,8 +511,7 @@ function retourDepuisJeuVersMenuOuAventure() {
   entrerMenu();
 }
 
-// ── Navigation jeu ────────────────────────────────────────────────────────────
-if (btnRetour) btnRetour.addEventListener("click", () => {
+function gererRetourJeu() {
   const jeu = getJeuCourant();
   const wrongs = getWrongQuestions(jeu);
   track("game_exit", {
@@ -509,10 +522,14 @@ if (btnRetour) btnRetour.addEventListener("click", () => {
   });
   if (proposerRevisionSiErreurs(jeu, retourDepuisJeuVersMenuOuAventure)) {
     return;
-  } else {
-    retourDepuisJeuVersMenuOuAventure();
   }
-});
+  retourDepuisJeuVersMenuOuAventure();
+}
+
+// ── Navigation jeu ────────────────────────────────────────────────────────────
+if (btnRetour) btnRetour.addEventListener("click", gererRetourJeu);
+const btnRetourBas = document.getElementById("btn-retour-bas");
+if (btnRetourBas) btnRetourBas.addEventListener("click", gererRetourJeu);
 if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
 
 // Changer de genre/classe gérés par brancherOnboardingUI.
