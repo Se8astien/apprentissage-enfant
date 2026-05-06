@@ -29,32 +29,55 @@ body {
   background: linear-gradient(135deg, #6151e6 0%, #8a7fff 100%);
   color: #fff;
   border-radius: 1.4rem;
-  padding: 1.2rem 1rem;
+  padding: 1.8rem 1.2rem;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(95, 80, 224, 0.2);
+}
+
+.hero-emoji {
+  display: block;
+  font-size: 3.5rem;
+  margin-bottom: 0.8rem;
+  line-height: 1;
 }
 
 .hero h1 {
-  margin: 0;
-  font-size: clamp(1.5rem, 5vw, 2.1rem);
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  line-height: 1.2;
 }
 
 .hero p {
-  margin: 0.6rem 0 0;
-  font-size: 1rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+.hero-sous {
+  font-size: 0.9rem;
+  opacity: 0.92;
+  margin-top: 0.4rem;
 }
 
 .hero-kicker {
-  margin: 0;
-  font-size: 0.78rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.92;
+  opacity: 0.88;
 }
 
 .hero-proof {
-  margin: 0.85rem 0 0;
-  font-size: 0.84rem;
-  opacity: 0.95;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  opacity: 0.9;
+}
+
+.cta-row {
+  margin-top: 1rem;
+  justify-content: center;
 }
 
 .cta-row {
@@ -68,22 +91,41 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.9rem;
-  padding: 0.55rem 1rem;
+  min-height: 3.2rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 999px;
   font-weight: 700;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.05rem;
 }
 
 .btn-primaire {
   background: #fff;
   color: var(--primaire-fonce);
+  box-shadow: 0 4px 12px rgba(95, 80, 224, 0.25);
+}
+
+.btn-primaire:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(95, 80, 224, 0.35);
+}
+
+.btn-primaire:active {
+  transform: translateY(0);
 }
 
 .btn-secondaire {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.3);
   color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.btn-secondaire:hover {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 main {
@@ -163,4 +205,123 @@ ul {
 footer {
   padding: 0.8rem 0 2rem;
   font-size: 0.92rem;
+}
+
+/* === STATS SOCIALES === */
+.stats-sociales {
+  background: linear-gradient(135deg, rgba(95, 80, 224, 0.08) 0%, rgba(255, 255, 255, 0.8) 100%);
+  border: 2px solid var(--bordure);
+  border-radius: 1.2rem;
+  padding: 1.2rem 0.95rem;
+  margin-bottom: 0.85rem;
+  text-align: center;
+}
+
+.stats-sociales h2 {
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.stat-item {
+  background: #fff;
+  border: 1px solid var(--bordure);
+  border-radius: 1rem;
+  padding: 0.8rem 0.6rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(95, 80, 224, 0.15);
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primaire-fonce);
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--texte);
+  line-height: 1.3;
+}
+
+.stats-sociales .trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--bordure);
+}
+
+.trust-badge {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(95, 80, 224, 0.08);
+  border-radius: 999px;
+  color: var(--primaire-fonce);
+  font-weight: 600;
+}
+
+/* === FAQ ACCORDION === */
+.faq-list article {
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid var(--bordure);
+}
+
+.faq-list h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.72rem;
+  margin: 0;
+}
+
+.faq-list h3::before {
+  content: "▶";
+  display: inline-block;
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.faq-list article[open] h3::before {
+  transform: rotate(90deg);
+}
+
+.faq-list p {
+  padding: 0 0.72rem 0.72rem;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 600px) {
+  .stat-row {
+    grid-template-columns: 1fr;
+  }
 }
