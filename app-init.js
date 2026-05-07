@@ -86,6 +86,7 @@ import {
 import { initFunMenuBar, accueillirWeekEndSiMenu } from "./app-fun-menu.js";
 import { afficherMenuHome } from "./app-menu-home.js";
 import { afficherParentDashboard } from "./app-parent-dashboard.js";
+import { afficherTableauBordProfesseur } from "./app-teacher-dashboard.js";
 
 const lanceurs = {};
 
@@ -684,6 +685,18 @@ function afficherParentDashboardScreen() {
 
 const btnParentMenu = document.getElementById("btn-parent-menu");
 if (btnParentMenu) btnParentMenu.addEventListener("click", afficherParentDashboardScreen);
+
+// ── Tableau de bord professeur ───────────────────────────────────────────────────
+function afficherTeacherDashboardScreen() {
+  const elTeacherDash = document.getElementById("ecran-teacher-dashboard");
+  if (elTeacherDash) {
+    revelerSeulEcran(elTeacherDash);
+    afficherTableauBordProfesseur();
+  }
+}
+
+const btnTeacherMenu = document.getElementById("btn-teacher-menu");
+if (btnTeacherMenu) btnTeacherMenu.addEventListener("click", afficherTeacherDashboardScreen);
 
 // ── Certificat imprimable ────────────────────────────────────────────────────
 function imprimerCertificat() {

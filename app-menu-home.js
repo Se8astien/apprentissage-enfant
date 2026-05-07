@@ -118,6 +118,10 @@ export function afficherMenuHome() {
           <span style="font-size: 1.8rem;">👨‍👩‍👧</span>
           <span style="font-size: 0.8rem; display: block;">Parent</span>
         </button>
+        <button type="button" id="btn-teacher-menu" class="btn-icon-menu" aria-label="Mode Professeur">
+          <span style="font-size: 1.8rem;">👨‍🏫</span>
+          <span style="font-size: 0.8rem; display: block;">Prof</span>
+        </button>
       </div>
     </div>
   `;
