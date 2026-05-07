@@ -7,6 +7,9 @@ const CHARGEURS = {
   langage: () => import("./games-langage.js"),
   algo: () => import("./games-algo.js"),
   musique: () => import("./games-musique.js"),
+  strategiemalo: () => import("./games-strategiemalo.js"),
+  comprehension: () => import("./games-comprehension.js"),
+  orthographe: () => import("./games-orthographe.js"),
 };
 
 const JEU_SPEC = {
@@ -79,6 +82,20 @@ const JEU_SPEC = {
   labyrintheLogique: ["algo", "lancerLabyrintheLogique"],
   planificationRenard: ["algo", "lancerPlanificationRenard"],
   triLogique: ["algo", "lancerTriLogique"],
+  strategieMalo: ["strategiemalo", "lancerStratégieMalo"],
+  doublesMalo: ["strategiemalo", "lancerStrategieDoubles"],
+  aller10Malo: ["strategiemalo", "lancerStrategieAller10"],
+  compensationMalo: ["strategiemalo", "lancerStrategieCompensation"],
+  estimationMalo: ["strategiemalo", "lancerStrategieEstimation"],
+  comprendreTexte: ["comprehension", "lancerComprendreTexte"],
+  comprendreTexteCE2: ["comprehension", "lancerComprendreTexteCE2"],
+  comprendreTexteCM1: ["comprehension", "lancerComprendreTexteCM1"],
+  comprendreTexteCM2: ["comprehension", "lancerComprendreTexteCM2"],
+  orthopuzzle: ["orthographe", "lancerOrthoPuzzle"],
+  orthopuzzleCE1: ["orthographe", "lancerOrthopuzzleCE1"],
+  orthopuzzleCE2: ["orthographe", "lancerOrthopuzzleCE2"],
+  orthopuzzleCM1: ["orthographe", "lancerOrthopuzzleCM1"],
+  orthopuzzleCM2: ["orthographe", "lancerOrthopuzzleCM2"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
