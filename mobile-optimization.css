@@ -154,17 +154,11 @@ button:focus-visible,
 
 /* ── PHASE 3: Touch Gestures & Orientation ────────────────────────────────── */
 
-/* Handle landscape orientation */
-@media (orientation: landscape) {
+/* Handle landscape orientation — mobile/tablet only (not desktop) */
+@media (orientation: landscape) and (max-width: 1024px) {
   .renard-header,
   [class*="header"] {
     padding: 0.5rem 0;
-  }
-
-  .ecran {
-    max-height: 100vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
   }
 
   /* Reduce top/bottom padding in landscape */
@@ -174,14 +168,9 @@ button:focus-visible,
   }
 }
 
-/* Handle portrait orientation */
-@media (orientation: portrait) {
-  .ecran {
-    /* Ensure content is scrollable on small screens */
-    max-height: 100vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+/* Handle portrait orientation — mobile/tablet only (not desktop) */
+@media (orientation: portrait) and (max-width: 1024px) {
+  /* content scrolls naturally via html/body — no inner scroll needed */
 }
 
 /* ── PHASE 4: Accessibility Improvements ──────────────────────────────────── */

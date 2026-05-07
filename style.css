@@ -58,13 +58,13 @@ body {
   background: var(--fond);
   background-attachment: fixed;
   -webkit-tap-highlight-color: transparent;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .app {
   max-width: min(36rem, 100%);
   margin: 0 auto;
-  padding: 1rem 1rem 2rem;
+  padding: 1rem 1rem 7rem;
   position: relative;
 }
 
@@ -72,7 +72,7 @@ body {
 @media (min-width: 900px) {
   .app {
     max-width: 1120px;
-    padding: 1.5rem 2.5rem 3rem;
+    padding: 1.5rem 2.5rem 7rem;
   }
 
   /* 3 colonnes sur tablette large / desktop */
