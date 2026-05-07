@@ -5,7 +5,11 @@ import {
   elTitre,
   getNiveauCourant,
   getDifficulte,
+  revelerSeulEcran,
+  lireMaitrise,
 } from "./app-state.js";
+import { resoudreLanceur } from "./games-registry.js";
+import { montrerJeu } from "./app-nav.js";
 
 export function afficherMenuHome() {
   const elMenuHome = document.getElementById("ecran-menu-home");
@@ -174,10 +178,50 @@ function trouverJeuPrefere(stats) {
 }
 
 function afficherMenuCategories() {
-  // Implémentation du menu par catégories
-  // À faire: afficher les cartes de catégories (Maths, Lecture, Ortho...)
-  // Puis les jeux de chaque catégorie avec progrès bar
-  console.log("Menu catégories à implémenter");
+  const elMenuHome = document.getElementById("ecran-menu-home");
+  if (!elMenuHome) return;
+
+  const categories = [
+    { nom: "Mathématiques", emoji: "🧮", jeux: ["addition", "soustraction", "multiplication", "division", "fractions"] },
+    { nom: "Lecture", emoji: "📖", jeux: ["lecture", "syllabes", "lecturePhrase", "comprendreTexte", "lectureExpress"] },
+    { nom: "Orthographe", emoji: "✏️", jeux: ["homophones", "orthopuzzle", "ponctuationPuzzle"] },
+    { nom: "Grammaire", emoji: "▲", jeux: ["grammaire", "conjugaison", "atelierAccords"] },
+    { nom: "Logique", emoji: "🤖", jeux: ["sequence", "code", "triLogique"] },
+  ];
+
+  const html = `
+    <div style="padding: 1.5rem;">
+      <h2 style="text-align: center; font-size: 1.4rem; margin: 0 0 1.5rem 0;">
+        📚 Catégories de jeux
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        ${categories.map(cat => `
+          <button type="button" class="menu-home-card" style="cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="font-size: 2rem;">${cat.emoji}</div>
+              <div style="text-align: left; flex-grow: 1;">
+                <h3 style="margin: 0; font-size: 1.1rem;">${cat.nom}</h3>
+                <p style="margin: 0.3rem 0 0 0; font-size: 0.9rem; color: #666;">${cat.jeux.length} jeux</p>
+              </div>
+              <div style="color: var(--primaire); font-size: 1.5rem;">→</div>
+            </div>
+          </button>
+        `).join('')}
+      </div>
+      <button type="button" id="btn-retour-categories" style="
+        margin-top: 1.5rem;
+        background: none;
+        border: none;
+        color: var(--primaire);
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: underline;
+      ">← Retour au menu</button>
+    </div>
+  `;
+
+  elMenuHome.innerHTML = html;
+  document.getElementById("btn-retour-categories").addEventListener("click", afficherMenuHome);
 }
 
 function lancerJeuAleatoire() {
@@ -192,10 +236,11 @@ function lancerJeuAleatoire() {
   lancerJeu(jeuRandom);
 }
 
-function lancerJeu(jeuId) {
-  // Lancer le jeu avec transition
-  console.log("Lancer jeu:", jeuId);
-  // À faire: importer resoudreLanceur et lancer
+async function lancerJeu(jeuId) {
+  const lanceur = await resoudreLanceur(jeuId);
+  if (lanceur && typeof lanceur === "function") {
+    montrerJeu(jeuId, { [jeuId]: lanceur });
+  }
 }
 
 function afficherEcran(ecranId) {
@@ -206,8 +251,84 @@ function afficherEcran(ecranId) {
 }
 
 function afficherStatistiques() {
-  console.log("Afficher statistiques");
-  // À faire: tableau de bord stats enfant
+  const elMenuHome = document.getElementById("ecran-menu-home");
+  if (!elMenuHome) return;
+
+  const stats = localStorage.getItem("stats") ? JSON.parse(localStorage.getItem("stats")) : { jeux: {}, sessions: 0 };
+  const etoiles = parseInt(localStorage.getItem("etoiles") || "0");
+  const enfantNom = localStorage.getItem("enfant-nom") || "Enfant";
+
+  const jeusMaitris = Object.entries(stats.jeux || {})
+    .filter(([id, data]) => lireMaitrise(id).some(Boolean))
+    .length;
+
+  const jeusMoins50 = Object.entries(stats.jeux || {})
+    .filter(([id, data]) => (data.reussite || 50) < 50)
+    .map(([id, data]) => ({ id, nom: data.nom || id, reussite: data.reussite || 50 }))
+    .sort((a, b) => a.reussite - b.reussite)
+    .slice(0, 3);
+
+  const html = `
+    <div style="padding: 1.5rem;">
+      <h2 style="text-align: center; font-size: 1.4rem; margin: 0 0 1.5rem 0;">
+        📊 Statistiques de ${enfantNom}
+      </h2>
+
+      <div class="parent-card parent-card--primary" style="margin-bottom: 1.5rem;">
+        <h3 style="margin: 0 0 1rem 0;">🏆 Progression</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div style="text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 700;">${etoiles}</div>
+            <div style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">⭐ étoiles</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 700;">${jeusMaitris}</div>
+            <div style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">🎮 jeux maîtrisés</div>
+          </div>
+        </div>
+      </div>
+
+      ${jeusMoins50.length > 0 ? `
+        <div class="parent-card parent-card--action" style="margin-bottom: 1.5rem;">
+          <h3 style="margin: 0 0 1rem 0;">⚠️ À travailler</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+            ${jeusMoins50.map(jeu => `
+              <div style="padding: 0.8rem; background: rgba(255,152,0,0.1); border-radius: 0.5rem;">
+                <div style="font-weight: 600;">${jeu.nom}</div>
+                <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">Réussite: ${jeu.reussite}%</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="parent-card" style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">${stats.sessions || 0}</div>
+          <div style="font-size: 0.9rem; color: #666;">sessions jouées</div>
+        </div>
+        <div class="parent-card" style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem;">${Object.keys(stats.jeux || {}).length}</div>
+          <div style="font-size: 0.9rem; color: #666;">jeux essayés</div>
+        </div>
+      </div>
+
+      <button type="button" id="btn-retour-stats" style="
+        width: 100%;
+        background: var(--primaire);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 0.8rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      ">← Retour au menu</button>
+    </div>
+  `;
+
+  elMenuHome.innerHTML = html;
+  document.getElementById("btn-retour-stats").addEventListener("click", afficherMenuHome);
 }
 
 export function rendreRenardVisibleMenuHome() {
