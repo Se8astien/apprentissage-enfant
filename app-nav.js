@@ -50,6 +50,7 @@ import { texteAccrocheAleatoire } from "./app-accroches.js";
 import { rafraichirBarreFunMenu } from "./app-fun-menu.js";
 
 import { track } from "./app-analytics.js";
+import { enregistrerReponse } from "./app-analytics-tracking.js";
 import { montrerMenuOuAventureApresRevision } from "./app-aventure.js";
 import { sonBonne, sonMauvaise, sonCombo, sonMission, sonAccessoire } from "./app-sons.js";
 
@@ -115,12 +116,13 @@ function marquerDebutQuestion() {
 }
 
 function enregistrerTempsReponse(jeu, timeout = false) {
-  if (!jeu || !tsQuestionCourante) return;
+  if (!jeu || !tsQuestionCourante) return 0;
   const brut = Date.now() - tsQuestionCourante;
   const ms = timeout ? Math.max(9000, brut) : Math.max(400, brut);
   if (!_tempsReponseParJeu[jeu]) _tempsReponseParJeu[jeu] = [];
   _tempsReponseParJeu[jeu].push(ms);
   if (_tempsReponseParJeu[jeu].length > 8) _tempsReponseParJeu[jeu].shift();
+  return Math.round(ms / 1000); // Return time in seconds for analytics
 }
 
 function moyenneTempsReponse(jeu) {
@@ -1332,8 +1334,12 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
   if (getRepondu()) return;
   setRepondu(true);
   stopChrono();
-  enregistrerTempsReponse(getJeuCourant(), false);
+  const tempsReponse = enregistrerTempsReponse(getJeuCourant(), false);
   questionsDepuisDebutJeu++;
+
+  // Enregistrer pour analytics pilote
+  const estCorrect = isText ? choix === String(correct) : choix === correct;
+  enregistrerReponse(estCorrect, tempsReponse, getJeuCourant());
   const boutons = elChoix.querySelectorAll(".btn-choix");
   boutons.forEach((btn) => {
     btn.disabled = true;

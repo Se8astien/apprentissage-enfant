@@ -4,6 +4,7 @@
 import { obtenirProfilActuel, obtenirClassesProf } from './teacher-profile-service.js';
 import { obtenirSessionsArchiviees, obtenirStatistiquesClasse, obtenirProgressionEtudiant } from './teacher-session-tracker.js';
 import { obtenirObjectifParNiveau, calculerCouvertureCurriculum, genererPlanTravailQuotidien } from './teacher-curriculum-map.js';
+import { afficherTableauBordAnalytiques } from './app-analytics-dashboard.js';
 
 const TAB_ACTIF = 'am-teacher-tab-actif';
 const CLASS_SELECTIONNEE = 'am-teacher-class-selected';
@@ -38,16 +39,27 @@ export function afficherTableauBordProfesseur() {
   const html = `
     <div style="padding: 1.5rem;">
       <!-- HEADER -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem;">
         <h2 style="margin: 0; font-size: 1.5rem;">📊 Tableau Bord Classe</h2>
-        <button id="btn-deconnexion-prof" style="
-          background: var(--primaire);
-          color: white;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
-          cursor: pointer;
-        ">Déconnexion</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="btn-analytics-pilote" style="
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+          ">📈 Analytique Pilote</button>
+          <button id="btn-deconnexion-prof" style="
+            background: var(--primaire);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+          ">Déconnexion</button>
+        </div>
       </div>
 
       <!-- SÉLECTEUR CLASSE -->
@@ -109,6 +121,18 @@ export function afficherTableauBordProfesseur() {
   document.getElementById('tab-etudiants').addEventListener('click', () => afficherTab('etudiants', classeActuelle, sessions));
   document.getElementById('tab-curriculum').addEventListener('click', () => afficherTab('curriculum', classeActuelle, sessions));
   document.getElementById('tab-analytics').addEventListener('click', () => afficherTab('analytics', classeActuelle, sessions));
+
+  const btnAnalyticsPilote = document.getElementById('btn-analytics-pilote');
+  if (btnAnalyticsPilote) {
+    btnAnalyticsPilote.addEventListener('click', () => {
+      const elAnalytics = document.getElementById('ecran-analytics-dashboard');
+      if (elAnalytics) {
+        const ecrans = document.querySelectorAll('.ecran');
+        ecrans.forEach(e => e.hidden = true);
+        afficherTableauBordAnalytiques();
+      }
+    });
+  }
 
   document.getElementById('btn-deconnexion-prof').addEventListener('click', () => {
     const { deconnecterProfesseur } = require('./teacher-profile-service.js');
