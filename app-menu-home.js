@@ -336,16 +336,3 @@ function afficherStatistiques() {
   elMenuHome.innerHTML = html;
   document.getElementById("btn-retour-stats").addEventListener("click", afficherMenuHome);
 }
-
-export function rendreRenardVisibleMenuHome() {
-  // Mettre à jour le renard et ses jauges en temps réel
-  const renard = localStorage.getItem("renard-nom") || "Noctis";
-  const etoiles = parseInt(localStorage.getItem("etoiles") || "0");
-  const level = Math.floor(etoiles / 50) + 1;
-
-  const el = document.getElementById("renard-level");
-  if (el) el.textContent = `Level ${level}`;
-
-  // Jauges
-  // À faire: calculer faim et bonheur basés sur le temps
-}

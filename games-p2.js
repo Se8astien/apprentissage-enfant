@@ -24,6 +24,12 @@ import {
 
 import { apresReponse, apresReponseTexte } from "./app-nav.js";
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function filtrerParNiveau(donnees, niveauActuel, mappingNiveaux) {
+  const niveaux = mappingNiveaux[niveauActuel] || Object.values(mappingNiveaux)[0];
+  return donnees.filter(d => niveaux.includes(d.niveau));
+}
+
 // ── 1. VOCABULAIRE RÉSEAUX (semantic fields) ────────────────────────────────
 const VOCAB_RESEAUX_DONNEES = [
   { mot: "chat", synonymes: ["félin", "minou", "greffier"], domaine: "animaux", niveau: "ce1" },
@@ -45,8 +51,7 @@ export function lancerVocabReseaux() {
     cm1: ["ce1", "ce2", "cm1"],
     cm2: ["ce1", "ce2", "cm1", "cm2"],
   };
-  const niveaux = niveauFiltres[niveau] || ["ce1", "ce2"];
-  const donnees = VOCAB_RESEAUX_DONNEES.filter(d => niveaux.includes(d.niveau));
+  const donnees = filtrerParNiveau(VOCAB_RESEAUX_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de questions pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
   const nbChoix = 2 + diff; // 2, 3 ou 4 options
@@ -94,8 +99,7 @@ export function lancerProblèmesProgressifs() {
     cm1: ["ce2", "cm1"],
     cm2: ["ce2", "cm1", "cm2"],
   };
-  const niveaux = niveauFiltres[niveau] || ["ce2"];
-  const donnees = PROBLEMES_DONNEES.filter(d => niveaux.includes(d.niveau));
+  const donnees = filtrerParNiveau(PROBLEMES_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de problèmes pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
@@ -159,8 +163,7 @@ export function lancerLectureExpress() {
     ce2: ["ce2"],
     cm1: ["ce2", "cm1"],
   };
-  const niveaux = niveauFiltres[niveau] || ["ce2"];
-  const donnees = TEXTES_EXPRESS.filter(t => niveaux.includes(t.niveau));
+  const donnees = filtrerParNiveau(TEXTES_EXPRESS, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de textes pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
@@ -214,8 +217,7 @@ export function lancerHomophonesAvances() {
     cm1: ["cm1"],
     cm2: ["cm1", "cm2"],
   };
-  const niveaux = niveauFiltres[niveau] || ["cm1"];
-  const donnees = HOMOPHONES_AVANCES.filter(h => niveaux.includes(h.niveau));
+  const donnees = filtrerParNiveau(HOMOPHONES_AVANCES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore d'homophones pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
   const contexte = item.contextes[Math.floor(Math.random() * item.contextes.length)];
@@ -260,8 +262,7 @@ export function lancerPonctuationPuzzle() {
     cm1: ["ce2", "cm1"],
     cm2: ["ce2", "cm1", "cm2"],
   };
-  const niveaux = niveauFiltres[niveau] || ["ce2"];
-  const donnees = PONCTUATION_DONNEES.filter(p => niveaux.includes(p.niveau));
+  const donnees = filtrerParNiveau(PONCTUATION_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de ponctuation pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
@@ -315,8 +316,7 @@ export function lancerAmisDesmots() {
     cm1: ["ce1", "ce2", "cm1"],
     cm2: ["ce1", "ce2", "cm1"],
   };
-  const niveaux = niveauFiltres[niveau] || ["ce1"];
-  const donnees = AMIS_DONNEES.filter(a => niveaux.includes(a.niveau));
+  const donnees = filtrerParNiveau(AMIS_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de mots pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
