@@ -187,8 +187,9 @@ export function afficherParentDashboard() {
     elParent.innerHTML = html;
     elParent.hidden = false;
 
-    document.getElementById("btn-retour-parent").addEventListener("click", () => {
-      afficherMenuHome();
+    document.getElementById("btn-retour-parent").addEventListener("click", async () => {
+      const { afficherMenuHome: showMenu } = await import("./app-menu-home.js");
+      showMenu();
       elParent.hidden = true;
     });
 
@@ -228,5 +229,3 @@ Questions? Répondez à cet email!
     alert("Email copié dans le presse-papiers! Vous pouvez le coller et l'envoyer.");
   });
 }
-
-export { afficherParentDashboard };

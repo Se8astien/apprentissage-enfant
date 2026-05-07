@@ -135,8 +135,9 @@ export function afficherMenuHome() {
     afficherStatistiques();
   });
 
-  document.getElementById("btn-parent-menu").addEventListener("click", () => {
-    afficherParentDashboard();
+  document.getElementById("btn-parent-menu").addEventListener("click", async () => {
+    const { afficherParentDashboard: showParentDash } = await import("./app-parent-dashboard.js");
+    showParentDash();
   });
 }
 
@@ -207,11 +208,6 @@ function afficherEcran(ecranId) {
 function afficherStatistiques() {
   console.log("Afficher statistiques");
   // À faire: tableau de bord stats enfant
-}
-
-function afficherParentDashboard() {
-  console.log("Afficher parent dashboard");
-  // À faire: voir app-parent-dashboard.js
 }
 
 export function rendreRenardVisibleMenuHome() {
