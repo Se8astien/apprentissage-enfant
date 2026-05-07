@@ -8,6 +8,7 @@ const CHARGEURS = {
   algo: () => import("./games-algo.js"),
   musique: () => import("./games-musique.js"),
   strategiemalo: () => import("./games-strategiemalo.js"),
+  comprehension: () => import("./games-comprehension.js"),
 };
 
 const JEU_SPEC = {
@@ -85,6 +86,10 @@ const JEU_SPEC = {
   aller10Malo: ["strategiemalo", "lancerStrategieAller10"],
   compensationMalo: ["strategiemalo", "lancerStrategieCompensation"],
   estimationMalo: ["strategiemalo", "lancerStrategieEstimation"],
+  comprendreTexte: ["comprehension", "lancerComprendreTexte"],
+  comprendreTexteCE2: ["comprehension", "lancerComprendreTexteCE2"],
+  comprendreTexteCM1: ["comprehension", "lancerComprendreTexteCM1"],
+  comprendreTexteCM2: ["comprehension", "lancerComprendreTexteCM2"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
