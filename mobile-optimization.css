@@ -1,0 +1,352 @@
+/* mobile-optimization.css — Touch-friendly improvements for tablets and phones
+   Provides :active states, touch target sizing, and responsive layouts */
+
+/* ── PHASE 1: Critical Touch & Hover Fixes ──────────────────────────────────── */
+
+/* All interactive elements need :active state for touch feedback */
+button,
+[role="button"],
+.btn-choix,
+.carte-jeu,
+.btn-classe,
+.btn-diff,
+.btn-retour,
+.btn-suivant,
+.menu-home-card,
+.parent-card,
+.teacher-card,
+.btn-icon-menu {
+  /* Ensure minimum touch target size */
+  min-width: 44px;
+  min-height: 44px;
+  padding: max(0.5rem, (44px - 1em) / 2) max(0.75rem, (44px - 1em) / 2);
+}
+
+/* Add :active state to all button-like elements */
+button:active,
+[role="button"]:active,
+.btn-choix:active,
+.carte-jeu:active,
+.btn-classe:active,
+.btn-diff:active,
+.btn-retour:active,
+.btn-suivant:active,
+.menu-home-card:active,
+.parent-card:active,
+.teacher-card:active,
+.btn-icon-menu:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* Ensure focus-visible works across all buttons */
+button:focus-visible,
+[role="button"]:focus-visible,
+.btn-choix:focus-visible,
+.carte-jeu:focus-visible,
+.btn-classe:focus-visible,
+.btn-diff:focus-visible,
+.btn-retour:focus-visible,
+.btn-suivant:focus-visible,
+.menu-home-card:focus-visible,
+.parent-card:focus-visible,
+.teacher-card:focus-visible,
+.btn-icon-menu:focus-visible {
+  outline: 3px solid var(--primaire);
+  outline-offset: 2px;
+}
+
+/* Remove hover-only visual cues - make them available on touch too */
+.indice-graduel,
+.aide-douce,
+.btn-aide,
+[class*="btn"]:not(:hover):not(:active):not(:focus-visible) > .tooltip,
+[class*="btn"]:not(:hover):not(:active):not(:focus-visible) > .hint {
+  /* Keep visible by default instead of hover-only */
+  opacity: 0.8;
+}
+
+/* ── PHASE 2: Responsive Tablet Layouts ────────────────────────────────────── */
+
+/* Tablet portrait (768px) */
+@media (max-width: 768px) and (orientation: portrait) {
+  body {
+    font-size: 16px; /* Ensure readability */
+    -webkit-text-size-adjust: 100%; /* Prevent auto zoom */
+  }
+
+  button,
+  [role="button"],
+  .btn-choix,
+  .carte-jeu {
+    min-height: 48px; /* Larger for tablets */
+    padding: 0.75rem 1.5rem;
+    font-size: 1.05rem;
+    margin: 0.5rem 0.25rem;
+  }
+
+  .ecran {
+    padding: 1rem 0.75rem;
+  }
+
+  .menu-home-card,
+  .parent-card,
+  .teacher-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  /* Grid adjustments for tablet */
+  .parent-stats-grid,
+  .teacher-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Better spacing for touch */
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 44px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+
+  /* Tab navigation - bigger touch targets */
+  .teacher-tab,
+  [role="tab"] {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    min-width: 80px;
+  }
+}
+
+/* Tablet landscape (1024px) */
+@media (min-width: 769px) and (orientation: landscape) {
+  body {
+    font-size: 16px;
+  }
+
+  .ecran {
+    padding: 1.5rem 2rem;
+  }
+
+  /* Two-column layout for landscape */
+  .parent-stats-grid,
+  .teacher-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  button,
+  [role="button"],
+  .btn-choix {
+    min-height: 48px;
+  }
+
+  /* Side-by-side layout options */
+  .modal-contenu,
+  #teacher-detail-modal > div {
+    max-width: 80%;
+  }
+}
+
+/* ── PHASE 3: Touch Gestures & Orientation ────────────────────────────────── */
+
+/* Handle landscape orientation */
+@media (orientation: landscape) {
+  .renard-header,
+  [class*="header"] {
+    padding: 0.5rem 0;
+  }
+
+  .ecran {
+    max-height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+  }
+
+  /* Reduce top/bottom padding in landscape */
+  button,
+  [role="button"] {
+    margin: 0.25rem;
+  }
+}
+
+/* Handle portrait orientation */
+@media (orientation: portrait) {
+  .ecran {
+    /* Ensure content is scrollable on small screens */
+    max-height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── PHASE 4: Accessibility Improvements ──────────────────────────────────── */
+
+/* Better contrast for high contrast mode users */
+@media (prefers-contrast: more) {
+  button,
+  [role="button"],
+  .btn-choix,
+  .carte-jeu {
+    border: 2px solid var(--primaire);
+    font-weight: 600;
+  }
+
+  .menu-home-card,
+  .parent-card,
+  .teacher-card {
+    border: 2px solid var(--primaire);
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  button:active,
+  [role="button"]:active {
+    transform: none; /* No transform on touch */
+  }
+}
+
+/* Dark mode adjustments for better readability */
+@media (prefers-color-scheme: dark) {
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  .btn-choix:focus-visible {
+    outline-color: #4fc3f7;
+    outline-width: 2px;
+  }
+}
+
+/* ── PHASE 5: Performance Optimization ────────────────────────────────────── */
+
+/* Lazy loading and content visibility hints */
+.ecran:not(:visible) {
+  content-visibility: auto;
+}
+
+/* Optimize animations for mobile */
+@media (max-width: 768px) {
+  /* Reduce animation complexity on mobile */
+  .toast-progression,
+  .modal-overlay,
+  [class*="animation"] {
+    animation-duration: 0.2s;
+  }
+
+  /* GPU acceleration for smooth scrolling */
+  .ecran,
+  [role="listbox"],
+  [class*="scroll"] {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Disable hover effects on mobile (will use active instead) */
+  button:hover:not(:focus-visible),
+  [role="button"]:hover:not(:focus-visible) {
+    background: none !important;
+  }
+}
+
+/* ── Touch-Friendly Spacing ──────────────────────────────────────────────────── */
+
+/* Increase spacing between interactive elements on touch devices */
+@media (max-width: 1024px) {
+  .elChoix {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn-choix {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  .menu-home-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .bottom-navigation,
+  [class*="nav-bottom"] {
+    padding: 1rem;
+    gap: 1rem;
+  }
+}
+
+/* ── Safe Area Support (notches, etc.) ────────────────────────────────────── */
+
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .ecran {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* For fixed headers/footers */
+  [class*="header"],
+  [class*="footer"] {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ── Disable Text Selection on Buttons ────────────────────────────────────── */
+
+button,
+[role="button"],
+.btn-choix,
+.carte-jeu,
+.menu-home-card,
+.parent-card,
+.teacher-card {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Allow text selection in inputs */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* ── Prevent Zoom on Input Focus (iOS) ────────────────────────────────────── */
+
+input,
+textarea,
+select {
+  font-size: 16px; /* Prevents iOS from zooming on focus */
+  min-height: 44px;
+}
+
+/* ── Smooth Scrolling for Mobile ────────────────────────────────────────────── */
+
+.ecran,
+[class*="scroll"],
+html {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Disable smooth scroll for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

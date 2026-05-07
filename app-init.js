@@ -87,6 +87,7 @@ import { initFunMenuBar, accueillirWeekEndSiMenu } from "./app-fun-menu.js";
 import { afficherMenuHome } from "./app-menu-home.js";
 import { afficherParentDashboard } from "./app-parent-dashboard.js";
 import { afficherTableauBordProfesseur } from "./app-teacher-dashboard.js";
+import "./mobile-utils.js";
 
 const lanceurs = {};
 
