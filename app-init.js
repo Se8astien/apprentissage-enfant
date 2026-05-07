@@ -213,6 +213,7 @@ function brancherOnboardingUI() {
       }
       const btnRapide = document.getElementById("btn-classe-rapide");
       if (btnRapide) btnRapide.hidden = false;
+      rajusterJeuxParNiveau();
     });
   });
 
@@ -223,6 +224,7 @@ function brancherOnboardingUI() {
     if (!nv) return;
     sauverNiveau(nv);
     setDifficulte(1);
+    rajusterJeuxParNiveau();
     routerVersEtape();
   });
 
@@ -245,6 +247,7 @@ function brancherOnboardingUI() {
       const nv = btn.getAttribute("data-niveau");
       if (!nv) return;
       sauverNiveau(nv);
+      rajusterJeuxParNiveau();
       rafraichirUiComplete();
       rafraichirAventureSiOuverte();
       fermerClasse();
@@ -485,7 +488,19 @@ function majEtoilesMaitrise() {
     el.textContent = etoiles > 0 ? "★".repeat(etoiles) + "☆".repeat(3 - etoiles) : "";
   });
 }
+
+// Filter games by current level (show/hide based on data-niveaux)
+function rajusterJeuxParNiveau() {
+  const niveauCourant = getNiveauCourant();
+  document.querySelectorAll(".carte-jeu[data-niveaux]").forEach(btn => {
+    const niveaux = (btn.dataset.niveaux || "").split(/\s+/).filter(Boolean);
+    const estDisponible = niveaux.includes(niveauCourant);
+    btn.hidden = !estDisponible;
+  });
+}
+
 majEtoilesMaitrise();
+rajusterJeuxParNiveau();
 
 document.querySelectorAll(".carte-jeu").forEach((btn) => {
   btn.addEventListener("click", async () => {

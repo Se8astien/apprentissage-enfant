@@ -81,25 +81,15 @@ body {
 
   /* Zone de jeu centrée et de largeur raisonnable */
   #ecran-jeu {
-    max-width: 680px;
+    max-width: 720px;
     margin: 0 auto;
-  }
-
-  /* Header se tient mieux */
-  .top {
-    padding: 0.5rem 0 0.8rem;
+    width: 100%;
+    padding: 0;
   }
 
   /* Carte jeu un peu plus grande */
   .carte-jeu {
     min-height: 6.5rem;
-  }
-
-  /* Zone de question centrée sur desktop */
-  #zone-question, #zone-choix {
-    max-width: 580px;
-    margin-left: auto;
-    margin-right: auto;
   }
 }
 
