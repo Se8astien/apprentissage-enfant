@@ -110,6 +110,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="teacher-dashboard.css" />
+  <link rel="stylesheet" href="mobile-optimization.css" />
   <style>
     .ecran.actif { display: block !important; }
     #ecran-genre.ecran.actif {
@@ -587,14 +589,14 @@
         <button type="button" class="carte-jeu" data-jeu="planificationRenard" data-cat="algo" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🦊</span><span class="nom-jeu">Planification renard</span><span class="desc-jeu">Mets les étapes dans l'ordre</span></button>
         <button type="button" class="carte-jeu" data-jeu="triLogique" data-cat="algo" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🧠</span><span class="nom-jeu">Tri logique</span><span class="desc-jeu">Remets dans le bon ordre</span></button>
 
-        <h3 class="grille-section">🚀 Phase 2 — Jeux Nouveaux</h3>
-        <button type="button" class="carte-jeu" data-jeu="vocabReseaux" data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">📚</span><span class="nom-jeu">VocabRéseaux</span><span class="desc-jeu">Mots liés par sens</span></button>
-        <button type="button" class="carte-jeu" data-jeu="problemesProgressifs" data-cat="maths" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">📖</span><span class="nom-jeu">ProblèmesProgressifs</span><span class="desc-jeu">Résous pas à pas</span></button>
-        <button type="button" class="carte-jeu" data-jeu="lectureExpress" data-cat="langage" data-niveaux="ce2 cm1"><span class="emoji-jeu">⚡</span><span class="nom-jeu">LectureExpress</span><span class="desc-jeu">Lire vite &amp; comprendre</span></button>
-        <button type="button" class="carte-jeu" data-jeu="homophonesAvances" data-cat="langage" data-niveaux="cm1 cm2"><span class="emoji-jeu">🎯</span><span class="nom-jeu">HomophonesAvancés</span><span class="desc-jeu">saut, seau, sceau…</span></button>
-        <button type="button" class="carte-jeu" data-jeu="ponctuationPuzzle" data-cat="langage" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">📌</span><span class="nom-jeu">PonctuationPuzzle</span><span class="desc-jeu">Ponctuation par pattern</span></button>
-        <button type="button" class="carte-jeu" data-jeu="amisDesmots" data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🔤</span><span class="nom-jeu">AmisDesmots</span><span class="desc-jeu">Familles de mots</span></button>
-        <button type="button" class="carte-jeu" data-jeu="comprehensionAudio" data-cat="langage" data-niveaux="cp ce1 ce2"><span class="emoji-jeu">🔊</span><span class="nom-jeu">CompréhensionAudio</span><span class="desc-jeu">Écoute &amp; comprends</span></button>
+        <h3 class="grille-section">🚀 Jeux Nouveaux (Phase 2)</h3>
+        <button type="button" class="carte-jeu" data-jeu="vocabReseaux"  data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🧠</span><span class="nom-jeu">Vocabulaire Réseaux</span><span class="desc-jeu">Synonymes et familles</span></button>
+        <button type="button" class="carte-jeu" data-jeu="problemesProgressifs" data-cat="maths" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">📊</span><span class="nom-jeu">Problèmes Progressifs</span><span class="desc-jeu">Résous étape par étape</span></button>
+        <button type="button" class="carte-jeu" data-jeu="lectureExpress" data-cat="langage" data-niveaux="ce2 cm1"><span class="emoji-jeu">⚡</span><span class="nom-jeu">Lecture Express</span><span class="desc-jeu">Lis vite et comprends</span></button>
+        <button type="button" class="carte-jeu" data-jeu="homophonesAvances" data-cat="langage" data-niveaux="cm1 cm2"><span class="emoji-jeu">🎯</span><span class="nom-jeu">Homophones Avancés</span><span class="desc-jeu">Saut / Seau / Sceau</span></button>
+        <button type="button" class="carte-jeu" data-jeu="ponctuationPuzzle" data-cat="langage" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">✏️</span><span class="nom-jeu">Ponctuation Puzzle</span><span class="desc-jeu">Ajoute les points !</span></button>
+        <button type="button" class="carte-jeu" data-jeu="amisDesmots"    data-cat="langage" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🤝</span><span class="nom-jeu">Amis des Mots</span><span class="desc-jeu">Famille de mots</span></button>
+        <button type="button" class="carte-jeu" data-jeu="comprehensionAudio" data-cat="langage" data-niveaux="cp ce1"><span class="emoji-jeu">🎧</span><span class="nom-jeu">Compréhension Audio</span><span class="desc-jeu">Écoute et réponds</span></button>
 
       </div>
 
@@ -701,6 +703,22 @@
       <button type="button" id="btn-reviser-erreurs" class="btn-reviser-erreurs" hidden>🔁 Revoir mes erreurs</button>
       <button type="button" class="btn-suivant" id="btn-suivant" hidden aria-label="Question suivante">Question suivante →</button>
       <button type="button" class="btn-retour btn-retour-bas" id="btn-retour-bas" aria-label="Retour au menu">← Retour au menu</button>
+    </section>
+
+    <section id="ecran-menu-home" class="ecran" hidden aria-label="Menu d'accueil">
+      <!-- Menu home: Will be populated by app-menu-home.js -->
+    </section>
+
+    <section id="ecran-parent-dashboard" class="ecran" hidden aria-label="Tableau de bord parent">
+      <!-- Parent dashboard: Will be populated by app-parent-dashboard.js -->
+    </section>
+
+    <section id="ecran-teacher-dashboard" class="ecran" hidden aria-label="Tableau de bord professeur">
+      <!-- Teacher dashboard: Will be populated by app-teacher-dashboard.js -->
+    </section>
+
+    <section id="ecran-analytics-dashboard" class="ecran" hidden aria-label="Analytique du pilote">
+      <!-- Analytics dashboard: Will be populated by app-analytics-dashboard.js -->
     </section>
 
     <div id="modal-classe-suivante" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-classe-titre" aria-describedby="modal-classe-texte">

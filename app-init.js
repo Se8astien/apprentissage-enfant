@@ -84,6 +84,11 @@ import {
   rafraichirAventureSiOuverte,
 } from "./app-aventure.js";
 import { initFunMenuBar, accueillirWeekEndSiMenu } from "./app-fun-menu.js";
+import { afficherMenuHome } from "./app-menu-home.js";
+import { afficherParentDashboard } from "./app-parent-dashboard.js";
+import { afficherTableauBordProfesseur } from "./app-teacher-dashboard.js";
+import "./mobile-utils.js";
+import { initAnalyticsTracking } from "./app-analytics-tracking.js";
 
 const lanceurs = {};
 
@@ -658,6 +663,42 @@ if (btnProfilsHeader) {
 // ── Paramètres parents ────────────────────────────────────────────────────────
 const btnParams = document.getElementById("btn-params");
 if (btnParams) btnParams.addEventListener("click", () => montrerParams(entrerMenu));
+
+// ── Menu d'accueil (home menu) ────────────────────────────────────────────────
+function afficherMenuHomeScreen() {
+  const elMenuHome = document.getElementById("ecran-menu-home");
+  if (elMenuHome) {
+    revelerSeulEcran(elMenuHome);
+    afficherMenuHome();
+  }
+}
+
+const btnMenuHome = document.getElementById("btn-maison-menu");
+if (btnMenuHome) btnMenuHome.addEventListener("click", afficherMenuHomeScreen);
+
+// ── Tableau de bord parent ───────────────────────────────────────────────────
+function afficherParentDashboardScreen() {
+  const elParentDash = document.getElementById("ecran-parent-dashboard");
+  if (elParentDash) {
+    revelerSeulEcran(elParentDash);
+    afficherParentDashboard();
+  }
+}
+
+const btnParentMenu = document.getElementById("btn-parent-menu");
+if (btnParentMenu) btnParentMenu.addEventListener("click", afficherParentDashboardScreen);
+
+// ── Tableau de bord professeur ───────────────────────────────────────────────────
+function afficherTeacherDashboardScreen() {
+  const elTeacherDash = document.getElementById("ecran-teacher-dashboard");
+  if (elTeacherDash) {
+    revelerSeulEcran(elTeacherDash);
+    afficherTableauBordProfesseur();
+  }
+}
+
+const btnTeacherMenu = document.getElementById("btn-teacher-menu");
+if (btnTeacherMenu) btnTeacherMenu.addEventListener("click", afficherTeacherDashboardScreen);
 
 // ── Certificat imprimable ────────────────────────────────────────────────────
 function imprimerCertificat() {
