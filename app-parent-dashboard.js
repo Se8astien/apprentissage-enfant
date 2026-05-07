@@ -4,7 +4,13 @@
 import { getNiveauCourant, NIVEAU } from "./app-state.js";
 
 export function afficherParentDashboard() {
-  const stats = JSON.parse(localStorage.getItem("stats") || "{}");
+  let stats = {};
+  try {
+    stats = JSON.parse(localStorage.getItem("stats") || "{}");
+  } catch (e) {
+    console.warn("Impossible de lire les statistiques", e);
+    stats = {};
+  }
   const niveau = getNiveauCourant();
   const enfantNom = localStorage.getItem("enfant-nom") || "Emma";
 

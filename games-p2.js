@@ -47,6 +47,7 @@ export function lancerVocabReseaux() {
   };
   const niveaux = niveauFiltres[niveau] || ["ce1", "ce2"];
   const donnees = VOCAB_RESEAUX_DONNEES.filter(d => niveaux.includes(d.niveau));
+  if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de questions pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
   const nbChoix = 2 + diff; // 2, 3 ou 4 options
 
@@ -95,6 +96,7 @@ export function lancerProblèmesProgressifs() {
   };
   const niveaux = niveauFiltres[niveau] || ["ce2"];
   const donnees = PROBLEMES_DONNEES.filter(d => niveaux.includes(d.niveau));
+  if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de problèmes pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
   elTitre.textContent = "📊 Problèmes Progressifs";
@@ -159,6 +161,7 @@ export function lancerLectureExpress() {
   };
   const niveaux = niveauFiltres[niveau] || ["ce2"];
   const donnees = TEXTES_EXPRESS.filter(t => niveaux.includes(t.niveau));
+  if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de textes pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
   let questionIndex = 0;
@@ -213,6 +216,7 @@ export function lancerHomophonesAvances() {
   };
   const niveaux = niveauFiltres[niveau] || ["cm1"];
   const donnees = HOMOPHONES_AVANCES.filter(h => niveaux.includes(h.niveau));
+  if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore d'homophones pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
   const contexte = item.contextes[Math.floor(Math.random() * item.contextes.length)];
 
@@ -258,6 +262,7 @@ export function lancerPonctuationPuzzle() {
   };
   const niveaux = niveauFiltres[niveau] || ["ce2"];
   const donnees = PONCTUATION_DONNEES.filter(p => niveaux.includes(p.niveau));
+  if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de ponctuation pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
   elTitre.textContent = "✏️ Ponctuation Puzzle";
@@ -269,7 +274,7 @@ export function lancerPonctuationPuzzle() {
     <p style="font-size:0.85rem;color:#666;">Indice: ${item.ponctuation}</p>
   `;
 
-  const correct = item.correct;
+  const correcteLower = item.correct.toLowerCase();
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder = "Tape la phrase complète...";
@@ -281,8 +286,7 @@ export function lancerPonctuationPuzzle() {
   btn.textContent = "✓ Vérifier";
   btn.addEventListener("click", () => {
     const reponse = input.value.trim().toLowerCase();
-    const correcte = correct.toLowerCase();
-    const match = reponse === correcte;
+    const match = reponse === correcteLower;
     apresReponseTexte(match ? "correct" : "faux", btn, "correct");
   });
 
@@ -313,6 +317,7 @@ export function lancerAmisDesmots() {
   };
   const niveaux = niveauFiltres[niveau] || ["ce1"];
   const donnees = AMIS_DONNEES.filter(a => niveaux.includes(a.niveau));
+  if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de mots pour ce niveau.</p>"; return; }
   const item = donnees[Math.floor(Math.random() * donnees.length)];
 
   elTitre.textContent = "🤝 Amis des Mots";
@@ -355,7 +360,7 @@ export function lancerComprehensionAudio() {
   const donnees = COMPREHENSION_AUDIO_DONNEES.filter(c => c.niveau === niveau || (estCE1() && c.niveau === "cp"));
 
   if (donnees.length === 0) {
-    elQuestion.innerHTML = "<p>Pas encore de questions audio pour ce niveau. À venir!</p>";
+    elQuestion.innerHTML = "<p>Pas encore de compréhension audio pour ce niveau.</p>";
     return;
   }
 
@@ -380,13 +385,14 @@ export function lancerComprehensionAudio() {
     input.placeholder = "Tape ta réponse...";
     input.style.cssText = "width:100%;padding:0.5rem;font-size:1rem;border:2px solid var(--primaire);border-radius:0.4rem;margin-bottom:0.5rem;";
 
+    const bonnesLower = q.bonnes.map(b => b.toLowerCase());
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn-choix";
     btn.textContent = "✓ Vérifier";
     btn.addEventListener("click", () => {
       const reponse = input.value.toLowerCase();
-      const bonne = q.bonnes.some(b => reponse.includes(b.toLowerCase()));
+      const bonne = bonnesLower.some(b => reponse.split(/\s+/).some(word => word.includes(b)));
       apresReponseTexte(bonne ? "bon" : "mauvais", btn, "bon");
       questionIndex++;
       if (questionIndex < item.questions.length) {

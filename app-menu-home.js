@@ -17,10 +17,14 @@ export function afficherMenuHome() {
 
   elMenuHome.hidden = false;
 
-  // Récupérer les données pour recommandations
-  const stats = localStorage.getItem("stats") ?
-    JSON.parse(localStorage.getItem("stats")) :
-    { jeux: {}, erreurs: {} };
+  // Récupérer les données pour recommandations (avec gestion d'erreur)
+  let stats = { jeux: {}, erreurs: {} };
+  try {
+    const statsRaw = localStorage.getItem("stats");
+    if (statsRaw) stats = JSON.parse(statsRaw);
+  } catch (e) {
+    console.warn("Impossible de lire les statistiques", e);
+  }
 
   // Trouver le jeu où l'enfant struggle le plus
   const jeuFaible = trouverJeuFaible(stats);
