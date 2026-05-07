@@ -326,6 +326,7 @@ export function lancerLectureExpress() {
 
   function afficherQuestion() {
     if (questionIndex >= item.questions.length) return;
+    setRepondu(false);
     const q = item.questions[questionIndex];
     elQuestion.innerHTML = `
       <p style="background:#fff3cd;padding:0.8rem;border-radius:0.5rem;margin-bottom:1rem;font-size:0.9rem;font-style:italic;">
@@ -345,7 +346,7 @@ export function lancerLectureExpress() {
         apresReponse(idx, btn, q.reponses.indexOf(q.bonne));
         questionIndex++;
         if (questionIndex < item.questions.length) {
-          setTimeout(afficherQuestion, 500);
+          setTimeout(afficherQuestion, 1200);
         }
       });
       elChoix.appendChild(btn);
@@ -608,15 +609,44 @@ const COMPREHENSION_AUDIO_DONNEES = [
     { q: "Quels jours la bibliothèque est-elle ouverte?", bonnes: ["lundi au samedi", "lundi", "samedi"] },
     { q: "Qu'y a-t-il dans la bibliothèque?", bonnes: ["livres", "ordinateurs", "salles de travail"] },
   ], niveau: "ce2" },
+  // CM1
+  { texte: "Le réchauffement climatique est un phénomène mondial. Les scientifiques expliquent qu'il est causé principalement par les activités humaines comme l'utilisation des énergies fossiles. La fonte des glaciers fait monter le niveau des mers. Des solutions existent : économiser l'énergie, planter des arbres et utiliser des énergies renouvelables.", questions: [
+    { q: "Qu'est-ce qui cause le réchauffement climatique?", bonnes: ["activités humaines", "énergies fossiles"] },
+    { q: "Quel est un effet du réchauffement?", bonnes: ["fonte des glaciers", "niveau des mers", "glaciers"] },
+    { q: "Citez une solution proposée.", bonnes: ["économiser", "arbres", "énergies renouvelables", "planter"] },
+  ], niveau: "cm1" },
+  { texte: "L'astronomie est la science qui étudie les étoiles et les planètes. Notre système solaire compte huit planètes autour du Soleil. La Terre est la troisième planète. La plus grande est Jupiter, et la plus petite est Mercure. On mesure les distances dans l'espace en années-lumière.", questions: [
+    { q: "Combien de planètes dans notre système solaire?", bonnes: ["huit", "8"] },
+    { q: "Quelle est la troisième planète?", bonnes: ["Terre", "la Terre"] },
+    { q: "Comment mesure-t-on les distances dans l'espace?", bonnes: ["années-lumière", "année-lumière"] },
+  ], niveau: "cm1" },
+  // CM2
+  { texte: "La Révolution française de 1789 a radicalement changé la société. Le peuple s'est soulevé contre la monarchie absolue du roi Louis XVI. La Déclaration des Droits de l'Homme et du Citoyen a été adoptée. Le principe de liberté, égalité et fraternité est devenu la devise de la France. La République a remplacé la royauté.", questions: [
+    { q: "En quelle année a eu lieu la Révolution française?", bonnes: ["1789"] },
+    { q: "Quel roi régnait?", bonnes: ["Louis XVI", "Louis 16"] },
+    { q: "Quelle est la devise de la France?", bonnes: ["liberté égalité fraternité", "liberté", "égalité", "fraternité"] },
+  ], niveau: "cm2" },
+  { texte: "Les mathématiciens de l'Antiquité ont posé les bases de notre savoir actuel. Pythagore a découvert un théorème sur les triangles rectangles. Euclide a défini les axiomes de la géométrie. Archimède a découvert le principe de la poussée dans les liquides. Leurs travaux sont encore utilisés aujourd'hui dans l'ingénierie et l'architecture.", questions: [
+    { q: "Qui a découvert le théorème sur les triangles rectangles?", bonnes: ["Pythagore"] },
+    { q: "Qu'a découvert Archimède?", bonnes: ["poussée", "liquides", "principe"] },
+    { q: "Dans quels domaines utilise-t-on ces travaux?", bonnes: ["ingénierie", "architecture"] },
+  ], niveau: "cm2" },
 ];
 
 export function lancerComprehensionAudio() {
-  const diff = getDifficulte();
   const niveau = getNiveauCourant();
-  const donnees = COMPREHENSION_AUDIO_DONNEES.filter(c => c.niveau === niveau || (estCE1() && c.niveau === "cp"));
+  const niveauFiltres = {
+    cp: ["cp"],
+    ce1: ["cp", "ce1"],
+    ce2: ["cp", "ce1", "ce2"],
+    cm1: ["cp", "ce1", "ce2", "cm1"],
+    cm2: ["cp", "ce1", "ce2", "cm1", "cm2"],
+  };
+  const niveauxActifs = niveauFiltres[niveau] || ["cp"];
+  const donnees = COMPREHENSION_AUDIO_DONNEES.filter(c => niveauxActifs.includes(c.niveau));
 
   if (donnees.length === 0) {
-    elQuestion.innerHTML = "<p>Pas encore de compréhension audio pour ce niveau.</p>";
+    elQuestion.innerHTML = "<p>Pas encore de compréhension pour ce niveau.</p>";
     return;
   }
 
@@ -625,21 +655,22 @@ export function lancerComprehensionAudio() {
 
   function afficherQuestion() {
     if (questionIndex >= item.questions.length) return;
+    setRepondu(false);
     const q = item.questions[questionIndex];
 
-    elTitre.textContent = "🎧 Compréhension Audio";
+    elTitre.textContent = "🎧 Compréhension";
     elQuestion.innerHTML = `
-      <p style="background:#e3f2fd;padding:0.8rem;border-radius:0.5rem;margin-bottom:1rem;font-size:0.95rem;">
-        <strong>📖 Texte lu:</strong><br/>
-        "${item.texte}"
+      <p style="background:#e3f2fd;padding:0.8rem;border-radius:0.5rem;margin-bottom:1rem;font-size:0.95rem;line-height:1.5;">
+        <strong>📖 Lis ce texte :</strong><br/>
+        ${item.texte}
       </p>
-      <p><strong>Question ${questionIndex + 1}/${item.questions.length}: ${q.q}</strong></p>
+      <p style="margin-top:0.5rem;"><strong>Question ${questionIndex + 1}/${item.questions.length} : ${q.q}</strong></p>
     `;
 
     const input = document.createElement("input");
     input.type = "text";
     input.placeholder = "Tape ta réponse...";
-    input.style.cssText = "width:100%;padding:0.5rem;font-size:1rem;border:2px solid var(--primaire);border-radius:0.4rem;margin-bottom:0.5rem;";
+    input.style.cssText = "width:100%;padding:0.6rem;font-size:1rem;border:2px solid var(--primaire);border-radius:0.4rem;margin-bottom:0.5rem;font-family:inherit;";
 
     const bonnesLower = q.bonnes.map(b => b.toLowerCase());
     const btn = document.createElement("button");
@@ -647,12 +678,13 @@ export function lancerComprehensionAudio() {
     btn.className = "btn-choix";
     btn.textContent = "✓ Vérifier";
     btn.addEventListener("click", () => {
-      const reponse = input.value.toLowerCase();
-      const bonne = bonnesLower.some(b => reponse.split(/\s+/).some(word => word.includes(b)));
+      if (getRepondu()) return;
+      const reponse = input.value.toLowerCase().trim();
+      const bonne = bonnesLower.some(b => reponse.includes(b));
       apresReponseTexte(bonne ? "bon" : "mauvais", btn, "bon");
       questionIndex++;
       if (questionIndex < item.questions.length) {
-        setTimeout(afficherQuestion, 500);
+        setTimeout(afficherQuestion, 1400);
       }
     });
 

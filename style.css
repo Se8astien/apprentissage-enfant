@@ -66,6 +66,49 @@ body {
   position: relative;
 }
 
+/* ── Desktop layout ─────────────────────────────────────────────────────────── */
+@media (min-width: 900px) {
+  .app {
+    max-width: 1120px;
+    padding: 1.5rem 2.5rem 3rem;
+  }
+
+  /* 3 colonnes sur tablette large / desktop */
+  .grille-jeux {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  /* Zone de jeu centrée et de largeur raisonnable */
+  #ecran-jeu {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* Header se tient mieux */
+  .top {
+    padding: 0.5rem 0 0.8rem;
+  }
+
+  /* Carte jeu un peu plus grande */
+  .carte-jeu {
+    min-height: 6.5rem;
+  }
+
+  /* Zone de question centrée sur desktop */
+  #zone-question, #zone-choix {
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .grille-jeux {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .top {
   position: relative;
   z-index: 2;
