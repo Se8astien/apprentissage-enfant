@@ -9,6 +9,7 @@ const CHARGEURS = {
   musique: () => import("./games-musique.js"),
   strategiemalo: () => import("./games-strategiemalo.js"),
   comprehension: () => import("./games-comprehension.js"),
+  orthographe: () => import("./games-orthographe.js"),
 };
 
 const JEU_SPEC = {
@@ -90,6 +91,11 @@ const JEU_SPEC = {
   comprendreTexteCE2: ["comprehension", "lancerComprendreTexteCE2"],
   comprendreTexteCM1: ["comprehension", "lancerComprendreTexteCM1"],
   comprendreTexteCM2: ["comprehension", "lancerComprendreTexteCM2"],
+  orthopuzzle: ["orthographe", "lancerOrthoPuzzle"],
+  orthopuzzleCE1: ["orthographe", "lancerOrthopuzzleCE1"],
+  orthopuzzleCE2: ["orthographe", "lancerOrthopuzzleCE2"],
+  orthopuzzleCM1: ["orthographe", "lancerOrthopuzzleCM1"],
+  orthopuzzleCM2: ["orthographe", "lancerOrthopuzzleCM2"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
