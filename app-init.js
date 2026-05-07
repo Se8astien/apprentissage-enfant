@@ -492,6 +492,13 @@ function majEtoilesMaitrise() {
 // Filter games by current level (show/hide based on data-niveaux)
 function rajusterJeuxParNiveau() {
   const niveauCourant = getNiveauCourant();
+  if (!niveauCourant) {
+    // Niveau non choisi encore, afficher tous les jeux
+    document.querySelectorAll(".carte-jeu[data-niveaux]").forEach(btn => {
+      btn.hidden = false;
+    });
+    return;
+  }
   document.querySelectorAll(".carte-jeu[data-niveaux]").forEach(btn => {
     const niveaux = (btn.dataset.niveaux || "").split(/\s+/).filter(Boolean);
     const estDisponible = niveaux.includes(niveauCourant);

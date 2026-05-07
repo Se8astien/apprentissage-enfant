@@ -26,6 +26,7 @@ html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--primaire) transparent;
+  overflow-x: hidden;
 }
 
 html::-webkit-scrollbar {
@@ -51,11 +52,13 @@ html::-webkit-scrollbar-thumb:hover {
 body {
   margin: 0;
   min-height: 100dvh;
+  width: 100%;
   font-family: "Fredoka", "Segoe UI", system-ui, sans-serif;
   color: var(--texte);
   background: var(--fond);
   background-attachment: fixed;
   -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
 .app {
