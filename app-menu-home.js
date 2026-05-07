@@ -11,8 +11,10 @@ import {
 import { resoudreLanceur } from "./games-registry.js";
 import { montrerJeu } from "./app-nav.js";
 
+const ECRAN_ID = "ecran-menu-home";
+
 export function afficherMenuHome() {
-  const elMenuHome = document.getElementById("ecran-menu-home");
+  const elMenuHome = document.getElementById(ECRAN_ID);
   if (!elMenuHome) return;
 
   elMenuHome.hidden = false;
@@ -212,7 +214,7 @@ function afficherMenuCategories() {
           </button>
         `).join('')}
       </div>
-      <button type="button" id="btn-retour-categories" style="
+      <button type="button" id="btn-retour-categories" aria-label="Retour au menu principal" style="
         margin-top: 1.5rem;
         background: none;
         border: none;
@@ -317,7 +319,7 @@ function afficherStatistiques() {
         </div>
       </div>
 
-      <button type="button" id="btn-retour-stats" style="
+      <button type="button" id="btn-retour-stats" aria-label="Retour au menu principal" style="
         width: 100%;
         background: var(--primaire);
         color: white;

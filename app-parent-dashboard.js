@@ -158,7 +158,7 @@ export function afficherParentDashboard() {
 
       <!-- EMAIL OPTION -->
       <div style="text-align: center; margin-bottom: 1rem;">
-        <button type="button" id="btn-email-summary" style="
+        <button type="button" id="btn-email-summary" aria-label="Envoyer ce résumé à un parent par email" style="
           background: var(--primaire);
           color: white;
           border: none;
@@ -174,7 +174,7 @@ export function afficherParentDashboard() {
 
       <!-- FOOTER -->
       <div style="text-align: center; padding: 1rem; border-top: 1px solid #eee;">
-        <button type="button" id="btn-retour-parent" style="
+        <button type="button" id="btn-retour-parent" aria-label="Retour au menu principal" style="
           background: none;
           border: none;
           color: var(--primaire);
