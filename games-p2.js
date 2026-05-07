@@ -32,6 +32,16 @@ function filtrerParNiveau(donnees, niveauActuel, mappingNiveaux) {
 
 // ── 1. VOCABULAIRE RÉSEAUX (semantic fields) ────────────────────────────────
 const VOCAB_RESEAUX_DONNEES = [
+  // CP - Animaux simples
+  { mot: "chat", synonymes: ["minou", "félin"], domaine: "animaux", niveau: "cp" },
+  { mot: "chien", synonymes: ["cabot", "toutou"], domaine: "animaux", niveau: "cp" },
+  { mot: "oiseau", synonymes: ["volatile", "piou"], domaine: "animaux", niveau: "cp" },
+  { mot: "poisson", synonymes: ["nageoire", "aquatique"], domaine: "animaux", niveau: "cp" },
+  { mot: "papillon", synonymes: ["insecte", "lépidoptère"], domaine: "animaux", niveau: "cp" },
+  // CP - Lieux simples
+  { mot: "maison", synonymes: ["demeure", "logis"], domaine: "lieux", niveau: "cp" },
+  { mot: "école", synonymes: ["classe", "établissement"], domaine: "lieux", niveau: "cp" },
+  { mot: "parc", synonymes: ["jardin", "jeu"], domaine: "lieux", niveau: "cp" },
   // CE1 - Animaux
   { mot: "chat", synonymes: ["félin", "minou", "matou"], domaine: "animaux", niveau: "ce1" },
   { mot: "chien", synonymes: ["canidé", "cabot", "clebs"], domaine: "animaux", niveau: "ce1" },
@@ -84,10 +94,11 @@ export function lancerVocabReseaux() {
   const diff = getDifficulte();
   const niveau = getNiveauCourant();
   const niveauFiltres = {
-    ce1: ["ce1"],
-    ce2: ["ce1", "ce2"],
-    cm1: ["ce1", "ce2", "cm1"],
-    cm2: ["ce1", "ce2", "cm1", "cm2"],
+    cp: ["cp"],
+    ce1: ["cp", "ce1"],
+    ce2: ["cp", "ce1", "ce2"],
+    cm1: ["cp", "ce1", "ce2", "cm1"],
+    cm2: ["cp", "ce1", "ce2", "cm1", "cm2"],
   };
   const donnees = filtrerParNiveau(VOCAB_RESEAUX_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de questions pour ce niveau.</p>"; return; }
@@ -123,6 +134,12 @@ export function lancerVocabReseaux() {
 
 // ── 2. PROBLÈMES PROGRESSIFS (step-by-step problem solving) ─────────────────
 const PROBLEMES_DONNEES = [
+  // CP - Simple addition
+  { enonce: "Tom a 2 billes. Léa lui en donne 1. Combien a-t-il ?", reponse: 3, etapes: ["2 + 1 = ?"], niveau: "cp" },
+  { enonce: "Tu as 3 crayons. On t'en donne 2. Combien as-tu maintenant ?", reponse: 5, etapes: ["3 + 2 = ?"], niveau: "cp" },
+  // CE1 - Simple addition/soustraction
+  { enonce: "Alex a 4 carrés. Il en donne 1. Combien lui en reste-t-il ?", reponse: 3, etapes: ["4 - 1 = ?"], niveau: "ce1" },
+  { enonce: "Sophie a 5 stickers. Elle en reçoit 3. Combien en a-t-elle ?", reponse: 8, etapes: ["5 + 3 = ?"], niveau: "ce1" },
   // CE2 - Addition/Soustraction simples
   { enonce: "Marie a 5 pommes. Elle en mange 2. Combien lui en reste-t-il ?", reponse: 3, etapes: ["5 - 2 = ?"], niveau: "ce2" },
   { enonce: "Tom a 3 billes. Son ami lui en donne 4. Combien en a-t-il maintenant ?", reponse: 7, etapes: ["3 + 4 = ?"], niveau: "ce2" },
@@ -153,9 +170,11 @@ export function lancerProblèmesProgressifs() {
   const diff = getDifficulte();
   const niveau = getNiveauCourant();
   const niveauFiltres = {
-    ce2: ["ce2"],
-    cm1: ["ce2", "cm1"],
-    cm2: ["ce2", "cm1", "cm2"],
+    cp: ["cp"],
+    ce1: ["cp", "ce1"],
+    ce2: ["cp", "ce1", "ce2"],
+    cm1: ["cp", "ce1", "ce2", "cm1"],
+    cm2: ["cp", "ce1", "ce2", "cm1", "cm2"],
   };
   const donnees = filtrerParNiveau(PROBLEMES_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de problèmes pour ce niveau.</p>"; return; }
@@ -194,6 +213,44 @@ export function lancerProblèmesProgressifs() {
 
 // ── 3. LECTURE EXPRESS (speed reading + comprehension) ──────────────────────
 const TEXTES_EXPRESS = [
+  // CP
+  {
+    texte: "Maman a un chat. Il s'appelle Minou. Minou aime jouer avec la balle.",
+    questions: [
+      { q: "Qui a un chat?", reponses: ["Papa", "Maman", "Grand-mère"], bonne: "Maman" },
+      { q: "Comment s'appelle le chat?", reponses: ["Minou", "Félix", "Tigre"], bonne: "Minou" },
+      { q: "Avec quoi joue Minou?", reponses: ["la souris", "la balle", "la ficelle"], bonne: "la balle" },
+    ],
+    niveau: "cp",
+  },
+  {
+    texte: "Tom est au parc. Il voit un oiseau bleu. L'oiseau vole très haut.",
+    questions: [
+      { q: "Où est Tom?", reponses: ["à l'école", "au parc", "à la maison"], bonne: "au parc" },
+      { q: "Quelle couleur est l'oiseau?", reponses: ["rouge", "bleu", "jaune"], bonne: "bleu" },
+      { q: "Que fait l'oiseau?", reponses: ["il dort", "il vole", "il marche"], bonne: "il vole" },
+    ],
+    niveau: "cp",
+  },
+  // CE1
+  {
+    texte: "Léo a un chien. Son chien s'appelle Bobo. Bobo aime courir dans le jardin. Le soir, Léo et Bobo jouent ensemble.",
+    questions: [
+      { q: "Comment s'appelle le chien?", reponses: ["Léo", "Bobo", "Max"], bonne: "Bobo" },
+      { q: "Où aime courir Bobo?", reponses: ["à la plage", "dans le jardin", "en ville"], bonne: "dans le jardin" },
+      { q: "Que font Léo et Bobo le soir?", reponses: ["ils mangent", "ils jouent", "ils dorment"], bonne: "ils jouent" },
+    ],
+    niveau: "ce1",
+  },
+  {
+    texte: "Clara adore les fleurs. Elle a un petit jardin avec des roses rouges et des tulipes jaunes. Chaque jour, elle arrose ses fleurs.",
+    questions: [
+      { q: "Qu'aime Clara?", reponses: ["les livres", "les fleurs", "les jeux"], bonne: "les fleurs" },
+      { q: "Quelle couleur sont les roses?", reponses: ["jaunes", "rouges", "blanches"], bonne: "rouges" },
+      { q: "Que fait Clara chaque jour?", reponses: ["elle lit", "elle arrose ses fleurs", "elle joue"], bonne: "elle arrose ses fleurs" },
+    ],
+    niveau: "ce1",
+  },
   // CE2
   {
     texte: "Léa adore les chevaux. Chaque matin, elle va au stade équestre. Elle monte Tonnerre, un cheval noir et rapide. Aujourd'hui, Léa a participé à une course et elle a gagné!",
@@ -256,8 +313,10 @@ export function lancerLectureExpress() {
   const diff = getDifficulte();
   const niveau = getNiveauCourant();
   const niveauFiltres = {
-    ce2: ["ce2"],
-    cm1: ["ce2", "cm1"],
+    cp: ["cp"],
+    ce1: ["cp", "ce1"],
+    ce2: ["cp", "ce1", "ce2"],
+    cm1: ["cp", "ce1", "ce2", "cm1"],
   };
   const donnees = filtrerParNiveau(TEXTES_EXPRESS, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de textes pour ce niveau.</p>"; return; }
@@ -299,6 +358,15 @@ export function lancerLectureExpress() {
 
 // ── 4. HOMOPHONES AVANCÉS (3-way homophones) ───────────────────────────────
 const HOMOPHONES_AVANCES = [
+  // CP
+  { mot: "ou", contextes: ["Tu veux du jus ou du lait?", "Où vas-tu?"], groupe: ["ou", "où"], niveau: "cp" },
+  { mot: "a", contextes: ["Il a un chat", "Va à l'école"], groupe: ["a", "à"], niveau: "cp" },
+  // CE1
+  { mot: "son", contextes: ["C'est son jouet", "Écoute le son"], groupe: ["son", "sont"], niveau: "ce1" },
+  { mot: "la", contextes: ["C'est la maison", "Regarde là"], groupe: ["la", "là"], niveau: "ce1" },
+  // CE2
+  { mot: "mer", contextes: ["la mer est bleue", "c'est ta mère"], groupe: ["mer", "mère"], niveau: "ce2" },
+  { mot: "ce", contextes: ["ce livre est beau", "se laver les mains"], groupe: ["ce", "se"], niveau: "ce2" },
   // CM1
   { mot: "saut", contextes: ["faire un saut", "un saut en longueur", "saut à la corde"], groupe: ["saut", "seau", "sceau"], niveau: "cm1" },
   { mot: "pair", contextes: ["un nombre pair", "travailler de pair"], groupe: ["pair", "père", "paire"], niveau: "cm1" },
@@ -322,8 +390,11 @@ export function lancerHomophonesAvances() {
   const diff = getDifficulte();
   const niveau = getNiveauCourant();
   const niveauFiltres = {
-    cm1: ["cm1"],
-    cm2: ["cm1", "cm2"],
+    cp: ["cp"],
+    ce1: ["cp", "ce1"],
+    ce2: ["cp", "ce1", "ce2"],
+    cm1: ["cp", "ce1", "ce2", "cm1"],
+    cm2: ["cp", "ce1", "ce2", "cm1", "cm2"],
   };
   const donnees = filtrerParNiveau(HOMOPHONES_AVANCES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore d'homophones pour ce niveau.</p>"; return; }
@@ -355,6 +426,15 @@ export function lancerHomophonesAvances() {
 
 // ── 5. PONCTUATION PUZZLE (punctuation recognition) ────────────────────────
 const PONCTUATION_DONNEES = [
+  // CP
+  { phrase: "Bonjour maman", correct: "Bonjour, maman.", ponctuation: "virgule et point", niveau: "cp" },
+  { phrase: "Comment tu appelles", correct: "Comment tu t'appelles?", ponctuation: "point d'interrogation", niveau: "cp" },
+  { phrase: "C'est genial", correct: "C'est génial!", ponctuation: "point d'exclamation", niveau: "cp" },
+  { phrase: "Tu veux jouer", correct: "Tu veux jouer?", ponctuation: "point d'interrogation", niveau: "cp" },
+  // CE1
+  { phrase: "Tu aimes les chats", correct: "Tu aimes les chats?", ponctuation: "point d'interrogation", niveau: "ce1" },
+  { phrase: "Regarde le ciel", correct: "Regarde le ciel!", ponctuation: "point d'exclamation", niveau: "ce1" },
+  { phrase: "Bonjour comment allez-vous", correct: "Bonjour, comment allez-vous?", ponctuation: "virgule et point d'interrogation", niveau: "ce1" },
   // CE2
   { phrase: "Bonjour comment allez-vous", correct: "Bonjour, comment allez-vous?", ponctuation: "virgule et point d'interrogation", niveau: "ce2" },
   { phrase: "Est-ce que tu viens", correct: "Est-ce que tu viens?", ponctuation: "point d'interrogation", niveau: "ce2" },
@@ -381,9 +461,11 @@ export function lancerPonctuationPuzzle() {
   const diff = getDifficulte();
   const niveau = getNiveauCourant();
   const niveauFiltres = {
-    ce2: ["ce2"],
-    cm1: ["ce2", "cm1"],
-    cm2: ["ce2", "cm1", "cm2"],
+    cp: ["cp"],
+    ce1: ["cp", "ce1"],
+    ce2: ["cp", "ce1", "ce2"],
+    cm1: ["cp", "ce1", "ce2", "cm1"],
+    cm2: ["cp", "ce1", "ce2", "cm1", "cm2"],
   };
   const donnees = filtrerParNiveau(PONCTUATION_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de ponctuation pour ce niveau.</p>"; return; }
@@ -422,6 +504,12 @@ export function lancerPonctuationPuzzle() {
 
 // ── 6. AMIS DES MOTS (word families and rhyming) ────────────────────────────
 const AMIS_DONNEES = [
+  // CP
+  { famille: "chat", mots: ["chaton", "chateau", "chaud"], mot_correct: "chaton", niveau: "cp" },
+  { famille: "maison", mots: ["maître", "mail", "maire"], mot_correct: "maître", niveau: "cp" },
+  { famille: "eau", mots: ["eaux", "eau", "eau"], mot_correct: "eaux", niveau: "cp" },
+  { famille: "pain", mots: ["panier", "pane", "peintre"], mot_correct: "panier", niveau: "cp" },
+  { famille: "sol", mots: ["soleil", "sola", "soldat"], mot_correct: "soleil", niveau: "cp" },
   // CE1
   { famille: "pain", mots: ["panier", "boulanger", "banneau"], mot_correct: "panier", niveau: "ce1" },
   { famille: "chat", mots: ["chateau", "chaton", "chaussure"], mot_correct: "chaton", niveau: "ce1" },
@@ -454,10 +542,11 @@ export function lancerAmisDesmots() {
   const diff = getDifficulte();
   const niveau = getNiveauCourant();
   const niveauFiltres = {
-    ce1: ["ce1"],
-    ce2: ["ce1", "ce2"],
-    cm1: ["ce1", "ce2", "cm1"],
-    cm2: ["ce1", "ce2", "cm1"],
+    cp: ["cp"],
+    ce1: ["cp", "ce1"],
+    ce2: ["cp", "ce1", "ce2"],
+    cm1: ["cp", "ce1", "ce2", "cm1"],
+    cm2: ["cp", "ce1", "ce2", "cm1", "cm2"],
   };
   const donnees = filtrerParNiveau(AMIS_DONNEES, niveau, niveauFiltres);
   if (donnees.length === 0) { elQuestion.innerHTML = "<p>Pas encore de mots pour ce niveau.</p>"; return; }
