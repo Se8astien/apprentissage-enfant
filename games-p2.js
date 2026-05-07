@@ -7,7 +7,6 @@ import {
   elChoix,
   getNiveauCourant,
   getDifficulte,
-  estCP,
   estCE1,
   estCE2,
   estCM1,
