@@ -19,7 +19,7 @@ import {
   NIVEAU,
 } from "./app-state.js";
 
-import { apresReponse } from "./app-nav.js";
+import { apresReponse, apresReponseTexte } from "./app-nav.js";
 
 // ============================================================================
 // CE1: Homophones simples (et/est, a/à, on/ont)
@@ -223,21 +223,30 @@ function lancerHomophonesSimple(puzzle) {
   setBonneReponse(reponse);
 
   // Options: le mot bon + alternative
-  const options = [reponse, alt];
-  afficherChoix(melanger(options), (val, btn) => {
-    const correct = val === reponse;
-    if (correct) {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
-      feedback.innerHTML = `✅ Correct! <strong>${reponse}</strong> c'est ${explication}`;
-      elQuestion.appendChild(feedback);
-    } else {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
-      feedback.innerHTML = `❌ Non. C'est <strong>${reponse}</strong>. ${explication}`;
-      elQuestion.appendChild(feedback);
-    }
-    setTimeout(() => apresReponse(val, btn, reponse), 2000);
+  const options = melanger([reponse, alt]);
+  elChoix.innerHTML = "";
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-choix";
+    btn.textContent = opt;
+    btn.dataset.valeur = opt;
+    btn.addEventListener("click", () => {
+      const correct = opt === reponse;
+      if (correct) {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
+        feedback.innerHTML = `✅ Correct! <strong>${reponse}</strong> c'est ${explication}`;
+        elQuestion.appendChild(feedback);
+      } else {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
+        feedback.innerHTML = `❌ Non. C'est <strong>${reponse}</strong>. ${explication}`;
+        elQuestion.appendChild(feedback);
+      }
+      setTimeout(() => apresReponseTexte(opt, btn, reponse), 2000);
+    });
+    elChoix.appendChild(btn);
   });
 }
 
@@ -270,20 +279,30 @@ function lancerSonsComplexes(puzzle) {
   `;
 
   setBonneReponse(bonne);
-  afficherChoix(melanger(options), (val, btn) => {
-    const correct = val === bonne;
-    if (correct) {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
-      feedback.innerHTML = `✅ Exact! ${explication}`;
-      elQuestion.appendChild(feedback);
-    } else {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
-      feedback.innerHTML = `❌ Non. Bonne: <strong>${bonne}</strong>. ${explication}`;
-      elQuestion.appendChild(feedback);
-    }
-    setTimeout(() => apresReponse(val, btn, bonne), 2000);
+  const shuffledOpts = melanger(options);
+  elChoix.innerHTML = "";
+  shuffledOpts.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-choix";
+    btn.textContent = opt;
+    btn.dataset.valeur = opt;
+    btn.addEventListener("click", () => {
+      const correct = opt === bonne;
+      if (correct) {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
+        feedback.innerHTML = `✅ Exact! ${explication}`;
+        elQuestion.appendChild(feedback);
+      } else {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
+        feedback.innerHTML = `❌ Non. Bonne: <strong>${bonne}</strong>. ${explication}`;
+        elQuestion.appendChild(feedback);
+      }
+      setTimeout(() => apresReponseTexte(opt, btn, bonne), 2000);
+    });
+    elChoix.appendChild(btn);
   });
 }
 
@@ -320,20 +339,30 @@ function lancerPlurielAccord(puzzle) {
   `;
 
   setBonneReponse(correct);
-  afficherChoix(melanger(plural_options), (val, btn) => {
-    const correct_val = val === correct;
-    if (correct_val) {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
-      feedback.innerHTML = `✅ Juste! <strong>${correct}</strong>. ${explication}`;
-      elQuestion.appendChild(feedback);
-    } else {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
-      feedback.innerHTML = `❌ Non. Bonne: <strong>${correct}</strong>. ${explication}`;
-      elQuestion.appendChild(feedback);
-    }
-    setTimeout(() => apresReponse(val, btn, correct), 2000);
+  const shuffledPlural = melanger(plural_options);
+  elChoix.innerHTML = "";
+  shuffledPlural.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-choix";
+    btn.textContent = opt;
+    btn.dataset.valeur = opt;
+    btn.addEventListener("click", () => {
+      const correct_val = opt === correct;
+      if (correct_val) {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
+        feedback.innerHTML = `✅ Juste! <strong>${correct}</strong>. ${explication}`;
+        elQuestion.appendChild(feedback);
+      } else {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
+        feedback.innerHTML = `❌ Non. Bonne: <strong>${correct}</strong>. ${explication}`;
+        elQuestion.appendChild(feedback);
+      }
+      setTimeout(() => apresReponseTexte(opt, btn, correct), 2000);
+    });
+    elChoix.appendChild(btn);
   });
 }
 
@@ -366,20 +395,30 @@ function lancerDifficulteCM2(puzzle) {
   `;
 
   setBonneReponse(correct);
-  afficherChoix(melanger(options), (val, btn) => {
-    const correct_val = val === correct;
-    if (correct_val) {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
-      feedback.innerHTML = `✅ Bravo! <strong>${correct}</strong>. ${explication}`;
-      elQuestion.appendChild(feedback);
-    } else {
-      const feedback = document.createElement("div");
-      feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
-      feedback.innerHTML = `❌ Non. <strong>${correct}</strong>. ${explication}`;
-      elQuestion.appendChild(feedback);
-    }
-    setTimeout(() => apresReponse(val, btn, correct), 2000);
+  const shuffledOpts2 = melanger(options);
+  elChoix.innerHTML = "";
+  shuffledOpts2.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-choix";
+    btn.textContent = opt;
+    btn.dataset.valeur = opt;
+    btn.addEventListener("click", () => {
+      const correct_val = opt === correct;
+      if (correct_val) {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #00b894; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #f0fff5; border-radius: 0.5rem;";
+        feedback.innerHTML = `✅ Bravo! <strong>${correct}</strong>. ${explication}`;
+        elQuestion.appendChild(feedback);
+      } else {
+        const feedback = document.createElement("div");
+        feedback.style.cssText = "color: #e17055; font-size: 0.9rem; margin-top: 0.8rem; padding: 0.5rem; background: #ffe5e0; border-radius: 0.5rem;";
+        feedback.innerHTML = `❌ Non. <strong>${correct}</strong>. ${explication}`;
+        elQuestion.appendChild(feedback);
+      }
+      setTimeout(() => apresReponseTexte(opt, btn, correct), 2000);
+    });
+    elChoix.appendChild(btn);
   });
 }
 

@@ -227,7 +227,7 @@ export function lancerCompte() {
         btn.className = "btn-choix";
         btn.style.fontSize = "2rem";
         btn.textContent = em;
-        btn.addEventListener("click", () => apresReponse(em, btn, moinsDe));
+        btn.addEventListener("click", () => apresReponseTexte(em, btn, moinsDe));
         elChoix.appendChild(btn);
       });
     } else {
