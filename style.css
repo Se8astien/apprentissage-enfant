@@ -5293,6 +5293,46 @@ h4.params-menu-aide-titre {
   opacity: 0.8;
 }
 
+/* ── Mobile responsiveness : petits écrans ──────────────────────────────────── */
+@media (max-width: 480px) {
+  .top {
+    gap: 0.35rem;
+    padding: 0.45rem 0.6rem;
+  }
+  .titre-bloc {
+    min-width: 0;
+  }
+  h1 {
+    font-size: 1.1rem;
+  }
+  .sous-titre {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+  .mascotte {
+    font-size: 1.8rem;
+  }
+  .header-tool {
+    width: 2.3rem;
+    height: 2.3rem;
+    min-width: 2.3rem;
+    min-height: 2.3rem;
+    font-size: 1.1rem;
+  }
+  .header-droite {
+    column-gap: 0.25rem;
+    row-gap: 0.3rem;
+  }
+  .header-toolbar {
+    gap: 0.08rem;
+    padding: 0.12rem;
+  }
+  .score-global {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+  }
+}
+
 /* ── Accessibilité : mouvement réduit ────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
