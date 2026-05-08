@@ -1186,10 +1186,13 @@ const HOMOPHONES_CE2 = [
   { phrase: "Les fleurs ___ très belles.", bonne: "sont", fausse: "son" },
   { phrase: "Tu préfères le chocolat ___ la vanille ?", bonne: "ou", fausse: "où" },
   { phrase: "___ habites-tu ?", bonne: "Où", fausse: "Ou" },
+  { phrase: "___ vas-tu ?", bonne: "Où", fausse: "Ou" },
   { phrase: "Papa ___ acheté du pain.", bonne: "a", fausse: "à" },
   { phrase: "Il parle ___ son ami.", bonne: "à", fausse: "a" },
   { phrase: "Le chien ___ très gentil.", bonne: "est", fausse: "et" },
   { phrase: "La fille chante ___ danse.", bonne: "et", fausse: "est" },
+  { phrase: "Le chat ___ sur le canapé.", bonne: "est", fausse: "et" },
+  { phrase: "Tu habites ___ ?", bonne: "où", fausse: "ou" },
 ];
 
 const HOMOPHONES_CM1 = [
@@ -1224,7 +1227,9 @@ export function lancerHomophones() {
   const phraseAff = item.phrase.replace("___",
     `<span style="background:var(--primaire);color:white;padding:0.1em 0.5em;border-radius:0.4em">___</span>`);
   elQuestion.innerHTML =
-    `<p style="font-size:0.9rem;margin-bottom:0.5rem">Quel mot complète la phrase ?</p>` +
+    `<p style="font-size:0.9rem;margin-bottom:0.3rem">Quel mot complète la phrase ?</p>` +
+    `<p style="font-size:0.75rem;color:#6c5ce7;background:#f0eeff;border-radius:0.5rem;padding:0.35rem 0.7rem;margin-bottom:0.5rem;display:inline-block">` +
+    `💬 <strong>Homophones</strong> = mots qui se prononcent pareil mais ne s'écrivent pas pareil</p>` +
     `<p style="font-size:1.2rem;font-weight:600;line-height:1.8;background:white;border-radius:0.8rem;padding:0.75rem 1rem;box-shadow:0 2px 8px var(--ombre)">${phraseAff}</p>`;
   elChoix.innerHTML = "";
   melanger([item.bonne, item.fausse]).forEach(mot => {
