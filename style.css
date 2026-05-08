@@ -525,6 +525,10 @@ h1 {
   font-family: inherit;
   cursor: pointer;
   box-shadow: 0 3px 12px var(--ombre);
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .btn-classe-menu-emoji { font-size: 1.45rem; }
 .btn-classe-menu-texte { display: flex; flex-direction: column; align-items: flex-start; text-align: left; flex: 1; min-width: 0; }
