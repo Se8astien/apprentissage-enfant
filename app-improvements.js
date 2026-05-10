@@ -21,57 +21,30 @@ const EXPLICATIONS_CONTEXTUELLES = {
   addition: {
     faux_inverse: {
       pattern: (rep, bonne) => rep === bonne - 10 || rep === bonne + 10,
-      explication: (rep, bonne) => `
-        ❌ Tu as répondu ${rep}
-        💡 Presque! Mais regarde le signe: c'est <strong>+</strong> (ajouter), pas <strong>−</strong> (enlever)
-        ✅ ${Math.floor(bonne / 10) * 10} + ${bonne % 10} = ${bonne}
-      `,
+      explication: (rep, bonne) => `<div>❌ Tu as répondu ${rep}</div><div>💡 Presque! Mais regarde le signe: c'est <strong>+</strong> (ajouter), pas <strong>−</strong> (enlever)</div><div>✅ ${Math.floor(bonne / 10) * 10} + ${bonne % 10} = ${bonne}</div>`,
     },
     oubli_retenue: {
       pattern: (rep, bonne) => Math.abs(rep - bonne) === 1,
-      explication: (rep, bonne) => `
-        ❌ Tu as répondu ${rep}
-        💡 Attention à la retenue!
-        ${Math.floor(bonne / 10) * 10} + ${bonne % 10}
-                ↓
-        Quand on dépasse 10, on met 1 dizaine en plus
-        ✅ Le bon résultat est ${bonne}
-      `,
+      explication: (rep, bonne) => `<div>❌ Tu as répondu ${rep}</div><div>💡 Attention à la retenue! Quand on dépasse 10, on met 1 dizaine en plus</div><div>✅ Le bon résultat est ${bonne}</div>`,
     },
   },
   soustraction: {
     confusion_addition: {
       pattern: (rep, bonne) => rep > bonne,
-      explication: (rep, bonne) => `
-        ❌ Tu as répondu ${rep}
-        💡 C'est une soustraction (−), pas une addition (+)
-        Soustraire = enlever, donc le résultat est PLUS PETIT
-        ✅ ${Math.floor(bonne) + 5} − 5 = ${bonne}
-      `,
+      explication: (rep, bonne) => `<div>❌ Tu as répondu ${rep}</div><div>💡 C'est une soustraction (−), pas une addition (+). Soustraire = enlever, le résultat est PLUS PETIT</div><div>✅ ${Math.floor(bonne) + 5} − 5 = ${bonne}</div>`,
     },
   },
   division: {
     confusion_multiplication: {
       pattern: (rep, bonne) => rep > bonne,
-      explication: (rep, bonne) => `
-        ❌ Tu as répondu ${rep}
-        💡 Diviser = partager entre, donc le résultat est PLUS PETIT
-        24 ÷ 4 = "combien de 4 dans 24?" = 6
-        ✅ ${bonne}
-      `,
+      explication: (rep, bonne) => `<div>❌ Tu as répondu ${rep}</div><div>💡 Diviser = partager entre, le résultat est PLUS PETIT. 24 ÷ 4 = "combien de 4 dans 24?" = 6</div><div>✅ ${bonne}</div>`,
     },
   },
   // Français
   homophones: {
     confusion_sens: {
       pattern: (rep, bonne) => rep && bonne,
-      explication: (rep, bonne) => `
-        ❌ Tu as choisi: <strong>${rep}</strong>
-        💡 Regarde le contexte:
-        • "a" = avoir (verbe) → "Il <strong>a</strong> un chat"
-        • "à" = vers/direction → "Je vais <strong>à</strong> l'école"
-        ✅ La bonne réponse était: <strong>${bonne}</strong>
-      `,
+      explication: (rep, bonne) => `<div>❌ Tu as choisi: <strong>${rep}</strong></div><div>💡 Regarde le contexte: "a" = avoir (verbe) · "à" = vers/direction</div><div>✅ La bonne réponse était: <strong>${bonne}</strong></div>`,
     },
   },
 };
@@ -80,18 +53,13 @@ export function obtenirExplication(jeuId, reponseEnfant, bonneReponse) {
   if (!EXPLICATIONS_CONTEXTUELLES[jeuId]) return null;
 
   const explicas = EXPLICATIONS_CONTEXTUELLES[jeuId];
-  for (const [key, {pattern, explication}] of Object.entries(explicas)) {
+  for (const { pattern, explication } of Object.values(explicas)) {
     if (pattern(reponseEnfant, bonneReponse)) {
       return explication(reponseEnfant, bonneReponse);
     }
   }
 
-  // Explication générique par défaut
-  return `
-    ❌ Ce n'était pas la bonne réponse
-    💡 Essaie de comprendre pourquoi avant de continuer
-    ✅ La bonne réponse était: <strong>${bonneReponse}</strong>
-  `;
+  return `<div>❌ Ce n'était pas la bonne réponse</div><div>💡 Essaie de comprendre pourquoi avant de continuer</div><div>✅ La bonne réponse était: <strong>${bonneReponse}</strong></div>`;
 }
 
 // ============================================================================
@@ -104,7 +72,7 @@ const BADGES_MAITRISE = {
   expert: { nom: "🥇 Expert", condition: (stats) => stats.bonnes >= 20 && stats.tempsMoyen < 8 && stats.tauxReussite >= 85 },
 };
 
-export function obtenirBadgesMaitrise(jeuId, stats) {
+export function obtenirBadgesMaitrise(stats) {
   const badges = [];
 
   if (BADGES_MAITRISE.debutant.condition(stats)) badges.push(BADGES_MAITRISE.debutant.nom);
@@ -114,8 +82,8 @@ export function obtenirBadgesMaitrise(jeuId, stats) {
   return badges;
 }
 
-export function afficherBadgesMaitrise(jeuId, stats) {
-  const badges = obtenirBadgesMaitrise(jeuId, stats);
+export function afficherBadgesMaitrise(stats) {
+  const badges = obtenirBadgesMaitrise(stats);
   if (badges.length === 0) return "";
 
   return `
@@ -167,28 +135,17 @@ export function obtenirIndiceAdapte(jeuId, tentative) {
 // #10 - DIAGNOSTIC D'ERREURS (patterns)
 // ============================================================================
 
+const DIAGNOSTICS = [
+  { type: "fatigue",              condition: (t)     => t > 4,                              suggestion: "Tu as l'air fatigué 😴 Ça serait bien de prendre une pause!" },
+  { type: "confusion_base",       condition: (t, d)  => t > 2 && d > 5,                    suggestion: "Je pense que tu n'as pas bien compris ce concept. On essaie avec des exemples plus simples?" },
+  { type: "confiance_insuffisante", condition: (t, d, r) => t > 3 && r === 0,              suggestion: "Tu as l'air d'avoir peur de te tromper. C'est OK de faire des erreurs — c'est comme ça qu'on apprend!" },
+  { type: "manque_concentration", condition: (t, d, r) => t === 2 && !r,                   suggestion: "Concentre-toi bien et essaie encore 💪" },
+];
+
 export function diagnostiquerErreur(jeuId, reponse, bonne, tentative) {
-  const diagnostics = {
-    confusion_base: tentative > 2 && Math.abs(reponse - bonne) > 5,
-    fatigue: tentative > 4,
-    manque_concentration: tentative === 2 && !reponse,
-    confiance_insuffisante: tentative > 3 && reponse === 0,
-  };
-
-  const diagnostic = Object.entries(diagnostics).find(([_, val]) => val);
-  if (!diagnostic) return null;
-
-  const suggestions = {
-    confusion_base: "Je pense que tu n'as pas bien compris ce concept. On essaie avec des exemples plus simples?",
-    fatigue: "Tu as l'air fatigué 😴 Ça serait bien de prendre une pause!",
-    manque_concentration: "Concentre-toi bien et essaie encore 💪",
-    confiance_insuffisante: "Tu as l'air d'avoir peur de te tromper. C'est OK de faire des erreurs — c'est comme ça qu'on apprend!",
-  };
-
-  return {
-    type: diagnostic[0],
-    suggestion: suggestions[diagnostic[0]],
-  };
+  const delta = Math.abs(reponse - bonne);
+  const found = DIAGNOSTICS.find(({ condition }) => condition(tentative, delta, reponse));
+  return found ? { type: found.type, suggestion: found.suggestion } : null;
 }
 
 // ============================================================================
@@ -314,7 +271,7 @@ export function getConfigLaboMode() {
 
 export function creerPalmaresFamille(statsEnfants) {
   const palmares = Object.entries(statsEnfants)
-    .sort(([_, a], [__, b]) => b.pointsTotal - a.pointsTotal)
+    .sort(([, a], [, b]) => b.pointsTotal - a.pointsTotal)
     .map(([nom, stats], idx) => ({
       rang: idx + 1,
       nom,
