@@ -51,6 +51,7 @@ const JEU_SPEC = {
   fractionsCM: ["avance", "lancerFractionsCM"],
   proportionnalite: ["avance", "lancerProportionnalite"],
   pourcentages: ["avance", "lancerPourcentages"],
+  calcuMalin: ["avance", "lancerCalcuMalin"],
   syllabes: ["langage", "lancerSyllabes"],
   lecture: ["langage", "lancerLecture"],
   anglais: ["langage", "lancerAnglaisMots"],
