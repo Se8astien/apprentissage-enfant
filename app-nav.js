@@ -76,6 +76,36 @@ import { getHistoireJeu } from "./app-histoire.js";
 import { getMasques } from "./app-params.js";
 import { texteDescCarteJeu } from "./app-menu-descriptions.js";
 
+import {
+  obtenirExplication,
+  obtenirBadgesMaitrise,
+  afficherBadgesMaitrise,
+  obtenirIndiceAdapte,
+  diagnostiquerErreur,
+  getMot,
+  obtenirQuete,
+  obtenirSuggestionTemps,
+  getConfigLaboMode,
+  creerPalmaresFamille,
+} from "./app-improvements.js";
+
+import {
+  activerRevisionBloquante,
+  getJeuBloque,
+  validerRevision,
+  genererDashboardParent,
+  demarrerQuete,
+  avanturetapeQuete,
+  completerQuete,
+  demarrerChronoSession,
+  obtenirTempsSession,
+  obtenirMessageTemps,
+  creerDuelParent,
+  afficherResultatDuel,
+  creerInterfaceCreateurJeux,
+  creerDashboardStats,
+} from "./app-features-advanced.js";
+
 // Re-export confetti so game files can import it from here if desired
 export { confetti } from "./app-state.js";
 
@@ -660,7 +690,7 @@ function afficherAideDouce(correct, { timeout = false } = {}) {
   el.append(titre, indice, reponse, encouragement);
 }
 
-function montrerExplicationVisuelle(correct) {
+function montrerExplicationVisuelle(correct, reponseEnfant = null) {
   const el = getExplicationVisuelleEl();
   if (!el) return;
   const jeu = getJeuCourant();
@@ -675,6 +705,16 @@ function montrerExplicationVisuelle(correct) {
   const visuel = document.createElement("div");
   visuel.className = "explication-visuel";
   let detail = "";
+
+  // Try contextual explanation first (#1 improvement)
+  if (reponseEnfant !== null && reponseEnfant !== correct) {
+    const expli = obtenirExplication(jeu, reponseEnfant, correct);
+    if (expli) {
+      visuel.innerHTML = expli;
+      el.append(titre, visuel);
+      return;
+    }
+  }
 
   const nombres = extraireNombresQuestion();
   if (jeu === "addition" && nombres.length >= 2) {
@@ -732,6 +772,9 @@ function cacherAideDouce() {
 function afficherIndiceAvantReponse() {
   if (getRepondu()) return;
   const btnIndice = document.getElementById("btn-indice-question");
+  const jeu = getJeuCourant();
+  const tentative = indiceUtiliseQuestion ? 2 : 1;
+
   if (!indiceUtiliseQuestion) {
     indiceUtiliseQuestion = true;
     indicesSession++;
@@ -748,7 +791,8 @@ function afficherIndiceAvantReponse() {
     titre.textContent = "Petit coup de pouce";
     const indice = document.createElement("p");
     indice.className = "aide-douce-indice";
-    indice.textContent = rappelErreur(getJeuCourant());
+    // #5 - Use adaptive hints based on attempt
+    indice.textContent = obtenirIndiceAdapte(jeu, tentative) || rappelErreur(jeu);
     const encouragement = document.createElement("p");
     encouragement.className = "aide-douce-encouragement";
     encouragement.textContent = estGrand()
@@ -756,7 +800,7 @@ function afficherIndiceAvantReponse() {
       : "Tu peux prendre ton temps, puis choisir.";
     el.append(titre, indice, encouragement);
     if (btnIndice) btnIndice.textContent = "💡 Indice ++";
-    track("hint_used", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+    track("hint_used", { game_name: jeu, niveau: getNiveauCourant(), level: 1 });
     return;
   }
   const el = getAideDouceEl();
@@ -768,10 +812,10 @@ function afficherIndiceAvantReponse() {
   titre.textContent = "Indice guide";
   const indice = document.createElement("p");
   indice.className = "aide-douce-indice";
-  indice.textContent = rappelErreur(getJeuCourant());
+  indice.textContent = obtenirIndiceAdapte(jeu, 2) || rappelErreur(jeu);
   const exemple = document.createElement("p");
   exemple.className = "aide-douce-reponse";
-  exemple.textContent = exempleIndice(getJeuCourant());
+  exemple.textContent = exempleIndice(jeu);
   const encouragement = document.createElement("p");
   encouragement.className = "aide-douce-encouragement";
   encouragement.textContent = estGrand()
@@ -779,7 +823,7 @@ function afficherIndiceAvantReponse() {
     : "Essaie pareil avec ta question.";
   el.append(titre, indice, exemple, encouragement);
   if (btnIndice) btnIndice.textContent = "💡 Indice guide";
-  track("hint_level_2", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
+  track("hint_level_2", { game_name: jeu, niveau: getNiveauCourant(), level: 2 });
 }
 
 function lireQuestion() {
@@ -1386,7 +1430,22 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
           if (debloquerBadge("diff_expert")) { const b = BADGES.find(x => x.id === "diff_expert"); if (b) afficherNotifBadge(b); }
         }
       });
-    } else if (comboActuel === 5) declencherCombo(5);
+    } else if (comboActuel === 5) {
+      declencherCombo(5);
+    }
+
+    // #2 - Show mastery badges if earned
+    const jeuCible = getJeuCourant();
+    const jeuStats = { bonnes: comboActuel >= 5 ? comboActuel : 1, tempsMoyen: moyenneTempsReponse(jeuCible) || 0, tauxReussite: 100 };
+    const badgesHTML = afficherBadgesMaitrise(jeuCible, jeuStats);
+    if (badgesHTML) {
+      const badgesEl = document.createElement("div");
+      badgesEl.innerHTML = badgesHTML;
+      const feedback = document.getElementById("feedback");
+      if (feedback && feedback.nextElementSibling) {
+        feedback.parentNode.insertBefore(badgesEl, feedback.nextElementSibling);
+      }
+    }
   } else {
     const idJeuErreur = jeuActifId();
     erreursSession++;
@@ -1413,11 +1472,18 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       elFeedback.textContent += " Mini entraînement : 2 questions faciles 💡";
     }
     afficherAideDouce(correct);
-    montrerExplicationVisuelle(correct);
+    montrerExplicationVisuelle(correct, choix);
     afficherActionRevision(idJeuErreur);
     verifierRappelRevisionEspacee(idJeuErreur);
     declencherReactionRenard(false);
     tenterModeFatigue();
+
+    // #10 - Error diagnostics for parents/teachers
+    const jeuEval = getJeuCourant();
+    const diagnostic = diagnostiquerErreur(jeuEval, choix, correct, essaisDepuisEncouragement);
+    if (diagnostic) {
+      track("error_diagnostic", { game_name: jeuEval, niveau: getNiveauCourant(), type: diagnostic.type });
+    }
   }
   verifierRappelRevisionEspacee(jeuActifId());
   verifierObjectifSession();
@@ -1666,6 +1732,7 @@ export function montrerJeu(nom, lanceurs) {
   lancerAvecAntiRepeat(nom, lanceurs);
   afficherMiniLecon(nom);
   startChrono();
+  demarrerChronoSession(); // #7 - Start session timer for pedagogical insights
   afficherHistoireJeu(nom);
 }
 
