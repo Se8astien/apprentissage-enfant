@@ -1,7 +1,7 @@
 // app-teacher-dashboard.js — Teacher classroom analytics dashboard
 // 4-tab interface: Class Overview, Individual Students, Curriculum Alignment, Session Analytics
 
-import { obtenirProfilActuel, obtenirClassesProf } from './teacher-profile-service.js';
+import { obtenirProfilActuel, obtenirClassesProf, deconnecterProfesseur } from './teacher-profile-service.js';
 import { obtenirSessionsArchiviees, obtenirStatistiquesClasse, obtenirProgressionEtudiant } from './teacher-session-tracker.js';
 import { obtenirObjectifParNiveau, calculerCouvertureCurriculum, genererPlanTravailQuotidien } from './teacher-curriculum-map.js';
 import { afficherTableauBordAnalytiques } from './app-analytics-dashboard.js';
@@ -135,7 +135,6 @@ export function afficherTableauBordProfesseur() {
   }
 
   document.getElementById('btn-deconnexion-prof').addEventListener('click', () => {
-    const { deconnecterProfesseur } = require('./teacher-profile-service.js');
     deconnecterProfesseur();
     afficherEcran('ecran-menu-home');
   });

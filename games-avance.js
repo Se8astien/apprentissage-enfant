@@ -435,7 +435,19 @@ export function lancerProbleme() {
   const tmpl = pool[Math.floor(Math.random() * pool.length)];
   const { texte, rep, min, max } = tmpl.generer();
   setBonneReponse(rep);
-  elQuestion.innerHTML = `<div class="probleme-question"><p>${texte}</p></div>`;
+
+  let html = '<div class="probleme-question">';
+
+  if (!estCM1() && !estCM2()) {
+    html += '<div class="probleme-etapes" style="margin:1rem 0;padding:1rem;background:#f0f8ff;border-radius:0.5rem;display:flex;gap:1rem;justify-content:space-around;align-items:center;flex-wrap:wrap">';
+    html += '<div style="text-align:center"><strong>Avant</strong><div style="font-size:2rem">➡️</div></div>';
+    html += '<div style="text-align:center"><strong>Pendant</strong><div style="font-size:2rem">➡️</div></div>';
+    html += '<div style="text-align:center"><strong>Après</strong><div style="font-size:2rem">?</div></div>';
+    html += '</div>';
+  }
+
+  html += `<p>${texte}</p></div>`;
+  elQuestion.innerHTML = html;
   const props = propositionsAvecBonne(rep, Math.max(0, min), Math.max(max, min + 5), 3);
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }
@@ -558,5 +570,71 @@ export function lancerPourcentages() {
     `<p style="font-size:0.82rem;margin:0 0 0.3rem;color:#888">💡 ${rappel}</p>` +
     `<div class="probleme-question"><p>${contexte}</p></div>`;
   const props = propositionsAvecBonne(rep, Math.max(0, rep - 20), rep + 20, 3);
+  afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}
+
+// ── lancerCalcuMalin ──────────────────────────────────────────────────────────
+export function lancerCalcuMalin() {
+  elTitre.textContent = "🧠 CalcuMalin – Stratégies de calcul";
+  const diff = getDifficulte();
+
+  if (estCM1() || estCM2()) {
+    const calculs = [
+      { a: 28, b: 37, bonneReponse: 65, strategiesHTML: [
+        `<strong>❌ Stratégie lente :</strong> Compte : 28 + 1 + 1 + 1... (trop long)`,
+        `<strong>✅ Stratégie malin :</strong> 28 + 37 = 30 + 35 = 65 <em>(arrondir d'abord)</em>`,
+      ]},
+      { a: 49, b: 51, bonneReponse: 100, strategiesHTML: [
+        `<strong>❌ Stratégie lente :</strong> Compte point par point`,
+        `<strong>✅ Stratégie malin :</strong> 49 + 51 = (50 - 1) + (50 + 1) = 100 <em>(compensation)</em>`,
+      ]},
+      { a: 38, b: 22, bonneReponse: 60, strategiesHTML: [
+        `<strong>❌ Stratégie lente :</strong> Compte : 38 + 22 = ...?`,
+        `<strong>✅ Stratégie malin :</strong> 38 + 22 = 40 + 20 = 60 <em>(aller à la dizaine)</em>`,
+      ]},
+    ];
+
+    const calcul = calculs[Math.floor(Math.random() * calculs.length)];
+    setBonneReponse(calcul.bonneReponse);
+
+    let html = `<p style="font-size:1.1rem;font-weight:700;margin:0.5rem 0;">${calcul.a} + ${calcul.b} = ?</p>`;
+    html += `<div style="margin:1rem 0;padding:1rem;background:#fff9e6;border-radius:0.5rem;">`;
+    calcul.strategiesHTML.forEach(s => {
+      html += `<p style="margin:0.5rem 0;font-size:0.9rem;">${s}</p>`;
+    });
+    html += `</div>`;
+    html += `<p style="font-size:0.85rem;color:#666;margin-top:1rem;">💡 Quel est le résultat ?</p>`;
+
+    elQuestion.innerHTML = html;
+    const props = propositionsAvecBonne(calcul.bonneReponse, Math.max(0, calcul.bonneReponse - 20), calcul.bonneReponse + 20, 3);
+    afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+    return;
+  }
+
+  // CE1/CE2 : doubles et décomposition pour aller à 10
+  const calculsSimples = estCE1() ? [
+    { a: 8, b: 7, bonneReponse: 15, stratagems: `8 + 7 = (8 + 2) + 5 = 10 + 5 = 15` },
+    { a: 9, b: 6, bonneReponse: 15, stratagems: `9 + 6 = (9 + 1) + 5 = 10 + 5 = 15` },
+    { a: 5, b: 5, bonneReponse: 10, stratagems: `5 + 5 = 10 (double!)` },
+    { a: 7, b: 3, bonneReponse: 10, stratagems: `7 + 3 = 10 (aller à 10)` },
+    { a: 6, b: 6, bonneReponse: 12, stratagems: `6 + 6 = 12 (double!)` },
+  ] : [
+    { a: 12, b: 8, bonneReponse: 20, stratagems: `12 + 8 = 10 + 10 = 20 (double de 10)` },
+    { a: 15, b: 5, bonneReponse: 20, stratagems: `15 + 5 = 20 (aller à 20)` },
+    { a: 18, b: 12, bonneReponse: 30, stratagems: `18 + 12 = (18 + 2) + 10 = 20 + 10 = 30` },
+    { a: 25, b: 25, bonneReponse: 50, stratagems: `25 + 25 = 50 (double!)` },
+  ];
+
+  const calcul = calculsSimples[Math.floor(Math.random() * calculsSimples.length)];
+  setBonneReponse(calcul.bonneReponse);
+
+  let html = `<p style="font-size:1.3rem;font-weight:700;margin:0.5rem 0;text-align:center;">${calcul.a} + ${calcul.b} = ?</p>`;
+  html += `<div style="margin:1rem 0;padding:1rem;background:#fff9e6;border-radius:0.5rem;">`;
+  html += `<p style="font-size:0.95rem;font-weight:500;">💡 Astuce malin :</p>`;
+  html += `<p style="font-size:1rem;font-weight:700;color:#0066cc;">${calcul.stratagems}</p>`;
+  html += `</div>`;
+
+  elQuestion.innerHTML = html;
+  const props = propositionsAvecBonne(calcul.bonneReponse, Math.max(0, calcul.bonneReponse - 10), calcul.bonneReponse + 10, 3);
   afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 }
