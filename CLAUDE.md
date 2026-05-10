@@ -160,6 +160,26 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - **Structure des pages SEO** : problème parent → solution/pédagogie → preuves → FAQ objections → CTA
 - **Trust obligatoire au-dessus de la ligne de flottaison** : gratuité, sans inscription, espace parents protégé, compatibilité tablette/ordinateur
 
+## Workflow de développement
+
+**À chaque évolution, TOUJOURS :**
+
+1. **Écrire les tests unitaires en premier** (TDD)
+   - Définir le comportement attendu dans le test avant d’écrire le code
+   - Tests doivent couvrir happy path + cas limites
+   - Format : assertions claires, noms explicites
+2. **Lancer les tests** : `npm run ci` (verify + lint)
+3. **Écrire le code** pour passer les tests
+4. **Vérifier** : `npm run ci` doit passer en vert
+5. **Committer** avec message détaillé (pourquoi, pas quoi)
+6. **Pousser** sur la branche de feature
+
+Ce workflow garantit :
+- ✅ Zéro régression — les tests existants passent toujours
+- ✅ Qualité immédiate — logique validée avant implémentation
+- ✅ Documentation vivante — tests décrivent le comportement attendu
+- ✅ Confiance — changements sans peur
+
 ## Tests (smoke E2E)
 
 - **Playwright** : `tests/e2e/smoke-menu.spec.js` vérifie :
