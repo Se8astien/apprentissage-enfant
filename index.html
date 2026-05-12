@@ -389,6 +389,41 @@
     <main id="ecran-menu" class="ecran" hidden>
 
       <div class="menu-hub">
+        <!-- ═══ TAMAGOTSHI RENARD ═══ -->
+        <div class="menu-tamagotshi">
+          <div class="tamagotshi-container">
+            <div class="tamagotshi-header">
+              <h2 id="tamagotshi-nom">Foxy</h2>
+              <span class="tamagotshi-stade" id="tamagotshi-stade">Bébé renard</span>
+            </div>
+
+            <div class="tamagotshi-renard" id="tamagotshi-renard" role="img" aria-label="Ton compagnon renard"></div>
+
+            <div class="tamagotshi-stats">
+              <div class="stat-ligne">
+                <span class="stat-label">❤️ Bonheur</span>
+                <div class="stat-barre">
+                  <div class="stat-remplissage" id="stat-bonheur" style="width: 100%"></div>
+                </div>
+              </div>
+              <div class="stat-ligne">
+                <span class="stat-label">🍖 Faim</span>
+                <div class="stat-barre">
+                  <div class="stat-remplissage" id="stat-faim" style="width: 50%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tamagotshi-actions">
+              <button type="button" class="btn-tamagotshi" id="btn-tamagotshi-nourrir">🍖 Nourrir</button>
+              <button type="button" class="btn-tamagotshi" id="btn-tamagotshi-calin">🤗 Câlin</button>
+              <button type="button" class="btn-tamagotshi btn-tamagotshi-jouer" id="btn-tamagotshi-jouer">🎮 Jouer</button>
+            </div>
+
+            <div class="tamagotshi-message" id="tamagotshi-message"></div>
+          </div>
+        </div>
+
         <div class="menu-classe-rapide">
           <button type="button" id="btn-classe-menu" class="btn-classe-menu" aria-haspopup="dialog" aria-controls="menu-classe-modal">
             <span class="btn-classe-menu-emoji" aria-hidden="true">🏫</span>
@@ -505,7 +540,7 @@
 
         <h3 class="grille-section">⏰ Temps &amp; Mesures</h3>
         <button type="button" class="carte-jeu" data-jeu="calendrier"    data-cat="temps" data-niveaux="cp ce1"><span class="emoji-jeu">📅</span><span class="nom-jeu">Calendrier</span><span class="desc-jeu">Jours et mois</span></button>
-        <button type="button" class="carte-jeu" data-jeu="heure"         data-cat="temps" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">🕐</span><span class="nom-jeu">L'heure</span><span class="desc-jeu">Lis l'horloge !</span></button>
+        <button type="button" class="carte-jeu" data-jeu="heure"         data-cat="temps" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🕐</span><span class="nom-jeu">L'heure</span><span class="desc-jeu">Lis l'horloge !</span></button>
         <button type="button" class="carte-jeu" data-jeu="horlogeExpress" data-cat="temps" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">⚡</span><span class="nom-jeu">Horloge express</span><span class="desc-jeu">Ajoute vite les minutes</span></button>
         <button type="button" class="carte-jeu" data-jeu="chronoDefi"    data-cat="temps" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">⏳</span><span class="nom-jeu">Chrono défi</span><span class="desc-jeu">Ajoute ou retire des minutes</span></button>
         <button type="button" class="carte-jeu" data-jeu="durees"        data-cat="temps" data-niveaux="ce1 ce2 cm1 cm2"><span class="emoji-jeu">⏱️</span><span class="nom-jeu">Durées</span><span class="desc-jeu">Calcule l'heure de fin</span></button>

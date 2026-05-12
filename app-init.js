@@ -98,6 +98,12 @@ function uneFois(el, evt, fn) {
   if (!el || el.dataset.amBound === "1") return;
   el.dataset.amBound = "1";
   el.addEventListener(evt, fn);
+  if (evt === "click") {
+    el.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      fn(e);
+    });
+  }
 }
 
 function idEcranOnboarding() {

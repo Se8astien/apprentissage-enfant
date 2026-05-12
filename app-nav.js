@@ -1,5 +1,7 @@
 // app-nav.js — navigation/screens, stars, combo, apresReponse, montrerMenu/Jeu
 
+import { initialiserTamagotchiMenu, rafraichirTamagotchiUI } from "./app-tamagotshi-menu.js";
+
 import {
   elGenre,
   elMenu,
@@ -1699,6 +1701,8 @@ export function montrerMenu() {
   const modal = document.getElementById("modal-classe-suivante");
   if (modal) modal.hidden = true;
   revelerSeulEcran(menu);
+  initialiserTamagotchiMenu();
+  rafraichirTamagotchiUI();
   synchroniserAffichageMenu();
   brancherObjectifSession();
   mettreAJourObjectifSession();
