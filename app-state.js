@@ -444,3 +444,44 @@ export function confetti(opts) {
     setTimeout(() => s.remove(), tier === "sparkle" ? 1600 : 2500);
   }
 }
+
+export function getStats() {
+  const DOMAINE_LABELS = {
+    addition: "Additions", soustraction: "Soustractions",
+    multiplication: "Multiplications", division: "Divisions",
+    fractions: "Fractions", fractionsCM: "Fractions",
+    lecture: "Lecture", lectureTexte: "Lecture de texte",
+    grammaire: "Grammaire", conjugaison: "Conjugaison",
+    heure: "Heure", decimaux: "Décimaux",
+  };
+
+  let perJeu = {};
+  try {
+    const raw = localStorage.getItem("stats-questions");
+    if (raw && !/^\d+$/.test(raw.trim())) perJeu = JSON.parse(raw) || {};
+  } catch { /* ignore */ }
+
+  let totalAll = 0, bonnesAll = 0;
+  const parDomaine = {}, competences = {};
+
+  for (const [jeu, s] of Object.entries(perJeu)) {
+    if (!s || !s.total) continue;
+    const total = parseInt(s.total, 10) || 0;
+    const bonnes = parseInt(s.bonnes, 10) || 0;
+    totalAll += total;
+    bonnesAll += bonnes;
+    const label = DOMAINE_LABELS[jeu] || jeu;
+    parDomaine[label] = { questions: total, tauxReussite: total ? bonnes / total * 100 : 0, tempsMoyen: 0 };
+    competences[label] = total ? Math.round(bonnes / total * 100) : 0;
+  }
+
+  let meilleureCombo = 0;
+  try {
+    const badges = JSON.parse(localStorage.getItem("badges-obtenus") || "[]");
+    if (badges.includes("combo20")) meilleureCombo = 20;
+    else if (badges.includes("combo10")) meilleureCombo = 10;
+    else if (badges.includes("combo5")) meilleureCombo = 5;
+  } catch { /* ignore */ }
+
+  return { partiesTotal: totalAll, tauxReussite: totalAll ? bonnesAll / totalAll * 100 : 0, meilleureCombo, competences, parDomaine };
+}
