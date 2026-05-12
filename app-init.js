@@ -83,6 +83,11 @@ import {
   consommerRetourDepuisAventure,
   rafraichirAventureSiOuverte,
 } from "./app-aventure.js";
+import { chargerQueteActive } from "./app-quests.js";
+import { evaluerBadges } from "./app-social-badges.js";
+import { initialiserArbresCompetences } from "./app-skill-trees.js";
+import { initialiserAudio } from "./app-audio-mode.js";
+import { calculerStatistiquesEnfant } from "./app-parent-dashboard-features.js";
 import { initFunMenuBar, accueillirWeekEndSiMenu } from "./app-fun-menu.js";
 import { afficherMenuHome } from "./app-menu-home.js";
 import { afficherParentDashboard } from "./app-parent-dashboard.js";
@@ -824,6 +829,9 @@ track("session_start", {
   profil_count: profilsListe.length,
 });
 flushAnalyticsQueue();
+chargerQueteActive();
+initialiserArbresCompetences();
+initialiserAudio();
 window.addEventListener("beforeunload", trackSessionEnd);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") trackSessionEnd();
