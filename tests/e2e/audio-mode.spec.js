@@ -57,7 +57,7 @@ test("audio playback state is tracked", async ({ page }) => {
       startedAt: null,
       history: [
         { texte: "7 + 3 = ?", playedAt: Date.now() - 10000 },
-        { texte: "Très bien!", playedAt: Date.now() - 5000 },
+        { texte: "Tres bien!", playedAt: Date.now() - 5000 },
       ],
     };
     localStorage.setItem("apprentissage-audio-playback", JSON.stringify(playbackState));
@@ -111,14 +111,14 @@ test("audio lessons are structured in localStorage", async ({ page }) => {
       {
         id: "audio-add-1",
         titre: "L'addition, c'est facile!",
-        durée: 120,
+        duree: 120,
         contenu: ["addition est ajouter", "5 + 3 = 8", "essaie toi aussi!"],
         completed: false,
       },
       {
         id: "audio-add-2",
         titre: "L'addition avec retenue",
-        durée: 180,
+        duree: 180,
         contenu: ["retenue = 10", "8 + 4 = 12", "12 = 10 + 2"],
         completed: true,
       },

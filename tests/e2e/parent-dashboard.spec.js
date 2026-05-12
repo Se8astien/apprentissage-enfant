@@ -116,13 +116,13 @@ test("parent dashboard generates recommendations for tomorrow", async ({ page })
       exercicesConsailles: [
         {
           domaine: "Division",
-          raison: "Maîtrise basse (70%)",
+          raison: "Maitrise basse (70%)",
           duree: "5-10 min",
           priorite: "haute",
         },
         {
           domaine: "Multiplication",
-          raison: "Consolider la maîtrise",
+          raison: "Consolider la maitrise",
           duree: "5 min",
           priorite: "moyenne",
         },
@@ -174,7 +174,7 @@ test("parent can export progress report as PDF data", async ({ page }) => {
           nom: "Division",
           tauxReussite: 70,
           questions: 20,
-          status: "À améliorer",
+          status: "A ameliorer",
         },
       ],
       recommendations: [

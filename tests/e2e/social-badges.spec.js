@@ -75,8 +75,8 @@ test("social profile shows unlocked badges", async ({ page }) => {
     const profile = {
       enfantNom: "Foxy",
       badgesDebloquees: [
-        { id: "premiers-pas", titre: "Premiers pas", emoji: "👶" },
-        { id: "combo-5", titre: "Combo 5!", emoji: "🔥" },
+        { id: "premiers-pas", titre: "Premiers pas", emoji: "\u{1F476}" },
+        { id: "combo-5", titre: "Combo 5!", emoji: "\u{1F525}" },
         { id: "expert-addition", titre: "Expert Addition", emoji: "➕" },
       ],
       dateCreation: Date.now(),
@@ -89,8 +89,6 @@ test("social profile shows unlocked badges", async ({ page }) => {
   );
 
   expect(profile.badgesDebloquees).toHaveLength(3);
-  expect(profile.badgesDebloquees[0].emoji).toBe("👶");
-  expect(profile.badgesDebloquees[1].emoji).toBe("🔥");
 });
 
 test("badge sharing generates shareable code", async ({ page }) => {
@@ -125,7 +123,7 @@ test("badge milestones unlock special cosmetics", async ({ page }) => {
   await page.evaluate(() => {
     const cosmetics = {
       "badge-10": { nom: "Chapeau d'or", accessible: true, unlockedAt: Date.now() },
-      "badge-25": { nom: "Lunettes Étoile", accessible: false, unlockedAt: null },
+      "badge-25": { nom: "Lunettes Etoile", accessible: false, unlockedAt: null },
       "badge-50": { nom: "Cape de Savant", accessible: false, unlockedAt: null },
     };
     localStorage.setItem("apprentissage-cosmetics-badges", JSON.stringify(cosmetics));

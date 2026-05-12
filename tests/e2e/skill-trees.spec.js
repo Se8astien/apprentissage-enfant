@@ -28,7 +28,7 @@ test("skill tree structure is persisted in localStorage", async ({ page }) => {
           nom: "Addition",
           niveaux: [
             { id: "add-1", nom: "Basics", req: 0, unlocked: true },
-            { id: "add-2", nom: "Intermédiaire", req: 10, unlocked: false },
+            { id: "add-2", nom: "Intermediaire", req: 10, unlocked: false },
             { id: "add-3", nom: "Expert", req: 30, unlocked: false },
           ],
         },
@@ -36,7 +36,7 @@ test("skill tree structure is persisted in localStorage", async ({ page }) => {
           nom: "Soustraction",
           niveaux: [
             { id: "sub-1", nom: "Basics", req: 0, unlocked: true },
-            { id: "sub-2", nom: "Intermédiaire", req: 10, unlocked: false },
+            { id: "sub-2", nom: "Intermediaire", req: 10, unlocked: false },
           ],
         },
       },
@@ -115,7 +115,7 @@ test("skill tree shows visual progress bars per domain", async ({ page }) => {
   // Create progress data
   await page.evaluate(() => {
     const progress = {
-      addition: { current: 38, target: 40, percent: 95 }, // Almost unlocks next level
+      addition: { current: 38, target: 40, percent: 95 },
       soustraction: { current: 22, target: 40, percent: 55 },
       multiplication: { current: 7, target: 40, percent: 17 },
     };
