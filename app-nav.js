@@ -1493,7 +1493,11 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     rattrapageRestant--;
     finaliserMiniRattrapage();
   }
-  elSuivant.hidden = false;
+  if (estCorrect) {
+    elSuivant.hidden = false;
+  } else {
+    setTimeout(() => { elSuivant.hidden = false; }, 2500);
+  }
 }
 
 export function apresReponse(choix, bouton, correct) {
