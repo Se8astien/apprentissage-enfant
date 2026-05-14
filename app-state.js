@@ -144,13 +144,33 @@ export function majGenre() {
   if (elIconeGenre) elIconeGenre.textContent = f ? "👧" : "👦";
 }
 
-export function getDifficulteJeu(jeu) {
-  const v = parseInt(localStorage.getItem("diff-jeu-" + jeu) || "0", 10);
+export function getBaselineDifficulte() {
+  const v = parseInt(localStorage.getItem("apprentissage-baseline-diff") || "0", 10);
   return (v >= 0 && v <= 2) ? v : 0;
 }
 
+export function setBaselineDifficulte(v) {
+  const clamped = Math.max(0, Math.min(2, v));
+  if (clamped > getBaselineDifficulte()) {
+    localStorage.setItem("apprentissage-baseline-diff", String(clamped));
+  }
+}
+
+export function getDifficulteJeu(jeu) {
+  const raw = localStorage.getItem("diff-jeu-" + jeu);
+  if (raw !== null) {
+    const v = parseInt(raw, 10);
+    return (v >= 0 && v <= 2) ? v : 0;
+  }
+  // Nouveau jeu : plancher = baseline - 1, et plancher minimum selon le niveau
+  const niveauFloor = (niveauCourant === NIVEAU.CE2 || niveauCourant === NIVEAU.CM1 || niveauCourant === NIVEAU.CM2) ? 1 : 0;
+  return Math.max(niveauFloor, Math.max(0, getBaselineDifficulte() - 1));
+}
+
 export function setDifficulteJeu(jeu, v) {
-  localStorage.setItem("diff-jeu-" + jeu, String(Math.max(0, Math.min(2, v))));
+  const clamped = Math.max(0, Math.min(2, v));
+  localStorage.setItem("diff-jeu-" + jeu, String(clamped));
+  setBaselineDifficulte(clamped);
 }
 
 export function getDifficulteProfil() {

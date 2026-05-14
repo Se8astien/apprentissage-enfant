@@ -140,14 +140,18 @@ function libelleMissionJeu(jeuId) {
 
 function missionFocusJeuFaible() {
   const perJeu = lireStatsParJeu();
+  const now = Date.now();
+  const MS_48H = 48 * 60 * 60 * 1000;
   const candidats = Object.entries(perJeu)
     .filter(([, s]) => s && Number.isFinite(s.total) && s.total >= 4)
     .map(([jeu, s]) => {
       const total = Math.max(1, parseInt(s.total, 10) || 0);
       const bonnes = Math.max(0, parseInt(s.bonnes, 10) || 0);
-      return { jeu, total, bonnes, taux: bonnes / total };
+      const ancienJeu = s.derniereVisite && (now - s.derniereVisite) >= MS_48H;
+      const score = (bonnes / total) / (ancienJeu ? 3 : 1);
+      return { jeu, total, bonnes, taux: bonnes / total, score };
     })
-    .sort((a, b) => a.taux - b.taux || b.total - a.total);
+    .sort((a, b) => a.score - b.score || b.total - a.total);
   if (candidats.length === 0) return null;
   const cible = candidats[0];
   const objectif = cible.total >= 12 ? 5 : 3;
@@ -312,6 +316,7 @@ export function incrementStats(bonneReponse, jeuId) {
       if (!perJeu[jeuId]) perJeu[jeuId] = { bonnes: 0, total: 0 };
       perJeu[jeuId].total++;
       if (bonneReponse) perJeu[jeuId].bonnes++;
+      perJeu[jeuId].derniereVisite = Date.now();
       localStorage.setItem(STATS_PAR_JEU_KEY, JSON.stringify(perJeu));
     } catch { /* ignore */ }
   }

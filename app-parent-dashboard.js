@@ -3,6 +3,71 @@
 
 import { getNiveauCourant, NIVEAU } from "./app-state.js";
 
+const STRATEGIES = {
+  [NIVEAU.CP]: [
+    { domaine: "🧮 Additions", methode: "On compte sur les doigts, puis on visualise des \"groupes\".", maison: "Avec des pâtes ou des cubes : «Mets 3 pâtes + 2 pâtes. Combien ?»" },
+    { domaine: "📖 Lecture", methode: "On décode lettre par lettre puis on fusionne les syllabes.", maison: "Pointer chaque syllabe du doigt en lisant à voix haute ensemble." },
+  ],
+  [NIVEAU.CE1]: [
+    { domaine: "🧮 Additions/Soustractions", methode: "On décompose en dizaines et unités : 27 + 15 = 20+10 + 7+5.", maison: "«Combien de dizaines ? Combien d'unités ?» avec des pièces de monnaie." },
+    { domaine: "📖 Compréhension", methode: "On reformule : «De qui parle le texte ? Que se passe-t-il ?»", maison: "Après une histoire, demandez : «Qu'est-ce qui s'est passé ? Pourquoi ?»" },
+  ],
+  [NIVEAU.CE2]: [
+    { domaine: "🧮 Multiplications", methode: "On visualise des tableaux : 3×4 = 3 rangées de 4.", maison: "Tables de 2, 3, 5 à réciter en sautant à la corde ou en jouant." },
+    { domaine: "✏️ Orthographe", methode: "On identifie le groupe nominal pour accorder : «le grand chien» → tout s'accorde.", maison: "Dictée de 3 phrases courtes, sans noter les erreurs — juste discuter." },
+  ],
+  [NIVEAU.CM1]: [
+    { domaine: "🧮 Fractions", methode: "On découpe visuellement : ½ pizza = 1 part sur 2 parts égales.", maison: "Partager une pizza ou une tarte en parts égales et nommer les fractions." },
+    { domaine: "✏️ Conjugaison", methode: "On identifie le sujet + son groupe pour choisir la terminaison.", maison: "Au dîner : transformer des phrases au passé composé ensemble." },
+  ],
+  [NIVEAU.CM2]: [
+    { domaine: "🧮 Calcul avancé", methode: "On estime d'abord l'ordre de grandeur, puis on calcule.", maison: "Courses : estimer le total avant de payer. «Ça va coûter environ combien ?»" },
+    { domaine: "📖 Rédaction", methode: "On structure : situation initiale → problème → résolution.", maison: "Raconter sa journée en 3 actes : ce qui s'est passé, le moment difficile, comment ça s'est terminé." },
+  ],
+};
+
+function _genererBlocStrategieSemaine(niveau, enfantNom) {
+  const strategies = STRATEGIES[niveau] || STRATEGIES[NIVEAU.CE1];
+  let diagPatterns = {};
+  try { diagPatterns = JSON.parse(localStorage.getItem("diag-erreurs") || "{}"); } catch { /* ignore */ }
+
+  const patternGlobal = Object.values(diagPatterns).reduce((acc, jeu) => {
+    for (const [k, v] of Object.entries(jeu)) acc[k] = (acc[k] || 0) + v;
+    return acc;
+  }, {});
+  const typeFrequent = Object.entries(patternGlobal).sort((a, b) => b[1] - a[1])[0]?.[0];
+  const conseilDiag = {
+    lecture: `${enfantNom} a souvent indiqué mal lire la consigne — lisez ensemble la question à voix haute avant de répondre.`,
+    methode: `${enfantNom} signale ne pas savoir comment commencer — montrez la méthode étape par étape sans donner la réponse.`,
+    calcul: `${enfantNom} fait des erreurs d'étourderie — encouragez à vérifier en recomptant lentement.`,
+    fatigue: `${enfantNom} se dit souvent fatigué(e) — préférez des sessions courtes de 10 min plutôt qu'une longue session.`,
+  }[typeFrequent] || "";
+
+  return `
+    <div class="parent-card" style="margin-bottom: 1.5rem; border-left: 4px solid #7c4dff;">
+      <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;">🎓 Cette semaine, on travaille comme ça</h3>
+      <p style="margin: 0 0 1rem 0; font-size: 0.85rem; color: #666;">
+        Pour renforcer à la maison ce que l'app enseigne à ${enfantNom} :
+      </p>
+      ${strategies.map(s => `
+        <div style="margin-bottom: 1rem; padding: 0.9rem; background: #f3f0ff; border-radius: 0.8rem;">
+          <div style="font-weight: 700; margin-bottom: 0.4rem;">${s.domaine}</div>
+          <div style="font-size: 0.88rem; color: #444; margin-bottom: 0.5rem;">
+            <strong>Méthode app :</strong> ${s.methode}
+          </div>
+          <div style="font-size: 0.88rem; color: #555; background: white; padding: 0.5rem 0.8rem; border-radius: 0.5rem;">
+            💡 <strong>À la maison :</strong> ${s.maison}
+          </div>
+        </div>
+      `).join("")}
+      ${conseilDiag ? `
+        <div style="margin-top: 0.5rem; padding: 0.8rem 1rem; background: #fff8e1; border-radius: 0.6rem; font-size: 0.88rem; color: #555;">
+          🔍 <strong>Observation :</strong> ${conseilDiag}
+        </div>
+      ` : ""}
+    </div>`;
+}
+
 export function afficherParentDashboard() {
   let stats = {};
   try {
@@ -115,6 +180,9 @@ export function afficherParentDashboard() {
           </div>
         </div>
       </div>
+
+      <!-- CETTE SEMAINE ON TRAVAILLE COMME ÇA -->
+      ${_genererBlocStrategieSemaine(niveau, enfantNom)}
 
       <!-- CONSEIL PÉDAGOGIQUE -->
       <div class="parent-card parent-card--pedagogue" style="margin-bottom: 1.5rem;">
