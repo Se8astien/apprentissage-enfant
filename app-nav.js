@@ -1362,6 +1362,54 @@ function declencherCombo(nb, onFermer) {
   overlay.addEventListener("click", (e) => { if (e.target === overlay) fermer(); });
 }
 
+function _afficherDiagnosticSelf() {
+  const zone = document.getElementById("zone-choix");
+  if (!zone) return;
+  const existant = zone.querySelector(".diagnostic-self");
+  if (existant) return;
+
+  const wrap = document.createElement("div");
+  wrap.className = "diagnostic-self";
+  wrap.style.cssText = "margin-top:1rem;padding:0.8rem 1rem;background:#fff8e1;border-left:4px solid #ffc107;border-radius:0.5rem;font-size:0.95rem;";
+  wrap.innerHTML = `<p style="margin:0 0 0.6rem;font-weight:700;">🤔 Qu'est-ce qui s'est passé ?</p>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+      ${[["lecture","J'ai mal lu 👀"],["methode","Je ne savais pas comment faire 🤷"],["calcul","Je me suis trompé en calculant 🔢"],["fatigue","Je suis fatigué(e) 😴"]].map(([k,l]) =>
+        `<button data-diag="${k}" style="padding:0.4rem 0.8rem;border:2px solid #ffc107;border-radius:2rem;background:white;cursor:pointer;font-size:0.85rem;">${l}</button>`
+      ).join("")}
+    </div>`;
+
+  wrap.querySelectorAll && setTimeout(() => {
+    wrap.querySelectorAll("button[data-diag]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.diag;
+        try {
+          const jeu = getJeuCourant();
+          const raw = JSON.parse(localStorage.getItem("diag-erreurs") || "{}");
+          if (!raw[jeu]) raw[jeu] = {};
+          raw[jeu][type] = (raw[jeu][type] || 0) + 1;
+          localStorage.setItem("diag-erreurs", JSON.stringify(raw));
+        } catch { /* ignore */ }
+        wrap.innerHTML = `<p style="margin:0;color:#666;">Merci ${type === "fatigue" ? "— tu peux faire une pause 🌿" : "— continue, tu apprends !"}</p>`;
+        track("error_self_diag", { game_name: getJeuCourant(), type });
+      });
+    });
+  }, 0);
+
+  zone.appendChild(wrap);
+}
+
+function _verifierBonusEspacement(jeuId) {
+  if (!jeuId) return false;
+  try {
+    const raw = localStorage.getItem("stats-questions");
+    if (!raw || /^\d+$/.test(raw.trim())) return false;
+    const perJeu = JSON.parse(raw);
+    const s = perJeu[jeuId];
+    if (!s || !s.derniereVisite) return false;
+    return (Date.now() - s.derniereVisite) >= 48 * 60 * 60 * 1000;
+  } catch { return false; }
+}
+
 // ── Reset feedback ────────────────────────────────────────────────────────────
 export function resetFeedback() {
   if (elFeedback) {
@@ -1403,7 +1451,11 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     const ok = messagesOk();
     elFeedback.textContent = (estGrand() ? "Correct — " : "✓ ") + ok[Math.floor(Math.random() * ok.length)];
     elFeedback.className = "feedback ok";
-    ajouterEtoiles(1);
+    const bonusEspacement = _verifierBonusEspacement(getJeuCourant());
+    ajouterEtoiles(bonusEspacement ? 2 : 1);
+    if (bonusEspacement) {
+      elFeedback.textContent += " ⭐ Bonus révision !";
+    }
     sauverFaim(lireFaim() + 5);
     confetti(estGrand() ? { tier: "sparkle", sobre: true } : { tier: "sparkle" });
     sonBonne(comboActuel);
@@ -1473,6 +1525,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     }
     afficherAideDouce(correct);
     montrerExplicationVisuelle(correct, choix);
+    if (erreursSerie === 2) _afficherDiagnosticSelf();
     afficherActionRevision(idJeuErreur);
     verifierRappelRevisionEspacee(idJeuErreur);
     declencherReactionRenard(false);
