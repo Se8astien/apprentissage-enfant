@@ -39,6 +39,21 @@ const SUIVI_MAITRISE = {
   soustraction: { fenetre: [], notifie: false },
 };
 
+// ── Tracker de variantes — évite de répéter la même forme 3× de suite ─────────
+const _varHistorique = new Map();
+
+function _trackVariante(jeu, type) {
+  const hist = _varHistorique.get(jeu) || [];
+  hist.push(type);
+  if (hist.length > 4) hist.shift();
+  _varHistorique.set(jeu, hist);
+}
+
+function _devraitChanger(jeu, typeActuel) {
+  const hist = _varHistorique.get(jeu) || [];
+  return hist.length >= 3 && hist.slice(-3).every(t => t === typeActuel);
+}
+
 function suivreMaitrise(jeu, correct) {
   const s = SUIVI_MAITRISE[jeu];
   if (!s) return;
@@ -85,7 +100,16 @@ function reponseAvecSuivi(jeu, val, btn, bonne, isText = false) {
 }
 
 function propositionsAdditionIntelligentes(a, b, bonne, min, max) {
-  const base = [bonne + 1, bonne - 1, bonne + 10, bonne - 10, Math.abs(a - b), a + b - 2];
+  // Erreur de retenue : additionne sans reporter la retenue des unités
+  const sansCRetenue = Math.floor(a / 10) * 10 + Math.floor(b / 10) * 10 + (a % 10 + b % 10) % 10;
+  const base = [
+    bonne + 1,             // décalage d'un
+    bonne - 1,             // décalage d'un
+    bonne + 10,            // oubli d'une dizaine
+    bonne - 10,            // oubli d'une dizaine
+    Math.abs(a - b),       // confusion avec la soustraction
+    sansCRetenue,          // oubli de la retenue (erreur fréquente)
+  ];
   const uniques = [...new Set(base)].filter((n) => Number.isFinite(n) && n >= min && n <= max && n !== bonne);
   while (uniques.length < 3) {
     const c = min + Math.floor(Math.random() * (max - min + 1));
@@ -95,7 +119,16 @@ function propositionsAdditionIntelligentes(a, b, bonne, min, max) {
 }
 
 function propositionsSoustractionIntelligentes(total, enleve, bonne, min, max) {
-  const base = [bonne + 1, bonne - 1, total + enleve, Math.abs(enleve - total), total - enleve + 10, total - enleve - 10];
+  // Erreur d'emprunt : soustrait sans emprunter (flip les unités)
+  const sansEmprunt = Math.floor(total / 10) * 10 - Math.floor(enleve / 10) * 10 + Math.abs(total % 10 - enleve % 10);
+  const base = [
+    bonne + 1,             // décalage d'un
+    bonne - 1,             // décalage d'un
+    total + enleve,        // confusion avec l'addition
+    Math.abs(enleve - total), // inversion des termes
+    sansEmprunt,           // oubli de l'emprunt (erreur fréquente)
+    enleve,                // renvoie ce qu'on a enlevé
+  ];
   const uniques = [...new Set(base)].filter((n) => Number.isFinite(n) && n >= min && n <= max && n !== bonne);
   while (uniques.length < 3) {
     const c = min + Math.floor(Math.random() * (max - min + 1));
@@ -432,8 +465,14 @@ export function lancerAddition() {
   // CE1 : addition jusqu'à 79
   const maxCE1 = [30, 55, 79][diff];
 
-  // 25% chance (diff > 0) : complément à la dizaine — ex: 27 + ? = 30
-  if (diff > 0 && Math.random() < 0.25) {
+  // Rotation de variantes : complément à la dizaine ou addition standard
+  // On évite de répéter la même forme 3× de suite
+  const forceComplement = diff > 0 && _devraitChanger("addition-ce1", "standard");
+  const forceStandard = _devraitChanger("addition-ce1", "complement");
+  const useComplement = diff > 0 && (forceComplement || (!forceStandard && Math.random() < 0.25));
+
+  if (useComplement) {
+    _trackVariante("addition-ce1", "complement");
     a = 11 + Math.floor(Math.random() * Math.max(1, maxCE1 - 12));
     if (a % 10 === 0) a++;
     const prochaineDiv = Math.ceil(a / 10) * 10;
@@ -454,6 +493,7 @@ export function lancerAddition() {
   }
 
   // Addition standard CE1 — parfois avec un multiple de 10 (20%)
+  _trackVariante("addition-ce1", "standard");
   const useDizaine = Math.random() < 0.20;
   if (useDizaine) {
     const dizaines = [10, 20, 30, 40, 50];
@@ -555,7 +595,10 @@ export function lancerSoustraction() {
       "Un train transporte <strong>" + total + "</strong> voyageurs. À l'arrêt, <strong>" + enleve + "</strong> descendent. Combien restent dans le train ?",
     ];
     let html;
-    if (diff === 0) {
+    const forceContexte = _devraitChanger("sous-ce2", "equation");
+    const useContexte = diff === 0 || forceContexte || (!_devraitChanger("sous-ce2", "contexte") && Math.random() < 0.4);
+    _trackVariante("sous-ce2", useContexte ? "contexte" : "equation");
+    if (useContexte) {
       const ctx = CONTEXTES_CE2[Math.floor(Math.random() * CONTEXTES_CE2.length)];
       html = "<p>" + ctx + "</p>" +
              '<p class="equation" style="font-size:2rem;margin-top:0.5rem">' + total + " − " + enleve + " = ?</p>";
