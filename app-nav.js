@@ -1,5 +1,7 @@
 // app-nav.js — navigation/screens, stars, combo, apresReponse, montrerMenu/Jeu
 
+import { initialiserTamagotchiMenu, rafraichirTamagotchiUI } from "./app-tamagotshi-menu.js";
+
 import {
   elGenre,
   elMenu,
@@ -1415,6 +1417,8 @@ export function resetFeedback() {
   if (elFeedback) {
     elFeedback.textContent = "";
     elFeedback.className = "feedback";
+    const badgesEl = elFeedback.parentNode?.querySelector("[data-maitrise-badges]");
+    if (badgesEl) badgesEl.remove();
   }
   cacherAideDouce();
   if (elSuivant) elSuivant.hidden = true;
@@ -1488,15 +1492,16 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
 
     // #2 - Show mastery badges if earned
     const jeuCible = getJeuCourant();
-    const jeuStats = { bonnes: comboActuel >= 5 ? comboActuel : 1, tempsMoyen: moyenneTempsReponse(jeuCible) || 0, tauxReussite: 100 };
-    const badgesHTML = afficherBadgesMaitrise(jeuCible, jeuStats);
-    if (badgesHTML) {
+    const tauxReussite = questionsDepuisDebutJeu > 0
+      ? Math.round(((questionsDepuisDebutJeu - mauvaisesDepuisDebutJeu) / questionsDepuisDebutJeu) * 100)
+      : 100;
+    const jeuStats = { bonnes: comboActuel, tempsMoyen: Math.round((moyenneTempsReponse(jeuCible) || 0) / 1000), tauxReussite };
+    const badgesHTML = afficherBadgesMaitrise(jeuStats);
+    if (badgesHTML && elFeedback) {
       const badgesEl = document.createElement("div");
+      badgesEl.dataset.maitriseBadges = "true";
       badgesEl.innerHTML = badgesHTML;
-      const feedback = document.getElementById("feedback");
-      if (feedback && feedback.nextElementSibling) {
-        feedback.parentNode.insertBefore(badgesEl, feedback.nextElementSibling);
-      }
+      elFeedback.parentNode?.insertBefore(badgesEl, elFeedback.nextSibling);
     }
   } else {
     const idJeuErreur = jeuActifId();
@@ -1753,6 +1758,8 @@ export function montrerMenu() {
   const modal = document.getElementById("modal-classe-suivante");
   if (modal) modal.hidden = true;
   revelerSeulEcran(menu);
+  initialiserTamagotchiMenu();
+  rafraichirTamagotchiUI();
   synchroniserAffichageMenu();
   brancherObjectifSession();
   mettreAJourObjectifSession();
