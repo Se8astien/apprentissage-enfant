@@ -144,13 +144,33 @@ export function majGenre() {
   if (elIconeGenre) elIconeGenre.textContent = f ? "👧" : "👦";
 }
 
-export function getDifficulteJeu(jeu) {
-  const v = parseInt(localStorage.getItem("diff-jeu-" + jeu) || "0", 10);
+export function getBaselineDifficulte() {
+  const v = parseInt(localStorage.getItem("apprentissage-baseline-diff") || "0", 10);
   return (v >= 0 && v <= 2) ? v : 0;
 }
 
+export function setBaselineDifficulte(v) {
+  const clamped = Math.max(0, Math.min(2, v));
+  if (clamped > getBaselineDifficulte()) {
+    localStorage.setItem("apprentissage-baseline-diff", String(clamped));
+  }
+}
+
+export function getDifficulteJeu(jeu) {
+  const raw = localStorage.getItem("diff-jeu-" + jeu);
+  if (raw !== null) {
+    const v = parseInt(raw, 10);
+    return (v >= 0 && v <= 2) ? v : 0;
+  }
+  // Nouveau jeu : plancher = baseline - 1, et plancher minimum selon le niveau
+  const niveauFloor = (niveauCourant === NIVEAU.CE2 || niveauCourant === NIVEAU.CM1 || niveauCourant === NIVEAU.CM2) ? 1 : 0;
+  return Math.max(niveauFloor, Math.max(0, getBaselineDifficulte() - 1));
+}
+
 export function setDifficulteJeu(jeu, v) {
-  localStorage.setItem("diff-jeu-" + jeu, String(Math.max(0, Math.min(2, v))));
+  const clamped = Math.max(0, Math.min(2, v));
+  localStorage.setItem("diff-jeu-" + jeu, String(clamped));
+  setBaselineDifficulte(clamped);
 }
 
 export function getDifficulteProfil() {
@@ -443,4 +463,45 @@ export function confetti(opts) {
     root.appendChild(s);
     setTimeout(() => s.remove(), tier === "sparkle" ? 1600 : 2500);
   }
+}
+
+export function getStats() {
+  const DOMAINE_LABELS = {
+    addition: "Additions", soustraction: "Soustractions",
+    multiplication: "Multiplications", division: "Divisions",
+    fractions: "Fractions", fractionsCM: "Fractions",
+    lecture: "Lecture", lectureTexte: "Lecture de texte",
+    grammaire: "Grammaire", conjugaison: "Conjugaison",
+    heure: "Heure", decimaux: "Décimaux",
+  };
+
+  let perJeu = {};
+  try {
+    const raw = localStorage.getItem("stats-questions");
+    if (raw && !/^\d+$/.test(raw.trim())) perJeu = JSON.parse(raw) || {};
+  } catch { /* ignore */ }
+
+  let totalAll = 0, bonnesAll = 0;
+  const parDomaine = {}, competences = {};
+
+  for (const [jeu, s] of Object.entries(perJeu)) {
+    if (!s || !s.total) continue;
+    const total = parseInt(s.total, 10) || 0;
+    const bonnes = parseInt(s.bonnes, 10) || 0;
+    totalAll += total;
+    bonnesAll += bonnes;
+    const label = DOMAINE_LABELS[jeu] || jeu;
+    parDomaine[label] = { questions: total, tauxReussite: total ? bonnes / total * 100 : 0, tempsMoyen: 0 };
+    competences[label] = total ? Math.round(bonnes / total * 100) : 0;
+  }
+
+  let meilleureCombo = 0;
+  try {
+    const badges = JSON.parse(localStorage.getItem("badges-obtenus") || "[]");
+    if (badges.includes("combo20")) meilleureCombo = 20;
+    else if (badges.includes("combo10")) meilleureCombo = 10;
+    else if (badges.includes("combo5")) meilleureCombo = 5;
+  } catch { /* ignore */ }
+
+  return { partiesTotal: totalAll, tauxReussite: totalAll ? bonnesAll / totalAll * 100 : 0, meilleureCombo, competences, parDomaine };
 }

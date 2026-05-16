@@ -4,7 +4,6 @@
 import {
   getDifficulte,
   getNiveauCourant,
-  estCP,
   estCE1,
   estCE2,
   estCM1,

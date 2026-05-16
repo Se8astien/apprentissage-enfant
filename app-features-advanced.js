@@ -2,17 +2,19 @@
 // #3 Révision bloquante + #4 Dashboard parent + #6 Quêtes + #7 Chrono
 // #8 Duels parent + #9 Créateur jeux + #12 Stats + #13 Palmarès
 
-import { getNiveauCourant } from "./app-state.js";
+import { getStats, getNiveauCourant } from "./app-state.js";
 
 // ============================================================================
 // #3 - RÉVISION BLOQUANTE (après erreur)
 // ============================================================================
 
 let jeuBloque = null;
+let conceptARevoir = null;
 let tentativesRevision = 0;
 
 export function activerRevisionBloquante(jeuId, concept) {
   jeuBloque = jeuId;
+  conceptARevoir = concept;
   tentativesRevision = 0;
 
   return `
@@ -61,7 +63,8 @@ export function validerRevision(reussie) {
 // #4 - DASHBOARD PARENT (heatmap + recommandations)
 // ============================================================================
 
-export function genererDashboardParent(enfant, stats = {}) {
+export function genererDashboardParent(enfant) {
+  const stats = getStats(enfant);
 
   const heatmap = `
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0;">
@@ -118,9 +121,11 @@ export function genererDashboardParent(enfant, stats = {}) {
 // #6 - QUÊTES NARRATIVES (progression)
 // ============================================================================
 
+let queteEnCours = null;
 let etapeQuete = 0;
 
 export function demarrerQuete(queteId, queteData) {
+  queteEnCours = queteId;
   etapeQuete = 0;
 
   return `
@@ -321,7 +326,8 @@ export function creerInterfaceCreateurJeux() {
 // #12 - STATS DÉTAILLÉES (pour enfants curieux CM1+)
 // ============================================================================
 
-export function creerDashboardStats(enfant, stats = {}) {
+export function creerDashboardStats(enfant) {
+  const stats = getStats(enfant);
 
   return `
     <div style="padding: 2rem; background: white; border-radius: 1rem;">
