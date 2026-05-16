@@ -387,3 +387,20 @@ export function verifierBadgesStats() {
 
   return nouveaux;
 }
+
+// ── Récompense différée ───────────────────────────────────────────────────────
+const MILESTONES_ETOILES = [10, 50, 100, 300, 500, 1000];
+const MILESTONES_RENARD = [21, 61, 151, 301];
+
+export function getMessageRecompenseDifferee() {
+  const etoiles = lireEtoiles();
+  const prochainMilestone = MILESTONES_ETOILES.find((m) => m > etoiles);
+  const prochainRenard = MILESTONES_RENARD.find((m) => m > etoiles);
+  if (prochainRenard && prochainRenard - etoiles <= 15) {
+    return `🦊 Plus que ${prochainRenard - etoiles} étoile${prochainRenard - etoiles > 1 ? "s" : ""} avant que le renard évolue !`;
+  }
+  if (prochainMilestone && prochainMilestone - etoiles <= 10) {
+    return `⭐ Plus que ${prochainMilestone - etoiles} étoile${prochainMilestone - etoiles > 1 ? "s" : ""} avant un nouveau badge !`;
+  }
+  return null;
+}

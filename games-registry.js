@@ -27,6 +27,7 @@ const JEU_SPEC = {
   perlesDorees: ["maths", "lancerPerlesDorees"],
   planche100: ["maths", "lancerPlanche100"],
   decimaux: ["maths", "lancerDecimaux"],
+  pourquoi: ["maths", "lancerPourquoi"],
   formes: ["formes", "lancerFormes"],
   fractions: ["formes", "lancerFractions"],
   symetrie: ["formes", "lancerSymetrie"],

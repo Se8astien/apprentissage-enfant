@@ -61,6 +61,7 @@ import {
   afficherNotifBadge,
   BADGES,
   lireBadges,
+  getMessageRecompenseDifferee,
 } from "./app-gamification.js";
 
 import { afficherIntroHistoire } from "./app-histoire.js";
@@ -94,6 +95,9 @@ import { afficherParentDashboard } from "./app-parent-dashboard.js";
 import { afficherTableauBordProfesseur } from "./app-teacher-dashboard.js";
 import "./mobile-utils.js";
 import { initAnalyticsTracking } from "./app-analytics-tracking.js";
+import { afficherCalendrierMenu } from "./app-calendrier.js";
+import { afficherObjectifMenu, progresserObjectif } from "./app-objectif-semaine.js";
+import { afficherDefiMenu, progresserDefi } from "./app-defi-parents.js";
 
 const lanceurs = {};
 
@@ -134,10 +138,52 @@ function montrerClasse() {
   document.querySelectorAll(".btn-classe").forEach(b => b.classList.remove("selectionne"));
 }
 
+function _verifierRevisionDemain() {
+  try {
+    const data = JSON.parse(localStorage.getItem("am-revision-demain") || "null");
+    if (!data) return;
+    const hier = new Date();
+    hier.setDate(hier.getDate() - 1);
+    const dateHier = hier.toISOString().slice(0, 10);
+    if (data.date !== dateHier) return;
+    const noms = (data.jeux || []).map((j) => {
+      const carte = document.querySelector(`.carte-jeu[data-jeu="${j}"] .nom-jeu`);
+      return carte?.textContent?.trim() || j;
+    }).join(", ");
+    if (!noms) return;
+    setTimeout(() => {
+      import("./app-nav.js").then((m) => {
+        if (typeof m.afficherToastSimple === "function") {
+          m.afficherToastSimple("🔁 Révision du jour", `Hier tu avais du mal avec : ${noms}. On reessaie ?`);
+        }
+      });
+    }, 1500);
+  } catch { /* ignore */ }
+}
+
+function _afficherRecompenseDifferee() {
+  try {
+    const msg = getMessageRecompenseDifferee?.();
+    if (!msg) return;
+    setTimeout(() => {
+      import("./app-nav.js").then((m) => {
+        if (typeof m.afficherToastSimple === "function") {
+          m.afficherToastSimple("✨ Presque !", msg);
+        }
+      });
+    }, 3000);
+  } catch { /* ignore */ }
+}
+
 function entrerMenu() {
   montrerMenu();
   afficherMissions();
   accueillirWeekEndSiMenu();
+  afficherCalendrierMenu();
+  afficherObjectifMenu();
+  afficherDefiMenu();
+  _verifierRevisionDemain();
+  _afficherRecompenseDifferee();
 }
 
 // -- Routeur central : 1 point qui decide quel ecran montrer
@@ -461,6 +507,10 @@ try {
 } catch { /* ignore */ }
 syncProfilActif(lireEtoiles(), lireNomRenard(), getNiveauCourant());
 
+// Appliquer les préférences d'accessibilité au démarrage
+if (localStorage.getItem("am-mode-dyslexie") === "1") document.body.classList.add("mode-dyslexie");
+if (localStorage.getItem("am-mode-daltonisme") === "1") document.body.classList.add("mode-daltonisme");
+
 function premierEcran() {
   if (profilsListe.length >= 2 && !sessionStorage.getItem("skip-selector")) {
     afficherSelecteurProfils(profilsListe, profilActifId);
@@ -524,6 +574,7 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
     if (!ok || typeof lanceurs[jeu] !== "function") return;
     track("game_start", { game_name: jeu, niveau: getNiveauCourant(), difficulte: getDifficulte() });
     montrerJeu(jeu, lanceurs);
+    window._jeuActifId = jeu;
   });
 });
 
@@ -829,6 +880,15 @@ initialiserAudio();
 window.addEventListener("beforeunload", trackSessionEnd);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") trackSessionEnd();
+});
+
+// Brancher la progression des objectifs lors des bonnes réponses
+document.addEventListener("am:bonneReponse", (e) => {
+  const jeu = e.detail?.jeu || window._jeuActifId;
+  if (jeu) {
+    progresserObjectif(jeu);
+    progresserDefi(jeu);
+  }
 });
 
 window.__amModuleReady = true;

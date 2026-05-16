@@ -1610,3 +1610,51 @@ export function lancerVraiFaux() {
     `<p class="equation vrai-faux-equation">${htmlLine}</p>`;
   afficherVraiFauxChoix();
 }
+
+// ── Jeu "Pourquoi ?" — Raisonnement mathématique (CM1/CM2) ────────────────────
+export function lancerPourquoi() {
+  if (!estCM1() && !estCM2()) return;
+
+  const QUESTIONS = [
+    {
+      question: "Pourquoi 6 × 8 = 48 est correct ?",
+      bonne: "Parce que 8 groupes de 6 donnent 48",
+      fausses: ["Parce que 6 + 8 = 48", "Parce que 48 − 6 = 8", "Parce que 6 × 8 = 56"],
+    },
+    {
+      question: "Pourquoi 72 ÷ 9 = 8 est correct ?",
+      bonne: "Parce que 9 × 8 = 72",
+      fausses: ["Parce que 72 − 9 = 8", "Parce que 9 + 8 = 72", "Parce que 7 + 2 = 9"],
+    },
+    {
+      question: "Pourquoi 3/4 > 1/2 ?",
+      bonne: "Parce que 3/4 = 0,75 et 1/2 = 0,5, donc 3/4 est plus grand",
+      fausses: ["Parce que 4 > 2", "Parce que 3 > 1", "Parce que 3 + 4 > 1 + 2"],
+    },
+    {
+      question: "Pourquoi 25 % de 80 = 20 ?",
+      bonne: "Parce que 25% = 1/4, et 80 ÷ 4 = 20",
+      fausses: ["Parce que 25 × 80 = 20", "Parce que 80 − 25 = 20", "Parce que 25 + 80 = 20"],
+    },
+    {
+      question: "Pourquoi 0,5 + 0,5 = 1 ?",
+      bonne: "Parce que 5/10 + 5/10 = 10/10 = 1 entier",
+      fausses: ["Parce que 0 + 0 = 0 et 5 + 5 = 10", "Parce que 0,5 × 2 = 10", "Parce que 0,5 = 5"],
+    },
+    {
+      question: "Pourquoi on ne peut pas diviser par 0 ?",
+      bonne: "Parce qu'on ne peut pas partager quelque chose en 0 groupes",
+      fausses: ["Parce que c'est une règle arbitraire", "Parce que 0 est trop petit", "Parce que ça donnerait 0"],
+    },
+  ];
+
+  const q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+  setBonneReponse(q.bonne);
+
+  elTitre.textContent = "🤔 Pourquoi ?";
+  elQuestion.innerHTML = `<p style="font-size:1.05rem;font-weight:600;margin-bottom:0.5rem">🤔 ${q.question}</p>
+    <p style="font-size:0.85rem;color:#64748b">Choisis le bon raisonnement :</p>`;
+
+  const toutes = melanger([q.bonne, ...q.fausses.slice(0, 3)]);
+  afficherChoix(toutes, (val, btn) => apresReponse(val, btn, getBonneReponse()));
+}

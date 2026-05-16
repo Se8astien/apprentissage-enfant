@@ -74,6 +74,7 @@ import {
   BADGES,
 } from "./app-gamification.js";
 
+import { signalerErreurLecon, reinitialiserLeconJeu } from "./app-lecon-mini.js";
 import { getHistoireJeu } from "./app-histoire.js";
 import { getMasques } from "./app-params.js";
 import { texteDescCarteJeu } from "./app-menu-descriptions.js";
@@ -547,7 +548,8 @@ function lireTexte(texte, opts = {}) {
   window.speechSynthesis.cancel();
   const voix = new SpeechSynthesisUtterance(propre);
   voix.lang = "fr-FR";
-  voix.rate = opts.lentement ? (estGrand() ? 0.82 : 0.78) : (estGrand() ? 0.98 : 0.9);
+  const vitesseBase = parseFloat(localStorage.getItem("am-vitesse-lecture") || "1");
+  voix.rate = opts.lentement ? vitesseBase * (estGrand() ? 0.82 : 0.78) : vitesseBase * (estGrand() ? 0.98 : 0.9);
   window.speechSynthesis.speak(voix);
   return true;
 }
@@ -874,7 +876,7 @@ function lireTexteCourt(texte, source) {
   }
 }
 
-function afficherToastSimple(titre, detail) {
+export function afficherToastSimple(titre, detail) {
   const app = document.querySelector(".app");
   if (!app) return;
   const toast = document.createElement("div");
@@ -1171,6 +1173,20 @@ export function proposerRevisionSiErreurs(jeu, onRetourMenu) {
     overlay.remove();
     if (onRetourMenu) onRetourMenu();
   });
+  // Sauvegarder les jeux faibles pour la révision du lendemain
+  try {
+    const statsQ = JSON.parse(localStorage.getItem("stats-questions") || "{}");
+    const jeuxFaibles = Object.entries(statsQ)
+      .filter(([, s]) => s.total >= 5 && Math.round((s.bonnes / s.total) * 100) < 65)
+      .map(([jeu]) => jeu)
+      .slice(0, 3);
+    if (jeuxFaibles.length) {
+      localStorage.setItem("am-revision-demain", JSON.stringify({
+        date: new Date().toISOString().slice(0, 10),
+        jeux: jeuxFaibles,
+      }));
+    }
+  } catch { /* ignore */ }
   return true;
 }
 
@@ -1507,6 +1523,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     const idJeuErreur = jeuActifId();
     erreursSession++;
     erreursSerie++;
+    signalerErreurLecon(getJeuCourant());
     mauvaisesDepuisDebutJeu++;
     essaisDepuisEncouragement++;
     recompenserCorrectionSiBesoin(false);
@@ -1784,6 +1801,7 @@ export function montrerJeu(nom, lanceurs) {
   correctionsDepuisEncouragement = 0;
   derniereQuestionEtaitErreur = false;
   miniLeconVueJeu = null;
+  reinitialiserLeconJeu(nom);
   delete _revisionFileParJeu[nom];
   _snapBonnesAuDebutJeu = bonnesSession;
   _snapErreursAuDebutJeu = erreursSession;
