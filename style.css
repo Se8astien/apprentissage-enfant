@@ -501,6 +501,155 @@ h1 {
   margin-bottom: 0.65rem;
 }
 
+/* ── TAMAGOTSHI RENARD ────────────────────────────────────────────────────────── */
+.menu-tamagotshi {
+  background: linear-gradient(135deg, #f5e6ff 0%, #e8d7ff 100%);
+  border-radius: 1.5rem;
+  padding: 1.2rem;
+  box-shadow: 0 8px 24px rgba(108, 92, 231, 0.15);
+  border: 2px solid rgba(108, 92, 231, 0.2);
+  text-align: center;
+}
+
+.tamagotshi-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.tamagotshi-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tamagotshi-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--primaire);
+  font-weight: 800;
+}
+
+.tamagotshi-stade {
+  font-size: 0.8rem;
+  color: #7c68c4;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.tamagotshi-renard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.tamagotshi-renard:hover {
+  transform: scale(1.05);
+}
+
+.tamagotshi-renard svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.tamagotshi-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.stat-ligne {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: left;
+}
+
+.stat-barre {
+  flex: 1;
+  height: 1.2rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.6rem;
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-remplissage {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b9d 0%, #ffa07a 100%);
+  border-radius: 0.5rem;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(255, 107, 157, 0.4);
+}
+
+.tamagotshi-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-tamagotshi {
+  padding: 0.65rem 1rem;
+  border: 2px solid rgba(108, 92, 231, 0.3);
+  background: white;
+  color: var(--primaire);
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  min-width: 100px;
+}
+
+.btn-tamagotshi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+  border-color: rgba(108, 92, 231, 0.5);
+}
+
+.btn-tamagotshi:active {
+  transform: translateY(0);
+}
+
+.btn-tamagotshi-jouer {
+  background: linear-gradient(135deg, #6c5ce7 0%, #5f3dc4 100%);
+  color: white;
+  border: none;
+}
+
+.btn-tamagotshi-jouer:hover {
+  box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+}
+
+.tamagotshi-message {
+  min-height: 1.5rem;
+  font-size: 0.9rem;
+  color: #2d3436;
+  font-style: italic;
+  animation: fadeInOut 2s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 .menu-bloc {
   border-radius: 1.1rem;
   border: 1px solid rgba(108, 92, 231, 0.16);

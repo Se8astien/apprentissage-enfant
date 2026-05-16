@@ -83,6 +83,11 @@ import {
   consommerRetourDepuisAventure,
   rafraichirAventureSiOuverte,
 } from "./app-aventure.js";
+import { chargerQueteActive } from "./app-quests.js";
+import { evaluerBadges } from "./app-social-badges.js";
+import { initialiserArbresCompetences } from "./app-skill-trees.js";
+import { initialiserAudio } from "./app-audio-mode.js";
+import { calculerStatistiquesEnfant } from "./app-parent-dashboard-features.js";
 import { initFunMenuBar, accueillirWeekEndSiMenu } from "./app-fun-menu.js";
 import { afficherMenuHome } from "./app-menu-home.js";
 import { afficherParentDashboard } from "./app-parent-dashboard.js";
@@ -117,7 +122,7 @@ function idEcranOnboarding() {
 
 window.__amRecharger = rafraichirUiComplete;
 
-// ── Helpers d'écrans ──────────────────────────────────────────────────────────
+// -- Helpers d'ecrans
 function montrerClasse() {
   if (!montrerEcranParId("ecran-classe")) return;
   const mascot = document.getElementById("classe-mascotte");
@@ -135,7 +140,7 @@ function entrerMenu() {
   accueillirWeekEndSiMenu();
 }
 
-// ── Routeur central : 1 point qui décide quel écran montrer ──────────────────
+// -- Routeur central : 1 point qui decide quel ecran montrer
 function routerVersEtape() {
   syncPrefsDepuisStockage();
   const etape = etapeCourante();
@@ -156,7 +161,7 @@ function routerVersEtape() {
     const nom = lireNomRenard();
     elSousTitre.textContent = estGrand()
       ? `Bon retour, ${nom} !`
-      : `${nom} t'attendait ! 🦊`;
+      : `${nom} t'attendait ! \u{1F98A}`;
     setTimeout(() => majGenre(), 3500);
   }
 }
@@ -285,22 +290,22 @@ function brancherOnboardingUI() {
 
   function syncUiTheme(btn) {
     const nuit = stockageGet(STORAGE_THEME_NUIT) === "1";
-    btn.textContent = nuit ? "☀️" : "🌙";
+    btn.textContent = nuit ? "☀️" : "\u{1F319}";
     btn.setAttribute("aria-pressed", nuit ? "true" : "false");
     btn.setAttribute(
       "aria-label",
-      nuit ? "Mode nuit actif — passer en mode jour clair" : "Activer le mode nuit (écran plus doux)",
+      nuit ? "Mode nuit actif — passer en mode jour clair" : "Activer le mode nuit (ecran plus doux)",
     );
   }
 
   function syncUiSons(btn) {
     const on = sonsActifs();
-    btn.textContent = on ? "🔊" : "🔇";
+    btn.textContent = on ? "\u{1F50A}" : "\u{1F507}";
     btn.setAttribute("aria-pressed", on ? "true" : "false");
     btn.classList.toggle("header-tool-sons-muet", !on);
     btn.setAttribute(
       "aria-label",
-      on ? "Sons activés — appuie pour couper les bruits du jeu" : "Sons coupés — appuie pour les rallumer",
+      on ? "Sons actives — appuie pour couper les bruits du jeu" : "Sons coupes — appuie pour les rallumer",
     );
   }
 
@@ -327,7 +332,7 @@ function brancherOnboardingUI() {
   function partager() {
     const data = {
       title: "Apprentissage Magique — Jeux Montessori",
-      text: "🦊 Des jeux Montessori gratuits pour apprendre en s'amusant, du CP au CM2 !",
+      text: "\u{1F98A} Des jeux Montessori gratuits pour apprendre en s'amusant, du CP au CM2 !",
       url: "https://apprentissage-magique.fr",
     };
     if (navigator.share) {
@@ -397,7 +402,7 @@ brancherOnboardingUI();
 brancherBoutonChronoMenu();
 majUiBoutonChrono();
 
-// ── Sélecteur de profils (multi-comptes) ──────────────────────────────────────
+// -- Selecteur de profils (multi-comptes)
 function afficherSelecteurProfils(liste, actifId) {
   const ecran = document.getElementById("ecran-profils");
   const grille = document.getElementById("profils-grille");
@@ -414,7 +419,7 @@ function afficherSelecteurProfils(liste, actifId) {
     return `<button type="button" class="profil-carte${p.id === actifId ? " actif" : ""}" data-id="${p.id}">
       <div class="profil-fox">${svgRenard(stade, 68, {})}</div>
       <span class="profil-nom">${escapeHtml(p.nom || "Renard")}</span>
-      <span class="profil-niveau">${NIVEAUX_LABELS[p.niveau || "cp"] || "🌱 CP"}</span>
+      <span class="profil-niveau">${NIVEAUX_LABELS[p.niveau || "cp"] || "\u{1F331} CP"}</span>
       <span class="profil-etoiles">⭐ ${p.etoiles || 0}</span>
     </button>`;
   }).join("");
@@ -441,7 +446,7 @@ function afficherSelecteurProfils(liste, actifId) {
   }
 }
 
-// ── Initialisation état + premier écran ──────────────────────────────────────
+// -- Initialisation etat + premier ecran
 const { liste: profilsListe, actifId: profilActifId } = initProfils();
 const sessionStartTs = Date.now();
 let sessionClosed = false;
@@ -462,8 +467,6 @@ function premierEcran() {
     return;
   }
   sessionStorage.removeItem("skip-selector");
-  // L'écran initial vient de brancherOnboardingUI (idEcranOnboarding).
-  // On ne fait que rafraîchir l'affichage menu si on est sur le menu (étoiles, missions).
   syncPrefsDepuisStockage();
   if (etapeCourante() === "menu" && document.getElementById("ecran-menu")?.classList.contains("actif")) {
     entrerMenu();
@@ -471,19 +474,19 @@ function premierEcran() {
       const nom = lireNomRenard();
       elSousTitre.textContent = estGrand()
         ? `Bon retour, ${nom} !`
-        : `${nom} t'attendait ! 🦊`;
+        : `${nom} t'attendait ! \u{1F98A}`;
       setTimeout(() => majGenre(), 3500);
     }
   }
 }
 premierEcran();
 
-// Filet de sécurité unique : si pour une raison X aucun écran n'est visible, route à nouveau
+// Filet de securite : si aucun ecran n'est visible, route a nouveau
 setTimeout(() => {
   if (!document.querySelector(".ecran.actif:not([hidden])")) routerVersEtape();
 }, 800);
 
-// ── Boutons jeux ──────────────────────────────────────────────────────────────
+// -- Boutons jeux
 function majEtoilesMaitrise() {
   document.querySelectorAll(".carte-jeu[data-jeu]").forEach(btn => {
     const jeu = btn.dataset.jeu;
@@ -495,11 +498,9 @@ function majEtoilesMaitrise() {
   });
 }
 
-// Filter games by current level (show/hide based on data-niveaux)
 function rajusterJeuxParNiveau() {
   const niveauCourant = getNiveauCourant();
   if (!niveauCourant) {
-    // Niveau non choisi encore, afficher tous les jeux
     document.querySelectorAll(".carte-jeu[data-niveaux]").forEach(btn => {
       btn.hidden = false;
     });
@@ -559,13 +560,11 @@ function gererRetourJeu() {
   retourDepuisJeuVersMenuOuAventure();
 }
 
-// ── Navigation jeu ────────────────────────────────────────────────────────────
+// -- Navigation jeu
 if (btnRetour) btnRetour.addEventListener("click", gererRetourJeu);
 const btnRetourBas = document.getElementById("btn-retour-bas");
 if (btnRetourBas) btnRetourBas.addEventListener("click", gererRetourJeu);
 if (elSuivant) elSuivant.addEventListener("click", () => questionSuivante(lanceurs));
-
-// Changer de genre/classe gérés par brancherOnboardingUI.
 
 const btnMaison = document.getElementById("btn-maison");
 if (btnMaison) btnMaison.addEventListener("click", () => montrerMaison(entrerMenu));
@@ -579,7 +578,7 @@ if (btnDressing) btnDressing.addEventListener("click", montrerDressing);
 const btnRetourDressing = document.getElementById("btn-retour-dressing");
 if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => montrerMaison(entrerMenu));
 
-// ── Modal classe suivante ────────────────────────────────────────────────────
+// -- Modal classe suivante
 const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: "cm1", cm1: "cm2", cm2: null };
 let focusAvantModalClasse = null;
 function fermerModalClasse({ retourFocus = true } = {}) {
@@ -613,7 +612,7 @@ if (modalOui) {
 const modalNon = document.getElementById("modal-non");
 if (modalNon) modalNon.addEventListener("click", () => fermerModalClasse());
 
-// ── Badges screen ─────────────────────────────────────────────────────────────
+// -- Badges screen
 const btnBadges = document.getElementById("btn-badges");
 if (btnBadges) {
   btnBadges.addEventListener("click", () => {
@@ -623,10 +622,10 @@ if (btnBadges) {
     if (!ecranBadges) return;
     revelerSeulEcran(ecranBadges);
     const obtenus = lireBadges();
-    if (compteur) compteur.textContent = `${obtenus.length} / ${BADGES.length} trophées`;
+    if (compteur) compteur.textContent = `${obtenus.length} / ${BADGES.length} trophees`;
     if (grille) grille.innerHTML = BADGES.map(b => `
       <div class="badge-carte ${obtenus.includes(b.id) ? "obtenu" : "verrouille"}">
-        <span class="badge-emoji">${obtenus.includes(b.id) ? b.emoji : "🔒"}</span>
+        <span class="badge-emoji">${obtenus.includes(b.id) ? b.emoji : "\u{1F512}"}</span>
         <div class="badge-nom">${b.nom}</div>
         <div class="badge-desc">${obtenus.includes(b.id) ? b.desc : "???"}</div>
       </div>`).join("");
@@ -635,7 +634,7 @@ if (btnBadges) {
 const btnRetourBadges = document.getElementById("btn-retour-badges");
 if (btnRetourBadges) btnRetourBadges.addEventListener("click", entrerMenu);
 
-// ── Streak / "de retour" badges ──────────────────────────────────────────────
+// -- Streak / "de retour" badges
 {
   const streakCount = streakInit.count || 0;
   [
@@ -666,7 +665,7 @@ if (btnRetourBadges) btnRetourBadges.addEventListener("click", entrerMenu);
   }
 }
 
-// ── Profils header ────────────────────────────────────────────────────────────
+// -- Profils header
 const btnProfilsHeader = document.getElementById("btn-profils-header");
 if (btnProfilsHeader) {
   if (profilsListe.length >= 2) btnProfilsHeader.hidden = false;
@@ -688,11 +687,11 @@ if (btnProfilsHeader) {
   });
 }
 
-// ── Paramètres parents ────────────────────────────────────────────────────────
+// -- Parametres parents
 const btnParams = document.getElementById("btn-params");
 if (btnParams) btnParams.addEventListener("click", () => montrerParams(entrerMenu));
 
-// ── Menu d'accueil (home menu) ────────────────────────────────────────────────
+// -- Menu d'accueil (home menu)
 function afficherMenuHomeScreen() {
   const elMenuHome = document.getElementById("ecran-menu-home");
   if (elMenuHome) {
@@ -704,7 +703,7 @@ function afficherMenuHomeScreen() {
 const btnMenuHome = document.getElementById("btn-maison-menu");
 if (btnMenuHome) btnMenuHome.addEventListener("click", afficherMenuHomeScreen);
 
-// ── Tableau de bord parent ───────────────────────────────────────────────────
+// -- Tableau de bord parent
 function afficherParentDashboardScreen() {
   const elParentDash = document.getElementById("ecran-parent-dashboard");
   if (elParentDash) {
@@ -716,7 +715,7 @@ function afficherParentDashboardScreen() {
 const btnParentMenu = document.getElementById("btn-parent-menu");
 if (btnParentMenu) btnParentMenu.addEventListener("click", afficherParentDashboardScreen);
 
-// ── Tableau de bord professeur ───────────────────────────────────────────────────
+// -- Tableau de bord professeur
 function afficherTeacherDashboardScreen() {
   const elTeacherDash = document.getElementById("ecran-teacher-dashboard");
   if (elTeacherDash) {
@@ -728,7 +727,7 @@ function afficherTeacherDashboardScreen() {
 const btnTeacherMenu = document.getElementById("btn-teacher-menu");
 if (btnTeacherMenu) btnTeacherMenu.addEventListener("click", afficherTeacherDashboardScreen);
 
-// ── Certificat imprimable ────────────────────────────────────────────────────
+// -- Certificat imprimable
 function imprimerCertificat() {
   const nom = lireNomRenard() || "???";
   const niveau = { cp: "CP", ce1: "CE1", ce2: "CE2", cm1: "CM1", cm2: "CM2" }[getNiveauCourant()] || "CP";
@@ -746,18 +745,18 @@ function imprimerCertificat() {
   el.innerHTML = `
     <div class="certificat">
       <div class="cert-header">
-        <span class="cert-fox">🦊</span>
+        <span class="cert-fox">\u{1F98A}</span>
         <h1 class="cert-titre">Apprentissage Magique</h1>
         <p class="cert-sous-titre">Certificat de progression</p>
       </div>
       <div class="cert-corps">
-        <p class="cert-decerne">Décerné à</p>
+        <p class="cert-decerne">Decerne a</p>
         <h2 class="cert-nom">${nom}</h2>
         <p class="cert-classe">Classe de <strong>${niveau}</strong></p>
         <div class="cert-stats">
-          <div class="cert-stat"><span class="cert-stat-nb">${etoiles}</span><span class="cert-stat-label">⭐ étoiles</span></div>
-          <div class="cert-stat"><span class="cert-stat-nb">${badgesObtenus.length}</span><span class="cert-stat-label">🏅 badges</span></div>
-          <div class="cert-stat"><span class="cert-stat-nb">${nbJeux}</span><span class="cert-stat-label">🎮 jeux maîtrisés</span></div>
+          <div class="cert-stat"><span class="cert-stat-nb">${etoiles}</span><span class="cert-stat-label">⭐ etoiles</span></div>
+          <div class="cert-stat"><span class="cert-stat-nb">${badgesObtenus.length}</span><span class="cert-stat-label">\u{1F3C5} badges</span></div>
+          <div class="cert-stat"><span class="cert-stat-nb">${nbJeux}</span><span class="cert-stat-label">\u{1F3AE} jeux maitrise</span></div>
         </div>
         ${badgesHtml ? `<div class="cert-badges">${badgesHtml}</div>` : ""}
       </div>
@@ -772,7 +771,7 @@ if (btnCertificat) btnCertificat.addEventListener("click", imprimerCertificat);
 const btnCertificatMenu = document.getElementById("btn-certificat-menu");
 if (btnCertificatMenu) btnCertificatMenu.addEventListener("click", imprimerCertificat);
 
-// ── Raccourcis clavier ────────────────────────────────────────────────────────
+// -- Raccourcis clavier
 document.addEventListener("keydown", (e) => {
   if (e.target.matches("input, textarea, select")) return;
   if (e.key === " " || e.key === "Enter") {
@@ -796,14 +795,14 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// ── Service worker cleanup (legacy) ───────────────────────────────────────────
+// -- Service worker cleanup (legacy)
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations()
     .then(regs => regs.forEach(r => r.unregister()))
     .catch(() => {});
 }
 
-// ── Analytics : début / fin de session ───────────────────────────────────────
+// -- Analytics : debut / fin de session
 function screenCourant() {
   const elActif = document.querySelector(".ecran.actif");
   return elActif ? (elActif.id || "unknown") : "unknown";
@@ -824,6 +823,9 @@ track("session_start", {
   profil_count: profilsListe.length,
 });
 flushAnalyticsQueue();
+chargerQueteActive();
+initialiserArbresCompetences();
+initialiserAudio();
 window.addEventListener("beforeunload", trackSessionEnd);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") trackSessionEnd();

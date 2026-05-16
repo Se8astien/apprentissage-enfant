@@ -92,8 +92,8 @@ export function genererDashboardParent(enfant) {
 
   const recommendations = stats.competences
     ? Object.entries(stats.competences)
-        .filter(([_, score]) => score < 70)
-        .map(([comp, _]) => `Refaire ${comp}`)
+        .filter(([, score]) => score < 70)
+        .map(([comp]) => `Refaire ${comp}`)
     : [];
 
   return `
