@@ -74,7 +74,7 @@ import {
   BADGES,
 } from "./app-gamification.js";
 
-import { signalerErreurLecon, reinitialiserLeconJeu } from "./app-lecon-mini.js";
+import { signalerErreurLecon, reinitialiserLeconJeu, afficherLeconMini } from "./app-lecon-mini.js";
 import { getHistoireJeu } from "./app-histoire.js";
 import { getMasques } from "./app-params.js";
 import { texteDescCarteJeu } from "./app-menu-descriptions.js";
@@ -1254,6 +1254,14 @@ function brancherOutilsQuestion() {
     if (btnLectureFacile.dataset.amEasyReadBound !== "1") {
       btnLectureFacile.dataset.amEasyReadBound = "1";
       btnLectureFacile.addEventListener("click", basculerLectureFacile);
+    }
+  }
+  const btnRappel = document.getElementById("btn-rappel-lecon");
+  if (btnRappel) {
+    btnRappel.hidden = false;
+    if (btnRappel.dataset.amRappelBound !== "1") {
+      btnRappel.dataset.amRappelBound = "1";
+      btnRappel.addEventListener("click", () => afficherLeconMini(getJeuCourant()));
     }
   }
 }
