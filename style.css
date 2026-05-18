@@ -5491,3 +5491,135 @@ h4.params-menu-aide-titre {
   }
   .confetti .confetti-part { display: none; }
 }
+
+/* ── Mode Dyslexie ────────────────────────────────────────────────────────────── */
+body.mode-dyslexie {
+  font-family: "OpenDyslexic", "Comic Sans MS", "Arial", sans-serif;
+  letter-spacing: 0.05em;
+  word-spacing: 0.15em;
+  line-height: 1.7;
+}
+body.mode-dyslexie .zone-question,
+body.mode-dyslexie .feedback,
+body.mode-dyslexie .btn-choix,
+body.mode-dyslexie .carte-jeu .nom-jeu {
+  letter-spacing: 0.08em;
+  word-spacing: 0.2em;
+}
+body.mode-dyslexie p,
+body.mode-dyslexie li,
+body.mode-dyslexie label {
+  line-height: 1.8;
+}
+
+/* ── Mode Daltonisme ──────────────────────────────────────────────────────────── */
+body.mode-daltonisme .feedback.bon { background: #1565c0; border-color: #0d47a1; color: #fff; }
+body.mode-daltonisme .feedback.non { background: #e65100; border-color: #bf360c; color: #fff; }
+body.mode-daltonisme .btn-choix.bon { background: #1565c0; border-color: #0d47a1; color: #fff; }
+body.mode-daltonisme .btn-choix.non { background: #e65100; border-color: #bf360c; color: #fff; }
+body.mode-daltonisme .barre-progression { background: #1565c0; }
+
+/* ── Objectif semaine ─────────────────────────────────────────────────────────── */
+.objectif-semaine-banner {
+  margin: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+.objectif-semaine-banner .obj-emoji { font-size: 1.4rem; flex-shrink: 0; }
+.objectif-semaine-banner .obj-texte { flex: 1; min-width: 0; }
+.objectif-semaine-banner .obj-titre { font-weight: 700; display: block; }
+.objectif-semaine-banner .obj-barre-wrap { background: rgba(255,255,255,0.3); border-radius: 99px; height: 6px; margin-top: 0.3rem; }
+.objectif-semaine-banner .obj-barre { background: white; height: 6px; border-radius: 99px; transition: width 0.4s ease; }
+
+/* ── Défi parent banner ───────────────────────────────────────────────────────── */
+.defi-parent-banner {
+  margin: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
+  background: #fff8e1;
+  border-left: 4px solid #f59e0b;
+  border-radius: 0.5rem;
+  font-size: 0.88rem;
+  color: #78350f;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.defi-parent-banner .defi-ico { font-size: 1.2rem; }
+.defi-parent-banner .defi-txt { flex: 1; }
+.defi-parent-banner strong { display: block; font-size: 0.9rem; }
+
+/* ── Calendrier scolaire ──────────────────────────────────────────────────────── */
+.calendrier-section {
+  margin: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  background: #f0f9ff;
+  border-radius: 0.75rem;
+  border: 1px solid #bae6fd;
+}
+.calendrier-section h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.calendrier-jeux {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.calendrier-jeu-badge {
+  padding: 0.3rem 0.7rem;
+  background: #0ea5e9;
+  color: white;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ── Mini-leçon overlay ───────────────────────────────────────────────────────── */
+.mini-lecon-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.mini-lecon-carte {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 2rem 1.5rem 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+.mini-lecon-emoji { font-size: 3rem; margin-bottom: 0.75rem; }
+.mini-lecon-titre { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.75rem; color: #1e293b; }
+.mini-lecon-texte { font-size: 1rem; color: #475569; line-height: 1.6; margin: 0 0 1.25rem; }
+.mini-lecon-etapes { text-align: left; margin: 0.75rem 0; padding: 0; list-style: none; }
+.mini-lecon-etapes li { padding: 0.4rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.92rem; color: #334155; }
+.mini-lecon-etapes li:last-child { border: none; }
+.mini-lecon-etapes li::before { content: attr(data-num) " "; font-weight: 700; color: #667eea; }
+.btn-mini-lecon-ok {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}

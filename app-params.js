@@ -411,6 +411,8 @@ function creerSettingsHtml() {
     <button type="button" class="params-tab" data-panel="conseils" role="tab" aria-selected="false">Conseils</button>
     <button type="button" class="params-tab" data-panel="jeux" role="tab" aria-selected="false">Jeux du menu</button>
     <button type="button" class="params-tab" data-panel="compte" role="tab" aria-selected="false">Compte</button>
+    <button type="button" class="params-tab" data-panel="accessibilite" role="tab" aria-selected="false">Accessibilité</button>
+    <button type="button" class="params-tab" data-panel="defi" role="tab" aria-selected="false">Défi</button>
   </nav>
 
   <div class="params-panels">
@@ -508,6 +510,58 @@ function creerSettingsHtml() {
         <button type="button" class="btn-params-action btn-params-reset">Remettre les étoiles à zéro</button>
         <button type="button" class="btn-params-action btn-params-effacer">Effacer toute la progression (ce profil)</button>
         <button type="button" class="btn-params-action btn-params-pin">Changer le code parent</button>
+      </div>
+    </section>
+
+    <section class="params-panel" data-panel="accessibilite" role="tabpanel" hidden>
+      <h3 class="params-section-title">Accessibilité</h3>
+      <p class="params-hint-block">Ces réglages aident les enfants ayant des besoins spécifiques. Ils s'appliquent immédiatement.</p>
+
+      <label class="params-switch params-lecture-cp-opt">
+        <input type="checkbox" class="params-check" id="params-cb-dyslexie"${localStorage.getItem("am-mode-dyslexie") === "1" ? " checked" : ""}>
+        <span class="params-switch-track" aria-hidden="true"><span class="params-switch-thumb"></span></span>
+        <span class="params-switch-label">
+          <strong>Mode Dyslexie</strong>
+          <span class="params-chrono-desc">Police plus lisible, espacement des lettres augmenté, interligne élargi.</span>
+        </span>
+      </label>
+
+      <label class="params-switch params-lecture-cp-opt" style="margin-top:1rem">
+        <input type="checkbox" class="params-check" id="params-cb-daltonisme"${localStorage.getItem("am-mode-daltonisme") === "1" ? " checked" : ""}>
+        <span class="params-switch-track" aria-hidden="true"><span class="params-switch-thumb"></span></span>
+        <span class="params-switch-label">
+          <strong>Mode Daltonisme</strong>
+          <span class="params-chrono-desc">Remplace le vert/rouge par bleu/orange pour les réponses correctes et incorrectes.</span>
+        </span>
+      </label>
+
+      <div style="margin-top:1.25rem">
+        <label style="display:block;font-weight:700;margin-bottom:0.4rem" for="params-vitesse-lecture">
+          Vitesse de lecture vocale : <span id="params-vitesse-val">${parseFloat(localStorage.getItem("am-vitesse-lecture") || "1").toFixed(1)}×</span>
+        </label>
+        <input type="range" id="params-vitesse-lecture" class="params-check"
+          min="0.5" max="1.5" step="0.1"
+          value="${parseFloat(localStorage.getItem("am-vitesse-lecture") || "1").toFixed(1)}"
+          style="width:100%;accent-color:#667eea">
+        <p class="params-chrono-desc" style="margin-top:0.3rem">0.5× = très lent · 1.0× = normal · 1.5× = rapide</p>
+      </div>
+    </section>
+
+    <section class="params-panel" data-panel="defi" role="tabpanel" hidden>
+      <h3 class="params-section-title">Défi pour l'enfant</h3>
+      <p class="params-hint-block">Posez un défi que l'enfant verra dans son menu. Il sera automatiquement supprimé après 24h.</p>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.75rem">
+        <label style="font-weight:600" for="params-defi-texte">Texte du défi</label>
+        <input type="text" id="params-defi-texte" placeholder="Ex : Fais 20 multiplications ce soir !"
+          style="padding:0.6rem 0.8rem;border:1.5px solid #cbd5e1;border-radius:0.5rem;font-size:0.95rem;width:100%;box-sizing:border-box">
+        <label style="font-weight:600" for="params-defi-cible">Nombre de bonnes réponses à atteindre</label>
+        <input type="number" id="params-defi-cible" min="1" max="100" value="20"
+          style="padding:0.6rem 0.8rem;border:1.5px solid #cbd5e1;border-radius:0.5rem;font-size:0.95rem;width:100%;box-sizing:border-box">
+        <button type="button" id="btn-params-envoyer-defi"
+          style="padding:0.75rem;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:0.75rem;font-size:1rem;font-weight:700;cursor:pointer">
+          Envoyer le défi ⭐
+        </button>
+        <div id="params-defi-status" style="font-size:0.9rem;color:#059669;display:none">Défi envoyé ! L'enfant le verra dans son menu.</div>
       </div>
     </section>
   </div>
@@ -878,5 +932,49 @@ function brancherSettings(overlay, onFermer) {
 
   brancherEscapeParent(overlay, () => fermerOverlayParent(overlay, onFermer));
   brancherIdleParent(overlay, onFermer);
+
+  // Accessibilité : dyslexie
+  const cbDyslexie = overlay.querySelector("#params-cb-dyslexie");
+  if (cbDyslexie) {
+    cbDyslexie.addEventListener("change", () => {
+      localStorage.setItem("am-mode-dyslexie", cbDyslexie.checked ? "1" : "0");
+      document.body.classList.toggle("mode-dyslexie", cbDyslexie.checked);
+    });
+  }
+
+  // Accessibilité : daltonisme
+  const cbDaltonisme = overlay.querySelector("#params-cb-daltonisme");
+  if (cbDaltonisme) {
+    cbDaltonisme.addEventListener("change", () => {
+      localStorage.setItem("am-mode-daltonisme", cbDaltonisme.checked ? "1" : "0");
+      document.body.classList.toggle("mode-daltonisme", cbDaltonisme.checked);
+    });
+  }
+
+  // Accessibilité : vitesse lecture
+  const sliderVitesse = overlay.querySelector("#params-vitesse-lecture");
+  const valVitesse = overlay.querySelector("#params-vitesse-val");
+  if (sliderVitesse) {
+    sliderVitesse.addEventListener("input", () => {
+      const v = parseFloat(sliderVitesse.value).toFixed(1);
+      localStorage.setItem("am-vitesse-lecture", v);
+      if (valVitesse) valVitesse.textContent = `${v}×`;
+    });
+  }
+
+  // Défi parents
+  const btnEnvoyerDefi = overlay.querySelector("#btn-params-envoyer-defi");
+  if (btnEnvoyerDefi) {
+    btnEnvoyerDefi.addEventListener("click", () => {
+      const texte = overlay.querySelector("#params-defi-texte")?.value?.trim();
+      const cible = parseInt(overlay.querySelector("#params-defi-cible")?.value || "20", 10);
+      if (!texte) return;
+      import("./app-defi-parents.js").then((m) => {
+        m.sauverDefiParent(texte, null, cible, 24);
+        const status = overlay.querySelector("#params-defi-status");
+        if (status) { status.style.display = "block"; setTimeout(() => { status.style.display = "none"; }, 3000); }
+      });
+    });
+  }
 }
 

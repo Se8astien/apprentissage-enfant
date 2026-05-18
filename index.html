@@ -476,6 +476,15 @@
           </div>
         </div>
 
+        <!-- Calendrier scolaire -->
+        <div id="calendrier-menu-section" class="menu-bloc" hidden></div>
+
+        <!-- Objectif semaine -->
+        <div id="objectif-semaine-banner" class="menu-bloc" hidden></div>
+
+        <!-- Défi parents -->
+        <div id="defi-parent-banner" class="menu-bloc" hidden></div>
+
         <div class="menu-secondaire menu-bloc" aria-label="Missions, parcours et profil">
           <div class="missions-section">
             <div class="missions-entete-ligne">
@@ -616,6 +625,7 @@
         <button type="button" class="carte-jeu" data-jeu="courseFractions"    data-cat="cm" data-niveaux="ce2 cm1 cm2"><span class="emoji-jeu">🏁</span><span class="nom-jeu">Course des fractions</span><span class="desc-jeu">Trouve la fraction équivalente</span></button>
         <button type="button" class="carte-jeu" data-jeu="proportionnalite"  data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">⚖️</span><span class="nom-jeu">Proportionnalité</span><span class="desc-jeu">Règle de trois</span></button>
         <button type="button" class="carte-jeu" data-jeu="pourcentages"      data-cat="cm" data-niveaux="cm2"><span class="emoji-jeu">%</span><span class="nom-jeu">Pourcentages</span><span class="desc-jeu">50%, 25%, 10%</span></button>
+        <button type="button" class="carte-jeu" data-jeu="pourquoi"          data-cat="cm" data-niveaux="cm1 cm2"><span class="emoji-jeu">🤔</span><span class="nom-jeu">Pourquoi ?</span><span class="desc-jeu">Comprendre le raisonnement</span></button>
 
         <h3 class="grille-section">🤖 Algorithmie &amp; Code</h3>
         <button type="button" class="carte-jeu" data-jeu="sequence"   data-cat="algo" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🤖</span><span class="nom-jeu">Algorithmes</span><span class="desc-jeu">Suis les instructions</span></button>
@@ -725,6 +735,7 @@
       <div id="chrono" class="chrono" hidden aria-live="polite" aria-label="Temps restant"></div>
       <div id="zone-question" class="zone-question" aria-live="polite" aria-atomic="true"></div>
       <div id="outils-jeu" class="jeu-outils" hidden aria-label="Aides pour répondre">
+        <button type="button" id="btn-rappel-lecon" class="btn-outil-jeu" hidden aria-label="Voir le rappel de cours">📖 Rappel</button>
         <button type="button" id="btn-indice-question" class="btn-outil-jeu" aria-controls="aide-douce">💡 Indice</button>
         <button type="button" id="btn-lire-question" class="btn-outil-jeu">🔊 Lire</button>
         <button type="button" id="btn-lire-lentement" class="btn-outil-jeu" hidden>🐢 Relire lentement</button>
