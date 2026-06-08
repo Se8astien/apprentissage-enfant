@@ -9,15 +9,16 @@ let currentUtterance = null;
 export function initialiserAudio() {
   const window_ = typeof window !== "undefined" ? window : globalThis;
 
-  const SpeechSynthesis = window_.SpeechSynthesis || window_.webkitSpeechSynthesis;
   const SpeechRecognition = window_.SpeechRecognition || window_.webkitSpeechRecognition;
 
-  if (SpeechSynthesis) {
-    synth = new SpeechSynthesis();
+  if (window_.speechSynthesis) {
+    synth = window_.speechSynthesis;
   }
 
   if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
+    try {
+      recognition = new SpeechRecognition();
+    } catch { /* ignore */ }
   }
 
   chargerConfigAudio();

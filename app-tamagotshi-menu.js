@@ -69,7 +69,7 @@ export function rafraichirTamagotchiUI() {
   const tamagotshiEl = document.getElementById("tamagotshi-renard");
   if (tamagotshiEl) {
     tamagotshiEl.innerHTML = svgRenard(stade, 180, {
-      accessoires: {},
+      accessoires: [],
       triste: bonheur < 30,
     });
   }
