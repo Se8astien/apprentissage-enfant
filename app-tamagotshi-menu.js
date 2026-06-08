@@ -10,8 +10,6 @@ import {
   confetti,
   estGrand,
   localDate,
-  ajouterEtoiles,
-  _ajouterEtoilesBase,
 } from "./app-state.js";
 
 import { getStade, svgRenard } from "./app-renard.js";
