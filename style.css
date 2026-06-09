@@ -6106,3 +6106,63 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
 .btn-genre-mini { color: #2d3436; }
 [data-theme="nuit"] .btn-genre-mini { background: #2a2a3e; color: #e8e8f0; }
 [data-theme="nuit"] .btn-genre-mini.selectionne { color: #a29bfe; }
+
+/* ══ Étoile volante vers le compteur ════════════════════════════════════════ */
+.etoile-volante {
+  position: fixed;
+  z-index: 999;
+  font-size: 1.7rem;
+  line-height: 1;
+  pointer-events: none;
+  transition: transform 0.8s cubic-bezier(0.45, -0.15, 0.55, 1), opacity 0.8s ease;
+  will-change: transform, opacity;
+}
+
+/* ══ Écran de jeu compact sur mobile : réponses visibles sans scroll ════════ */
+@media (max-width: 600px) {
+  #ecran-jeu .jeu-titre {
+    font-size: 1rem;
+    margin: 0 0 0.4rem;
+  }
+  #ecran-jeu .btn-retour:not(.btn-retour-bas) {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.85rem;
+  }
+  #ecran-jeu .zone-question {
+    padding: 0.8rem 0.9rem;
+    margin-bottom: 0.6rem;
+    min-height: 3.5rem;
+  }
+  #ecran-jeu .btn-outil-jeu {
+    padding: 0.35rem 0.6rem;
+    min-height: 38px;
+    font-size: 0.78rem;
+  }
+  #ecran-jeu .jeu-outils {
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+  }
+  #ecran-jeu .chrono-svg {
+    width: 36px;
+    height: 36px;
+  }
+  #ecran-jeu .barre-session {
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* En jeu sur mobile : header réduit à l'essentiel (étoiles + chrono),
+   pour que les réponses tiennent à l'écran sans scroll */
+@media (max-width: 600px) {
+  body:has(#ecran-jeu.actif) header.top .mascotte,
+  body:has(#ecran-jeu.actif) header.top .titre-bloc,
+  body:has(#ecran-jeu.actif) header.top #btn-theme,
+  body:has(#ecran-jeu.actif) header.top #btn-sons,
+  body:has(#ecran-jeu.actif) header.top #btn-lecture-facile {
+    display: none;
+  }
+  body:has(#ecran-jeu.actif) header.top {
+    padding: 0.3rem 0.7rem;
+    margin-bottom: 0.3rem;
+  }
+}
