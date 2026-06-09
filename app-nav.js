@@ -139,6 +139,7 @@ let _snapBonnesAuDebutJeu = 0;
 let _snapErreursAuDebutJeu = 0;
 let _bonnesBarreCourante = 0;
 const _BARRE_TAILLE = 5;
+let _limitSession = 0;
 
 function _initBarreSession() {
   const dots = document.getElementById("barre-session-dots");
@@ -165,6 +166,57 @@ function _mettreAJourBarre() {
       else { d.classList.remove("pleine"); d.textContent = ""; }
     });
   }
+}
+
+function _mettreAJourComboBadge() {
+  const el = document.getElementById("combo-badge");
+  if (!el) return;
+  if (comboActuel >= 2) {
+    el.textContent = `🔥 ×${comboActuel}`;
+    el.hidden = false;
+    el.classList.toggle("combo-badge--feu", comboActuel >= 5);
+  } else {
+    el.hidden = true;
+  }
+}
+
+export function getStatsSessionJeu() {
+  return {
+    bonnes: questionsDepuisDebutJeu - mauvaisesDepuisDebutJeu,
+    erreurs: mauvaisesDepuisDebutJeu,
+    total: questionsDepuisDebutJeu,
+    etoiles: Math.max(0, bonnesSession - _snapBonnesAuDebutJeu),
+  };
+}
+
+export function afficherFinDeJeu(jeu, onRevision, onMenu) {
+  const { bonnes, erreurs, total, etoiles } = getStatsSessionJeu();
+  if (total === 0) { onMenu(); return; }
+  const pct = Math.round((bonnes / total) * 100);
+  const msg = pct >= 80 ? "🌟 Excellent !" : pct >= 60 ? "👍 Bien joué !" : "💪 Continue, ça progresse !";
+  const hasWrong = getWrongQuestions(jeu)?.length > 0;
+  const overlay = document.createElement("div");
+  overlay.className = "evolution-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.innerHTML = `
+    <div class="evolution-carte fin-jeu-carte">
+      <p class="fin-jeu-msg">${msg}</p>
+      <div class="fin-jeu-stats">
+        <div class="fin-jeu-stat"><span class="fin-jeu-nb fin-jeu-nb--ok">✓ ${bonnes}</span><span class="fin-jeu-lbl">bonnes</span></div>
+        <div class="fin-jeu-stat"><span class="fin-jeu-nb fin-jeu-nb--ko">✗ ${erreurs}</span><span class="fin-jeu-lbl">erreurs</span></div>
+        <div class="fin-jeu-stat"><span class="fin-jeu-nb fin-jeu-nb--star">+${etoiles} ⭐</span><span class="fin-jeu-lbl">étoiles</span></div>
+      </div>
+      ${hasWrong ? `<button type="button" class="btn-evolution-fermer" id="fin-jeu-rev">🔁 Revoir mes erreurs</button>` : ""}
+      <button type="button" class="${hasWrong ? "btn-revision-non" : "btn-evolution-fermer"}" id="fin-jeu-menu">${hasWrong ? "Plus tard" : "✓ Retour au menu"}</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#fin-jeu-menu")?.addEventListener("click", () => { overlay.remove(); onMenu(); });
+  overlay.querySelector("#fin-jeu-rev")?.addEventListener("click", () => { overlay.remove(); onRevision(); });
+}
+
+export function demarrerModeSession(n) {
+  _limitSession = n;
 }
 
 function jeuActifId() {
@@ -222,6 +274,21 @@ function secondesChrono() {
   return Math.min(max, base);
 }
 
+const _CHRONO_R = 18;
+const _CHRONO_CIRC = 2 * Math.PI * _CHRONO_R;
+
+function _chronoSvg(reste, total) {
+  const frac = Math.max(0, reste / total);
+  const offset = _CHRONO_CIRC * (1 - frac);
+  const color = reste <= 10 ? "#e17055" : "#6c5ce7";
+  return `<svg class="chrono-svg" viewBox="0 0 44 44" aria-hidden="true">
+    <circle cx="22" cy="22" r="${_CHRONO_R}" fill="none" stroke="#e0e0e8" stroke-width="4"/>
+    <circle cx="22" cy="22" r="${_CHRONO_R}" fill="none" stroke="${color}" stroke-width="4"
+      stroke-dasharray="${_CHRONO_CIRC.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+      stroke-linecap="round" transform="rotate(-90 22 22)" class="chrono-arc"/>
+  </svg><span class="chrono-sec">${reste}</span>`;
+}
+
 function startChrono() {
   const secs = secondesChrono();
   stopChrono();
@@ -230,7 +297,7 @@ function startChrono() {
   if (secs <= 0) {
     if (el && estMinuteurDisponible()) {
       el.hidden = false;
-      el.textContent = "∞ Temps libre";
+      el.innerHTML = `<span class="chrono-sec chrono-libre-txt">∞</span>`;
       el.className = "chrono chrono-libre";
     }
     return;
@@ -238,13 +305,13 @@ function startChrono() {
   if (!el) return;
   el.hidden = false;
   let reste = secs;
-  el.textContent = `⏱ ${reste}s`;
-  el.className = "chrono" + (getDifficulte() >= 2 ? " chrono--expert" : "");
+  el.innerHTML = _chronoSvg(reste, secs);
+  el.className = "chrono chrono-svg-wrap" + (getDifficulte() >= 2 ? " chrono--expert" : "");
   _chronoTimer = setInterval(() => {
     reste--;
     if (reste <= 0) { clearInterval(_chronoTimer); _chronoTimer = null; chronoExpire(); return; }
-    el.textContent = `⏱ ${reste}s`;
-    if (reste <= 10) el.className = "chrono chrono-urgent" + (getDifficulte() >= 2 ? " chrono--expert" : "");
+    el.innerHTML = _chronoSvg(reste, secs);
+    if (reste <= 10) el.classList.add("chrono-urgent");
   }, 1000);
 }
 
@@ -1511,6 +1578,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     void elFeedback.offsetWidth;
     elFeedback.className = "feedback ok";
     _mettreAJourBarre();
+    _mettreAJourComboBadge();
     const bonusEspacement = _verifierBonusEspacement(getJeuCourant());
     ajouterEtoiles(bonusEspacement ? 2 : 1);
     if (bonusEspacement) {
@@ -1576,6 +1644,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     track("question_wrong", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
     sonMauvaise();
     comboActuel = 0;
+    _mettreAJourComboBadge();
     const ko = messagesKo();
     const base = ko[Math.floor(Math.random() * ko.length)];
     const message = erreursSerie >= 2 ? `${base} ${rappelErreur(getJeuCourant())}` : base;
@@ -1846,6 +1915,7 @@ export function montrerJeu(nom, lanceurs) {
   reinitialiserLeconJeu(nom);
   delete _revisionFileParJeu[nom];
   _initBarreSession();
+  _mettreAJourComboBadge();
   _snapBonnesAuDebutJeu = bonnesSession;
   _snapErreursAuDebutJeu = erreursSession;
   revelerSeulEcran(jeu);
@@ -1869,9 +1939,20 @@ export function questionSuivante(lanceurs) {
     _afficherRevision();
     return;
   }
+  if (_limitSession > 0 && questionsDepuisDebutJeu >= _limitSession) {
+    const jeuFin = getJeuCourant();
+    _limitSession = 0;
+    afficherFinDeJeu(jeuFin, () => {
+      if (!proposerRevisionSiErreurs(jeuFin, montrerMenu)) montrerMenu();
+    }, montrerMenu);
+    return;
+  }
   const jeu = getJeuCourant();
   if (jeu && lanceurs[jeu]) {
+    const zq = document.getElementById("zone-question");
+    if (zq) { zq.classList.remove("q-entree"); void zq.offsetWidth; }
     lancerAvecAntiRepeat(jeu, lanceurs);
+    if (zq) zq.classList.add("q-entree");
     startChrono();
   }
 }

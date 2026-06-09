@@ -535,9 +535,19 @@
           <span class="menu-hero-ico">🔁</span>
           <span class="menu-hero-txt">Mes erreurs</span>
         </button>
+        <button type="button" class="menu-hero-btn" id="btn-hero-5questions">
+          <span class="menu-hero-ico">⚡</span>
+          <span class="menu-hero-txt">5 questions</span>
+        </button>
       </div>
 
       <p class="accueil">Touche un jeu</p>
+
+      <!-- ── Jeux récents ──────────────────────────────────────── -->
+      <section id="jeux-recents-section" class="jeux-recents-section" hidden aria-label="Jeux récents">
+        <h3 class="grille-section">🕐 Récemment joués</h3>
+        <div class="grille-jeux jeux-recents-grille" id="jeux-recents-grille"></div>
+      </section>
 
       <!-- ── Grille des jeux ─────────────────────────────────── -->
       <div class="grille-jeux">
@@ -750,6 +760,7 @@
       <h2 id="jeu-titre" class="jeu-titre"></h2>
       <div id="mini-lecon-jeu" class="mini-lecon-jeu" hidden></div>
       <div id="chrono" class="chrono" hidden aria-live="polite" aria-label="Temps restant"></div>
+      <div id="combo-badge" class="combo-badge" hidden aria-live="polite"></div>
       <div id="barre-session" class="barre-session" hidden aria-label="Progression de la session">
         <div class="barre-session-dots" id="barre-session-dots"></div>
       </div>
