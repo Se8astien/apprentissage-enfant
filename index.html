@@ -338,6 +338,10 @@
       <div class="classe-conteneur">
         <div class="classe-mascotte" id="classe-mascotte" aria-hidden="true"></div>
         <h2 class="classe-titre">Tu es en quelle classe ?</h2>
+        <div class="genre-mini" role="group" aria-label="Je suis…">
+          <button type="button" class="btn-genre-mini" data-genre="fille" aria-label="Fille">👧 Fille</button>
+          <button type="button" class="btn-genre-mini" data-genre="garcon" aria-label="Garçon">👦 Garçon</button>
+        </div>
         <div class="classe-btns classe-btns-5">
           <button type="button" class="btn-classe" data-niveau="cp">
             <span class="classe-emoji">🌱</span>
@@ -386,11 +390,11 @@
       </div>
     </section>
 
-    <main id="ecran-menu" class="ecran" hidden>
+    <main id="ecran-menu" class="ecran" hidden data-tab="accueil">
 
       <div class="menu-hub">
         <!-- ═══ TAMAGOTSHI RENARD ═══ -->
-        <div class="menu-tamagotshi">
+        <div class="menu-tamagotshi" data-tabs="renard">
           <div class="tamagotshi-container">
             <div class="tamagotshi-header">
               <h2 id="tamagotshi-nom">Foxy</h2>
@@ -425,7 +429,7 @@
           </div>
         </div>
 
-        <div class="menu-classe-rapide">
+        <div class="menu-classe-rapide" data-tabs="progres">
           <button type="button" id="btn-classe-menu" class="btn-classe-menu" aria-haspopup="dialog" aria-controls="menu-classe-modal">
             <span class="btn-classe-menu-emoji" aria-hidden="true">🏫</span>
             <span class="btn-classe-menu-texte">
@@ -455,14 +459,14 @@
         </div>
       </div>
 
-        <div class="menu-barre-liens menu-bloc" role="group" aria-label="Trophées, parents et partage">
+        <div class="menu-barre-liens menu-bloc" data-tabs="progres" role="group" aria-label="Trophées, parents et partage">
           <button type="button" id="btn-badges" class="btn-badges-menu" aria-label="Voir mes trophées">🏅 Trophées</button>
           <button type="button" id="btn-params" class="btn-params-menu" aria-label="Espace parents (code requis)">👪 Parents</button>
           <button type="button" id="btn-partager" class="btn-partager-menu" aria-label="Partager l'application">📤 Partager</button>
           <button type="button" id="btn-certificat-menu" class="btn-certificat btn-certificat--menu" aria-label="Voir mon bulletin (à imprimer)">🎓 Mon Bulletin</button>
         </div>
 
-        <div class="menu-surprises-encart menu-bloc" aria-label="Autres façons de jouer">
+        <div class="menu-surprises-encart menu-bloc" data-tabs="accueil" aria-label="Autres façons de jouer">
           <p class="menu-surprises-titre">Si tu hésites…</p>
           <div class="aventure-raccourci">
             <button type="button" id="btn-aventure" class="btn-aventure-menu">🗺️ Aventure</button>
@@ -478,15 +482,15 @@
         </div>
 
         <!-- Calendrier scolaire -->
-        <div id="calendrier-menu-section" class="menu-bloc" hidden></div>
+        <div id="calendrier-menu-section" class="menu-bloc" data-tabs="progres" hidden></div>
 
         <!-- Objectif semaine -->
-        <div id="objectif-semaine-banner" class="menu-bloc" hidden></div>
+        <div id="objectif-semaine-banner" class="menu-bloc" data-tabs="progres" hidden></div>
 
         <!-- Défi parents -->
-        <div id="defi-parent-banner" class="menu-bloc" hidden></div>
+        <div id="defi-parent-banner" class="menu-bloc" data-tabs="accueil" hidden></div>
 
-        <div class="menu-secondaire menu-bloc" aria-label="Missions, parcours et profil">
+        <div class="menu-secondaire menu-bloc" data-tabs="accueil" aria-label="Missions, parcours et profil">
           <div class="missions-section">
             <div class="missions-entete-ligne">
               <h3 class="missions-titre">🎯 Missions du jour</h3>
@@ -506,10 +510,12 @@
           </div>
         </div>
 
-        <div id="bilan-session" class="bilan-session menu-bloc" hidden></div>
+        <div id="bilan-session" class="bilan-session menu-bloc" data-tabs="accueil" hidden></div>
+
+        <div id="progres-widget" class="progres-widget menu-bloc" data-tabs="progres"></div>
       </div>
 
-      <button type="button" class="maison-banner maison-banner--avant-jeux" id="btn-maison" aria-label="Ma Maison">
+      <button type="button" class="maison-banner maison-banner--avant-jeux" id="btn-maison" data-tabs="renard" aria-label="Ma Maison">
         <div class="maison-banner-fox maison-banner-fox-place" id="maison-banner-fox" aria-hidden="true"><span aria-hidden="true">🦊</span></div>
         <div class="maison-banner-infos">
           <span class="maison-banner-nom" id="maison-banner-nom">Ta maison</span>
@@ -522,7 +528,7 @@
       </button>
 
       <!-- ── Hero raccourcis ─────────────────────────────── -->
-      <div class="menu-hero" aria-label="Raccourcis">
+      <div class="menu-hero" data-tabs="accueil" aria-label="Raccourcis">
         <button type="button" class="menu-hero-btn" id="btn-hero-mission">
           <span class="menu-hero-ico">🎯</span>
           <span class="menu-hero-txt">Mission du jour</span>
@@ -541,16 +547,25 @@
         </button>
       </div>
 
-      <p class="accueil">Touche un jeu</p>
-
       <!-- ── Jeux récents ──────────────────────────────────────── -->
-      <section id="jeux-recents-section" class="jeux-recents-section" hidden aria-label="Jeux récents">
+      <section id="jeux-recents-section" class="jeux-recents-section" data-tabs="accueil" hidden aria-label="Jeux récents">
         <h3 class="grille-section">🕐 Récemment joués</h3>
         <div class="grille-jeux jeux-recents-grille" id="jeux-recents-grille"></div>
       </section>
 
+      <!-- ── Catégories de jeux ─────────────────────────────── -->
+      <div class="jeux-cats" id="jeux-cats" data-tabs="jeux" role="group" aria-label="Catégories de jeux">
+        <button type="button" class="jeux-cat actif" data-cats="*"><span class="jeux-cat-ico">✨</span><span>Tout</span></button>
+        <button type="button" class="jeux-cat" data-cats="maths avance cm argent"><span class="jeux-cat-ico">🔢</span><span>Nombres</span></button>
+        <button type="button" class="jeux-cat" data-cats="formes"><span class="jeux-cat-ico">📐</span><span>Formes</span></button>
+        <button type="button" class="jeux-cat" data-cats="temps"><span class="jeux-cat-ico">⏰</span><span>Temps</span></button>
+        <button type="button" class="jeux-cat" data-cats="langage"><span class="jeux-cat-ico">📚</span><span>Français</span></button>
+        <button type="button" class="jeux-cat" data-cats="musique"><span class="jeux-cat-ico">🎵</span><span>Musique</span></button>
+        <button type="button" class="jeux-cat" data-cats="algo"><span class="jeux-cat-ico">🤖</span><span>Logique</span></button>
+      </div>
+
       <!-- ── Grille des jeux ─────────────────────────────────── -->
-      <div class="grille-jeux">
+      <div class="grille-jeux" data-tabs="jeux">
 
         <h3 class="grille-section">🔢 Mathématiques</h3>
         <button type="button" class="carte-jeu" data-jeu="compte"        data-cat="maths" data-niveaux="cp ce1"><span class="emoji-jeu">🐱</span><span class="nom-jeu">Compte-moi ça !</span><span class="desc-jeu">Combien d'animaux ?</span></button>
@@ -670,6 +685,14 @@
         <button type="button" class="carte-jeu" data-jeu="comprehensionAudio" data-cat="langage" data-niveaux="cp ce1 ce2 cm1 cm2"><span class="emoji-jeu">🎧</span><span class="nom-jeu">Compréhension</span><span class="desc-jeu">Lis et réponds</span></button>
 
       </div>
+
+      <!-- ── Barre d'onglets ─────────────────────────────────── -->
+      <nav class="menu-tabs" id="menu-tabs" aria-label="Navigation du menu">
+        <button type="button" class="menu-tab actif" data-tab="accueil" aria-pressed="true"><span class="menu-tab-ico">🏠</span><span class="menu-tab-lbl">Accueil</span></button>
+        <button type="button" class="menu-tab" data-tab="jeux" aria-pressed="false"><span class="menu-tab-ico">🎮</span><span class="menu-tab-lbl">Jeux</span></button>
+        <button type="button" class="menu-tab" data-tab="renard" aria-pressed="false"><span class="menu-tab-ico">🦊</span><span class="menu-tab-lbl">Renard</span></button>
+        <button type="button" class="menu-tab" data-tab="progres" aria-pressed="false"><span class="menu-tab-ico">⭐</span><span class="menu-tab-lbl">Progrès</span></button>
+      </nav>
 
     </main>
 

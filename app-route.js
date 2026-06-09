@@ -1,11 +1,10 @@
 // app-route.js — routage des écrans onboarding/menu (un seul point de contrôle)
 
-import { STORAGE_NIVEAU, STORAGE_GENRE, RENARD_NOM_KEY, revelerSeulEcran } from "./app-state.js";
+import { STORAGE_NIVEAU, RENARD_NOM_KEY, revelerSeulEcran } from "./app-state.js";
 
 export const STORAGE_LANDING_VU = "landing-seen";
 
 export function etapeCourante() {
-  if (!localStorage.getItem(STORAGE_GENRE)) return "genre";
   if (!localStorage.getItem(STORAGE_NIVEAU)) return "classe";
   if (!(localStorage.getItem(RENARD_NOM_KEY) || "").trim()) return "nommage";
   return "menu";

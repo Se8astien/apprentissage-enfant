@@ -22,7 +22,8 @@ async function goToMenu(page, extra = {}) {
 
 async function goToGame(page, jeu = "addition", extra = {}) {
   await goToMenu(page, extra);
-  await page.locator(`.carte-jeu[data-jeu="${jeu}"]`).click();
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  await page.locator(`.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="${jeu}"]`).click();
   await expect(page.locator("#ecran-jeu")).toBeVisible();
   // Fermer intro histoire si présente
   const btnJouer = page.getByRole("button", { name: /Jouer/i });
@@ -78,7 +79,7 @@ test("la mini-leçon affiche le bon contenu selon le jeu (soustraction)", async 
 });
 
 test("la mini-leçon fonctionne aussi pour un jeu de langue (homophones)", async ({ page }) => {
-  await goToGame(page, "homophones");
+  await goToGame(page, "homophones", { "maths-cp-niveau": "ce2" });
   await page.locator("#btn-rappel-lecon").click();
   const overlay = page.locator(".mini-lecon-overlay");
   await expect(overlay).toBeVisible();
@@ -100,6 +101,10 @@ test("mini-leçon automatique apparaît après 3 mauvaises réponses sur le mêm
     const fauxVisible = await faux.isVisible({ timeout: 3000 }).catch(() => false);
     if (!fauxVisible) break;
     await faux.click();
+    // Si la mini-leçon auto s'ouvre, inutile de continuer la boucle
+    const overlayDejaLa = await page.locator(".mini-lecon-overlay")
+      .isVisible({ timeout: 1500 }).catch(() => false);
+    if (overlayDejaLa) break;
     // Attendre le feedback puis passer à la question suivante
     await page.locator("#btn-suivant").waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
     const btnSuivant = page.locator("#btn-suivant");
@@ -196,11 +201,12 @@ test("le sélecteur d'objectif semaine s'affiche quand aucun objectif n'est déf
 
 test("choisir un objectif l'enregistre et affiche la barre de progression", async ({ page }) => {
   await goToMenu(page);
+  await page.locator('.menu-tab[data-tab="progres"]').click();
   const btnObjectifs = page.locator("#objectif-semaine-banner .btn-choix-objectif");
   const count = await btnObjectifs.count();
   if (count > 0) {
     await btnObjectifs.first().click();
-    await expect(page.locator("#objectif-semaine-banner .obj-barre")).toBeVisible();
+    await expect(page.locator("#objectif-semaine-banner .obj-barre-wrap")).toBeVisible();
     await expect(page.locator("#objectif-semaine-banner .obj-titre")).toBeVisible();
   }
 });
@@ -208,17 +214,20 @@ test("choisir un objectif l'enregistre et affiche la barre de progression", asyn
 // ── 7. Jeu "Pourquoi ?" (CM1/CM2) ─────────────────────────────────────────────
 test("le jeu Pourquoi est visible pour CM1", async ({ page }) => {
   await goToMenu(page, { "maths-cp-niveau": "cm1" });
-  await expect(page.locator('.carte-jeu[data-jeu="pourquoi"]')).toBeVisible();
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  await expect(page.locator('.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="pourquoi"]')).toBeVisible();
 });
 
 test("le jeu Pourquoi est visible pour CM2", async ({ page }) => {
   await goToMenu(page, { "maths-cp-niveau": "cm2" });
-  await expect(page.locator('.carte-jeu[data-jeu="pourquoi"]')).toBeVisible();
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  await expect(page.locator('.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="pourquoi"]')).toBeVisible();
 });
 
 test("le jeu Pourquoi est masqué pour CP", async ({ page }) => {
   await goToMenu(page, { "maths-cp-niveau": "cp" });
-  await expect(page.locator('.carte-jeu[data-jeu="pourquoi"]')).not.toBeVisible();
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  await expect(page.locator('.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="pourquoi"]')).not.toBeVisible();
 });
 
 test("le jeu Pourquoi affiche une question de raisonnement pour CM1", async ({ page }) => {
@@ -249,6 +258,7 @@ test("un toast de révision apparaît si des jeux faibles ont été sauvés hier
 // ── 9. Espace parents — onglet Accessibilité ─────────────────────────────────
 test("l'espace parents contient l'onglet Accessibilité après authentification", async ({ page }) => {
   await goToMenu(page, { "parent-pin": "1234" });
+  await page.locator('.menu-tab[data-tab="progres"]').click();
   await page.locator("#btn-params").click();
 
   // Saisir le PIN
@@ -263,6 +273,7 @@ test("l'espace parents contient l'onglet Accessibilité après authentification"
 
 test("l'espace parents contient les contrôles d'accessibilité dans le bon panneau", async ({ page }) => {
   await goToMenu(page, { "parent-pin": "1234" });
+  await page.locator('.menu-tab[data-tab="progres"]').click();
   await page.locator("#btn-params").click();
 
   for (const chiffre of ["1", "2", "3", "4"]) {

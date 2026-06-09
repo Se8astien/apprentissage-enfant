@@ -1412,9 +1412,18 @@ h1 {
 /* ── Menu hero ──────────────────────────────────────────────────────────── */
 .menu-hero {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.6rem;
   margin: 0.5rem 0 1rem;
+}
+
+@media (min-width: 700px) {
+  .menu-hero { grid-template-columns: repeat(4, 1fr); }
+}
+
+[data-theme="nuit"] .menu-hero-btn {
+  background: #2a2a3e !important;
+  color: #e8e8f0;
 }
 
 .menu-hero-btn {
@@ -5911,3 +5920,189 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
   cursor: pointer;
   margin-top: 0.5rem;
 }
+
+/* ══ Refonte navigation : onglets bas d'écran ═══════════════════════════════ */
+#ecran-menu[data-tab="accueil"] [data-tabs]:not([data-tabs~="accueil"]),
+#ecran-menu[data-tab="jeux"] [data-tabs]:not([data-tabs~="jeux"]),
+#ecran-menu[data-tab="renard"] [data-tabs]:not([data-tabs~="renard"]),
+#ecran-menu[data-tab="progres"] [data-tabs]:not([data-tabs~="progres"]) {
+  display: none !important;
+}
+
+#ecran-menu {
+  padding-bottom: 5.5rem;
+}
+
+.menu-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+  background: var(--carte);
+  box-shadow: 0 -4px 18px var(--ombre);
+  padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+}
+
+.menu-tab {
+  flex: 1;
+  max-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.4rem 0.2rem;
+  border: none;
+  border-radius: 14px;
+  background: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--texte);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.menu-tab-ico { font-size: 1.45rem; line-height: 1; }
+.menu-tab.actif {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.14), rgba(162, 155, 254, 0.18));
+  color: var(--primaire);
+}
+.menu-tab:active { transform: scale(0.93); }
+
+[data-theme="nuit"] .menu-tabs { background: #2a2a3e; }
+[data-theme="nuit"] .menu-tab { color: #e8e8f0; }
+[data-theme="nuit"] .menu-tab.actif { color: #a29bfe; }
+
+#ecran-menu[data-tab="renard"] .tamagotshi-fermer { display: none; }
+
+/* ══ Cartes catégories de jeux ══════════════════════════════════════════════ */
+.jeux-cats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 0.6rem 0 1rem;
+}
+
+.jeux-cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.6rem 0.25rem;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: var(--carte);
+  box-shadow: 0 2px 8px var(--ombre);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.74rem;
+  color: var(--texte);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease;
+}
+.jeux-cat-ico { font-size: 1.5rem; line-height: 1; }
+.jeux-cat.actif {
+  border-color: var(--primaire);
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.14));
+  color: var(--primaire);
+}
+.jeux-cat:active { transform: scale(0.93); }
+
+.cat-cachee { display: none !important; }
+
+[data-theme="nuit"] .jeux-cat { background: #2a2a3e; color: #e8e8f0; }
+[data-theme="nuit"] .jeux-cat.actif { color: #a29bfe; }
+
+/* ══ Genre optionnel sur l'écran classe ═════════════════════════════════════ */
+.genre-mini {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.btn-genre-mini {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--carte);
+  box-shadow: 0 2px 8px var(--ombre);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease;
+}
+.btn-genre-mini.selectionne {
+  border-color: var(--primaire);
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.14));
+}
+.btn-genre-mini:active { transform: scale(0.93); }
+
+/* ══ Widget progrès ═════════════════════════════════════════════════════════ */
+.progres-widget {
+  background: var(--carte);
+  border-radius: 20px;
+  padding: 1rem 0.8rem;
+  box-shadow: 0 4px 14px var(--ombre);
+}
+.progres-titre {
+  margin: 0 0 0.7rem;
+  font-size: 1.05rem;
+  text-align: center;
+}
+.progres-stats {
+  display: flex;
+  justify-content: space-around;
+}
+.progres-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+.progres-nb { font-size: 1.35rem; font-weight: 800; }
+.progres-lbl { font-size: 0.72rem; color: #888; }
+
+[data-theme="nuit"] .progres-widget { background: #2a2a3e; }
+
+/* ══ Flash plein écran au feedback ══════════════════════════════════════════ */
+@keyframes flashJeuOk {
+  0% { background-color: rgba(0, 184, 148, 0); }
+  25% { background-color: rgba(0, 184, 148, 0.16); }
+  100% { background-color: rgba(0, 184, 148, 0); }
+}
+@keyframes flashJeuNon {
+  0% { background-color: rgba(225, 112, 85, 0); }
+  25% { background-color: rgba(225, 112, 85, 0.14); }
+  100% { background-color: rgba(225, 112, 85, 0); }
+}
+#ecran-jeu.jeu-flash-ok { animation: flashJeuOk 0.75s ease-out; }
+#ecran-jeu.jeu-flash-non { animation: flashJeuNon 0.75s ease-out; }
+
+/* ══ Micro-interactions tactiles ════════════════════════════════════════════ */
+.carte-jeu:active,
+.menu-hero-btn:active,
+.btn-choix:active,
+.btn-classe:active,
+.btn-tamagotshi:active,
+.btn-fun-menu:active {
+  transform: scale(0.96);
+}
+
+/* Ordre des blocs sur l'onglet Accueil : hero puis récents en premier,
+   missions avant les surprises dans le hub */
+#ecran-menu .menu-hero,
+#ecran-menu .jeux-recents-section { order: -1; }
+#ecran-menu[data-tab="accueil"] .menu-secondaire { order: -1; }
+
+/* Le transform GPU de mobile-optimization.css créerait un containing block
+   et casserait la barre d'onglets fixed — on le neutralise sur le menu */
+#ecran-menu { transform: none !important; }
+
+.btn-genre-mini { color: #2d3436; }
+[data-theme="nuit"] .btn-genre-mini { background: #2a2a3e; color: #e8e8f0; }
+[data-theme="nuit"] .btn-genre-mini.selectionne { color: #a29bfe; }

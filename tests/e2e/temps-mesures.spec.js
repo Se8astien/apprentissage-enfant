@@ -48,7 +48,8 @@ async function fermerOverlays(page) {
  * Retourne la page dans l'état "jeu ouvert, en attente de réponse".
  */
 async function lancerJeu(page, jeuId) {
-  const carte = page.locator(`.carte-jeu[data-jeu="${jeuId}"]`);
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  const carte = page.locator(`.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="${jeuId}"]`);
   await expect(carte).toBeVisible({ timeout: 5_000 });
   await carte.click();
   await expect(page.locator("#ecran-jeu")).toBeVisible({ timeout: 8_000 });
@@ -287,7 +288,8 @@ test("masse CE2 : total de trois objets ou conversion kg→g", async ({ page }) 
 test("homophones CE2 : deux choix, la bonne réponse est bien reconnue", async ({ page }) => {
   await ouvrirMenu(page, "ce2");
 
-  const carte = page.locator('.carte-jeu[data-jeu="homophones"]');
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  const carte = page.locator('.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="homophones"]');
   await expect(carte).toBeVisible({ timeout: 5_000 });
   await carte.click();
   await expect(page.locator("#ecran-jeu")).toBeVisible();
@@ -325,13 +327,15 @@ test("homophones CE2 : deux choix, la bonne réponse est bien reconnue", async (
   } else {
     await expect(btn1).toHaveClass(/mauvaise/);
     await expect(btn2).toHaveClass(/bonne/);
-    expect(feedbackTxt).toMatch(/Bonne tentative|bonne réponse/i);
+    expect(feedbackTxt).toMatch(/✗/);
+    await expect(page.locator("#aide-douce")).toContainText(/bonne réponse/i);
   }
 });
 
 test("homophones CE2 : explication du mot 'homophone' visible", async ({ page }) => {
   await ouvrirMenu(page, "ce2");
-  const carte = page.locator('.carte-jeu[data-jeu="homophones"]');
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  const carte = page.locator('.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="homophones"]');
   await expect(carte).toBeVisible();
   await carte.click();
   await expect(page.locator("#ecran-jeu")).toBeVisible();
@@ -344,7 +348,8 @@ test("homophones CE2 : explication du mot 'homophone' visible", async ({ page })
 
 test("homophones CM1 : fonctionne avec le pool étendu (ce/se, là/la)", async ({ page }) => {
   await ouvrirMenu(page, "cm1");
-  const carte = page.locator('.carte-jeu[data-jeu="homophones"]');
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  const carte = page.locator('.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="homophones"]');
   await expect(carte).toBeVisible();
   await carte.click();
   await expect(page.locator("#ecran-jeu")).toBeVisible();
@@ -359,7 +364,8 @@ test("homophones CM1 : fonctionne avec le pool étendu (ce/se, là/la)", async (
 
 test("homophones : cliquer la bonne réponse donne un feedback positif", async ({ page }) => {
   await ouvrirMenu(page, "ce2");
-  const carte = page.locator('.carte-jeu[data-jeu="homophones"]');
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  const carte = page.locator('.grille-jeux[data-tabs="jeux"] .carte-jeu[data-jeu="homophones"]');
   await expect(carte).toBeVisible();
   await carte.click();
   await expect(page.locator("#ecran-jeu")).toBeVisible();
