@@ -6166,3 +6166,43 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
     margin-bottom: 0.3rem;
   }
 }
+
+/* ══ Bilan hebdo espace parents ═════════════════════════════════════════════ */
+.params-semaine-graph {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.4rem;
+  padding: 0.6rem 0.4rem 0.2rem;
+  margin-bottom: 0.8rem;
+  background: rgba(108, 92, 231, 0.05);
+  border-radius: 14px;
+}
+.params-semaine-jour {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+.params-semaine-nb {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--primaire-fonce);
+  min-height: 1em;
+}
+.params-semaine-barre {
+  width: 70%;
+  max-width: 26px;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, #a29bfe, var(--primaire));
+}
+.params-semaine-jour.est-aujourdhui .params-semaine-barre {
+  background: linear-gradient(180deg, #ffeaa7, #fdcb6e);
+}
+.params-semaine-lbl {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #888;
+}
+.params-semaine-jour.est-aujourdhui .params-semaine-lbl { color: var(--primaire-fonce); }

@@ -297,9 +297,34 @@ export function lireStatsQuestions() {
   return g;
 }
 
+const STATS_SEMAINE_KEY = "am-stats-semaine";
+
+export function lireStatsSemaine() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STATS_SEMAINE_KEY) || "{}");
+    return data && typeof data === "object" ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+function enregistrerStatJour(bonneReponse) {
+  try {
+    const data = lireStatsSemaine();
+    const jour = dateAujourdhui();
+    if (!data[jour]) data[jour] = { bonnes: 0, total: 0 };
+    data[jour].total++;
+    if (bonneReponse) data[jour].bonnes++;
+    const jours = Object.keys(data).sort();
+    while (jours.length > 14) delete data[jours.shift()];
+    localStorage.setItem(STATS_SEMAINE_KEY, JSON.stringify(data));
+  } catch { /* ignore */ }
+}
+
 export function incrementStats(bonneReponse, jeuId) {
   const total = lireStatsQuestions() + 1;
   localStorage.setItem(STATS_GLOBAL_KEY, String(total));
+  enregistrerStatJour(bonneReponse);
 
   if (jeuId) {
     try {
