@@ -1,6 +1,7 @@
 // app-params.js — Espace parents PIN-protégé
 
 import { effacerDonneesProfilCourant } from "./app-profils.js";
+import { lireStatsSemaine } from "./app-gamification.js";
 import {
   escapeHtml,
   estMinuteurDisponible,
@@ -375,6 +376,41 @@ function brancherPin(overlay, pinExistant, onFermer) {
   brancherEscapeParent(overlay, () => fermerSansIdle(overlay, onFermer));
 }
 
+function bilanSemaineHtml() {
+  const data = lireStatsSemaine();
+  const labels = ["D", "L", "M", "M", "J", "V", "S"];
+  const jours = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const s = data[d.toISOString().slice(0, 10)] || { bonnes: 0, total: 0 };
+    jours.push({ label: labels[d.getDay()], bonnes: s.bonnes || 0, total: s.total || 0, aujourdHui: i === 0 });
+  }
+  const totalQ = jours.reduce((a, j) => a + j.total, 0);
+  if (totalQ === 0) {
+    return "<p class=\"params-hint-block\">Pas encore d'activité cette semaine — le bilan apparaîtra dès les premières questions.</p>";
+  }
+  const totalB = jours.reduce((a, j) => a + j.bonnes, 0);
+  const joursActifs = jours.filter((j) => j.total > 0).length;
+  const taux = Math.round((totalB / totalQ) * 100);
+  const maxJ = Math.max(...jours.map((j) => j.total), 1);
+  const barres = jours.map((j) => {
+    const h = j.total > 0 ? Math.max(12, Math.round((j.total / maxJ) * 56)) : 4;
+    return `<div class="params-semaine-jour${j.aujourdHui ? " est-aujourdhui" : ""}">
+      <span class="params-semaine-nb">${j.total || ""}</span>
+      <div class="params-semaine-barre" style="height:${h}px"></div>
+      <span class="params-semaine-lbl">${j.label}</span>
+    </div>`;
+  }).join("");
+  return `
+    <div class="params-kpi-grid params-kpi-grid--semaine">
+      <div class="params-kpi"><span class="params-kpi-val">${joursActifs}<span class="params-kpi-unit">/7</span></span><span class="params-kpi-lbl">Jours actifs</span></div>
+      <div class="params-kpi"><span class="params-kpi-val">${totalQ}</span><span class="params-kpi-lbl">Questions</span></div>
+      <div class="params-kpi"><span class="params-kpi-val">${taux}<span class="params-kpi-unit">%</span></span><span class="params-kpi-lbl">Réussite</span></div>
+    </div>
+    <div class="params-semaine-graph" role="img" aria-label="Questions répondues par jour sur les 7 derniers jours">${barres}</div>`;
+}
+
 function creerSettingsHtml() {
   const stats = lireStats();
   const resume = lireResumeParent(stats);
@@ -472,6 +508,8 @@ function creerSettingsHtml() {
     </section>
 
     <section class="params-panel" data-panel="conseils" role="tabpanel" hidden>
+      <h3 class="params-section-title">Bilan des 7 derniers jours</h3>
+      ${bilanSemaineHtml()}
       <h3 class="params-section-title">Pistes personnalisées</h3>
       <p class="params-hint-block">Court et concret&nbsp;; adapte la durée et le jour au rythme de l’enfant.</p>
       <ul class="params-conseils-list">
