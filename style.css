@@ -525,6 +525,87 @@ h1 {
   text-align: center;
 }
 
+/* Compact par défaut : le renard ne doit pas cacher les jeux */
+.menu-tamagotshi:not(.ouvert) {
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+}
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "fox header"
+    "fox stats";
+  column-gap: 0.9rem;
+  row-gap: 0.3rem;
+  align-items: center;
+  text-align: left;
+}
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-renard {
+  grid-area: fox;
+  min-height: 0;
+}
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-renard svg {
+  width: 64px;
+  height: 64px;
+}
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-header {
+  grid-area: header;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-header h2 { font-size: 1.1rem; }
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-stats {
+  grid-area: stats;
+  gap: 0.3rem;
+}
+
+.menu-tamagotshi:not(.ouvert) .stat-label {
+  min-width: 0;
+  font-size: 0.8rem;
+}
+
+.menu-tamagotshi:not(.ouvert) .stat-barre { height: 0.85rem; }
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-actions,
+.menu-tamagotshi:not(.ouvert) .tamagotshi-message {
+  display: none;
+}
+
+.menu-tamagotshi:not(.ouvert)::after {
+  content: "Touche-moi pour jouer avec moi ▾";
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7c68c4;
+  opacity: 0.8;
+}
+
+.tamagotshi-fermer {
+  margin-top: 0.5rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  min-height: 44px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #7c68c4;
+  cursor: pointer;
+}
+
+.menu-tamagotshi:not(.ouvert) .tamagotshi-fermer { display: none; }
+
 .tamagotshi-container {
   display: flex;
   flex-direction: column;
@@ -2721,15 +2802,19 @@ h1 {
   left: 50%;
   transform: translateX(-50%) translateY(-5rem);
   background: white;
-  border-radius: 999px;
+  border-radius: 1.2rem;
   padding: 0.55rem 1.25rem;
   box-shadow: 0 4px 24px rgba(108, 92, 231, 0.25);
   font-size: 0.9rem;
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
   z-index: 150;
-  white-space: nowrap;
+  max-width: calc(100vw - 2rem);
+  width: max-content;
+  text-align: center;
   border: 2px solid var(--primaire);
   animation: toastEntree 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
              toastSortie 0.4s 2.7s ease forwards;
@@ -3011,6 +3096,8 @@ h1 {
 
 /* ── Footer SEO ──────────────────────────────────────────────────────────── */
 .seo-footer { margin-top: 2rem; padding: 1rem 1.5rem; background: rgba(0,0,0,0.03); border-top: 1px solid rgba(0,0,0,0.06); text-align: center; }
+/* Contenu SEO réservé à la landing : caché dès que l'enfant est dans l'app */
+body:has(#ecran-landing[hidden]) .seo-footer { display: none; }
 .seo-footer p { font-size: 0.75rem; color: #888; line-height: 1.6; max-width: 680px; margin: 0 auto; }
 .seo-footer-links {
   display: flex;
@@ -5557,19 +5644,21 @@ h4.params-menu-aide-titre {
   .top {
     gap: 0.35rem;
     padding: 0.45rem 0.6rem;
+    justify-content: space-between;
   }
   .titre-bloc {
     min-width: 0;
+    flex: 1;
   }
   h1 {
-    font-size: 1.1rem;
+    font-size: 0.98rem;
+    line-height: 1.15;
   }
   .sous-titre {
-    font-size: 0.7rem;
-    line-height: 1.3;
+    display: none;
   }
   .mascotte {
-    font-size: 1.8rem;
+    display: none;
   }
   .header-tool {
     width: 2.3rem;

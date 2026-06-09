@@ -427,6 +427,17 @@ function brancherOnboardingUI() {
     });
   }, 1500);
 
+  const tamaCarte = document.querySelector(".menu-tamagotshi");
+  if (tamaCarte) {
+    tamaCarte.addEventListener("click", () => {
+      if (!tamaCarte.classList.contains("ouvert")) tamaCarte.classList.add("ouvert");
+    });
+    document.getElementById("btn-tamagotshi-fermer")?.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      tamaCarte.classList.remove("ouvert");
+    });
+  }
+
   document.getElementById("btn-hero-mission")?.addEventListener("click", () => {
     const w = document.getElementById("missions-widget");
     if (w) { w.scrollIntoView({ behavior: "smooth", block: "nearest" }); w.style.outline = "3px solid var(--primaire)"; setTimeout(() => { w.style.outline = ""; }, 1200); }
