@@ -520,6 +520,22 @@
         </div>
       </button>
 
+      <!-- ── Hero raccourcis ─────────────────────────────── -->
+      <div class="menu-hero" aria-label="Raccourcis">
+        <button type="button" class="menu-hero-btn" id="btn-hero-mission">
+          <span class="menu-hero-ico">🎯</span>
+          <span class="menu-hero-txt">Mission du jour</span>
+        </button>
+        <button type="button" class="menu-hero-btn" id="btn-hero-hasard">
+          <span class="menu-hero-ico">🎲</span>
+          <span class="menu-hero-txt">Jeu surprise</span>
+        </button>
+        <button type="button" class="menu-hero-btn" id="btn-hero-erreurs">
+          <span class="menu-hero-ico">🔁</span>
+          <span class="menu-hero-txt">Mes erreurs</span>
+        </button>
+      </div>
+
       <p class="accueil">Touche un jeu</p>
 
       <!-- ── Grille des jeux ─────────────────────────────────── -->
@@ -733,6 +749,9 @@
       <h2 id="jeu-titre" class="jeu-titre"></h2>
       <div id="mini-lecon-jeu" class="mini-lecon-jeu" hidden></div>
       <div id="chrono" class="chrono" hidden aria-live="polite" aria-label="Temps restant"></div>
+      <div id="barre-session" class="barre-session" hidden aria-label="Progression de la session">
+        <div class="barre-session-dots" id="barre-session-dots"></div>
+      </div>
       <div id="zone-question" class="zone-question" aria-live="polite" aria-atomic="true"></div>
       <div id="outils-jeu" class="jeu-outils" hidden aria-label="Aides pour répondre">
         <button type="button" id="btn-rappel-lecon" class="btn-outil-jeu" hidden aria-label="Voir le rappel de cours">📖 Rappel</button>

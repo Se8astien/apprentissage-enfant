@@ -427,6 +427,17 @@ function brancherOnboardingUI() {
     });
   }, 1500);
 
+  document.getElementById("btn-hero-mission")?.addEventListener("click", () => {
+    const w = document.getElementById("missions-widget");
+    if (w) { w.scrollIntoView({ behavior: "smooth", block: "nearest" }); w.style.outline = "3px solid var(--primaire)"; setTimeout(() => { w.style.outline = ""; }, 1200); }
+  });
+  document.getElementById("btn-hero-hasard")?.addEventListener("click", () => {
+    document.getElementById("btn-fun-roue")?.click();
+  });
+  document.getElementById("btn-hero-erreurs")?.addEventListener("click", () => {
+    document.getElementById("btn-fun-mystere")?.click();
+  });
+
   window.addEventListener("error", (ev) => {
     try {
       const src = ev && ev.filename ? String(ev.filename) : "";

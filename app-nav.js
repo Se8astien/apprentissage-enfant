@@ -137,6 +137,35 @@ let tsQuestionCourante = 0;
 const _tempsReponseParJeu = Object.create(null);
 let _snapBonnesAuDebutJeu = 0;
 let _snapErreursAuDebutJeu = 0;
+let _bonnesBarreCourante = 0;
+const _BARRE_TAILLE = 5;
+
+function _initBarreSession() {
+  const dots = document.getElementById("barre-session-dots");
+  const barre = document.getElementById("barre-session");
+  if (!dots || !barre) return;
+  dots.innerHTML = Array.from({ length: _BARRE_TAILLE }, () => '<div class="barre-session-dot"></div>').join("");
+  barre.hidden = false;
+  _bonnesBarreCourante = 0;
+}
+
+function _mettreAJourBarre() {
+  const dots = document.getElementById("barre-session-dots");
+  if (!dots) return;
+  _bonnesBarreCourante++;
+  const pos = _bonnesBarreCourante % _BARRE_TAILLE;
+  const allDots = dots.querySelectorAll(".barre-session-dot");
+  const lapComplete = pos === 0;
+  if (lapComplete) {
+    allDots.forEach(d => { d.classList.add("pleine"); d.textContent = "⭐"; });
+    setTimeout(() => allDots.forEach(d => { d.classList.remove("pleine"); d.textContent = ""; }), 900);
+  } else {
+    allDots.forEach((d, i) => {
+      if (i < pos) { d.classList.add("pleine"); d.textContent = "⭐"; }
+      else { d.classList.remove("pleine"); d.textContent = ""; }
+    });
+  }
+}
 
 function jeuActifId() {
   const j = getJeuCourant();
@@ -1478,7 +1507,10 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     track("question_correct", { game_name: getJeuCourant(), niveau: getNiveauCourant(), combo: comboActuel });
     const ok = messagesOk();
     elFeedback.textContent = (estGrand() ? "Correct — " : "✓ ") + ok[Math.floor(Math.random() * ok.length)];
+    elFeedback.className = "feedback";
+    void elFeedback.offsetWidth;
     elFeedback.className = "feedback ok";
+    _mettreAJourBarre();
     const bonusEspacement = _verifierBonusEspacement(getJeuCourant());
     ajouterEtoiles(bonusEspacement ? 2 : 1);
     if (bonusEspacement) {
@@ -1548,6 +1580,8 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     const base = ko[Math.floor(Math.random() * ko.length)];
     const message = erreursSerie >= 2 ? `${base} ${rappelErreur(getJeuCourant())}` : base;
     elFeedback.textContent = `✗ ${message}`;
+    elFeedback.className = "feedback";
+    void elFeedback.offsetWidth;
     elFeedback.className = "feedback non";
     if (erreursSerie === 2) {
       activerMiniRattrapage();
@@ -1811,6 +1845,7 @@ export function montrerJeu(nom, lanceurs) {
   miniLeconVueJeu = null;
   reinitialiserLeconJeu(nom);
   delete _revisionFileParJeu[nom];
+  _initBarreSession();
   _snapBonnesAuDebutJeu = bonnesSession;
   _snapErreursAuDebutJeu = erreursSession;
   revelerSeulEcran(jeu);
