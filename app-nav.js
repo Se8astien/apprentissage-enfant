@@ -1420,6 +1420,27 @@ function finaliserMiniRattrapage() {
 }
 
 // ── Reaction renard ───────────────────────────────────────────────────────────
+function volerEtoile(depuisEl) {
+  const cible = document.querySelector(".score-global");
+  if (!cible || !depuisEl) return;
+  const r1 = depuisEl.getBoundingClientRect();
+  const r2 = cible.getBoundingClientRect();
+  if (!r1.width || !r2.width) return;
+  const star = document.createElement("span");
+  star.className = "etoile-volante";
+  star.textContent = "⭐";
+  star.style.left = `${r1.left + r1.width / 2}px`;
+  star.style.top = `${r1.top + r1.height / 2}px`;
+  document.body.appendChild(star);
+  requestAnimationFrame(() => {
+    const dx = r2.left + r2.width / 2 - (r1.left + r1.width / 2);
+    const dy = r2.top + r2.height / 2 - (r1.top + r1.height / 2);
+    star.style.transform = `translate(${dx}px, ${dy}px) scale(0.45)`;
+    star.style.opacity = "0.25";
+  });
+  setTimeout(() => star.remove(), 900);
+}
+
 function flashEcranJeu(ok) {
   if (!elJeu) return;
   elJeu.classList.remove("jeu-flash-ok", "jeu-flash-non");
@@ -1594,6 +1615,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       elFeedback.textContent += " ⭐ Bonus révision !";
     }
     sauverFaim(lireFaim() + 5);
+    volerEtoile(bouton);
     confetti(estGrand() ? { tier: "sparkle", sobre: true } : { tier: "sparkle" });
     sonBonne(comboActuel);
     declencherReactionRenard(true);

@@ -481,6 +481,7 @@ function brancherOnboardingUI() {
       const t = btn.dataset.tab;
       if (!t || !ecranMenuEl) return;
       ecranMenuEl.setAttribute("data-tab", t);
+      try { sessionStorage.setItem("am-tab-menu", t); } catch { /* ignore */ }
       document.querySelectorAll(".menu-tab").forEach((b) => {
         const on = b === btn;
         b.classList.toggle("actif", on);
@@ -491,6 +492,12 @@ function brancherOnboardingUI() {
       if (t === "progres") afficherProgresWidget();
     });
   });
+  try {
+    const tabSauve = sessionStorage.getItem("am-tab-menu");
+    if (tabSauve && tabSauve !== "accueil") {
+      document.querySelector(`.menu-tab[data-tab="${tabSauve}"]`)?.click();
+    }
+  } catch { /* ignore */ }
 
   document.querySelectorAll(".jeux-cat").forEach((btn) => {
     btn.addEventListener("click", () => {
