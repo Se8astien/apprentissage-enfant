@@ -53,6 +53,8 @@ import {
   brancherBoutonChronoMenu,
   majUiBoutonChrono,
   proposerRevisionSiErreurs,
+  afficherFinDeJeu,
+  demarrerModeSession,
 } from "./app-nav.js";
 
 import {
@@ -62,6 +64,7 @@ import {
   BADGES,
   lireBadges,
   getMessageRecompenseDifferee,
+  lireMissionsJour,
 } from "./app-gamification.js";
 
 import { afficherIntroHistoire } from "./app-histoire.js";
@@ -439,14 +442,37 @@ function brancherOnboardingUI() {
   }
 
   document.getElementById("btn-hero-mission")?.addEventListener("click", () => {
-    const w = document.getElementById("missions-widget");
-    if (w) { w.scrollIntoView({ behavior: "smooth", block: "nearest" }); w.style.outline = "3px solid var(--primaire)"; setTimeout(() => { w.style.outline = ""; }, 1200); }
+    const store = lireMissionsJour();
+    const focusMission = store?.missions?.find(m => m.focus_jeu && !m.completee);
+    const jeuCible = focusMission?.jeuId || store?.missions?.find(m => !m.completee)?.jeuId;
+    if (jeuCible && lanceurs[jeuCible]) {
+      montrerJeu(jeuCible, lanceurs);
+    } else {
+      const w = document.getElementById("missions-widget");
+      if (w) { w.scrollIntoView({ behavior: "smooth", block: "nearest" }); w.style.outline = "3px solid var(--primaire)"; setTimeout(() => { w.style.outline = ""; }, 1200); }
+    }
   });
   document.getElementById("btn-hero-hasard")?.addEventListener("click", () => {
     document.getElementById("btn-fun-roue")?.click();
   });
   document.getElementById("btn-hero-erreurs")?.addEventListener("click", () => {
+    try {
+      const raw = localStorage.getItem("stats-questions");
+      const stats = raw ? JSON.parse(raw) : {};
+      let pireJeu = null, pireTaux = 1;
+      for (const [jeu, s] of Object.entries(stats)) {
+        if (s.joues >= 5 && lanceurs[jeu]) {
+          const taux = s.bonnes / s.joues;
+          if (taux < pireTaux) { pireTaux = taux; pireJeu = jeu; }
+        }
+      }
+      if (pireJeu) { montrerJeu(pireJeu, lanceurs); return; }
+    } catch { /* ignore */ }
     document.getElementById("btn-fun-mystere")?.click();
+  });
+  document.getElementById("btn-hero-5questions")?.addEventListener("click", () => {
+    demarrerModeSession(5);
+    document.getElementById("btn-fun-roue")?.click();
   });
 
   window.addEventListener("error", (ev) => {
@@ -588,6 +614,43 @@ function rajusterJeuxParNiveau() {
 majEtoilesMaitrise();
 rajusterJeuxParNiveau();
 
+function _enregistrerJeuRecent(jeu) {
+  try {
+    const raw = localStorage.getItem("am-jeux-recents");
+    const liste = raw ? JSON.parse(raw) : [];
+    const filtered = liste.filter(j => j !== jeu);
+    filtered.unshift(jeu);
+    localStorage.setItem("am-jeux-recents", JSON.stringify(filtered.slice(0, 5)));
+    _afficherJeuxRecents();
+  } catch { /* ignore */ }
+}
+
+function _afficherJeuxRecents() {
+  const section = document.getElementById("jeux-recents-section");
+  const grille = document.getElementById("jeux-recents-grille");
+  if (!section || !grille) return;
+  try {
+    const raw = localStorage.getItem("am-jeux-recents");
+    const liste = raw ? JSON.parse(raw) : [];
+    if (liste.length === 0) { section.hidden = true; return; }
+    grille.innerHTML = "";
+    liste.forEach(jeu => {
+      const src = document.querySelector(`.carte-jeu[data-jeu="${jeu}"]`);
+      if (!src) return;
+      const btn = src.cloneNode(true);
+      btn.dataset.amBound = "";
+      btn.addEventListener("click", async () => {
+        const ok = await assurerLanceurDansMap(jeu, lanceurs);
+        if (!ok || typeof lanceurs[jeu] !== "function") return;
+        _enregistrerJeuRecent(jeu);
+        montrerJeu(jeu, lanceurs);
+      });
+      grille.appendChild(btn);
+    });
+    section.hidden = false;
+  } catch { section.hidden = true; }
+}
+
 document.querySelectorAll(".carte-jeu").forEach((btn) => {
   btn.addEventListener("click", async () => {
     const jeu = btn.dataset.jeu;
@@ -595,10 +658,13 @@ document.querySelectorAll(".carte-jeu").forEach((btn) => {
     const ok = await assurerLanceurDansMap(jeu, lanceurs);
     if (!ok || typeof lanceurs[jeu] !== "function") return;
     track("game_start", { game_name: jeu, niveau: getNiveauCourant(), difficulte: getDifficulte() });
+    _enregistrerJeuRecent(jeu);
     montrerJeu(jeu, lanceurs);
     window._jeuActifId = jeu;
   });
 });
+
+_afficherJeuxRecents();
 
 initFunMenuBar({ montrerJeu, assurerLanceurDansMap, lanceurs });
 
@@ -627,10 +693,11 @@ function gererRetourJeu() {
     wrong_count: wrongs.length,
     revision_prompted: wrongs.length > 0,
   });
-  if (proposerRevisionSiErreurs(jeu, retourDepuisJeuVersMenuOuAventure)) {
-    return;
-  }
-  retourDepuisJeuVersMenuOuAventure();
+  afficherFinDeJeu(
+    jeu,
+    () => { if (!proposerRevisionSiErreurs(jeu, retourDepuisJeuVersMenuOuAventure)) retourDepuisJeuVersMenuOuAventure(); },
+    retourDepuisJeuVersMenuOuAventure,
+  );
 }
 
 // -- Navigation jeu
