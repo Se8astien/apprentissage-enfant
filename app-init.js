@@ -475,6 +475,46 @@ function brancherOnboardingUI() {
     document.getElementById("btn-fun-roue")?.click();
   });
 
+  const ecranMenuEl = document.getElementById("ecran-menu");
+  document.querySelectorAll(".menu-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.tab;
+      if (!t || !ecranMenuEl) return;
+      ecranMenuEl.setAttribute("data-tab", t);
+      document.querySelectorAll(".menu-tab").forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle("actif", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      window.scrollTo(0, 0);
+      if (t === "renard") document.querySelector(".menu-tamagotshi")?.classList.add("ouvert");
+      if (t === "progres") afficherProgresWidget();
+    });
+  });
+
+  document.querySelectorAll(".jeux-cat").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".jeux-cat").forEach((b) => b.classList.toggle("actif", b === btn));
+      appliquerFiltreCats();
+    });
+  });
+
+  document.querySelectorAll(".btn-genre-mini").forEach((btn) => {
+    uneFois(btn, "click", () => {
+      const g = btn.getAttribute("data-genre");
+      if (!g) return;
+      sauverGenre(g);
+      document.querySelectorAll(".btn-genre-mini").forEach((b) => b.classList.toggle("selectionne", b === btn));
+    });
+  });
+
+  try {
+    if (stockageGet(STORAGE_THEME_NUIT) == null) {
+      const h = new Date().getHours();
+      if (h >= 19 || h < 7) document.documentElement.setAttribute("data-theme", "nuit");
+    }
+  } catch { /* ignore */ }
+
   window.addEventListener("error", (ev) => {
     try {
       const src = ev && ev.filename ? String(ev.filename) : "";
@@ -602,6 +642,7 @@ function rajusterJeuxParNiveau() {
     document.querySelectorAll(".carte-jeu[data-niveaux]").forEach(btn => {
       btn.hidden = false;
     });
+    appliquerFiltreCats();
     return;
   }
   document.querySelectorAll(".carte-jeu[data-niveaux]").forEach(btn => {
@@ -609,6 +650,49 @@ function rajusterJeuxParNiveau() {
     const estDisponible = niveaux.includes(niveauCourant);
     btn.hidden = !estDisponible;
   });
+  appliquerFiltreCats();
+}
+
+function appliquerFiltreCats() {
+  const grille = document.querySelector('.grille-jeux[data-tabs="jeux"]');
+  if (!grille) return;
+  const actif = document.querySelector(".jeux-cat.actif");
+  const cats = (actif?.dataset.cats || "*").split(/\s+/).filter(Boolean);
+  const tout = cats.includes("*");
+  let h3Courant = null;
+  let h3Visible = false;
+  const majH3 = () => { if (h3Courant) h3Courant.classList.toggle("cat-cachee", !h3Visible); };
+  Array.from(grille.children).forEach(el => {
+    if (el.tagName === "H3") { majH3(); h3Courant = el; h3Visible = false; return; }
+    if (!el.classList.contains("carte-jeu")) return;
+    const ok = tout || cats.includes(el.dataset.cat || "");
+    el.classList.toggle("cat-cachee", !ok);
+    if (ok && !el.hidden) h3Visible = true;
+  });
+  majH3();
+}
+
+function afficherProgresWidget() {
+  const el = document.getElementById("progres-widget");
+  if (!el) return;
+  let total = 0;
+  let bonnes = 0;
+  try {
+    const stats = JSON.parse(localStorage.getItem("stats-questions") || "{}");
+    for (const s of Object.values(stats)) {
+      total += s.joues || 0;
+      bonnes += s.bonnes || 0;
+    }
+  } catch { /* ignore */ }
+  const taux = total > 0 ? Math.round((bonnes / total) * 100) : 0;
+  const nbBadges = lireBadges().length;
+  el.innerHTML = `
+    <h3 class="progres-titre">Mes progrès</h3>
+    <div class="progres-stats">
+      <div class="progres-stat"><span class="progres-nb">⭐ ${lireEtoiles()}</span><span class="progres-lbl">étoiles</span></div>
+      <div class="progres-stat"><span class="progres-nb">🏅 ${nbBadges}</span><span class="progres-lbl">trophées</span></div>
+      <div class="progres-stat"><span class="progres-nb">${total ? "✓ " + taux + "%" : "—"}</span><span class="progres-lbl">réussite</span></div>
+    </div>`;
 }
 
 majEtoilesMaitrise();

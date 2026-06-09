@@ -1420,7 +1420,16 @@ function finaliserMiniRattrapage() {
 }
 
 // ── Reaction renard ───────────────────────────────────────────────────────────
+function flashEcranJeu(ok) {
+  if (!elJeu) return;
+  elJeu.classList.remove("jeu-flash-ok", "jeu-flash-non");
+  void elJeu.offsetWidth;
+  elJeu.classList.add(ok ? "jeu-flash-ok" : "jeu-flash-non");
+  setTimeout(() => elJeu.classList.remove("jeu-flash-ok", "jeu-flash-non"), 750);
+}
+
 function declencherReactionRenard(correct) {
+  flashEcranJeu(correct);
   const el = document.getElementById("renard-reaction");
   if (!el) return;
   el.hidden = false;

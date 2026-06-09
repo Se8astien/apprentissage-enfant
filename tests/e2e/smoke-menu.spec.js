@@ -26,6 +26,7 @@ test("menu visible après onboarding simulé + barre classe synchronisée au cha
 
   await expect(page.locator("#ecran-menu")).toBeVisible();
 
+  await page.locator('.menu-tab[data-tab="progres"]').click();
   await page.locator("#btn-classe-menu").click();
   await expect(page.locator("#niveau-cp")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#btn-changer-rythme")).toContainText("Normal");
@@ -51,6 +52,7 @@ test("une mauvaise réponse affiche une aide douce et la bonne réponse", async 
     timeout: 20_000,
   });
 
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
   await page.locator('.carte-jeu[data-jeu="addition"]').click();
   await expect(page.locator("#ecran-jeu")).toBeVisible();
   const jouerHistoire = page.getByRole("button", { name: /Jouer/i });
