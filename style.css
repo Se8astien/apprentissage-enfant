@@ -5771,6 +5771,9 @@ h4.params-menu-aide-titre {
     min-height: 2.3rem;
     font-size: 1.1rem;
   }
+  .header-lecture-ic {
+    font-size: 1.1rem;
+  }
   .header-droite {
     column-gap: 0.25rem;
     row-gap: 0.3rem;
