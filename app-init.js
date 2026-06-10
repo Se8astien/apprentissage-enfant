@@ -693,12 +693,39 @@ function afficherProgresWidget() {
   } catch { /* ignore */ }
   const taux = total > 0 ? Math.round((bonnes / total) * 100) : 0;
   const nbBadges = lireBadges().length;
+  const etoiles = lireEtoiles();
   el.innerHTML = `
     <h3 class="progres-titre">Mes progrès</h3>
     <div class="progres-stats">
-      <div class="progres-stat"><span class="progres-nb">⭐ ${lireEtoiles()}</span><span class="progres-lbl">étoiles</span></div>
+      <div class="progres-stat"><span class="progres-nb">⭐ ${etoiles}</span><span class="progres-lbl">étoiles</span></div>
       <div class="progres-stat"><span class="progres-nb">🏅 ${nbBadges}</span><span class="progres-lbl">trophées</span></div>
       <div class="progres-stat"><span class="progres-nb">${total ? "✓ " + taux + "%" : "—"}</span><span class="progres-lbl">réussite</span></div>
+    </div>
+    ${chemiRenardHtml(etoiles)}`;
+}
+
+const SEUILS_STADES = [0, 21, 61, 151, 301];
+
+function chemiRenardHtml(etoiles) {
+  const stade = getStade(etoiles);
+  const seuilSuivant = SEUILS_STADES[stade + 1];
+  const etapes = SEUILS_STADES.map((seuil, i) => {
+    let etat = "future";
+    if (i < stade) etat = "fait";
+    else if (i === stade) etat = "actuel";
+    return `<div class="chemin-etape chemin-etape--${etat}">
+        <span class="chemin-pastille">${i < stade ? "✓" : i === stade ? "🦊" : "⭐"}</span>
+        <span class="chemin-seuil">${seuil}</span>
+      </div>`;
+  }).join('<div class="chemin-trait"></div>');
+  const messageFin = seuilSuivant
+    ? `<p class="chemin-message">Encore <strong>${seuilSuivant - etoiles}</strong> étoile${seuilSuivant - etoiles > 1 ? "s" : ""} pour la prochaine évolution !</p>`
+    : `<p class="chemin-message">Bravo, ton renard a atteint sa forme légendaire ! 🎉</p>`;
+  return `
+    <div class="chemin-renard">
+      <h3 class="progres-titre">Le chemin de ton renard</h3>
+      <div class="chemin-piste">${etapes}</div>
+      ${messageFin}
     </div>`;
 }
 

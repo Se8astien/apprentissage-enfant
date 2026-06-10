@@ -6069,6 +6069,58 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
 
 [data-theme="nuit"] .progres-widget { background: #2a2a3e; }
 
+.chemin-renard { margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed var(--ombre); }
+.chemin-piste {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.6rem 0 0.8rem;
+}
+.chemin-etape {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  flex: 0 0 auto;
+}
+.chemin-pastille {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: var(--carte);
+  border: 2px solid var(--ombre);
+}
+.chemin-etape--fait .chemin-pastille { background: var(--succes); border-color: var(--succes); }
+.chemin-etape--actuel .chemin-pastille {
+  background: var(--soleil);
+  border-color: var(--primaire);
+  box-shadow: 0 0 0 4px rgba(244, 162, 97, 0.25);
+  animation: pulseChemin 1.6s ease-in-out infinite;
+}
+@keyframes pulseChemin {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.chemin-seuil { font-size: 0.65rem; color: #888; font-weight: 700; }
+.chemin-trait {
+  flex: 1 1 auto;
+  height: 4px;
+  background: var(--ombre);
+  border-radius: 2px;
+  margin: 0 0.2rem;
+  margin-bottom: 1rem;
+}
+.chemin-message {
+  text-align: center;
+  font-size: 0.85rem;
+  margin: 0;
+  color: var(--texte);
+}
+
 /* ══ Flash plein écran au feedback ══════════════════════════════════════════ */
 @keyframes flashJeuOk {
   0% { background-color: rgba(82, 166, 117, 0); }
