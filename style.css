@@ -5751,6 +5751,7 @@ h4.params-menu-aide-titre {
   h1 {
     font-size: 0.98rem;
     line-height: 1.15;
+    overflow-wrap: anywhere;
   }
   .sous-titre {
     display: none;
