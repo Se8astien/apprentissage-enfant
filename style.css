@@ -5742,16 +5742,20 @@ h4.params-menu-aide-titre {
   .top {
     gap: 0.35rem;
     padding: 0.45rem 0.6rem;
-    justify-content: space-between;
+    flex-wrap: wrap;
   }
   .titre-bloc {
     min-width: 0;
-    flex: 1;
+    flex: 1 1 100%;
+    order: -1;
   }
   h1 {
-    font-size: 0.98rem;
+    font-size: 1.05rem;
     line-height: 1.15;
-    overflow-wrap: anywhere;
+  }
+  .header-droite {
+    flex: 1 1 100%;
+    justify-content: space-between;
   }
   .sous-titre {
     display: none;

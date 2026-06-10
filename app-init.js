@@ -338,7 +338,7 @@ function brancherOnboardingUI() {
   });
 
   function syncUiTheme(btn) {
-    const nuit = stockageGet(STORAGE_THEME_NUIT) === "1";
+    const nuit = document.documentElement.getAttribute("data-theme") === "nuit";
     btn.textContent = nuit ? "☀️" : "\u{1F319}";
     btn.setAttribute("aria-pressed", nuit ? "true" : "false");
     btn.setAttribute(
@@ -362,7 +362,7 @@ function brancherOnboardingUI() {
   if (btnTheme) {
     syncUiTheme(btnTheme);
     uneFois(btnTheme, "click", () => {
-      const nuit = stockageGet(STORAGE_THEME_NUIT) !== "1";
+      const nuit = document.documentElement.getAttribute("data-theme") !== "nuit";
       stockageSet(STORAGE_THEME_NUIT, nuit ? "1" : "0");
       document.documentElement.setAttribute("data-theme", nuit ? "nuit" : "");
       syncUiTheme(btnTheme);
@@ -518,7 +518,10 @@ function brancherOnboardingUI() {
   try {
     if (stockageGet(STORAGE_THEME_NUIT) == null) {
       const h = new Date().getHours();
-      if (h >= 19 || h < 7) document.documentElement.setAttribute("data-theme", "nuit");
+      if (h >= 19 || h < 7) {
+        document.documentElement.setAttribute("data-theme", "nuit");
+        if (btnTheme) syncUiTheme(btnTheme);
+      }
     }
   } catch { /* ignore */ }
 
