@@ -5965,7 +5965,9 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
   cursor: pointer;
   transition: background 0.15s ease, transform 0.12s ease;
 }
-.menu-tab-ico { font-size: 1.45rem; line-height: 1; }
+.menu-tab-ico { font-size: 1.45rem; line-height: 1; display: flex; color: var(--texte); }
+.menu-tab-ico svg { width: 1.5rem; height: 1.5rem; }
+.menu-tab.actif .menu-tab-ico { color: var(--primaire); }
 .menu-tab.actif {
   background: linear-gradient(135deg, rgba(224, 120, 86, 0.14), rgba(244, 162, 97, 0.18));
   color: var(--primaire);
@@ -5975,6 +5977,8 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
 [data-theme="nuit"] .menu-tabs { background: #2a2a3e; }
 [data-theme="nuit"] .menu-tab { color: #e8e8f0; }
 [data-theme="nuit"] .menu-tab.actif { color: #f4a261; }
+[data-theme="nuit"] .menu-tab-ico { color: #e8e8f0; }
+[data-theme="nuit"] .menu-tab.actif .menu-tab-ico { color: #f4a261; }
 
 #ecran-menu[data-tab="renard"] .tamagotshi-fermer { display: none; }
 
