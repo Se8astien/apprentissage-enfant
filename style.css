@@ -6003,7 +6003,9 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
   cursor: pointer;
   transition: transform 0.12s ease, border-color 0.15s ease;
 }
-.jeux-cat-ico { font-size: 1.5rem; line-height: 1; }
+.jeux-cat-ico { font-size: 1.5rem; line-height: 1; display: flex; color: var(--texte); }
+.jeux-cat-ico svg { width: 1.6rem; height: 1.6rem; }
+.jeux-cat.actif .jeux-cat-ico { color: var(--primaire); }
 .jeux-cat.actif {
   border-color: var(--primaire);
   background: linear-gradient(135deg, rgba(224, 120, 86, 0.1), rgba(244, 162, 97, 0.14));
@@ -6015,6 +6017,8 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
 
 [data-theme="nuit"] .jeux-cat { background: #2a2a3e; color: #e8e8f0; }
 [data-theme="nuit"] .jeux-cat.actif { color: #f4a261; }
+[data-theme="nuit"] .jeux-cat-ico { color: #e8e8f0; }
+[data-theme="nuit"] .jeux-cat.actif .jeux-cat-ico { color: #f4a261; }
 
 /* ══ Genre optionnel sur l'écran classe ═════════════════════════════════════ */
 .genre-mini {
