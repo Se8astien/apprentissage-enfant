@@ -907,28 +907,28 @@ const PHRASES_TROU_CP = [
   { avant: "La fille", trou: "dessine", apres: "une maison.", fausses: ["mange", "dort", "court"] },
   { avant: "Le soleil", trou: "brille", apres: "dans le ciel.", fausses: ["tombe", "mange", "court"] },
   { avant: "Le chien", trou: "aboie", apres: "très fort.", fausses: ["miaule", "chante", "dort"] },
-  { avant: "Les enfants", trou: "jouent", apres: "dans le jardin.", fausses: ["dorment", "mangent", "lisent"] },
-  { avant: "Le lapin", trou: "saute", apres: "dans l'herbe.", fausses: ["nage", "vole", "dort"] },
+  { avant: "Les enfants", trou: "jouent", apres: "dans le jardin.", fausses: ["volent", "nagent", "aboient"] },
+  { avant: "Le lapin", trou: "saute", apres: "dans l'herbe.", fausses: ["nage", "vole", "miaule"] },
   { avant: "La petite fille", trou: "pleure", apres: "car elle est triste.", fausses: ["rit", "chante", "court"] },
   { avant: "L'oiseau", trou: "chante", apres: "sur la branche.", fausses: ["miaule", "aboie", "rugit"] },
 ];
 
 const PHRASES_TROU_CE1 = [
-  { avant: "Le boulanger prépare", trou: "délicieux", apres: "du pain.", fausses: ["chaud", "frais", "croustillant"] },
-  { avant: "Les élèves écoutent", trou: "attentivement", apres: "la maîtresse.", fausses: ["vite", "rarement", "ensemble"] },
+  { avant: "Le boulanger", trou: "prépare", apres: "du pain délicieux.", fausses: ["boit", "dessine", "écoute"] },
+  { avant: "Les élèves écoutent", trou: "attentivement", apres: "la maîtresse.", fausses: ["salement", "méchamment", "lourdement"] },
   { avant: "La tortue marche", trou: "lentement", apres: "dans le jardin.", fausses: ["vite", "souvent", "haut"] },
-  { avant: "Le vent souffle", trou: "fortement", apres: "sur les arbres.", fausses: ["doucement", "rarement", "souvent"] },
+  { avant: "Le vent", trou: "souffle", apres: "sur les arbres.", fausses: ["mange", "lit", "nage"] },
   { avant: "Chaque matin, le coq", trou: "chante", apres: "pour réveiller la ferme.", fausses: ["dort", "mange", "court"] },
-  { avant: "La rivière coule", trou: "paisiblement", apres: "dans la vallée.", fausses: ["vite", "rarement", "partout"] },
+  { avant: "La rivière", trou: "coule", apres: "dans la vallée.", fausses: ["vole", "marche", "chante"] },
   { avant: "Les étoiles", trou: "brillent", apres: "dans la nuit noire.", fausses: ["tombent", "disparaissent", "tournent"] },
   { avant: "La bibliothèque est remplie de", trou: "livres", apres: "passionnants.", fausses: ["jeux", "jouets", "images"] },
 ];
 
 const PHRASES_TROU_CE2 = [
   { avant: "Les chercheurs ont", trou: "découvert", apres: "une nouvelle espèce d'insecte.", fausses: ["inventé", "mangé", "oublié"] },
-  { avant: "La cathédrale a été", trou: "construite", apres: "au Moyen Âge.", fausses: ["détruite", "peinte", "visitée"] },
-  { avant: "Le photographe a", trou: "immortalisé", apres: "ce magnifique coucher de soleil.", fausses: ["raté", "regardé", "oublié"] },
-  { avant: "Les astronautes", trou: "flottent", apres: "en apesanteur dans la station.", fausses: ["dorment", "marchent", "tombent"] },
+  { avant: "La cathédrale a été", trou: "construite", apres: "au Moyen Âge.", fausses: ["mangée", "plantée", "cuisinée"] },
+  { avant: "Le photographe a", trou: "immortalisé", apres: "ce magnifique coucher de soleil.", fausses: ["mangé", "conduit", "planté"] },
+  { avant: "Les astronautes", trou: "flottent", apres: "en apesanteur dans la station.", fausses: ["creusent", "nagent", "pédalent"] },
   { avant: "Les abeilles", trou: "pollinisent", apres: "les fleurs en récoltant le nectar.", fausses: ["mangent", "protègent", "coupent"] },
 ];
 
