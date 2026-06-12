@@ -288,6 +288,13 @@ export function lireTenue() {
   catch { return {}; }
 }
 
+export function lireDecor() {
+  try { return JSON.parse(localStorage.getItem("renard-decor") || "{}"); }
+  catch { return {}; }
+}
+
+export function sauverDecor(d) { localStorage.setItem("renard-decor", JSON.stringify(d)); }
+
 export function sauverTenue(t) { localStorage.setItem("renard-tenue", JSON.stringify(t)); }
 
 export function debloquerAccessoire(id) {

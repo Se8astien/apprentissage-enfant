@@ -730,6 +730,7 @@
       <div class="maison-conteneur">
         <button type="button" class="btn-certificat btn-certificat--principal" id="btn-certificat">🎓 Mon Bulletin</button>
         <div class="maison-renard" id="maison-renard" aria-hidden="true"></div>
+        <div class="maison-decor-row" id="maison-decor-row" aria-hidden="true" hidden></div>
         <div class="maison-infos">
           <p class="maison-nom" id="maison-nom"></p>
           <p class="maison-stade" id="maison-stade"></p>
@@ -770,8 +771,18 @@
             ❤️ Câlin<br><small id="calin-dispo-label">1× par jour</small>
           </button>
         </div>
-        <button type="button" class="btn-dressing" id="btn-dressing">👗 Dressing</button>
+        <div class="maison-boutons-secondaires">
+          <button type="button" class="btn-dressing" id="btn-dressing">👗 Dressing</button>
+          <button type="button" class="btn-dressing" id="btn-decor">🎨 Décorer</button>
+        </div>
       </div>
+    </section>
+
+    <section id="ecran-decor" class="ecran" hidden aria-label="Décoration de la maison">
+      <button type="button" class="btn-retour" id="btn-retour-decor">← Maison</button>
+      <h2 class="dressing-titre">🎨 Décore la maison</h2>
+      <p class="dressing-sous-titre" id="decor-sous-titre"></p>
+      <div class="dressing-grille" id="decor-grille"></div>
     </section>
 
     <section id="ecran-dressing" class="ecran" hidden aria-label="Dressing">

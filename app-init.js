@@ -41,6 +41,7 @@ import {
   afficherStreakHeader,
   montrerMaison,
   montrerDressing,
+  montrerDecor,
   svgRenard,
   getStade,
 } from "./app-renard.js";
@@ -846,6 +847,12 @@ if (btnDressing) btnDressing.addEventListener("click", montrerDressing);
 
 const btnRetourDressing = document.getElementById("btn-retour-dressing");
 if (btnRetourDressing) btnRetourDressing.addEventListener("click", () => montrerMaison(entrerMenu));
+
+const btnDecor = document.getElementById("btn-decor");
+if (btnDecor) btnDecor.addEventListener("click", montrerDecor);
+
+const btnRetourDecor = document.getElementById("btn-retour-decor");
+if (btnRetourDecor) btnRetourDecor.addEventListener("click", () => montrerMaison(entrerMenu));
 
 // -- Modal classe suivante
 const CLASSE_SUIVANTE = { cp: "ce1", ce1: "ce2", ce2: "cm1", cm1: "cm2", cm2: null };
