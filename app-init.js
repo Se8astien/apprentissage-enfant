@@ -87,6 +87,7 @@ import {
   consommerRetourDepuisAventure,
   rafraichirAventureSiOuverte,
 } from "./app-aventure.js";
+import { initDuel } from "./app-duel.js";
 import { chargerQueteActive } from "./app-quests.js";
 import { evaluerBadges } from "./app-social-badges.js";
 import { initialiserArbresCompetences } from "./app-skill-trees.js";
@@ -536,6 +537,13 @@ function brancherOnboardingUI() {
 }
 
 initAventure({
+  montrerJeu,
+  assurerLanceurDansMap,
+  lanceurs,
+  entrerMenu,
+});
+
+initDuel({
   montrerJeu,
   assurerLanceurDansMap,
   lanceurs,
