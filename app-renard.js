@@ -33,6 +33,8 @@ import {
   escapeHtml,
   piegerFocus,
   revelerSeulEcran,
+  lireDecor,
+  sauverDecor,
 } from "./app-state.js";
 
 // Re-export peutFaireCalin so other modules don't need to import app-state directly
@@ -54,6 +56,18 @@ export function getStade(etoiles) {
   if (etoiles < 301) return 3;
   return 4;
 }
+
+// ── Décorations de la maison ─────────────────────────────────────────────────
+export const DECOR_DEF = {
+  "plante":    { nom: "🪴 Plante verte",    emoji: "🪴", cout: 5 },
+  "tableau":   { nom: "🖼️ Tableau",         emoji: "🖼️", cout: 8 },
+  "ballons":   { nom: "🎈 Ballons",         emoji: "🎈", cout: 8 },
+  "guirlande": { nom: "✨ Guirlande",       emoji: "✨", cout: 12 },
+  "tapis":     { nom: "🟫 Tapis",           emoji: "🟫", cout: 12 },
+  "lampe":     { nom: "🪔 Lampe",           emoji: "🪔", cout: 15 },
+  "aquarium":  { nom: "🐠 Aquarium",        emoji: "🐠", cout: 20 },
+  "trophee":   { nom: "🏆 Trophée",         emoji: "🏆", cout: 25 },
+};
 
 // ── Accessoires ───────────────────────────────────────────────────────────────
 export const ACCESSOIRES_DEF = {
@@ -416,6 +430,14 @@ export function montrerMaison(montrerMenuFn) {
 
   const conteneur = elMaison.querySelector(".maison-conteneur");
   if (conteneur) afficherContexteHistoireMaison(conteneur);
+
+  const decorRow = document.getElementById("maison-decor-row");
+  if (decorRow) {
+    const decor = lireDecor();
+    const items = Object.keys(decor).filter((id) => decor[id] && DECOR_DEF[id]);
+    decorRow.innerHTML = items.map((id) => `<span class="maison-decor-item">${DECOR_DEF[id].emoji}</span>`).join("");
+    decorRow.hidden = items.length === 0;
+  }
 }
 
 // ── Dressing screen ───────────────────────────────────────────────────────────
@@ -455,6 +477,55 @@ export function montrerDressing() {
         mettreAJourRenardHeader();
         montrerDressing();
       });
+    }
+    grille.appendChild(carte);
+  });
+}
+
+// ── Décoration screen ────────────────────────────────────────────────────────
+export function montrerDecor() {
+  const elDecor = document.getElementById("ecran-decor");
+  if (!elDecor) return;
+  revelerSeulEcran(elDecor);
+
+  const etoiles = lireEtoiles();
+  const decor = lireDecor();
+
+  document.getElementById("decor-sous-titre").textContent =
+    `Tu as ${etoiles} ⭐ — décore la maison de ${lireNomRenard() || "Foxy"} !`;
+
+  const grille = document.getElementById("decor-grille");
+  grille.innerHTML = "";
+  Object.entries(DECOR_DEF).forEach(([id, def]) => {
+    const possede = !!decor[id];
+    const carte = document.createElement("button");
+    carte.type = "button";
+    carte.className = "dressing-carte" + (possede ? " equipe" : "");
+    carte.innerHTML = `
+      <span class="decor-carte-emoji">${def.emoji}</span>
+      <span class="dressing-carte-nom">${def.nom}</span>
+      <span class="dressing-carte-badge">${possede ? "✓ Installé" : `${def.cout} ⭐`}</span>`;
+    if (possede) {
+      carte.addEventListener("click", () => {
+        const d = lireDecor();
+        delete d[id];
+        sauverDecor(d);
+        montrerDecor();
+      });
+    } else if (etoiles >= def.cout) {
+      carte.addEventListener("click", () => {
+        const e = lireEtoiles() - def.cout;
+        localStorage.setItem(STORAGE_KEY, String(e));
+        if (elTotal) elTotal.textContent = e;
+        const d = lireDecor();
+        d[id] = true;
+        sauverDecor(d);
+        sonAccessoire();
+        confetti({ tier: "sparkle" });
+        montrerDecor();
+      });
+    } else {
+      carte.classList.add("verrouille");
     }
     grille.appendChild(carte);
   });

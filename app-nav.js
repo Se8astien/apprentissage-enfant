@@ -813,6 +813,10 @@ function montrerExplicationVisuelle(correct, reponseEnfant = null) {
     if (expli) {
       visuel.innerHTML = expli;
       el.append(titre, visuel);
+      const etapes = Array.from(visuel.querySelectorAll("div"))
+        .map((d) => d.textContent.trim())
+        .filter(Boolean);
+      ajouterBoutonPasAPas(el, etapes.join(" : "));
       return;
     }
   }
@@ -856,6 +860,62 @@ function montrerExplicationVisuelle(correct, reponseEnfant = null) {
   texte.className = "explication-detail";
   texte.textContent = detail;
   el.append(titre, visuel, texte);
+
+  ajouterBoutonPasAPas(el, detail);
+}
+
+// ── Aide visuelle pas à pas avec le renard ────────────────────────────────────
+function decouperEnEtapes(detail) {
+  return detail
+    .split(/(?:,?\s*puis\s+|\.\s+(?=[A-ZÀ-Ü0-9])|\s*:\s*)/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function ajouterBoutonPasAPas(el, detail) {
+  const etapes = decouperEnEtapes(detail);
+  if (etapes.length < 2) return;
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn-pas-a-pas";
+  btn.textContent = "🦊 Montre-moi pas à pas";
+
+  const zone = document.createElement("div");
+  zone.className = "pas-a-pas-zone";
+  zone.hidden = true;
+
+  let index = 0;
+  function afficherEtape() {
+    zone.innerHTML = "";
+    const ligne = document.createElement("p");
+    ligne.className = "pas-a-pas-ligne";
+    ligne.innerHTML = `<span class="pas-a-pas-renard">🦊</span> <span class="pas-a-pas-texte"></span>`;
+    ligne.querySelector(".pas-a-pas-texte").textContent = etapes[index];
+    zone.appendChild(ligne);
+    void ligne.offsetWidth;
+    ligne.classList.add("pas-a-pas-anim");
+    btn.textContent = index < etapes.length - 1 ? "🦊 Étape suivante" : "🦊 J'ai compris !";
+  }
+
+  btn.addEventListener("click", () => {
+    if (zone.hidden) {
+      zone.hidden = false;
+      index = 0;
+      afficherEtape();
+      return;
+    }
+    if (index < etapes.length - 1) {
+      index++;
+      afficherEtape();
+    } else {
+      zone.hidden = true;
+      index = 0;
+      btn.textContent = "🦊 Montre-moi pas à pas";
+    }
+  });
+
+  el.append(btn, zone);
 }
 
 function cacherAideDouce() {
@@ -1611,13 +1671,17 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     _mettreAJourBarre();
     _mettreAJourComboBadge();
     const bonusEspacement = _verifierBonusEspacement(getJeuCourant());
-    ajouterEtoiles(bonusEspacement ? 2 : 1);
+    const surprise = !bonusEspacement && Math.random() < 0.08;
+    ajouterEtoiles(bonusEspacement || surprise ? 2 : 1);
     if (bonusEspacement) {
       elFeedback.textContent += " ⭐ Bonus révision !";
+    } else if (surprise) {
+      elFeedback.textContent += " 🎁 Surprise ! +1 étoile bonus";
+      track("surprise_bonus", { game_name: getJeuCourant(), niveau: getNiveauCourant() });
     }
     sauverFaim(lireFaim() + 5);
     volerEtoile(bouton);
-    confetti(estGrand() ? { tier: "sparkle", sobre: true } : { tier: "sparkle" });
+    confetti(surprise ? { tier: "burst" } : (estGrand() ? { tier: "sparkle", sobre: true } : { tier: "sparkle" }));
     sonBonne(comboActuel);
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
