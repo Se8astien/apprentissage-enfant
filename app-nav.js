@@ -54,6 +54,7 @@ import { rafraichirBarreFunMenu } from "./app-fun-menu.js";
 import { track } from "./app-analytics.js";
 import { enregistrerReponse } from "./app-analytics-tracking.js";
 import { montrerMenuOuAventureApresRevision } from "./app-aventure.js";
+import { signalerReponseDuel, annulerDuelSiActif } from "./app-duel.js";
 import { sonBonne, sonMauvaise, sonCombo, sonMission, sonAccessoire } from "./app-sons.js";
 
 import {
@@ -1702,6 +1703,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
       track("error_diagnostic", { game_name: jeuEval, niveau: getNiveauCourant(), type: diagnostic.type });
     }
   }
+  signalerReponseDuel(estCorrect);
   verifierRappelRevisionEspacee(jeuActifId());
   verifierObjectifSession();
   mettreAJourProgressEffort();
@@ -1903,6 +1905,7 @@ export function montrerMenu() {
   if (!menu) return;
   const jeuQuitte = jeuActifId() || getJeuCourant();
   if (jeuQuitte) sauverDernierJeuMenu(jeuQuitte);
+  annulerDuelSiActif();
   syncPrefsDepuisStockage();
   resetFeedback();
   stopChrono();

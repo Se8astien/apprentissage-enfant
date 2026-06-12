@@ -147,6 +147,7 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - Montée de difficulté plus fine : tient compte aussi du temps de réponse moyen récent
 - Onboarding rapide : bouton `Commencer vite (Normal)` après choix de classe
 - Navigation jeu mobile : bouton `← Retour au menu` en bas d’écran en plus du bouton haut
+- Mode Duel à deux (`app-duel.js`) : bouton `⚔️ Duel à deux` au menu, deux joueurs alternent sur le même appareil (3 questions chacun), bannière de tour dans l'écran jeu, écran de résultat avec revanche
 - Refonte conversion parent-centric : landing et pages SEO orientées problèmes parents (lecture difficile, concentration, écrans passifs), avec promesse claire, trust immédiat, preuves sociales, FAQ objections et CTA explicites
 
 ## Conventions
