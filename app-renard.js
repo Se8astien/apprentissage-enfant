@@ -82,6 +82,19 @@ export const DECOR_DEF = {
   "lustre":    { nom: "💡 Lustre doré",     emoji: "💡", cout: 80 },
 };
 
+// ── Copains animaux (débloqués par paliers d'étoiles) ─────────────────────────
+export const COPAINS_DEF = {
+  "lapin":      { nom: "Lapin",      emoji: "🐰", seuil: 50 },
+  "ours":       { nom: "Ourson",     emoji: "🐻", seuil: 120 },
+  "pingouin":   { nom: "Pingouin",   emoji: "🐧", seuil: 250 },
+  "hibou":      { nom: "Hibou",      emoji: "🦉", seuil: 400 },
+  "grenouille": { nom: "Grenouille", emoji: "🐸", seuil: 600 },
+};
+
+export function copainsDebloques(etoiles = lireEtoiles()) {
+  return Object.keys(COPAINS_DEF).filter((id) => etoiles >= COPAINS_DEF[id].seuil);
+}
+
 // ── Couleurs du pelage ────────────────────────────────────────────────────────
 // "defaut" suit les couleurs du stade d'évolution ; les autres teignent le pelage.
 export const COULEUR_DEF = {
@@ -478,6 +491,18 @@ export function montrerMaison(montrerMenuFn) {
     decorRow.hidden = items.length === 0;
   }
 
+  const copainsRow = document.getElementById("maison-copains");
+  if (copainsRow) {
+    const copains = copainsDebloques(etoiles);
+    if (copains.length) {
+      copainsRow.innerHTML = `<span class="maison-copains-label">Les copains de ${nom} :</span> ` +
+        copains.map((id) => `<span class="maison-copain" title="${COPAINS_DEF[id].nom}">${COPAINS_DEF[id].emoji}</span>`).join("");
+      copainsRow.hidden = false;
+    } else {
+      copainsRow.hidden = true;
+    }
+  }
+
   const annivEl = document.getElementById("maison-anniv");
   if (annivEl) {
     if (estAnniversaireRenard()) {
@@ -621,6 +646,55 @@ function jouerBalle(montrerMenuFn) {
   reagirRenard("Ouaaah, la balle ! 🎾");
   mettreAJourRenardHeader();
   setTimeout(() => montrerMaison(montrerMenuFn), 950);
+}
+
+// ── Collection / Vitrine ──────────────────────────────────────────────────────
+function sectionCollection(titre, items) {
+  const obtenus = items.filter((it) => it.acquis).length;
+  const cases = items.map((it) =>
+    `<div class="collec-case${it.acquis ? "" : " verrouille"}" title="${escapeHtml(it.nom)}">` +
+    `<span class="collec-emoji">${it.acquis ? it.emoji : "🔒"}</span>` +
+    `<span class="collec-nom">${it.acquis ? escapeHtml(it.nom) : it.indice || "?"}</span>` +
+    `</div>`).join("");
+  return `<div class="collec-section">` +
+    `<h3 class="collec-titre">${titre} <span class="collec-compteur">${obtenus}/${items.length}</span></h3>` +
+    `<div class="collec-grille">${cases}</div></div>`;
+}
+
+export function montrerCollection() {
+  const el = document.getElementById("ecran-collection");
+  if (!el) return;
+  revelerSeulEcran(el);
+
+  const etoiles = lireEtoiles();
+  const decor = lireDecor();
+  const accessoires = lireAccessoires();
+  const couleurChoisie = lireCouleur();
+
+  const decorItems = Object.entries(DECOR_DEF).map(([id, d]) => ({
+    emoji: d.emoji, nom: d.nom.replace(/^\S+\s/, ""), acquis: !!decor[id], indice: `${d.cout} ⭐`,
+  }));
+  const accItems = Object.entries(ACCESSOIRES_DEF).map(([id, d]) => ({
+    emoji: d.nom.match(/\p{Emoji}/u)?.[0] || "🎁", nom: d.nom.replace(/^\S+\s/, ""), acquis: accessoires.includes(id),
+  }));
+  const couleurItems = Object.entries(COULEUR_DEF).map(([id, d]) => ({
+    emoji: "🎨", nom: d.nom, acquis: true, marque: id === couleurChoisie,
+  }));
+  const copainItems = Object.entries(COPAINS_DEF).map(([, d]) => ({
+    emoji: d.emoji, nom: d.nom, acquis: etoiles >= d.seuil, indice: `${d.seuil} ⭐`,
+  }));
+
+  const totalAcquis = [...decorItems, ...accItems, ...copainItems].filter((i) => i.acquis).length;
+  const totalItems = decorItems.length + accItems.length + copainItems.length;
+  const sous = document.getElementById("collection-sous-titre");
+  if (sous) sous.textContent = `Tu as débloqué ${totalAcquis} objets sur ${totalItems} ! Continue pour tout collectionner ✨`;
+
+  const contenu = document.getElementById("collection-contenu");
+  contenu.innerHTML =
+    sectionCollection("🎨 Décorations", decorItems) +
+    sectionCollection("👗 Accessoires", accItems) +
+    sectionCollection("🦊 Couleurs", couleurItems) +
+    sectionCollection("🐾 Copains", copainItems);
 }
 
 // ── Dressing screen ───────────────────────────────────────────────────────────
