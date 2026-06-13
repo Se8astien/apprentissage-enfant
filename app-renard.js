@@ -37,6 +37,13 @@ import {
   sauverDecor,
   lireCouleur,
   sauverCouleur,
+  coffreDispoAujourdhui,
+  marquerCoffreOuvert,
+  joursDepuisDerniereVisite,
+  marquerVisite,
+  estAnniversaireRenard,
+  marquerAnniversaireFete,
+  ageAnneesRenard,
 } from "./app-state.js";
 
 // Re-export peutFaireCalin so other modules don't need to import app-state directly
@@ -304,7 +311,9 @@ function majBulle(faim, bonheur, nom, contexte = {}) {
   const el = document.getElementById("tama-bulle");
   if (!el) return;
   let msg;
-  if (faim < 20)         msg = "J'ai très faim ! 🍎";
+  if (contexte.anniversaire)        msg = `C'est mon anniversaire ! 🎂 Merci ${nom} !`;
+  else if (contexte.retourJours >= 2) msg = `Tu m'as manqué ! 💛 Contente de te revoir !`;
+  else if (faim < 20)    msg = "J'ai très faim ! 🍎";
   else if (bonheur < 20) msg = "Je m'ennuie ! 🎮";
   else if (faim < 40)    msg = "J'aurais bien mangé... 🍎";
   else if (bonheur < 40) msg = "Joue avec moi ! 🎮";
@@ -395,7 +404,10 @@ export function montrerMaison(montrerMenuFn) {
   majJaugeEl("jauge-bonheur-barre", "jauge-bonheur-val", bonheur);
 
   const reste = stade < 4 ? seuils[stade + 1] - etoiles : null;
-  majBulle(faim, bonheur, nom, { streak: lireStreak(), reste });
+  const retourJours = joursDepuisDerniereVisite();
+  const anniversaire = estAnniversaireRenard();
+  majBulle(faim, bonheur, nom, { streak: lireStreak(), reste, retourJours, anniversaire });
+  marquerVisite();
   renderSegments("tama-faim-segments",    faim);
   renderSegments("tama-bonheur-segments", bonheur);
 
@@ -468,6 +480,65 @@ export function montrerMaison(montrerMenuFn) {
     decorRow.innerHTML = items.map((id) => `<span class="maison-decor-item">${DECOR_DEF[id].emoji}</span>`).join("");
     decorRow.hidden = items.length === 0;
   }
+
+  const annivEl = document.getElementById("maison-anniv");
+  if (annivEl) {
+    if (estAnniversaireRenard()) {
+      const age = ageAnneesRenard();
+      annivEl.textContent = `🎂 ${nom} a ${age} an${age > 1 ? "s" : ""} aujourd'hui ! Joyeux anniversaire !`;
+      annivEl.hidden = false;
+      marquerAnniversaireFete();
+      confetti({ tier: "burst" });
+    } else {
+      annivEl.hidden = true;
+    }
+  }
+
+  majCoffre(montrerMenuFn);
+}
+
+// ── Coffre à trésors quotidien ────────────────────────────────────────────────
+const COFFRE_RECOMPENSES = [
+  { type: "etoiles", valeur: 2, txt: "🎁 +2 ⭐ !" },
+  { type: "etoiles", valeur: 3, txt: "🎁 +3 ⭐ !" },
+  { type: "etoiles", valeur: 5, txt: "🎁 Jackpot ! +5 ⭐ !" },
+  { type: "faim",    valeur: 40, txt: "🎁 Un bon repas ! 🍎" },
+  { type: "bonheur", valeur: 40, txt: "🎁 Un jouet rigolo ! 🎈" },
+];
+
+function majCoffre(montrerMenuFn) {
+  const coffre = document.getElementById("maison-coffre");
+  if (!coffre) return;
+  const txt = document.getElementById("maison-coffre-txt");
+
+  if (!coffreDispoAujourdhui()) {
+    coffre.hidden = true;
+    return;
+  }
+  coffre.hidden = false;
+  coffre.disabled = false;
+  coffre.classList.remove("maison-coffre--ouvert");
+  if (txt) txt.textContent = "Cadeau du jour !";
+
+  coffre.onclick = () => {
+    if (!coffreDispoAujourdhui()) return;
+    marquerCoffreOuvert();
+    const r = COFFRE_RECOMPENSES[Math.floor(Math.random() * COFFRE_RECOMPENSES.length)];
+    if (r.type === "etoiles") {
+      _ajouterEtoilesBase(r.valeur);
+    } else if (r.type === "faim") {
+      sauverFaim(lireFaim() + r.valeur);
+    } else {
+      sauverBonheur(lireBonheur() + r.valeur);
+    }
+    if (txt) txt.textContent = r.txt;
+    coffre.classList.add("maison-coffre--ouvert");
+    coffre.disabled = true;
+    sonAccessoire();
+    confetti({ tier: "sparkle" });
+    mettreAJourRenardHeader();
+    setTimeout(() => montrerMaison(montrerMenuFn), 1400);
+  };
 }
 
 // ── Dressing screen ───────────────────────────────────────────────────────────

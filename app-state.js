@@ -278,6 +278,52 @@ export function peutFaireCalin() {
   return d !== localDate();
 }
 
+// ── Coffre à trésors quotidien ────────────────────────────────────────────────
+export function coffreDispoAujourdhui() {
+  return localStorage.getItem("renard-coffre-date") !== localDate();
+}
+
+export function marquerCoffreOuvert() {
+  localStorage.setItem("renard-coffre-date", localDate());
+}
+
+// ── Bon retour & anniversaire ─────────────────────────────────────────────────
+function diffJours(dateStr) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr || "");
+  if (!m) return null;
+  const passe = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const now = new Date();
+  const aujourd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((aujourd - passe) / 86400000);
+}
+
+export function joursDepuisDerniereVisite() {
+  return diffJours(localStorage.getItem("renard-derniere-visite"));
+}
+
+export function marquerVisite() {
+  localStorage.setItem("renard-derniere-visite", localDate());
+}
+
+export function estAnniversaireRenard() {
+  const n = localStorage.getItem(RENARD_NAISSANCE_KEY);
+  if (!n) return false;
+  const today = localDate();
+  if (n.slice(5) !== today.slice(5)) return false;
+  if (n.slice(0, 4) === today.slice(0, 4)) return false;
+  return localStorage.getItem("renard-anniv-fete") !== today.slice(0, 4);
+}
+
+export function marquerAnniversaireFete() {
+  localStorage.setItem("renard-anniv-fete", localDate().slice(0, 4));
+}
+
+export function ageAnneesRenard() {
+  const n = localStorage.getItem(RENARD_NAISSANCE_KEY);
+  if (!n) return 0;
+  return Number(localDate().slice(0, 4)) - Number(n.slice(0, 4));
+}
+
 export function lireAccessoires() {
   try { return JSON.parse(localStorage.getItem("renard-accessoires") || "[]"); }
   catch { return []; }

@@ -2703,6 +2703,57 @@ h1 {
   font-size: 2.4rem;
   line-height: 1;
 }
+.maison-coffre {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.4rem auto 0.6rem;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffd86b, #ff9f43);
+  color: #6b4500;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 159, 67, 0.4);
+  animation: coffre-pulse 1.4s ease-in-out infinite;
+}
+.maison-coffre-emoji {
+  font-size: 1.6rem;
+}
+.maison-coffre--ouvert {
+  animation: none;
+  background: linear-gradient(135deg, #c8f7c5, #7bed9f);
+  color: #1e6b34;
+}
+@keyframes coffre-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@keyframes coffre-secousse {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+.maison-coffre:not(.maison-coffre--ouvert) .maison-coffre-emoji {
+  animation: coffre-secousse 0.8s ease-in-out infinite;
+}
+.maison-anniv {
+  text-align: center;
+  font-weight: 800;
+  color: #c0392b;
+  background: #fff3cd;
+  border-radius: 14px;
+  padding: 0.6rem 1rem;
+  margin: 0 auto 0.6rem;
+  max-width: 320px;
+}
+[data-theme="nuit"] .maison-anniv {
+  background: #3a3320;
+  color: #ffcf6b;
+}
 
 .btn-certificat--principal {
   display: block;
