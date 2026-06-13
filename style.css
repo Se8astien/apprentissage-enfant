@@ -2740,6 +2740,36 @@ h1 {
   margin-bottom: 1rem;
   line-height: 0;
 }
+.dressing-section-titre {
+  font-weight: 700;
+  text-align: center;
+  margin: 1rem 0 0.5rem;
+  color: var(--texte, #5a4632);
+}
+.dressing-couleurs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  max-width: 380px;
+  margin: 0 auto;
+}
+.dressing-couleur {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 3px solid #e0e0e0;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.dressing-couleur:active { transform: scale(0.92); }
+.dressing-couleur.active {
+  border-color: #ffb300;
+  transform: scale(1.12);
+  box-shadow: 0 0 0 3px rgba(255, 179, 0, 0.35);
+}
 .dressing-grille {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
