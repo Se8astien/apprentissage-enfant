@@ -300,7 +300,7 @@ export function afficherStreakHeader(count) {
 }
 
 // ── Tamagotchi helpers ────────────────────────────────────────────────────────
-function majBulle(faim, bonheur, nom) {
+function majBulle(faim, bonheur, nom, contexte = {}) {
   const el = document.getElementById("tama-bulle");
   if (!el) return;
   let msg;
@@ -309,7 +309,12 @@ function majBulle(faim, bonheur, nom) {
   else if (faim < 40)    msg = "J'aurais bien mangé... 🍎";
   else if (bonheur < 40) msg = "Joue avec moi ! 🎮";
   else {
+    const { streak = 0, reste = null, heure = new Date().getHours() } = contexte;
     const pool = ["Je t'aime ! 💜", "Je suis heureux !", "C'est magique ! ✨", `Merci ${nom} !`, "Quelle belle journée !"];
+    if (heure < 10) pool.push("Bonjour ! Prêt à apprendre ? ☀️");
+    else if (heure >= 19) pool.push("Bonsoir ! On joue un peu avant le dodo ? 🌙");
+    if (streak >= 3) pool.push(`${streak} jours de suite, bravo ! 🔥`);
+    if (reste != null && reste <= 5) pool.push("Tu es tout proche de la prochaine évolution ! ✨");
     msg = pool[Math.floor(Math.random() * pool.length)];
   }
   el.textContent = msg;
@@ -389,7 +394,8 @@ export function montrerMaison(montrerMenuFn) {
   majJaugeEl("jauge-faim-barre",    "jauge-faim-val",    faim);
   majJaugeEl("jauge-bonheur-barre", "jauge-bonheur-val", bonheur);
 
-  majBulle(faim, bonheur, nom);
+  const reste = stade < 4 ? seuils[stade + 1] - etoiles : null;
+  majBulle(faim, bonheur, nom, { streak: lireStreak(), reste });
   renderSegments("tama-faim-segments",    faim);
   renderSegments("tama-bonheur-segments", bonheur);
 
