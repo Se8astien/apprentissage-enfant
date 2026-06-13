@@ -128,6 +128,14 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - Accessoires débloquables par streak : chapeau (3j), lunettes (7j), écharpe (30j)
 - Couronne débloquée au stade 4 (renard légendaire)
 - Jauges faim + bonheur diminuent avec le temps, se remplissent en jouant/nourrissant
+- **Couleur du pelage** : 8 teintes au choix dans le dressing (`COULEUR_DEF`, clé `renard-couleur`) ; `"defaut"` suit les couleurs du stade, les autres teignent corps/intérieur
+- **Phrases d'humeur** : la bulle de la maison varie selon l'heure, le streak, la proximité de la prochaine évolution, l'anniversaire et le retour après absence
+- **Coffre à trésors quotidien** : ouvrable 1×/jour (`coffreDispoAujourdhui`/`marquerCoffreOuvert`), récompense aléatoire (étoiles/repas/jouet) — incite au retour quotidien
+- **Anniversaire** : bannière + confettis au jour anniversaire de l'adoption, 1×/an (`estAnniversaireRenard`) ; message « Tu m'as manqué ! » après 2 jours+ d'absence (`joursDepuisDerniereVisite`)
+- **Nourrir** : choix de 5 aliments (`ALIMENTS_DEF`) au coût/effet variables, chacun avec une réaction du renard (overlay `#nourrir-overlay`)
+- **Jouer à la balle** : interaction gratuite qui fait sauter le renard et augmente le bonheur
+- **Copains animaux** : débloqués par paliers d'étoiles (`COPAINS_DEF` : 🐰 50, 🐻 120, 🐧 250, 🦉 400, 🐸 600), affichés dans la maison
+- **Écran Collection** (`montrerCollection`, `#ecran-collection`) : vitrine de tous les objets (décorations, accessoires, couleurs, copains) avec état débloqué/verrouillé et compteur par section
 
 ## Gamification (app-gamification.js)
 
@@ -148,6 +156,9 @@ afficherChoix(props, (val, btn) => apresReponse(val, btn, getBonneReponse()));
 - Onboarding rapide : bouton `Commencer vite (Normal)` après choix de classe
 - Navigation jeu mobile : bouton `← Retour au menu` en bas d’écran en plus du bouton haut
 - Mode Duel à deux (`app-duel.js`) : bouton `⚔️ Duel à deux` au menu, deux joueurs alternent sur le même appareil (3 questions chacun), bannière de tour dans l'écran jeu, écran de résultat avec revanche
+- Décoration de la maison : boutique `🎨 Décorer` (`DECOR_DEF`, clé `renard-decor`) pour acheter des objets avec les étoiles, affichés dans la maison
+- Aide visuelle pas à pas : après une erreur, bouton `🦊 Montre-moi pas à pas` qui révèle la méthode étape par étape
+- Bonus surprise : ~8 % de chance d'une étoile bonus avec confettis sur une bonne réponse (événement `surprise_bonus`)
 - Refonte conversion parent-centric : landing et pages SEO orientées problèmes parents (lecture difficile, concentration, écrans passifs), avec promesse claire, trust immédiat, preuves sociales, FAQ objections et CTA explicites
 
 ## Conventions
