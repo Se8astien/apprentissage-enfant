@@ -295,6 +295,10 @@ export function lireDecor() {
 
 export function sauverDecor(d) { localStorage.setItem("renard-decor", JSON.stringify(d)); }
 
+export function lireCouleur() { return localStorage.getItem("renard-couleur") || "defaut"; }
+
+export function sauverCouleur(c) { localStorage.setItem("renard-couleur", c); }
+
 export function sauverTenue(t) { localStorage.setItem("renard-tenue", JSON.stringify(t)); }
 
 export function debloquerAccessoire(id) {

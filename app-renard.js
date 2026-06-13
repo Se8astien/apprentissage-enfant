@@ -35,6 +35,8 @@ import {
   revelerSeulEcran,
   lireDecor,
   sauverDecor,
+  lireCouleur,
+  sauverCouleur,
 } from "./app-state.js";
 
 // Re-export peutFaireCalin so other modules don't need to import app-state directly
@@ -73,6 +75,19 @@ export const DECOR_DEF = {
   "lustre":    { nom: "💡 Lustre doré",     emoji: "💡", cout: 80 },
 };
 
+// ── Couleurs du pelage ────────────────────────────────────────────────────────
+// "defaut" suit les couleurs du stade d'évolution ; les autres teignent le pelage.
+export const COULEUR_DEF = {
+  "defaut":  { nom: "Origine",  apercu: "#e8872a", corps: null,      interne: null },
+  "roux":    { nom: "Roux vif", apercu: "#e8872a", corps: "#e8872a", interne: "#f5c07a" },
+  "brun":    { nom: "Brun",     apercu: "#8d6e63", corps: "#8d6e63", interne: "#d7ccc8" },
+  "gris":    { nom: "Gris",     apercu: "#95a5a6", corps: "#95a5a6", interne: "#dfe6e9" },
+  "blanc":   { nom: "Blanc",    apercu: "#ecf0f1", corps: "#ecf0f1", interne: "#ffffff" },
+  "violet":  { nom: "Violet",   apercu: "#9c59d1", corps: "#9c59d1", interne: "#c99ef0" },
+  "bleu":    { nom: "Bleu",     apercu: "#5b8def", corps: "#5b8def", interne: "#b8cdfb" },
+  "rose":    { nom: "Rose",     apercu: "#ff80ab", corps: "#ff80ab", interne: "#ffc1d8" },
+};
+
 // ── Accessoires ───────────────────────────────────────────────────────────────
 export const ACCESSOIRES_DEF = {
   "chapeau-base":  { nom: "🎩 Chapeau",    svg: (t) => `<rect x="30" y="8" width="40" height="6" rx="3" fill="#2d3436"/><rect x="22" y="13" width="56" height="5" rx="2.5" fill="#2d3436"/>` },
@@ -87,7 +102,12 @@ export const ACCESSOIRES_DEF = {
 // ── SVG renard ────────────────────────────────────────────────────────────────
 export function svgRenard(stade, taille, opts) {
   const triste = opts && opts.triste;
-  const s = RENARD_STADES[Math.max(0, Math.min(4, stade))];
+  const base = RENARD_STADES[Math.max(0, Math.min(4, stade))];
+  const couleurId = (opts && opts.couleur != null) ? opts.couleur : lireCouleur();
+  const teinte = COULEUR_DEF[couleurId];
+  const s = (teinte && teinte.corps)
+    ? { ...base, corps: teinte.corps, interne: teinte.interne }
+    : base;
   const t = taille || 80;
   const h = Math.round(t * 1.1);
 
@@ -460,6 +480,27 @@ export function montrerDressing() {
 
   document.getElementById("dressing-preview").innerHTML =
     svgRenard(stade, 120, { accessoires: Object.keys(tenue) });
+
+  const couleurs = document.getElementById("dressing-couleurs");
+  if (couleurs) {
+    const choisie = lireCouleur();
+    couleurs.innerHTML = "";
+    Object.entries(COULEUR_DEF).forEach(([id, def]) => {
+      const swatch = document.createElement("button");
+      swatch.type = "button";
+      swatch.className = "dressing-couleur" + (id === choisie ? " active" : "");
+      swatch.style.background = def.apercu;
+      swatch.title = def.nom;
+      swatch.setAttribute("aria-label", def.nom);
+      swatch.setAttribute("aria-pressed", id === choisie ? "true" : "false");
+      swatch.addEventListener("click", () => {
+        sauverCouleur(id);
+        mettreAJourRenardHeader();
+        montrerDressing();
+      });
+      couleurs.appendChild(swatch);
+    });
+  }
 
   const grille = document.getElementById("dressing-grille");
   grille.innerHTML = "";
