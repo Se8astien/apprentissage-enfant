@@ -11,6 +11,7 @@ const CHARGEURS = {
   comprehension: () => import("./games-comprehension.js"),
   orthographe: () => import("./games-orthographe.js"),
   p2: () => import("./games-p2.js"),
+  geo: () => import("./games-geo.js"),
 };
 
 const JEU_SPEC = {
@@ -106,6 +107,7 @@ const JEU_SPEC = {
   ponctuationPuzzle: ["p2", "lancerPonctuationPuzzle"],
   amisDesmots: ["p2", "lancerAmisDesmots"],
   comprehensionAudio: ["p2", "lancerComprehensionAudio"],
+  geographie: ["geo", "lancerGeographie"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
