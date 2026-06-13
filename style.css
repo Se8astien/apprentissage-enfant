@@ -5612,6 +5612,94 @@ h4.params-menu-aide-titre {
   25% { transform: rotate(-4deg) scale(1.02); }
   75% { transform: rotate(4deg) scale(1.02); }
 }
+.maison-renard { position: relative; }
+.maison-renard--saute {
+  animation: maisonRenardSaute 0.85s ease;
+}
+@keyframes maisonRenardSaute {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-26px) scale(1.04); }
+  55% { transform: translateY(0) scale(0.98); }
+  70% { transform: translateY(-12px); }
+}
+.balle-jouet {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  font-size: 2rem;
+  pointer-events: none;
+  animation: balleRebond 0.9s ease-in-out;
+}
+@keyframes balleRebond {
+  0%   { transform: translate(60px, -40px) rotate(0); opacity: 0; }
+  20%  { opacity: 1; }
+  50%  { transform: translate(-50%, 60px) rotate(360deg); }
+  100% { transform: translate(-120px, -30px) rotate(540deg); opacity: 0; }
+}
+
+/* Overlay choix d'aliments */
+.nourrir-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 600;
+  padding: 1rem;
+}
+.nourrir-carte {
+  background: #fff;
+  border-radius: 22px;
+  padding: 1.3rem 1.1rem;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+.nourrir-titre {
+  font-weight: 800;
+  margin: 0 0 0.9rem;
+  font-size: 1.1rem;
+  color: #5a4632;
+}
+.nourrir-grille {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+.nourrir-aliment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  background: #fff8ec;
+  border: 3px solid #ffe0a3;
+  border-radius: 16px;
+  padding: 0.7rem 0.3rem;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.nourrir-aliment:active { transform: scale(0.94); }
+.nourrir-aliment:disabled { opacity: 0.4; cursor: not-allowed; }
+.nourrir-aliment-emoji { font-size: 1.9rem; line-height: 1; }
+.nourrir-aliment-nom { font-size: 0.8rem; font-weight: 700; color: #5a4632; }
+.nourrir-aliment-cout { font-size: 0.75rem; color: #c97b00; font-weight: 700; }
+.nourrir-fermer {
+  margin-top: 1rem;
+  background: #eee;
+  border: none;
+  border-radius: 14px;
+  padding: 0.6rem 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #555;
+}
+[data-theme="nuit"] .nourrir-carte { background: #2b241f; }
+[data-theme="nuit"] .nourrir-titre,
+[data-theme="nuit"] .nourrir-aliment-nom { color: #f0e6d8; }
+[data-theme="nuit"] .nourrir-aliment { background: #3a322a; border-color: #5a4a36; }
+[data-theme="nuit"] .nourrir-fermer { background: #444; color: #ddd; }
 
 #ecran-aventure {
   padding: 0 1rem 2rem;

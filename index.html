@@ -770,10 +770,13 @@
         </div>
         <div class="maison-actions">
           <button type="button" class="btn-action-renard" id="btn-nourrir">
-            🍎 Nourrir<br><small>−2 ⭐</small>
+            🍎 Nourrir<br><small>choisir</small>
           </button>
           <button type="button" class="btn-action-renard" id="btn-calin">
             ❤️ Câlin<br><small id="calin-dispo-label">1× par jour</small>
+          </button>
+          <button type="button" class="btn-action-renard" id="btn-balle">
+            🎾 Jouer<br><small>à la balle</small>
           </button>
         </div>
         <div class="maison-boutons-secondaires">
@@ -782,6 +785,14 @@
         </div>
       </div>
     </section>
+
+    <div id="nourrir-overlay" class="nourrir-overlay" hidden role="dialog" aria-modal="true" aria-label="Choisir un aliment">
+      <div class="nourrir-carte">
+        <p class="nourrir-titre">Que veux-tu donner à <span id="nourrir-nom">Foxy</span> ?</p>
+        <div class="nourrir-grille" id="nourrir-grille"></div>
+        <button type="button" class="nourrir-fermer" id="nourrir-fermer">Fermer</button>
+      </div>
+    </div>
 
     <section id="ecran-decor" class="ecran" hidden aria-label="Décoration de la maison">
       <button type="button" class="btn-retour" id="btn-retour-decor">← Maison</button>

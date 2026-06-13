@@ -439,17 +439,14 @@ export function montrerMaison(montrerMenuFn) {
   }
 
   const btnNourrir = document.getElementById("btn-nourrir");
-  btnNourrir.disabled = etoiles < 2 || faim >= 95;
-  btnNourrir.onclick = () => {
-    if (lireEtoiles() < 2) return;
-    flotterEmoji("🍎", btnNourrir);
-    const t = lireEtoiles() - 2;
-    localStorage.setItem(STORAGE_KEY, String(t));
-    elTotal.textContent = t;
-    sauverFaim(lireFaim() + 30);
-    mettreAJourRenardHeader();
-    montrerMaison(montrerMenuFn);
-  };
+  btnNourrir.disabled = faim >= 95;
+  btnNourrir.onclick = () => ouvrirNourrir(montrerMenuFn);
+
+  const btnBalle = document.getElementById("btn-balle");
+  if (btnBalle) {
+    btnBalle.disabled = bonheur >= 98;
+    btnBalle.onclick = () => jouerBalle(montrerMenuFn);
+  }
 
   const btnCalin = document.getElementById("btn-calin");
   const peutCalin = peutFaireCalin();
@@ -539,6 +536,91 @@ function majCoffre(montrerMenuFn) {
     mettreAJourRenardHeader();
     setTimeout(() => montrerMaison(montrerMenuFn), 1400);
   };
+}
+
+// ── Nourrir : choix d'aliments ────────────────────────────────────────────────
+export const ALIMENTS_DEF = {
+  "carotte": { emoji: "🥕", nom: "Carotte", cout: 1, faim: 15, bonheur: 0,  reaction: "Crounch crounch ! 🥕" },
+  "pomme":   { emoji: "🍎", nom: "Pomme",   cout: 2, faim: 30, bonheur: 0,  reaction: "Miam, bien croquant !" },
+  "poisson": { emoji: "🐟", nom: "Poisson", cout: 3, faim: 40, bonheur: 5,  reaction: "Mon préféré ! 🐟" },
+  "pizza":   { emoji: "🍕", nom: "Pizza",   cout: 4, faim: 50, bonheur: 5,  reaction: "Une pizza ? Trop bon !" },
+  "gateau":  { emoji: "🍰", nom: "Gâteau",  cout: 4, faim: 35, bonheur: 15, reaction: "Un délice sucré ! 😋" },
+};
+
+function fermerNourrir() {
+  const ov = document.getElementById("nourrir-overlay");
+  if (ov) ov.hidden = true;
+}
+
+function ouvrirNourrir(montrerMenuFn) {
+  const ov = document.getElementById("nourrir-overlay");
+  if (!ov) return;
+  const nom = lireNomRenard() || "Foxy";
+  const nomEl = document.getElementById("nourrir-nom");
+  if (nomEl) nomEl.textContent = nom;
+
+  if (ov.dataset.amWired !== "1") {
+    ov.dataset.amWired = "1";
+    const btnFermer = document.getElementById("nourrir-fermer");
+    if (btnFermer) btnFermer.addEventListener("click", fermerNourrir);
+    ov.addEventListener("click", (e) => { if (e.target === ov) fermerNourrir(); });
+  }
+
+  const grille = document.getElementById("nourrir-grille");
+  grille.innerHTML = "";
+  Object.entries(ALIMENTS_DEF).forEach(([id, def]) => {
+    const carte = document.createElement("button");
+    carte.type = "button";
+    carte.className = "nourrir-aliment";
+    carte.disabled = lireEtoiles() < def.cout;
+    carte.setAttribute("aria-label", `${def.nom}, ${def.cout} étoiles`);
+    carte.innerHTML = `<span class="nourrir-aliment-emoji">${def.emoji}</span>` +
+      `<span class="nourrir-aliment-nom">${def.nom}</span>` +
+      `<span class="nourrir-aliment-cout">${def.cout} ⭐</span>`;
+    carte.addEventListener("click", () => {
+      if (lireEtoiles() < def.cout) return;
+      _ajouterEtoilesBase(-def.cout);
+      sauverFaim(lireFaim() + def.faim);
+      if (def.bonheur) sauverBonheur(lireBonheur() + def.bonheur);
+      reagirRenard(def.reaction);
+      fermerNourrir();
+      mettreAJourRenardHeader();
+      montrerMaison(montrerMenuFn);
+    });
+    grille.appendChild(carte);
+  });
+
+  ov.hidden = false;
+}
+
+function reagirRenard(message) {
+  const bulle = document.getElementById("tama-bulle");
+  if (bulle) bulle.textContent = message;
+  const mr = document.getElementById("maison-renard");
+  if (mr) {
+    mr.classList.remove("maison-renard--wiggle");
+    void mr.offsetWidth;
+    mr.classList.add("maison-renard--wiggle");
+  }
+}
+
+// ── Jouer à la balle (interaction libre) ──────────────────────────────────────
+function jouerBalle(montrerMenuFn) {
+  const mr = document.getElementById("maison-renard");
+  if (mr) {
+    const balle = document.createElement("div");
+    balle.className = "balle-jouet";
+    balle.textContent = "🎾";
+    mr.appendChild(balle);
+    mr.classList.remove("maison-renard--saute");
+    void mr.offsetWidth;
+    mr.classList.add("maison-renard--saute");
+    setTimeout(() => balle.remove(), 900);
+  }
+  sauverBonheur(lireBonheur() + 8);
+  reagirRenard("Ouaaah, la balle ! 🎾");
+  mettreAJourRenardHeader();
+  setTimeout(() => montrerMaison(montrerMenuFn), 950);
 }
 
 // ── Dressing screen ───────────────────────────────────────────────────────────
