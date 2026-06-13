@@ -358,6 +358,13 @@ const PAR_JEU = {
     cm1: "Indices plus subtils",
     cm2: "Lexique thématique avancé",
   },
+  geographie: {
+    cp: "Reconnaître des drapeaux",
+    ce1: "Drapeaux et régions de France",
+    ce2: "Drapeaux, capitales, régions",
+    cm1: "Capitales et régions du monde",
+    cm2: "Géographie avancée",
+  },
   anglais: {
     cp: "Mots très simples",
     ce1: "Lexique famille école",
