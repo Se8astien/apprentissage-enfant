@@ -67,6 +67,10 @@ export const DECOR_DEF = {
   "lampe":     { nom: "🪔 Lampe",           emoji: "🪔", cout: 15 },
   "aquarium":  { nom: "🐠 Aquarium",        emoji: "🐠", cout: 20 },
   "trophee":   { nom: "🏆 Trophée",         emoji: "🏆", cout: 25 },
+  "piano":     { nom: "🎹 Piano",           emoji: "🎹", cout: 35 },
+  "telescope": { nom: "🔭 Télescope",       emoji: "🔭", cout: 45 },
+  "cheminee":  { nom: "🔥 Cheminée",        emoji: "🔥", cout: 60 },
+  "lustre":    { nom: "💡 Lustre doré",     emoji: "💡", cout: 80 },
 };
 
 // ── Accessoires ───────────────────────────────────────────────────────────────
