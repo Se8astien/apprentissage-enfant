@@ -37,6 +37,8 @@ import {
   sauverDecor,
   lireCouleur,
   sauverCouleur,
+  lireMotif,
+  sauverMotif,
   coffreDispoAujourdhui,
   marquerCoffreOuvert,
   joursDepuisDerniereVisite,
@@ -108,6 +110,28 @@ export const COULEUR_DEF = {
   "rose":    { nom: "Rose",     apercu: "#ff80ab", corps: "#ff80ab", interne: "#ffc1d8" },
 };
 
+// ── Motifs du pelage ──────────────────────────────────────────────────────────
+export const MOTIF_DEF = {
+  "aucun":   { nom: "Uni",     apercu: "—", svg: () => "" },
+  "taches":  { nom: "Taches",  apercu: "🐆", svg: (couleur) => `
+    <circle cx="33" cy="55" r="4" fill="${couleur}" opacity="0.35"/>
+    <circle cx="62" cy="50" r="3.2" fill="${couleur}" opacity="0.35"/>
+    <circle cx="50" cy="80" r="4.5" fill="${couleur}" opacity="0.35"/>
+    <circle cx="68" cy="78" r="3" fill="${couleur}" opacity="0.35"/>` },
+  "rayures": { nom: "Rayures", apercu: "🐯", svg: (couleur) => `
+    <path d="M22,60 Q50,68 78,60" stroke="${couleur}" stroke-width="3" fill="none" opacity="0.35"/>
+    <path d="M20,72 Q50,82 80,72" stroke="${couleur}" stroke-width="3" fill="none" opacity="0.35"/>
+    <path d="M26,88 Q50,96 74,88" stroke="${couleur}" stroke-width="3" fill="none" opacity="0.35"/>` },
+  "etoiles": { nom: "Étoiles", apercu: "✨", svg: (couleur) => `
+    <text x="30" y="58" font-size="9" opacity="0.7">✨</text>
+    <text x="64" y="52" font-size="7" opacity="0.7">✨</text>
+    <text x="58" y="90" font-size="8" opacity="0.7">✨</text>` },
+  "coeurs":  { nom: "Cœurs",   apercu: "💗", svg: () => `
+    <text x="28" y="58" font-size="9" opacity="0.75">💗</text>
+    <text x="64" y="52" font-size="7" opacity="0.75">💗</text>
+    <text x="58" y="90" font-size="8" opacity="0.75">💗</text>` },
+};
+
 // ── Accessoires ───────────────────────────────────────────────────────────────
 export const ACCESSOIRES_DEF = {
   "chapeau-base":  { nom: "🎩 Chapeau",    svg: (t) => `<rect x="30" y="8" width="40" height="6" rx="3" fill="#2d3436"/><rect x="22" y="13" width="56" height="5" rx="2.5" fill="#2d3436"/>` },
@@ -171,6 +195,10 @@ export function svgRenard(stade, taille, opts) {
   const tenue = (opts && opts.accessoires != null) ? opts.accessoires : Object.keys(lireTenue());
   const accSvg = tenue.map(id => ACCESSOIRES_DEF[id] ? ACCESSOIRES_DEF[id].svg(t) : "").join("");
 
+  const motifId = (opts && opts.motif != null) ? opts.motif : lireMotif();
+  const motif = MOTIF_DEF[motifId];
+  const motifSvg = motif ? motif.svg(s.interne) : "";
+
   return `<svg width="${t}" height="${h}" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
   ${couronne}${particules}
   <polygon points="16,66 28,22 45,60" fill="${s.corps}"/>
@@ -190,6 +218,7 @@ export function svgRenard(stade, taille, opts) {
   ${bouche}
   <circle cx="27" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
   <circle cx="73" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
+  ${motifSvg}
   ${accSvg}
 </svg>`;
 }
@@ -670,6 +699,7 @@ export function montrerCollection() {
   const decor = lireDecor();
   const accessoires = lireAccessoires();
   const couleurChoisie = lireCouleur();
+  const motifChoisi = lireMotif();
 
   const decorItems = Object.entries(DECOR_DEF).map(([id, d]) => ({
     emoji: d.emoji, nom: d.nom.replace(/^\S+\s/, ""), acquis: !!decor[id], indice: `${d.cout} ⭐`,
@@ -679,6 +709,9 @@ export function montrerCollection() {
   }));
   const couleurItems = Object.entries(COULEUR_DEF).map(([id, d]) => ({
     emoji: "🎨", nom: d.nom, acquis: true, marque: id === couleurChoisie,
+  }));
+  const motifItems = Object.entries(MOTIF_DEF).map(([id, d]) => ({
+    emoji: d.apercu === "—" ? "✨" : d.apercu, nom: d.nom, acquis: true, marque: id === motifChoisi,
   }));
   const copainItems = Object.entries(COPAINS_DEF).map(([, d]) => ({
     emoji: d.emoji, nom: d.nom, acquis: etoiles >= d.seuil, indice: `${d.seuil} ⭐`,
@@ -694,6 +727,7 @@ export function montrerCollection() {
     sectionCollection("🎨 Décorations", decorItems) +
     sectionCollection("👗 Accessoires", accItems) +
     sectionCollection("🦊 Couleurs", couleurItems) +
+    sectionCollection("✨ Motifs", motifItems) +
     sectionCollection("🐾 Copains", copainItems);
 }
 
@@ -732,6 +766,27 @@ export function montrerDressing() {
         montrerDressing();
       });
       couleurs.appendChild(swatch);
+    });
+  }
+
+  const motifs = document.getElementById("dressing-motifs");
+  if (motifs) {
+    const choisi = lireMotif();
+    motifs.innerHTML = "";
+    Object.entries(MOTIF_DEF).forEach(([id, def]) => {
+      const swatch = document.createElement("button");
+      swatch.type = "button";
+      swatch.className = "dressing-couleur" + (id === choisi ? " active" : "");
+      swatch.textContent = def.apercu;
+      swatch.title = def.nom;
+      swatch.setAttribute("aria-label", def.nom);
+      swatch.setAttribute("aria-pressed", id === choisi ? "true" : "false");
+      swatch.addEventListener("click", () => {
+        sauverMotif(id);
+        mettreAJourRenardHeader();
+        montrerDressing();
+      });
+      motifs.appendChild(swatch);
     });
   }
 
