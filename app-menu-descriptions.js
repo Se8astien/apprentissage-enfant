@@ -372,6 +372,13 @@ const PAR_JEU = {
     cm1: "Corps, planètes, états de l'eau",
     cm2: "Cycles, système solaire, vivant",
   },
+  histoire: {
+    cp: "Hier, aujourd'hui, autrefois",
+    ce1: "La vie à la Préhistoire",
+    ce2: "Antiquité et Moyen Âge",
+    cm1: "Grandes périodes et personnages",
+    cm2: "Dates clés et époque moderne",
+  },
   anglais: {
     cp: "Mots très simples",
     ce1: "Lexique famille école",

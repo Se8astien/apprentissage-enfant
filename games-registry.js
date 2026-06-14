@@ -13,6 +13,7 @@ const CHARGEURS = {
   p2: () => import("./games-p2.js"),
   geo: () => import("./games-geo.js"),
   sciences: () => import("./games-sciences.js"),
+  histoire: () => import("./games-histoire.js"),
 };
 
 const JEU_SPEC = {
@@ -110,6 +111,7 @@ const JEU_SPEC = {
   comprehensionAudio: ["p2", "lancerComprehensionAudio"],
   geographie: ["geo", "lancerGeographie"],
   sciences: ["sciences", "lancerSciences"],
+  histoire: ["histoire", "lancerHistoire"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
