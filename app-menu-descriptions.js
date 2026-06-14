@@ -372,6 +372,13 @@ const PAR_JEU = {
     cm1: "Corps, planètes, états de l'eau",
     cm2: "Cycles, système solaire, vivant",
   },
+  dessin: {
+    cp: "Grilles 2×2, deux couleurs",
+    ce1: "Grilles 2×2, trois couleurs",
+    ce2: "Grilles 3×3",
+    cm1: "Grilles 3×3, quatre couleurs",
+    cm2: "Grilles 4×4",
+  },
   histoire: {
     cp: "Hier, aujourd'hui, autrefois",
     ce1: "La vie à la Préhistoire",

@@ -14,6 +14,7 @@ const CHARGEURS = {
   geo: () => import("./games-geo.js"),
   sciences: () => import("./games-sciences.js"),
   histoire: () => import("./games-histoire.js"),
+  dessin: () => import("./games-dessin.js"),
 };
 
 const JEU_SPEC = {
@@ -112,6 +113,7 @@ const JEU_SPEC = {
   geographie: ["geo", "lancerGeographie"],
   sciences: ["sciences", "lancerSciences"],
   histoire: ["histoire", "lancerHistoire"],
+  dessin: ["dessin", "lancerDessin"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
