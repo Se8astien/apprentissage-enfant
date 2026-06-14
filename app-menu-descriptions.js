@@ -365,6 +365,13 @@ const PAR_JEU = {
     cm1: "Capitales et régions du monde",
     cm2: "Géographie avancée",
   },
+  sciences: {
+    cp: "Observer la nature et les animaux",
+    ce1: "Saisons, corps, vivant",
+    ce2: "Fonctions du vivant et matière",
+    cm1: "Corps, planètes, états de l'eau",
+    cm2: "Cycles, système solaire, vivant",
+  },
   anglais: {
     cp: "Mots très simples",
     ce1: "Lexique famille école",
