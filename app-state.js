@@ -349,6 +349,14 @@ export function lireMotif() { return localStorage.getItem("renard-motif") || "au
 
 export function sauverMotif(m) { localStorage.setItem("renard-motif", m); }
 
+export function lireFond() { return localStorage.getItem("renard-fond") || "defaut"; }
+
+export function sauverFond(f) { localStorage.setItem("renard-fond", f); }
+
+export function lireExpression() { return localStorage.getItem("renard-expression") || "mignons"; }
+
+export function sauverExpression(e) { localStorage.setItem("renard-expression", e); }
+
 export function sauverTenue(t) { localStorage.setItem("renard-tenue", JSON.stringify(t)); }
 
 export function debloquerAccessoire(id) {

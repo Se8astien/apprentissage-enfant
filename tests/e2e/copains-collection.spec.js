@@ -46,8 +46,8 @@ test("la collection liste les objets avec leur état débloqué/verrouillé", as
   await page.locator("#btn-collection").click();
   await expect(page.locator("#ecran-collection")).toBeVisible();
 
-  // 5 sections (décor, accessoires, couleurs, motifs, copains)
-  await expect(page.locator(".collec-section")).toHaveCount(5);
+  // 7 sections (décor, accessoires, couleurs, motifs, fonds, expressions, copains)
+  await expect(page.locator(".collec-section")).toHaveCount(7);
 
   // Au moins un objet verrouillé et un débloqué existent
   expect(await page.locator(".collec-case").count()).toBeGreaterThan(5);

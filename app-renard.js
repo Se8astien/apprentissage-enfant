@@ -39,6 +39,10 @@ import {
   sauverCouleur,
   lireMotif,
   sauverMotif,
+  lireFond,
+  sauverFond,
+  lireExpression,
+  sauverExpression,
   coffreDispoAujourdhui,
   marquerCoffreOuvert,
   joursDepuisDerniereVisite,
@@ -132,8 +136,57 @@ export const MOTIF_DEF = {
     <text x="58" y="90" font-size="8" opacity="0.75">💗</text>` },
 };
 
+// ── Fond de la maison ─────────────────────────────────────────────────────────
+export const FOND_DEF = {
+  "defaut":  { nom: "Origine", apercu: "🏠", style: "" },
+  "ciel":    { nom: "Ciel",    apercu: "☁️", style: "linear-gradient(180deg, #aee1f9 0%, #f4fbff 100%)" },
+  "foret":   { nom: "Forêt",   apercu: "🌳", style: "linear-gradient(180deg, #c8e6c9 0%, #f1f8e9 100%)" },
+  "nuit":    { nom: "Nuit",    apercu: "🌙", style: "linear-gradient(180deg, #2c3e50 0%, #6c7a89 100%)" },
+  "plage":   { nom: "Plage",   apercu: "🏖️", style: "linear-gradient(180deg, #a0e7ff 0%, #ffe9b3 100%)" },
+  "arcenciel": { nom: "Arc-en-ciel", apercu: "🌈", style: "linear-gradient(135deg, #ffd1dc 0%, #fff3b0 35%, #c1f0d1 65%, #b3e5ff 100%)" },
+};
+
+// ── Expressions du visage ────────────────────────────────────────────────────
+export const EXPRESSION_DEF = {
+  "mignons":   { nom: "😊 Mignons", apercu: "😊" },
+  "etincelants": { nom: "✨ Étincelants", apercu: "✨" },
+  "coeurs":    { nom: "😍 Cœurs", apercu: "😍" },
+};
+
+function yeuxSvg(expression, yeuxCouleur, triste) {
+  if (triste || expression === "mignons") {
+    return `
+  <circle cx="37" cy="63" r="7.5" fill="white"/>
+  <circle cx="63" cy="63" r="7.5" fill="white"/>
+  <circle cx="39" cy="64" r="4.5" fill="${yeuxCouleur}"/>
+  <circle cx="65" cy="64" r="4.5" fill="${yeuxCouleur}"/>
+  <circle cx="41" cy="62" r="1.8" fill="white"/>
+  <circle cx="67" cy="62" r="1.8" fill="white"/>`;
+  }
+  if (expression === "etincelants") {
+    return `
+  <circle cx="37" cy="63" r="7.5" fill="white"/>
+  <circle cx="63" cy="63" r="7.5" fill="white"/>
+  <circle cx="39" cy="64" r="4.5" fill="${yeuxCouleur}"/>
+  <circle cx="65" cy="64" r="4.5" fill="${yeuxCouleur}"/>
+  <text x="41" y="61" font-size="6">✨</text>
+  <text x="67" y="61" font-size="6">✨</text>`;
+  }
+  if (expression === "coeurs") {
+    return `
+  <text x="33" y="69" font-size="13">💗</text>
+  <text x="59" y="69" font-size="13">💗</text>`;
+  }
+  return "";
+}
+
 // ── Accessoires ───────────────────────────────────────────────────────────────
+export const ACCESSOIRES_COSMETIQUES = ["noeud", "bandana", "medaillon"];
+
 export const ACCESSOIRES_DEF = {
+  "noeud":     { nom: "🎀 Nœud",     svg: () => `<path d="M44,32 Q38,26 32,30 Q38,34 44,32 Q50,28 44,32 Q38,36 32,34 Q38,38 44,32" fill="#ff4d6d"/><circle cx="44" cy="32" r="2.2" fill="#c9184a"/>` },
+  "bandana":   { nom: "🧡 Bandana",  svg: () => `<path d="M22,55 Q50,48 78,55 L78,60 Q50,53 22,60 Z" fill="#ff9f1c"/><path d="M50,55 L46,64 L54,64 Z" fill="#ff9f1c"/>` },
+  "medaillon": { nom: "🔶 Médaillon", svg: () => `<path d="M44,84 L56,84 L50,96 Z" fill="#cdb4f9"/><circle cx="50" cy="86" r="4.5" fill="#ffd700" stroke="#b8860b" stroke-width="1"/>` },
   "chapeau-base":  { nom: "🎩 Chapeau",    svg: (t) => `<rect x="30" y="8" width="40" height="6" rx="3" fill="#2d3436"/><rect x="22" y="13" width="56" height="5" rx="2.5" fill="#2d3436"/>` },
   "lunettes-base": { nom: "👓 Lunettes",   svg: (t) => `<circle cx="37" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><circle cx="63" cy="63" r="8.5" fill="none" stroke="#2d3436" stroke-width="2.5"/><line x1="45.5" y1="63" x2="54.5" y2="63" stroke="#2d3436" stroke-width="2"/><line x1="28.5" y1="63" x2="22" y2="60" stroke="#2d3436" stroke-width="2"/><line x1="71.5" y1="63" x2="78" y2="60" stroke="#2d3436" stroke-width="2"/>` },
   "echarpe-rare":  { nom: "🧣 Écharpe",    svg: (t) => `<path d="M20,88 Q35,82 50,84 Q65,82 80,88" stroke="#e74c3c" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50,84 L54,97" stroke="#e74c3c" stroke-width="6" stroke-linecap="round"/>` },
@@ -199,6 +252,9 @@ export function svgRenard(stade, taille, opts) {
   const motif = MOTIF_DEF[motifId];
   const motifSvg = motif ? motif.svg(s.interne) : "";
 
+  const expressionId = (opts && opts.expression != null) ? opts.expression : lireExpression();
+  const yeux = yeuxSvg(expressionId, s.yeux, triste);
+
   return `<svg width="${t}" height="${h}" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
   ${couronne}${particules}
   <polygon points="16,66 28,22 45,60" fill="${s.corps}"/>
@@ -208,12 +264,7 @@ export function svgRenard(stade, taille, opts) {
   <ellipse cx="50" cy="70" rx="33" ry="30" fill="${s.corps}"/>
   <ellipse cx="50" cy="79" rx="23" ry="21" fill="white" opacity="0.88"/>
   ${sourcils}
-  <circle cx="37" cy="63" r="7.5" fill="white"/>
-  <circle cx="63" cy="63" r="7.5" fill="white"/>
-  <circle cx="39" cy="64" r="4.5" fill="${s.yeux}"/>
-  <circle cx="65" cy="64" r="4.5" fill="${s.yeux}"/>
-  <circle cx="41" cy="62" r="1.8" fill="white"/>
-  <circle cx="67" cy="62" r="1.8" fill="white"/>
+  ${yeux}
   <ellipse cx="50" cy="73" rx="3.5" ry="2.5" fill="#8B4513"/>
   ${bouche}
   <circle cx="27" cy="71" r="7" fill="#ff9999" opacity="0.30"/>
@@ -410,6 +461,9 @@ export function montrerMaison(montrerMenuFn) {
   const nom     = lireNomRenard() || "Foxy";
   const faim    = lireFaim();
   const bonheur = lireBonheur();
+
+  const fond = FOND_DEF[lireFond()];
+  elMaison.style.background = (fond && fond.style) || "";
 
   const triste = faim < 20 || bonheur < 20;
   document.getElementById("maison-renard").innerHTML = svgRenard(stade, 180, { triste, accessoires: Object.keys(lireTenue()) });
@@ -705,13 +759,21 @@ export function montrerCollection() {
     emoji: d.emoji, nom: d.nom.replace(/^\S+\s/, ""), acquis: !!decor[id], indice: `${d.cout} ⭐`,
   }));
   const accItems = Object.entries(ACCESSOIRES_DEF).map(([id, d]) => ({
-    emoji: d.nom.match(/\p{Emoji}/u)?.[0] || "🎁", nom: d.nom.replace(/^\S+\s/, ""), acquis: accessoires.includes(id),
+    emoji: d.nom.match(/\p{Emoji}/u)?.[0] || "🎁", nom: d.nom.replace(/^\S+\s/, ""), acquis: accessoires.includes(id) || ACCESSOIRES_COSMETIQUES.includes(id),
   }));
   const couleurItems = Object.entries(COULEUR_DEF).map(([id, d]) => ({
     emoji: "🎨", nom: d.nom, acquis: true, marque: id === couleurChoisie,
   }));
   const motifItems = Object.entries(MOTIF_DEF).map(([id, d]) => ({
     emoji: d.apercu === "—" ? "✨" : d.apercu, nom: d.nom, acquis: true, marque: id === motifChoisi,
+  }));
+  const fondChoisi = lireFond();
+  const fondItems = Object.entries(FOND_DEF).map(([id, d]) => ({
+    emoji: d.apercu, nom: d.nom, acquis: true, marque: id === fondChoisi,
+  }));
+  const expressionChoisie = lireExpression();
+  const expressionItems = Object.entries(EXPRESSION_DEF).map(([id, d]) => ({
+    emoji: d.apercu, nom: d.nom.replace(/^\S+\s/, ""), acquis: true, marque: id === expressionChoisie,
   }));
   const copainItems = Object.entries(COPAINS_DEF).map(([, d]) => ({
     emoji: d.emoji, nom: d.nom, acquis: etoiles >= d.seuil, indice: `${d.seuil} ⭐`,
@@ -728,6 +790,8 @@ export function montrerCollection() {
     sectionCollection("👗 Accessoires", accItems) +
     sectionCollection("🦊 Couleurs", couleurItems) +
     sectionCollection("✨ Motifs", motifItems) +
+    sectionCollection("🏠 Fonds", fondItems) +
+    sectionCollection("😊 Expressions", expressionItems) +
     sectionCollection("🐾 Copains", copainItems);
 }
 
@@ -790,10 +854,51 @@ export function montrerDressing() {
     });
   }
 
+  const fonds = document.getElementById("dressing-fonds");
+  if (fonds) {
+    const choisi = lireFond();
+    fonds.innerHTML = "";
+    Object.entries(FOND_DEF).forEach(([id, def]) => {
+      const swatch = document.createElement("button");
+      swatch.type = "button";
+      swatch.className = "dressing-couleur" + (id === choisi ? " active" : "");
+      swatch.textContent = def.apercu;
+      swatch.title = def.nom;
+      swatch.setAttribute("aria-label", def.nom);
+      swatch.setAttribute("aria-pressed", id === choisi ? "true" : "false");
+      swatch.addEventListener("click", () => {
+        sauverFond(id);
+        montrerDressing();
+      });
+      fonds.appendChild(swatch);
+    });
+  }
+
+  const expressions = document.getElementById("dressing-expressions");
+  if (expressions) {
+    const choisie = lireExpression();
+    expressions.innerHTML = "";
+    Object.entries(EXPRESSION_DEF).forEach(([id, def]) => {
+      const swatch = document.createElement("button");
+      swatch.type = "button";
+      swatch.className = "dressing-couleur" + (id === choisie ? " active" : "");
+      swatch.textContent = def.apercu;
+      swatch.title = def.nom;
+      swatch.setAttribute("aria-label", def.nom);
+      swatch.setAttribute("aria-pressed", id === choisie ? "true" : "false");
+      swatch.addEventListener("click", () => {
+        sauverExpression(id);
+        mettreAJourRenardHeader();
+        montrerDressing();
+      });
+      expressions.appendChild(swatch);
+    });
+  }
+
   const grille = document.getElementById("dressing-grille");
   grille.innerHTML = "";
   Object.entries(ACCESSOIRES_DEF).forEach(([id, def]) => {
-    const debloque = debloques.includes(id);
+    const debloque = debloques.includes(id) || ACCESSOIRES_COSMETIQUES.includes(id);
     const equipe   = id in tenue;
     const carte = document.createElement("button");
     carte.type = "button";
