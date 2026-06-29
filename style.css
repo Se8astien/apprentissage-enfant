@@ -6746,3 +6746,67 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
   background: #38302a;
   color: #f0e8e0;
 }
+
+/* ── L'abeille programmeuse ──────────────────────────────────────────────── */
+.abeille-consigne { font-size: 0.95rem; margin: 0 0 0.6rem; }
+.abeille-grille {
+  display: grid;
+  gap: 4px;
+  justify-content: center;
+  max-width: 320px;
+  margin: 0 auto 0.7rem;
+}
+.abeille-case {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.3rem, 7vw, 2rem);
+  background: #fef6e4;
+  border: 2px solid #f0d9a8;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.abeille-case.abeille-ici { background: #fff3c4; }
+.abeille-case.abeille-obstacle { background: #e6f0d4; }
+.abeille-grille.abeille-secousse { animation: abeille-secousse 0.4s; }
+@keyframes abeille-secousse {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.abeille-programme {
+  min-height: 2.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+  padding: 0.4rem;
+  margin: 0 auto 0.6rem;
+  max-width: 340px;
+  background: #f7f4ef;
+  border-radius: 10px;
+}
+.abeille-pas { font-size: 1.3rem; }
+.abeille-prog-vide { font-size: 0.85rem; color: #999; }
+.abeille-commandes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.abeille-fleche {
+  font-size: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 14px;
+  background: #ffd86b;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #e0b73c;
+  transition: transform 0.1s;
+}
+.abeille-fleche:active { transform: translateY(2px); box-shadow: 0 1px 0 #e0b73c; }
+.abeille-effacer, .abeille-reset { background: #e8e2d8; box-shadow: 0 3px 0 #c9c0b2; }
+.abeille-verifier { font-size: 1.05rem; }

@@ -512,6 +512,13 @@ const PAR_JEU = {
     cm1: "Tri logique plus long",
     cm2: "Classement rapide expert",
   },
+  abeille: {
+    cp: "Grille 3×3, trajet court",
+    ce1: "Grille 4×4 sans obstacle",
+    ce2: "Grille 4×4 avec un cactus",
+    cm1: "Grille 5×5 et obstacles",
+    cm2: "Trajets longs à contourner",
+  },
 };
 
 export function texteDescCarteJeu(jeuId, niveau) {
