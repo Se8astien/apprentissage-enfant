@@ -46,6 +46,23 @@ test("on guide l'abeille jusqu'à la ruche avec les flèches", async ({ page }) 
   await expect(page.locator("#feedback.ok")).toBeVisible({ timeout: 8000 });
 });
 
+test("la grille grandit avec la difficulté (CP expert = 5×5)", async ({ context, page }) => {
+  await context.addInitScript(() => {
+    localStorage.setItem("apprentissage-difficulte", "2"); // expert
+    localStorage.setItem("diff-jeu-abeille", "2");
+  });
+  await page.goto("/index.html");
+  await page.waitForFunction(() => window.__amModuleReady === true, null, { timeout: 20_000 });
+  await page.locator('.menu-tab[data-tab="jeux"]').click();
+  await page.locator('.carte-jeu[data-jeu="abeille"]').click();
+  await expect(page.locator("#abeille-grille")).toBeVisible();
+
+  const cols = await page.locator("#abeille-grille").evaluate(
+    (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length
+  );
+  expect(cols).toBe(5); // CP base 3 + difficulté 2 = 5×5
+});
+
 test("un mauvais programme ne fait pas gagner", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForFunction(() => window.__amModuleReady === true, null, { timeout: 20_000 });

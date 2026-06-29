@@ -513,11 +513,11 @@ const PAR_JEU = {
     cm2: "Classement rapide expert",
   },
   abeille: {
-    cp: "Grille 3×3, trajet court",
-    ce1: "Grille 4×4 sans obstacle",
-    ce2: "Grille 4×4 avec un cactus",
-    cm1: "Grille 5×5 et obstacles",
-    cm2: "Trajets longs à contourner",
+    cp: "Grille 3×3 qui grandit avec les réussites",
+    ce1: "Grille 4×4 qui s'agrandit",
+    ce2: "Grilles plus grandes avec cactus",
+    cm1: "Jusqu'à 6×6 et obstacles",
+    cm2: "Grands trajets à contourner",
   },
 };
 

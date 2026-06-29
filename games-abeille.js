@@ -12,13 +12,18 @@ import {
 
 import { apresReponse } from "./app-nav.js";
 
-const NIVEAU_PARAMS = {
-  cp:  { taille: 3, distMin: 2, obstacles: 0 },
-  ce1: { taille: 4, distMin: 3, obstacles: 0 },
-  ce2: { taille: 4, distMin: 4, obstacles: 1 },
-  cm1: { taille: 5, distMin: 5, obstacles: 2 },
-  cm2: { taille: 5, distMin: 6, obstacles: 3 },
-};
+// La grille grandit avec la classe ET avec la difficulté (maîtrise dans la
+// session) : un enfant à l'aise atteint 5×5, voire 6×6, même en CP.
+const TAILLE_BASE = { cp: 3, ce1: 4, ce2: 4, cm1: 5, cm2: 5 };
+const OBSTACLES_BASE = { cp: 0, ce1: 0, ce2: 1, cm1: 2, cm2: 3 };
+
+function paramsPour(niveau, diff) {
+  const base = TAILLE_BASE[niveau] ?? 3;
+  const taille = Math.min(6, base + diff); // diff 0/1/2 → +0/+1/+2
+  const distMin = Math.max(2, taille);
+  const obstacles = (OBSTACLES_BASE[niveau] ?? 0) + (diff >= 2 ? 1 : 0);
+  return { taille, distMin, obstacles };
+}
 
 const DIRECTIONS = {
   haut:   { dr: -1, dc: 0, fleche: "⬆️", nom: "Haut" },
@@ -82,7 +87,7 @@ function genererPuzzle(params) {
 export function lancerAbeille() {
   elTitre.textContent = "🐝 L'abeille programmeuse";
   const niveau = getNiveauCourant();
-  const params = NIVEAU_PARAMS[niveau] || NIVEAU_PARAMS.cp;
+  const params = paramsPour(niveau, getDifficulte());
   const puzzle = genererPuzzle(params);
   setBonneReponse(1);
 
