@@ -295,6 +295,13 @@ const PAR_JEU = {
     cm1: "Conjonctions et temps",
     cm2: "Phrases littéraires",
   },
+  phraseOrdre: {
+    cp: "Phrase de 3-4 mots à remettre",
+    ce1: "Phrases de 5-6 mots",
+    ce2: "Phrases plus longues",
+    cm1: "Phrases riches à reconstruire",
+    cm2: "Phrases riches à reconstruire",
+  },
   lectureTexte: {
     cp: "Conte très court",
     ce1: "Texte niveau CE",

@@ -6810,3 +6810,45 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
 .abeille-fleche:active { transform: translateY(2px); box-shadow: 0 1px 0 #e0b73c; }
 .abeille-effacer, .abeille-reset { background: #e8e2d8; box-shadow: 0 3px 0 #c9c0b2; }
 .abeille-verifier { font-size: 1.05rem; }
+
+/* ── Remets la phrase ────────────────────────────────────────────────────── */
+.phrase-consigne { font-size: 0.95rem; margin: 0 0 0.7rem; }
+.phrase-zone {
+  min-height: 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  padding: 0.6rem;
+  margin: 0 auto 0.9rem;
+  max-width: 480px;
+  background: #f7f4ef;
+  border: 2px dashed #d9cdbb;
+  border-radius: 12px;
+}
+.phrase-zone.phrase-secousse { animation: abeille-secousse 0.4s; }
+.phrase-zone-vide { font-size: 0.85rem; color: #999; }
+.phrase-mots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.phrase-mot {
+  font-size: 1.15rem;
+  padding: 0.4em 0.8em;
+  border: none;
+  border-radius: 12px;
+  background: #ffd86b;
+  color: #5b4a1f;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #e0b73c;
+  transition: transform 0.1s;
+}
+.phrase-mot:active { transform: translateY(2px); box-shadow: 0 1px 0 #e0b73c; }
+.phrase-mot--place { background: #8ed6a0; color: #1d4a2c; box-shadow: 0 3px 0 #5fb277; }
+.phrase-mot--utilise { visibility: hidden; }
+.phrase-verifier { font-size: 1.05rem; }

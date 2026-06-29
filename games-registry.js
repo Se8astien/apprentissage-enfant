@@ -16,6 +16,7 @@ const CHARGEURS = {
   histoire: () => import("./games-histoire.js"),
   dessin: () => import("./games-dessin.js"),
   abeille: () => import("./games-abeille.js"),
+  phrases: () => import("./games-phrases.js"),
 };
 
 const JEU_SPEC = {
@@ -116,6 +117,7 @@ const JEU_SPEC = {
   histoire: ["histoire", "lancerHistoire"],
   dessin: ["dessin", "lancerDessin"],
   abeille: ["abeille", "lancerAbeille"],
+  phraseOrdre: ["phrases", "lancerPhraseOrdre"],
 };
 
 export const LISTE_IDS_JEUX = Object.freeze(Object.keys(JEU_SPEC));
