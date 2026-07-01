@@ -6852,3 +6852,56 @@ body.mode-daltonisme .barre-progression { background: #1565c0; }
 .phrase-mot--place { background: #8ed6a0; color: #1d4a2c; box-shadow: 0 3px 0 #5fb277; }
 .phrase-mot--utilise { visibility: hidden; }
 .phrase-verifier { font-size: 1.05rem; }
+
+/* ── Parcours d'été ──────────────────────────────────────────────────────── */
+.ete-carte {
+  background: linear-gradient(135deg, #fff3c4 0%, #ffe9a8 55%, #b3e5ff 100%);
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  text-align: center;
+}
+.ete-titre { margin: 0; font-size: 1.15rem; font-weight: 800; color: #7a5a00; }
+.ete-sous-titre { margin: 0.2rem 0 0.6rem; font-size: 0.85rem; color: #8a6d1f; }
+.ete-chemin {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 0.6rem;
+}
+.ete-pas {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
+  border: 2px solid #e0c86b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+.ete-pas--fait { background: #8ed6a0; border-color: #5fb277; color: #1d4a2c; font-weight: 800; }
+.ete-pas--actuel { background: #fff; border-color: #ff9f1c; font-size: 0.95rem; animation: ete-pulse 1.6s infinite; }
+.ete-pas--palier { border-color: #c97bd8; }
+@keyframes ete-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+.ete-statut { margin: 0.2rem 0 0; font-size: 0.9rem; font-weight: 600; color: #6b5410; }
+.ete-jouer {
+  margin-top: 0.55rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 14px;
+  background: #ff9f1c;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #d07f0a;
+}
+.ete-jouer:active { transform: translateY(2px); box-shadow: 0 1px 0 #d07f0a; }
+.toast-ete { background: #ff9f1c; color: #fff; }
+[data-theme="nuit"] .ete-carte { background: linear-gradient(135deg, #4a3f1e 0%, #3a3a52 100%); }
+[data-theme="nuit"] .ete-titre { color: #ffd86b; }
+[data-theme="nuit"] .ete-sous-titre, [data-theme="nuit"] .ete-statut { color: #e8d9a8; }

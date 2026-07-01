@@ -71,6 +71,7 @@ import {
 
 import { afficherIntroHistoire } from "./app-histoire.js";
 import { LISTE_IDS_JEUX, assurerLanceurDansMap } from "./games-registry.js";
+import { majEteWidget, jeuEteConseille } from "./app-ete.js";
 import {
   track,
   setAnalyticsConsent,
@@ -443,6 +444,14 @@ function brancherOnboardingUI() {
       tamaCarte.classList.remove("ouvert");
     });
   }
+
+  document.getElementById("ete-section")?.addEventListener("click", async (ev) => {
+    if (!ev.target.closest("#btn-ete-jouer")) return;
+    const jeu = jeuEteConseille();
+    const ok = await assurerLanceurDansMap(jeu, lanceurs);
+    if (ok && typeof lanceurs[jeu] === "function") montrerJeu(jeu, lanceurs);
+  });
+  majEteWidget();
 
   document.getElementById("btn-hero-mission")?.addEventListener("click", () => {
     const store = lireMissionsJour();

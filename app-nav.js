@@ -55,6 +55,7 @@ import { track } from "./app-analytics.js";
 import { enregistrerReponse } from "./app-analytics-tracking.js";
 import { montrerMenuOuAventureApresRevision } from "./app-aventure.js";
 import { signalerReponseDuel, annulerDuelSiActif } from "./app-duel.js";
+import { progresserEte, majEteWidget } from "./app-ete.js";
 import { sonBonne, sonMauvaise, sonCombo, sonMission, sonAccessoire } from "./app-sons.js";
 
 import {
@@ -1685,6 +1686,7 @@ function _apresReponseImpl(choix, bouton, correct, isText) {
     sonBonne(comboActuel);
     declencherReactionRenard(true);
     incrementStats(true, getJeuCourant());
+    progresserEte();
     const missOk = [
       ...progresserMission("bonnes"),
       ...progresserMission("etoiles"),
@@ -1991,6 +1993,7 @@ export function montrerMenu() {
   mettreAJourObjectifSession();
   afficherGuidageDuJour();
   afficherBilanSession(jeuQuitte);
+  majEteWidget();
 }
 
 // ── montrerJeu ────────────────────────────────────────────────────────────────
